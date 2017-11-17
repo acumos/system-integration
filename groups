@@ -1,0 +1,3 @@
+# UUID                                                                               	Group Name
+#
+ldap:cn=acumos-gerrit-system-integration-committers,ou=Groups,dc=freestandards,dc=org	ldap/acumos-gerrit-system-integration-committers
