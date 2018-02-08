@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+ name: cognita-mariadb-deployment
+spec:
+ replicas: 1
+ template:
+   metadata:
+     labels:
+       app: cognitamariadb
+       tier: backend
+       track: stable
+   spec:
+     containers:
+       - name: cognita-mariadb
+         image: cognitasandboxreg.azurecr.io/mariadb
+         ports:
+           - containerPort: 3306
+         env:
+           - name: MYSQL_ROOT_PASSWORD
+             value: rootme

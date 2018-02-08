@@ -1,0 +1,112 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+ name: acumos_IST3
+spec:
+ replicas: 1
+ template:
+   metadata:
+     labels:
+       app: acmos_IST3_app
+   spec:
+     containers:
+       - name: onboarding-app
+         image: cognitasandboxreg.azurecr.io/onboarding-app:1.6.6
+         volumeMounts:
+         - name: shared-data
+           mountPath: /usr/share/acumos/logs
+         ports:
+           - containerPort: 8090
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{ "server" :{ "port" : 8090 }, "cognita": { "userId": "techmdev",
+            "password": "Root1234" }, "docker" : { "host" : "cognita-ist2-vm01-core",
+            "port" : 4243, "config": "/docker_host/.docker", "registry" :{ "url":
+            "http://cognita-nexus01.eastus.cloudapp.azure.com:8001/", "username" :
+            "cognita_model_rw", "password" : "not4you", "email": "admin@cognita.com"
+            }, "tls": { "verify": "false" }, "api": { "version": "1.23" }, "imagetag":
+            { "prefix": "cognita-nexus01.eastus.cloudapp.azure.com:8001" }, "max_total_connections":
+            "1", "max_per_route_connections": "1" }, "http_proxy": "http://10.2.0.7:3128",
+            "nexus": { "nexusEndPointURL": "http://cognita-nexus01.eastus.cloudapp.azure.com:8081/repository/repo_cognita_model_maven/",
+            "nexusUserName": "cognita_model_rw", "nexusPassword": "not4you", "nexusproxy":
+            "", "nexusGroupId": "com.artifact" }, "cmndatasvc": { "cmnDataSvcEndPoinURL":
+            "http://mlp-cmn-data-svc:8000/ccds", "cmnDataSvcUser": "ccds_client",
+            "cmnDataSvcPwd": "ccds_client" }, "tosca": { "OutputFolder" : "/temp/",
+            "GeneratorEndPointURL": "http://cognita-ist2-vm01-core:8080/model_create"
+            }, "mktPlace": { "mktPlaceEndPoinURL" : "http://cognita-ist2-vm01-core.eastus.cloudapp.azure.com:8083"
+            }, "requirements": { "extraIndexURL": "http://cognita-dev1-vm01-core:8087/archive",
+            "trustedHost": "cognita-dev1-vm01-core" }, "authenticationServiceURL":
+            "http://cognita-ist2-vm01-core:8083" }'
+
+       - name: cognita-portal-be
+         image: cognitasandboxreg.azurecr.io/cognita-portal-be:1.9.20
+         volumeMounts:
+         - name: shared-data
+           mountPath: /usr/share/acumos/logs_portalbe
+
+         ports:
+           - containerPort: 8083
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{ "server" : { "port" : 8083 }, "zuul" : { "routes" : { "api" :
+            { "url": "http://cognita-portal-be:8083" }, "dsce": { "url": "http://cognita-ist2-vm01-core:8088"
+            }, "site" : { "url": "http://cognita-ist2-vm01-core:9080" } } } }'
+
+       - name: cognita-portal-fe
+         image: cognitasandboxreg.azurecr.io/cognita-portal-fe:1.9.20
+         volumeMounts:
+         - name: shared-data
+           mountPath: /usr/share/acumos/logs/logs_portalfe
+
+         ports:
+           - containerPort: 8085
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{ "server" : { "port" : 8085 }, "zuul" : { "routes" : { "api" :
+            { "url": "http://cognita-portal-be:8083" }, "dsce": { "url": "http://cognita-ist2-vm01-core:8088"
+            } } } }'
+
+       - name: toscapythonserver
+         image: cognitasandboxreg.azurecr.io/toscapythonserver:2.0.0
+         volumeMounts:
+         - name: shared-data
+           mountPath: /usr/share/acumos/logs_tosca
+
+         ports:
+           - containerPort: 8080
+       - name: ds-compositionengine
+         image: cognitasandboxreg.azurecr.io/ds-compositionengine:0.0.14
+         volumeMounts:
+         - name: shared-data
+           mountPath: /usr/share/acumos/logs_ds
+
+         ports:
+           - containerPort: 8088
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{ "server": { "port": 8088 }, "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
+            "tosca": { "outputfolder": "/temp/" }, "nexus": { "nexusendpointurl":
+            "http://cognita-nexus01.eastus.cloudapp.azure.com:8081/repository/repo_cognita_model_maven/",
+            "nexusproxy": "", "nexuspassword": "not4you", "nexususername": "cognita_model_rw",
+            "nexusgroupid": "com.artifact" }, "cmndatasvc": { "cmndatasvcendpoinurl":
+            "http://mlp-cmn-data-svc:8000/ccds", "cmndatasvcuser": "ccds_client",
+            "cmndatasvcpwd": "ccds_client" } }'
+
+       - name:  common-dataservice
+         image: cognitasandboxreg.azurecr.io/common-dataservice:1.7.0
+         ports:
+           - containerPort: 8000
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{ "server" : { "port" : 8000 }, "security" : { "user" : { "name"     :
+            "ccds_client", "password" : "ENC(CTQD7Xk5bOIuC4MaqRZtzjW1K4ArjCjr)" }
+            }, "spring" : { "database" : { "driver" : { "classname" : "org.mariadb.jdbc.Driver"
+            } }, "datasource" : { "url" : "jdbc:mysql://cognita-ist2-vm01-db.eastus.cloudapp.azure.com:3306/cognitaist_1_7_0?useSSL=false",
+            "username" : "cognita_ro", "password" : "istro2017"
+            }, "jpa" : { "database-platform" : "org.hibernate.dialect.MySQLDialect",
+            "hibernate" : { "ddl-auto" : "validate" } } } }'
+
+     volumes:
+     - name: shared-data
+       persistentVolumeClaim:
+         claimName: mysql-pv-claim

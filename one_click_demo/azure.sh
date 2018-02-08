@@ -1,0 +1,1 @@
+# bringing azure instance alive

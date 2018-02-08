@@ -1,0 +1,626 @@
+# docker-compose for development host cognita-dev1-vm01-core
+# in network 3rkcjk3hwkvetlyvh1y3q1v3wa.bx.internal.cloudapp.net
+# The database and nexus servers use unqualified host names
+
+version: '2'
+
+services:
+
+   common-dataservice-1101:
+       container_name: common-dataservice-1101
+       image: cognita-nexus01:8002/common-dataservice:1.10.1
+       environment:
+           SPRING_APPLICATION_JSON: '{
+                "server" : {
+                    "port" : 8000
+                },
+                "security" : {
+                    "user" : {
+                        "name"     : "ccds_client",
+                        "password" : "ENC(CTQD7Xk5bOIuC4MaqRZtzjW1K4ArjCjr)"
+                    }
+                },
+                "spring" : {
+                    "database" : {
+                        "driver" : {
+                            "classname" : "org.mariadb.jdbc.Driver"
+                        }
+                    },
+                    "datasource" : {
+                        "url" : "jdbc:mysql://cognita-dev1-vm01-db:3306/cds1100?useSSL=false",
+                        "username" : "cds_1100",
+                        "password" : "ENC(gFkjWOg7nflZs9a4Ou3BCCQBBFcxt2Vm)"
+                    },
+                    "jpa" : {
+                        "database-platform" : "org.hibernate.dialect.MySQLDialect",
+                        "hibernate" : {
+                            "ddl-auto" : "validate"
+                        }
+                    }
+               }
+           }'
+       ports:
+           - 8000:8000
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+   common-dataservice-1121:
+       container_name: common-dataservice-1121
+       image: nexus3.acumos.org:10003/common-dataservice:1.12.1-SNAPSHOT
+       environment:
+           SPRING_APPLICATION_JSON: '{
+                "server" : {
+                    "port" : 8003
+                },
+                "security" : {
+                    "user" : {
+                        "name"     : "ccds_client",
+                        "password" : "ENC(CTQD7Xk5bOIuC4MaqRZtzjW1K4ArjCjr)"
+                    }
+                },
+                "spring" : {
+                    "database" : {
+                        "driver" : {
+                            "classname" : "org.mariadb.jdbc.Driver"
+                        }
+                    },
+                    "datasource" : {
+                        "url" : "jdbc:mysql://cognita-dev1-vm01-db:3306/cds1120m?useSSL=false",
+                        "username" : "cds_1120",
+                        "password" : "ENC(QeAtQyefyDlAFkq0JK9C5YC5p5vrpLtB)"
+                    },
+                    "jpa" : {
+                        "database-platform" : "org.hibernate.dialect.MySQLDialect",
+                        "hibernate" : {
+                            "ddl-auto" : "validate"
+                        }
+                    }
+               }
+           }'
+       ports:
+           - 8003:8003
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+   common-dataservice-1130:
+       container_name: common-dataservice-1130
+       image: nexus3.acumos.org:10003/common-dataservice:1.13.0-SNAPSHOT
+       environment:
+           SPRING_APPLICATION_JSON: '{
+                "server" : {
+                    "port" : 8002
+                },
+                "security" : {
+                    "user" : {
+                        "name"     : "ccds_client",
+                        "password" : "ENC(CTQD7Xk5bOIuC4MaqRZtzjW1K4ArjCjr)"
+                    }
+                },
+                "spring" : {
+                    "database" : {
+                        "driver" : {
+                            "classname" : "org.mariadb.jdbc.Driver"
+                        }
+                    },
+                    "datasource" : {
+                        "url" : "jdbc:mysql://cognita-dev1-vm01-db:3306/cds1130?useSSL=false",
+                        "username" : "cds_1130",
+                        "password" : "ENC(ZTPEeTJzi/IQnwOGVzPldKgHW9+FX9GL)"
+                    },
+                    "jpa" : {
+                        "database-platform" : "org.hibernate.dialect.MySQLDialect",
+                        "hibernate" : {
+                            "ddl-auto" : "validate"
+                        }
+                    }
+               }
+           }'
+       ports:
+           - 8002:8002
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+   onboarding-app1101:
+      container_name: onboarding-app1101
+      image: cognita-nexus01:8002/onboarding-app-prop:1.10.1-SNAPSHOT
+      environment:
+          SPRING_APPLICATION_JSON: '{
+               "server": {
+                    "port": 8090
+                },
+               "docker": {
+                   "host": "cognita-dev1-vm01-core",
+                   "port": 4243,
+                   "config": "/docker_host/.docker",
+                   "registry": {
+                       "url": "http://cognita-nexus01:8001/",
+                       "username": "cognita_model_rw",
+                       "password": "not4you",
+                       "email": "admin@cognita.com"
+                   },
+               "tls": {
+                       "verify": "false"
+               },
+               "api": {
+                       "version": "1.23"
+               },
+               "imagetag": {
+                       "prefix": "cognita-nexus01:8001"
+               },
+               "max_total_connections": "1",
+                       "max_per_route_connections": "1"
+               },
+               "http_proxy": "http://10.1.0.6:3128",
+               "nexus": {
+                       "nexusEndPointURL": "http://cognita_model_rw:not4you@cognita-nexus01:8081/repository/repo_cognita_model_maven",
+                       "nexusUserName": "cognita_model_rw",
+                       "nexusPassword": "not4you",
+                       "nexusproxy": "",
+                       "nexusGroupId": "com.artifact"
+               },
+               "cmndatasvc": {
+                       "cmnDataSvcEndPoinURL": "http://cognita-dev1-vm01-core:8003/ccds",
+                       "cmnDataSvcUser": "ccds_client",
+                       "cmnDataSvcPwd": "ccds_client"
+               },
+               "mktPlace": {
+                        "mktPlaceEndPoinURL": "http://cognita-dev1-vm01-core:8083"
+               },
+               "requirements": {
+                       "extraIndexURL": "http://cognita-dev1-vm01-core:8087/archive",
+                       "trustedHost": "cognita-dev1-vm01-core"
+               },
+               "tosca": {
+                       "OutputFolder": "/temp/",
+                       "GeneratorEndPointURL": "http://cognita-dev1-vm01-core:8080/model_create"
+               }
+      }'
+      expose:
+        - 8090
+      ports:
+        - 8090:8090
+      links:
+        - common-dataservice-1101:common-dataservice
+      depends_on:
+        - common-dataservice-1101
+      volumes:
+        - cognita-logs:/maven/logs
+        - cognita-output:/temp/
+      logging:
+        driver: json-file
+
+   acumos-portal-be:
+       container_name: acumos-portal-be
+       image: nexus3.acumos.org:10003/acumos-portal-be:1.14.18-SNAPSHOT
+       environment:
+           SPRING_APPLICATION_JSON: '{
+               "server" : {
+                    "port" : 8083
+                },
+                "docker" : {
+                   "host" : "cognita-dev1-vm01-core",
+                   "registry" : {
+                      "url" : "http://cognita-nexus01:8001/",
+                      "username" : "cognita_model_rw",
+                      "password" : "not4you",
+                      "email" : "admin@cognita.com"
+                   },
+                   "imagetag" : {
+                      "prefix" : "cognita-nexus01:8001"
+                   }
+                },
+                "nexus": {
+                        "url": "http://cognita-nexus01:8081/repository/repo_cognita_model_maven/",
+                        "proxy": "",
+                        "password": "not4you",
+                        "username": "cognita_model_rw",
+                        "groupId": "com.artifact"
+                },
+                "cdms" : {
+                  "client" : {
+                     "url": "http://cognita-dev1-vm01-core:8003/ccds",
+                     "username": "ccds_client",
+                     "password": "ccds_client"
+                  }
+                },
+                "onboarding" : {
+                   "push" : {
+                       "model" : {
+                          "url" : "http://cognita-dev1-vm01-core:8090/onboarding-app/v2/models"
+                       }
+                   }
+                },
+                "model" : {
+                   "storage" : {
+                      "folder" : {
+                         "name" : "/acumosWebOnboarding"
+                      }
+                   }
+                },
+                "portal" : {
+                   "feature" : {
+                      "validateModel" : "true"
+                   },
+                   "submitValidation" : {
+                      "api" : "http://cognita-dev1-tools.eastus.cloudapp.azure.com:9602/status/v1.0/tasks"
+                   }
+                }                
+           }'
+       expose:
+           - 8083
+       ports:
+           - 8083:8083
+       links:
+           - common-dataservice-1101:common-dataservice
+       depends_on:
+           - common-dataservice-1101
+       volumes:
+           - cognita-logs:/maven/logs
+           - acumosWebOnboarding:/acumosWebOnboarding
+       logging:
+           driver: json-file
+   acumos-portal-fe:
+       container_name: acumos-portal-fe
+       image: nexus3.acumos.org:10003/acumos-portal-fe:1.14.18-SNAPSHOT
+       environment:
+           SPRING_APPLICATION_JSON: '{
+               "server" : {
+                    "port" : 8085
+                },
+                "zuul" : {
+                   "routes" : {
+                      "api" : {
+                        "url": "http://acumos-portal-be:8083"
+                      },
+                      "dsce": {
+                        "url": "http://cognita-dev1-vm01-core:8088"
+                      },
+                      "site" : {
+                        "url": "http://cognita-dev1-vm01-core:9080"
+                      },
+                      "cmnt" : {
+                         "url" : "http://cognita-dev1-vm01-core:9083"
+                      },
+                      "azure" : {
+                         "url" : ""http://cognita-dev1-vm01-core:9081"
+                      }
+                   }
+               },
+               "spring" : {
+                  "http" : {
+                     "multipart" : {
+                        "max-file-size": -1,
+                        "max-request-size": -1
+                     }
+                  }
+               }
+           }'
+       expose:
+           - 8085
+       ports:
+           - 8085:8085
+       links:
+           - acumos-portal-be:acumos-portal-be
+       depends_on:
+           - acumos-portal-be
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+   cognita-azure-client:
+       container_name: cognita-azure-client
+       image: nexus3.acumos.org:10003/acumos-azure-client:1.53.0-SNAPSHOT
+       environment:
+           SPRING_APPLICATION_JSON: '{
+               "server" : { 
+                    "port" : 9081
+                },
+                "docker" : {
+                    "containerNamePrefix": "cognita-e6e",
+                    "host": "cognita-dev1-vm01-core",
+                    "port": "4243",
+                    "dockerVMUserName": "dockerUser",
+                    "dockerVMPassword": "12NewPA$$w0rd!",
+                    "solutionPort":"8336",
+                    "registry": {
+                        "bluePrint": {
+                            "username": "cognita_platform_ro",
+                            "password": "plat1sopen"
+                        },
+                        "networkgroupName": "E6E-NSG",
+                        "port": "80",
+                        "name": "http://cognita-nexus01:8001/",
+                        "url": "http://cognita_model_rw:not4you@cognita-nexus01.eastus.cloudapp.azure.com:8001/",
+                        "username": "cognita_model_rw",
+                        "password": "not4you"
+                    }
+                },
+                "blueprint": {
+                    "ImageName": "cognita-nexus01:8002/blueprint-orchestrator:1.0.0-SNAPSHOT",
+                    "name": "blueprint-orchestrator"
+                },
+                "nexus": {
+                    "url": "http://cognita-nexus01:8081/repository/repo_cognita_model_maven/",
+                    "nexusproxy": "",
+                    "password": "not4you",
+                    "username": "cognita_model_rw",
+                    "groupId": "com.artifact"
+                },
+                "cmndatasvc": {
+                    "cmndatasvcendpoinurl": "http://cognita-dev1-vm01-core:8000/ccds",
+                    "cmndatasvcuser": "ccds_client",
+                    "cmndatasvcpwd": "ccds_client"
+                }
+           }'
+       expose:
+           - 9081
+       ports:
+           - 9081:9081
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+   toscapythonserver:
+       container_name: toscapythonserver
+       image: cognita-nexus01:8002/toscapythonserver:2.0.0
+       expose:
+           - 8080
+       ports:
+           - 8080:8080
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+   ds-compositionengine-0191-SNAPSHOT:
+       container_name: ds-compositionengine-0191-SNAPSHOT
+       image: cognita-nexus01:8002/ds-compositionengine:0.19.1
+       environment:
+           SPRING_APPLICATION_JSON: '{
+               "server": {
+                    "port": 8088
+                },
+                "dateformat": "dd-MM-yyyy",
+                "tosca": {
+                     "outputfolder": "/temp/"
+                },
+                "nexus": {
+                     "nexusendpointurl": "http://cognita-nexus01:8081/repository/repo_cognita_model_maven/",
+                     "nexusproxy": "",
+                     "nexuspassword": "not4you",
+                     "nexususername": "cognita_model_rw",
+                     "nexusgroupid": "com.artifact"
+                },
+                "cmndatasvc": {
+                     "cmndatasvcendpoinurl": "http://cognita-dev1-vm01-core:8002/ccds",
+                     "cmndatasvcuser": "ccds_client",
+                     "cmndatasvcpwd": "ccds_client"
+                }
+            }'
+       expose:
+           - 8088
+       ports:
+           - 8088:8088
+       volumes:
+           - cognita-logs:/maven/logs
+           - cognita-output:/temp/
+       logging:
+           driver: json-file
+   acumos-platon:
+       container_name: acumos-platon
+       image: cognita-nexus01:8002/acumos-platon:1.10.7
+       environment:
+           SPRING_APPLICATION_JSON: '{
+                "server" : { 
+                    "port" : 9083
+                },
+                 "spring" : {
+                    "datasource" : {
+                        "url" : "jdbc:mariadb://cognita-dev1-vm01-db:3306/acumos_comment",
+                        "username" : "CCDS_USER",
+                        "password" : "CCDS_PASS"
+                    },
+                    "jooq" : {
+                        "sql-dialect": "mariadb"
+                    },
+                    "platon" : {
+                        "input" : {
+                           "html_elements" : "h1, h2, h3, h4, h5, h6, br, p, hr, div, span, a, img, em, strong, ol, ul, li, blockquote, code, pre"
+                         }
+                     }
+                 }
+           }'
+       expose:
+           - 9083
+       ports:
+           - 9083:9083
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+   acumos-cms-docker:
+       container_name: acumos-cms-docker
+       image: cognita-nexus01:8002/acumos-cms-docker:1.3.0
+       environment:
+           SPRING_APPLICATION_JSON: '{
+                "server" : { 
+                    "port" : 9080
+                },
+                "spring" : {
+                    "datasource" : {
+                        "url" : "jdbc:mysql://cognita-dev1-vm01-db:3306/acumos_cms?useSSL=false",
+                        "username" : "cms_user",
+                        "password" : "cms_pass"
+                    }
+                },
+                "parameters": {
+                   "repository" : {
+                      "dataSource" : {
+                         "url" : "jdbc:mysql://cognita-dev1-vm01-db:3306/acumos_cms?useSSL=false",
+                         "username" : "cms_user",
+                         "password" : "cms_pass"
+                      }
+                   }
+                }
+           }'
+       expose:
+           - 9080
+       ports:
+           - 9080:9080
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+   blueprint-runtime-orchestrator:
+       container_name: blueprint-runtime-orchestrator
+       image: cognita-nexus01:8002/blueprint-orchestrator:1.0.0-SNAPSHOT
+       environment:
+           SPRING_APPLICATION_JSON: '{
+                "server" : { 
+                    "port" : 9084
+                }
+           }'
+       expose:
+           - 9084
+       ports:
+           - 9084:9084
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+   federation-gateway:
+       container_name: federation-gateway-dev
+       image: cognita-nexus01:8002/federation-gateway:1.0.4-RELEASE
+       environment:
+           SPRING_APPLICATION_JSON: '{
+                "server" : {
+                    "port" : 9001,
+                    "ssl" : {
+                        "key-store" : "/app/certs/acumos_dev.pkcs12",
+                        "key-store-password" : "acumosa",
+                        "key-store-type" : "PKCS12",
+                        "key-password" : "acumosa",
+                        "trust-store" : "/app/certs/acumosTrustStore.jks",
+                        "trust-store-password" : "acumos",
+                        "client-auth" : "need"
+                    }
+                },
+                "client" : {
+                    "ssl" : {
+                        "key-store" : "file:///app/certs/acumos_dev.pkcs12",
+                        "key-store-password" : "acumosb",
+                        "key-store-type" : "PKCS12",
+                        "key-password" : "acumosb"
+                    }
+                },
+                "nexus": {
+                        "url": "http://cognita-nexus01.eastus.cloudapp.azure.com:8081/repository/repo_cognita_model_maven/",
+                        "proxy": "",
+                        "password": "not4you",
+                        "username": "cognita_model_rw",
+                        "groupid": "com.artifact"
+                },
+                "spring": {
+                    "profiles": {
+                        "active": "default, gateway"
+                    }
+                },
+                "peer": {
+                    "jobchecker": {
+                        "interval": 300
+                    }
+                },
+                "federation" : {
+                    "instance" : "gateway",
+                    "instance.name": "dev",
+                    "operator" : "f98e4c52-89f4-4f8c-b573-28cd6997016a"
+                },
+                "cdms" : {
+                    "client" : {
+                        "url": "http://cognita-dev1-vm01-core:8000/ccds",
+                        "username": "ccds_client",
+                        "password": "ccds_client"
+                    }
+                }
+           }'
+       expose:
+           - 9001
+       ports:
+           - 9001:9001
+       volumes:
+           - cognita-logs:/maven/logs
+           - /home/cognitaopr/app/certs:/app/certs
+       logging:
+           driver: json-file
+
+   wrapper:
+       container_name: validationwrapper
+       image: cognita-nexus01:8002/validation/wrapper:1.6
+       expose:
+           - 9603
+       ports:
+           - 9603:9603
+       links:
+           - acumos-portal-be:acumos-portal-be
+       volumes:
+           - cognita-logs:/wrapper-logs
+   intermediate:
+       container_name: validationintermediate
+       image: cognita-nexus01:8002/validation/intermediate:1.21
+       expose:
+           - 9604
+           - 8083
+           - 8081
+           - 8003
+       ports:
+           - 9604:9604
+       links:
+           - acumos-portal-be:acumos-portal-be
+       volumes:
+           - cognita-logs:/intermediate-logs
+   root:
+       container_name: validationroot
+       image: cognita-nexus01:8002/validation/root:1.5
+       expose:
+           - 9605
+       ports:
+           - 9605:9605
+       volumes:
+           - cognita-logs:/wrapper-logs
+   redis:
+       container_name: redis
+       image: cognita-nexus01:8002/redis:1.8
+       volumes:
+           - cognita-logs:/redis-logs
+   celery:
+       container_name: celery
+       image: cognita-nexus01:8002/celery:1.6
+       environment:
+           - C_FORCE_ROOT=true
+       links:
+           - redis:redis
+       volumes:
+           - cognita-logs:/celery-logs
+
+
+# This persistent volume must be created externally:
+#	docker volume create cognita-logs
+#   docker volume create cognita-output
+volumes:
+    cognita-logs:
+        external: true
+    cognita-output:
+        external: true
+    acumosWebOnboarding:
+        external: true
+    acumosCerts:
+        external: true

@@ -1,0 +1,150 @@
+# docker-compose Template File
+# This file requires .env file
+# Rename this file to docker-compose.yaml
+# No changes are necessery in this file, please update .env file with appropriate values
+
+version: '2'
+services:
+   mlp-cmn-data-svc:
+       container_name: ${CMNDATASVCNAME}
+       image: "${IMAGENXHOST}:${IMAGENXPORT}/${CMNDATASVCIMAGENXNAME}:${CMNDATASVCIMAGENXVERSION}"
+       environment:
+           SPRING_APPLICATION_JSON: '{
+                "server" : { 
+                    "port" : "${CMNDATASVCPORT}" 
+                },
+                "security" : {
+                    "user" : {
+                        "name"     : "${CCDSUSER}",
+                        "password" : "ENC($CCDSPASSWORD)"
+                    }
+                },
+                "spring" : {
+                    "datasource" : {
+                        "url" : "jdbc:mysql://${DATABASEHOST}:3306/${DATABASENAME}?useSSL=false",
+                        "username" : "DATABASEUSER",
+                        "password" : ENC($DATABASEPASSWORD)
+                    }
+                }
+           }'
+       expose:
+           - ${CMNDATASVCPORT}
+       ports:
+           - ${CMNDATASVCPORT}:${CMNDATASVCPORT}
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+           
+   onboarding-app:
+       container_name: ${ONBOARDINGNAME}
+       image: ${IMAGENXHOST}:${IMAGENXPORT}/${ONBOARDINGIMAGENXNAME}:${ONBOARDINGIMAGENXVERSION}
+       environment:
+           SPRING_APPLICATION_JSON: '{
+                "server" : { 
+                   "port" : ${ONBOARDINGPORT} 
+                },
+               "docker" : {
+   	                "host" : "${DOCKERHOST}",
+   	                "port" : ${DOCKERPORT},
+   	                "registry" : {
+   	    	            "url": "http://${DOCKERREGISTERYHOST}:${DOCKERREGISTERYPORT}/",
+   	    	            "username" : "${DOCKERREGISTERYUSER}",
+   	    	            "password" : "${DOCKERREGISTERYPASSWORD}"
+   	                }
+                },
+                "authenticationServiceURL": "http://${AUTHSERVICEHOST}:${AUTHSERVICEPORT}",
+                "cmnDataSvcEndPoinURL" : "http://${CMNDATASVCNAME}:${CMNDATASVCPORT}/ccds",
+                "cmnDataSvcUser" : "${CCDSUSER}",
+                "cmnDataSvcPwd" : "${CCDSPASSWORD}",
+                "nexusEndPointURL" : "http://${DOCKERREGISTERYUSER}:${DOCKERREGISTERYPASSWORD}@${DOCKERREGISTERYHOST}:${DOCKERREGISTERYPORT}/repository/${DOCKERREGISTERYREPO}",
+                "toscaGeneratorEndPointURL" : "http://${TOSCAGENHOST}:${TOSCAPYTHONPORT}/model_create"
+            }'
+       expose:
+           - ${ONBOARDINGPORT}
+       ports:
+           - ${ONBOARDINGPORT}:${ONBOARDINGPORT}
+       links:
+           - ${CMNDATASVCNAME}:${CMNDATASVCNAME}
+       depends_on:
+           - ${CMNDATASVCNAME}
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+           
+   cognita-portal-be:
+       container_name: ${PORTALBENAME}
+       image: ${IMAGENXHOST}:${IMAGENXPORT}/${PORTALBEIMAGENXNAME}:${PORTALBEIMAGENXVERSION}
+       environment:
+           SPRING_APPLICATION_JSON: '{
+               "server" : { 
+                    "port" : ${PORTALBEPORT} 
+                },
+                "cdms" : {
+                  "client" : {
+                     "url": "http://${CMNDATASVCNAME}:${CMNDATASVCPORT}/ccds",
+                     "username": "${CCDSUSER}",
+                     "password": "${CCDSPASSWORD}"
+                  }
+                }
+           }'
+       expose:
+           - ${PORTALBEPORT}
+       ports:
+           - ${PORTALBEPORT}:${PORTALBEPORT}
+       links:
+           - ${CMNDATASVCNAME}:${CMNDATASVCNAME}
+       depends_on:
+           - ${CMNDATASVCNAME}
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+           
+   cognita-portal-fe:
+       container_name: ${PORTALFENAME}
+       image: ${IMAGENXHOST}:${IMAGENXPORT}/${PORTALFEIMAGENXNAME}:${PORTALFEIMAGENXVERSION}
+       environment:
+           SPRING_APPLICATION_JSON: '{
+               "server" : { 
+                    "port" : ${PORTALFEPORT} 
+                },
+                "zuul" : {
+                   "routes" : {
+                      "api" : {
+                        "url": "http://${PORTALBENAME}:${PORTALBEPORT}"
+                      }
+                   }
+               }
+           }'
+       expose:
+           - ${PORTALFEPORT}
+       ports:
+           - ${PORTALFEPORT}:${PORTALFEPORT}
+       links:
+           - ${PORTALBENAME}:${PORTALBENAME}
+       depends_on:
+           - ${PORTALBENAME}
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+           
+   toscapythonserver:
+       container_name: ${TOSCAPYTHONNAME}
+       image: ${IMAGENXHOST}:${IMAGENXPORT}/${TOSCAPYTHONIMAGENXNAME}:${TOSCAPYTHONIMAGENXVERSION}
+       expose:
+           - ${TOSCAPYTHONPORT}
+       ports:
+           - ${TOSCAPYTHONPORT}:${TOSCAPYTHONPORT}
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+# This persistent volume must be created externally:
+#	docker volume create cognita-logs
+volumes:
+    cognita-logs:
+        external: true

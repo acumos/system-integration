@@ -1,0 +1,44 @@
+# docker-compose for IST2 environment
+# in network ilenwbvv3qnudcp0zpuj3yy0ab.bx.internal.cloudapp.net
+# requires FQDN for nexus repo VM (different network)
+# requires unqualified name for database VM (same network)
+
+version: '2'
+services:
+   filebeat:
+       container_name: filebeat
+       image: cognita-nexus01.eastus.cloudapp.azure.com:8002/filebeat:1.2.0
+       volumes:
+           - cognita-logs:/filebeat-logs
+   wrapper:
+       container_name: validationwrapper
+       image: cognita-nexus01.eastus.cloudapp.azure.com:8002/validation/wrapper:1.1
+       volumes:
+           - cognita-logs:/wrapper-logs
+   intermediate:
+       container_name: validationintermediate
+       image: cognita-nexus01.eastus.cloudapp.azure.com:8002/validation/intermediate:1.1
+       volumes:
+           - cognita-logs:/intermediate-logs
+   root:
+       container_name: validationroot
+       image: cognita-nexus01.eastus.cloudapp.azure.com:8002/validation/root:1.1
+       volumes:
+           - cognita-logs:/wrapper-logs
+   redis:
+       container_name: redis 
+       image: cognita-nexus01.eastus.cloudapp.azure.com:8002/validation/redis:1.1
+       volumes:
+           - cognita-logs:/redis-logs
+   wrapper:
+       container_name: celery
+       image: cognita-nexus01.eastus.cloudapp.azure.com:8002/validation/celery:1.1
+       volumes:
+           - cognita-logs:/celery-logs
+
+
+
+volumes:
+    cognita-logs:
+        external: true
+

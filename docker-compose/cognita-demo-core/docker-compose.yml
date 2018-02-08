@@ -1,0 +1,235 @@
+# docker-compose for DEMO host demo instance
+# in network ilenwbvv3qnudcp0zpuj3yy0ab.bx.internal.cloudapp.net
+# requires FQDN for nexus repo VM (different network)
+# requires unqualified name for database VM (same network)
+
+version: '2'
+services:
+   mlp-cmn-data-svc:
+       container_name: mlp-cmn-data-svc
+       image: cognita-nexus01.eastus.cloudapp.azure.com:8002/mlp-cmn-data-svc:1.6.1
+       environment:
+           SPRING_APPLICATION_JSON: '{
+                "server" : {
+                    "port" : 8000
+                },
+                "security" : {
+                    "user" : {
+                        "name"     : "ccds_client",
+                        "password" : "ENC(CTQD7Xk5bOIuC4MaqRZtzjW1K4ArjCjr)"
+                    }
+                },
+                "spring" : {
+                    "datasource" : {
+                        "url" : "jdbc:mysql://cognita-demo-db:3306/cognitademo_1_6_0?useSSL=false",
+                        "username" : "cognita_demo",
+                        "password" : "ENC(HOr3OHlQ8zeZEwjmzO+zvdxVQIjzpsyi)"
+                    }
+                }
+           }'
+       expose:
+           - 8000
+       ports:
+           - 8000:8000
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+   onboarding-app:
+       container_name: onboarding-app
+       image: cognita-nexus01.eastus.cloudapp.azure.com:8002/onboarding-app:1.5.9
+
+       environment:
+          SPRING_APPLICATION_JSON: '{
+               "server" :{
+                   "port" : 8090
+               },
+               "cognita": {
+                   "userId": "techmdev",
+                   "password": "Root1234"
+               },
+               "docker" : {
+                   "host" : "cognita-demo-core",
+                   "port" : 4243,
+                   "config": "/docker_host/.docker",
+                   "registry" :{
+                       "url": "http://cognita-nexus01.eastus.cloudapp.azure.com:8003/",
+                       "username" : "demo_cognita_model_rw",
+                       "password" : "demo_not4you",
+                       "email": "admin@cognita.com"
+                   },
+               "tls": {
+                       "verify": "false"
+               },
+               "api": {
+                       "version": "1.23"
+               },
+               "imagetag": {
+                       "prefix": "cognita-nexus01.eastus.cloudapp.azure.com:8003"
+               },
+               "max_total_connections": "1",
+                       "max_per_route_connections": "1"
+               },
+               "http_proxy": "http://10.2.0.7:3128",
+               "nexus":{
+                          "nexusEndPointURL": "http://cognita-nexus01.eastus.cloudapp.azure.com:8081/repository/demo_repo_cognita_model_maven/",
+                          "nexusUserName": "demo_cognita_model_rw",
+                          "nexusPassword": "demo_not4you",
+                          "nexusproxy": "",
+                          "nexusGroupId": "com.artifact"
+                       },
+                       "cmndatasvc": {
+                       "cmnDataSvcEndPoinURL": "http://mlp-cmn-data-svc:8000/ccds",
+                       "cmnDataSvcUser": "ccds_client",
+                       "cmnDataSvcPwd": "ccds_client"
+               },
+               "tosca": {
+                  "OutputFolder" : "/temp/",
+                  "GeneratorEndPointURL": "http://cognita-demo-core:8080/model_create"
+               },
+               "authenticationServiceURL": "http://cognita-demo-core:8083"
+       }'
+       expose:
+           - 8090
+       ports:
+           - 8090:8090
+       links:
+           - mlp-cmn-data-svc:mlp-cmn-data-svc
+       depends_on:
+           - mlp-cmn-data-svc
+       volumes:
+           - cognita-logs:/maven/logs
+           - cognita-output:/temp/
+       logging:
+           driver: json-file
+
+   cognita-portal-be:
+       container_name: cognita-portal-be
+       image: cognita-nexus01.eastus.cloudapp.azure.com:8002/cognita-portal-be:1.9.16
+       environment:
+           SPRING_APPLICATION_JSON: '{
+               "server" : {
+                    "port" : 8083
+                },
+                "nexus": {
+                        "url": "http://cognita-nexus01.eastus.cloudapp.azure.com:8081/repository/demo_repo_cognita_model_maven/",
+                        "proxy": "",
+                        "password": "demo_not4you",
+                        "username": "demo_cognita_model_rw",
+                        "groupId": "com.artifact"
+                },
+                "cdms" : {
+                  "client" : {
+                     "url": "http://mlp-cmn-data-svc:8000/ccds",
+                     "username": "ccds_client",
+                     "password": "ccds_client"
+                  }
+                },
+                "qanda" : {
+                   "url" : "http://cognita-demo-core:9080"
+                }
+           }'
+       expose:
+           - 8083
+       ports:
+           - 8083:8083
+       links:
+           - mlp-cmn-data-svc:mlp-cmn-data-svc
+       depends_on:
+           - mlp-cmn-data-svc
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+   cognita-portal-fe:
+       container_name: cognita-portal-fe
+       image: cognita-nexus01.eastus.cloudapp.azure.com:8002/cognita-portal-fe:1.9.16
+       environment:
+           SPRING_APPLICATION_JSON: '{
+               "server" : {
+                    "port" : 8085
+                },
+                 "zuul" : {
+                   "routes" : {
+                      "api" : {
+                        "url": "http://cognita-portal-be:8083"
+                      },
+                      "dsce": {
+                        "url": "http://cognita-demo-core:8088"
+                      },
+                      "site" : {
+                        "url": "http://cognita-demo-core:9080"
+                      }
+                   }
+               }
+           }'
+       expose:
+           - 8085
+       ports:
+           - 8085:8085
+       links:
+           - cognita-portal-be:cognita-portal-be
+       depends_on:
+           - cognita-portal-be
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+   toscapythonserver:
+       container_name: toscapythonserver
+       image: cognita-nexus01.eastus.cloudapp.azure.com:8002/toscapythonserver:2.0.0
+       expose:
+           - 8080
+       ports:
+           - 8080:8080
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+   ds-compositionengine-0130:
+       container_name: ds-compositionengine-0130
+       image: cognita-nexus01.eastus.cloudapp.azure.com:8002/ds-compositionengine:0.13.3
+       environment:
+           SPRING_APPLICATION_JSON: '{
+                          "server": {
+                                "port": 8088
+                          },
+                          "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
+                          "tosca": {
+                                "outputfolder": "/temp/"
+                          },
+                          "nexus": {
+                                "nexusendpointurl": "http://cognita-nexus01.eastus.cloudapp.azure.com:8081/repository/demo_repo_cognita_model_maven/",
+                                "nexusproxy": "",
+                                "nexuspassword": "demo_not4you",
+                                "nexususername": "demo_cognita_model_rw",
+                                "nexusgroupid": "com.artifact"
+                          },
+                          "cmndatasvc": {
+                                "cmndatasvcendpoinurl": "http://mlp-cmn-data-svc:8000/ccds",
+                                "cmndatasvcuser": "ccds_client",
+                                "cmndatasvcpwd": "ccds_client"
+                          }
+                        }'
+       expose:
+           - 8088
+       ports:
+           - 8088:8088
+       volumes:
+           - cognita-logs:/maven/logs
+           - cognita-output:/temp/
+       logging:
+           driver: json-file
+
+# This persistent volume must be created externally:
+#	docker volume create cognita-logs
+#   docker volume create cognita-output
+volumes:
+    cognita-logs:
+        external: true
+    cognita-output:
+       external: true

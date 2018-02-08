@@ -1,0 +1,45 @@
+---
+- job-template:
+    # template settings
+    name: '{name}-grep-bitbucket'
+    project-type: freestyle
+    concurrent: true
+    properties:
+      - acumos-infra-properties:
+          build-days-to-keep: 14
+          build-num-to-keep: 5
+    parameters:
+      - string:
+          name: BITBUCKET_BRANCH
+          default: master
+          description: 'Git ref for the new code. Can be a branch name, commit ID or tag.'
+      - string:
+          name: BASE_CHECKOUT
+          default: master
+          description: 'Git ref for the old code. Can be a branch name, commit ID or tag.'
+    scm:
+      - bitbucket-repo:
+          repo: '{repo}.git'
+      - bitbucket-repo-branch-plus:
+          repo: system-integration.git
+          branch: 'origin/master'
+          skip-tag: 'true'
+          wipe-workspace: false
+          timeout: 30
+          basedir: system-integration
+    triggers:
+      - bitbucket
+    wrappers:
+      - build-timeout:
+          build-timeout: '{build-timeout}'
+    builders:
+      - shell: |
+          ls
+          # this is slightly redundant
+          git checkout $BITBUCKET_BRANCH
+          cp system-integration/jenkins-jobs/grep-keywords.sh .
+          rm -fr system-integration
+          chmod +x grep-keywords.sh
+          ( ./grep-keywords.sh ) || true
+    publishers:
+      - archive-publish-files

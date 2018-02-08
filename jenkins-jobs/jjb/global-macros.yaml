@@ -1,0 +1,76 @@
+---
+# PROPERTIES
+- property:
+    name: acumos-infra-properties
+    properties:
+      - build-discarder:
+          days-to-keep: '{build-days-to-keep}'
+          num-to-keep: '{build-num-to-keep}'
+          artifact-days-to-keep: -1
+          artifact-num-to-keep: 5
+
+# PUBLISHERS
+- publisher:
+    name: archive-publish-files
+    publishers:
+      - archive:
+          artifacts: 'publish/**/*'
+          allow-empty: true
+          fingerprint: true
+          latest-only: true
+
+# SCMS
+- scm:
+    name: bitbucket-repo
+    scm:
+      - git:
+          credentials-id: 'f96ecb6a-5632-478e-9b82-987a22bc2d89'
+          url: 'https://bitbucket.org/cognita_dev/{repo}'
+          branches:
+            - 'origin/$BITBUCKET_BRANCH'
+          skip-tag: true
+          wipe-workspace: true
+          timeout: 30
+
+- scm:
+    name: bitbucket-repo-branch-plus
+    scm:
+      - git:
+          credentials-id: 'f96ecb6a-5632-478e-9b82-987a22bc2d89'
+          url: 'https://bitbucket.org/cognita_dev/{repo}'
+          branches: 
+              - '{branch}'
+          skip-tag: '{skip-tag}'
+          wipe-workspace: '{wipe-workspace}'
+          timeout: '{timeout}'
+          basedir: '{basedir}'
+
+- builder:
+    name: provide-maven-settings
+    builders:
+      - config-file-provider:
+          files:
+            - file-id: '{global-settings-file}'
+              variable: 'GLOBAL_SETTINGS_FILE'
+            - file-id: '{settings-file}'
+              variable: 'SETTINGS_FILE'
+
+# WRAPPERS
+- wrapper:
+    name: build-timeout
+    wrappers:
+      - timeout:
+          type: absolute
+          timeout: 360
+          fail: true
+
+- wrapper:
+    # This wrapper is required for all jobs as it
+    # configures the wrappers needed.
+    name: acumos-infra-wrappers
+    wrappers:
+      - timeout:
+          type: absolute
+          timeout: '{build-timeout}'
+          timeout-var: 'BUILD_TIMEOUT'
+          fail: true

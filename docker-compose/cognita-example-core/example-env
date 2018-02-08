@@ -1,0 +1,46 @@
+# Rename this file to .env in the directory you are running docker-compose
+# These valuse are example values only,  replace the values on the right appropriately
+# Global Parameters
+CCDSUSER=ccds_client
+CCDSPASSWORD=CTQD7Xk5bOIuC4MaqRZtzjW1K4ArjCjr
+DATABASEHOST=cognita-int01-db.onap-f.onap.homer.att.com
+DATABASENAME=cognita_int01_db
+DATABASEUSER=cognita_int01_user
+DATABASEPASSWORD=F680BEAD7F7AA6AA37250491B47E7D4C083572C0
+IMAGENXHOST=cognita-nexus01.eastus.cloudapp.azure.com
+IMAGENXPORT=8002
+DOCKERHOST=cognita-int01-core.onap-f.onap.homer.att.com
+DOCKERPORT=4243
+DOCKERREGISTERYHOST=cognita-nexus01.eastus.cloudapp.azure.com
+DOCKERREGISTERYPORT=8001
+DOCKERREGISTERYUSER=cognita_model_rw
+DOCKERREGISTERYPASSWORD=not4you
+DOCKERREGISTERYREPO=repo_cognita_model_maven
+# Common Data Services
+CMNDATASVCNAME=mlp-cmn-data-svc
+CMNDATASVCIMAGENXNAME=mlp-cmn-data-svc
+CMNDATASVCIMAGENXVERSION=1.1.2
+CMNDATASVCPORT=8000
+# Onboarding
+ONBOARDINGNAME=onboarding-app
+ONBOARDINGIMAGENXNAME=onboarding-app
+ONBOARDINGIMAGENXVERSION=1.0.3-SNAPSHOT
+ONBOARDINGPORT=8090
+AUTHSERVICEHOST=cognita-int01-core.onap-f.onap.homer.att.com
+AUTHSERVICEPORT=8083
+# Portal Backend
+PORTALBENAME=cognita-portal-be
+PORTALBEIMAGENXNAME=cognita-portal-be
+PORTALBEIMAGENXVERSION=1.3.7
+PORTALBEPORT=8083
+# Portal Frontend
+PORTALFENAME=cognita-portal-fe
+PORTALFEIMAGENXNAME=cognita-portal-fe
+PORTALFEIMAGENXVERSION=1.3.7
+PORTALFEPORT=8085
+# Tosca Python server
+TOSCAPYTHONNAME=toscapythonserver
+TOSCAPYTHONIMAGENXNAME=toscapythonserver
+TOSCAPYTHONIMAGENXVERSION=1.0.0
+TOSCAPYTHONPORT=8080
+TOSCAGENHOST=cognita-int01-core.onap-f.onap.homer.att.com

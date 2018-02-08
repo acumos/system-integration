@@ -1,0 +1,288 @@
+# docker-compose for development host cognita-dev1-vm01-core
+# in network 3rkcjk3hwkvetlyvh1y3q1v3wa.bx.internal.cloudapp.net
+# The database and nexus servers use unqualified host names
+
+version: '2'
+
+services:
+
+   mlp-cmn-data-svc-122:
+       container_name: mlp-cmn-data-svc-122
+       image: cognita-nexus01:8002/mlp-cmn-data-svc:1.2.2
+       environment:
+           SPRING_APPLICATION_JSON: '{
+                "server" : { 
+                    "port" : 8002
+                },
+                "security" : {
+                    "user" : {
+                        "name"     : "ccds_client",
+                        "password" : "ENC(CTQD7Xk5bOIuC4MaqRZtzjW1K4ArjCjr)"
+                    }
+                },
+                "spring" : {
+                    "datasource" : {
+                        "url" : "jdbc:mysql://cognita-dev1-vm01-db:3306/cds122?useSSL=false",
+                        "username" : "cds_122",
+                        "password" : "ENC(908ias5UIGoduBkwK56qmw==)"
+                    }
+                }
+           }'
+       expose:
+           - 8002
+       ports:
+           - 8002:8002
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+   mlp-cmn-data-svc-123:
+       container_name: mlp-cmn-data-svc-123
+       image: cognita-nexus01:8002/mlp-cmn-data-svc:1.2.3
+       environment:
+           SPRING_APPLICATION_JSON: '{
+                "server" : { 
+                    "port" : 8000
+                },
+                "security" : {
+                    "user" : {
+                        "name"     : "ccds_client",
+                        "password" : "ENC(CTQD7Xk5bOIuC4MaqRZtzjW1K4ArjCjr)"
+                    }
+                },
+                "spring" : {
+                    "datasource" : {
+                        "url" : "jdbc:mysql://cognita-dev1-vm01-db:3306/cds123?useSSL=false",
+                        "username" : "cds_123",
+                        "password" : "ENC(jzt9NVTUkbG7/dss83MubQ==)"
+                    }
+                }
+           }'
+       expose:
+           - 8000
+       ports:
+           - 8000:8000
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+   mlp-cmn-data-svc-130:
+       container_name: mlp-cmn-data-svc-130
+       image: cognita-nexus01.eastus.cloudapp.azure.com:8002/mlp-cmn-data-svc:1.3.0
+       environment:
+           SPRING_APPLICATION_JSON: '{
+                "server" : { 
+                    "port" : 8001
+                },
+                "security" : {
+                    "user" : {
+                        "name"     : "ccds_client",
+                        "password" : "ENC(CTQD7Xk5bOIuC4MaqRZtzjW1K4ArjCjr)"
+                    }
+                },
+                "spring" : {
+                    "datasource" : {
+                        "url" : "jdbc:mysql://cognita-int01-db.onap-f.onap.homer.att.com:3306/cds130?useSSL=false",
+                        "username" : "cds_130",
+                        "password" : "ENC(K+AF7ZgXWxUOWkSTvWLtMg==)"
+                    }
+                }
+           }'
+       expose:
+           - 8001
+       ports:
+           - 8001:8001
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+   mlp-cmn-data-svc-131:
+       container_name: mlp-cmn-data-svc-131
+       image: cognita-nexus01.eastus.cloudapp.azure.com:8002/mlp-cmn-data-svc:1.3.1
+       environment:
+           SPRING_APPLICATION_JSON: '{
+                "server" : {
+                    "port" : 8003
+                },
+                "security" : {
+                    "user" : {
+                        "name"     : "ccds_client",
+                        "password" : "ENC(CTQD7Xk5bOIuC4MaqRZtzjW1K4ArjCjr)"
+                    }
+                },
+                "spring" : {
+                    "datasource" : {
+                        "url" : "jdbc:mysql://cognita-int01-db.onap-f.onap.homer.att.com:3306/cds131?useSSL=false",
+                        "username" : "cds_131",
+                        "password" : "ENC(tTWqUeIqCajUqYWcQrioUQ==)"
+                    }
+                }
+           }'
+       expose:
+           - 8003
+       ports:
+           - 8003:8003
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+   onboarding-app:
+       container_name: onboarding-app
+       image: cognita-nexus01.eastus.cloudapp.azure.com:8002/onboarding-app:1.0.12-SNAPSHOT
+       environment:
+           SPRING_APPLICATION_JSON: '{
+               "mlp-cmn-data-svc": {
+                   "uri": "http://mlp-cmn-data-svc:8003/ccds",
+                   "username": "ccds_client",
+                   "password": "CTQD7Xk5bOIuC4MaqRZtzjW1K4ArjCjr"
+               }
+           }'
+       expose:
+           - 8090
+       ports:
+           - 8090:8090
+       links:
+           - mlp-cmn-data-svc-131:mlp-cmn-data-svc
+       depends_on:
+           - mlp-cmn-data-svc-131
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+   federated-gateway:
+       container_name: federated-gateway
+       image: cognita-nexus01.eastus.cloudapp.azure.com:8002/federated-gateway:1.0.0-SNAPSHOT
+       environment:
+           SPRING_APPLICATION_JSON: '{
+               "server" : { 
+                    "port" : 8084 
+                },
+                "nexus": {
+                        "nexusendpointurl": "http://cognita-nexus01.eastus.cloudapp.azure.com:8081/repository/repo_cognita_model_maven/",
+                        "nexusproxy": "",
+                        "nexuspassword": "not4you",
+                        "nexususername": "cognita_model_rw",
+                        "nexusgroupid": "com.artifact"
+                },
+                "spring": {
+                    "profiles": {
+                        "active": "gateway"
+                    }
+                },
+                "peer": {
+                    "jobchecker": {
+                        "interval": 300
+                    }
+                },
+                "federated" : {
+                    "instance" : "gateway",
+                    "instancename": "ATT",
+                    "peerGatewayOperator" : "d468656f-57d0-46e3-9f94-7ffa4f66dc03"
+                },
+                "cdms" : {
+                  "client" : {
+                     "url": "http://mlp-cmn-data-svc:8003/ccds",
+                     "username": "ccds_client",
+                     "password": "ccds_client"
+                  }
+                }
+           }'
+       expose:
+           - 8084
+       ports:
+           - 8084:8084
+       links:
+           - mlp-cmn-data-svc-131:mlp-cmn-data-svc
+       depends_on:
+           - mlp-cmn-data-svc-131
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+   cognita-portal-be-151:
+       container_name: cognita-portal-be-151
+       image: cognita-nexus01.eastus.cloudapp.azure.com:8002/cognita-portal-be:1.5.13
+       environment:
+           SPRING_APPLICATION_JSON: '{
+               "server" : { 
+                    "port" : 8084 
+                },
+                "nexus":{
+                        "nexusendpointurl": "http://cognita-nexus01.eastus.cloudapp.azure.com:8081/repository/repo_cognita_model_maven/",
+                        "nexusproxy": "",
+                        "nexuspassword": "not4you",
+                        "nexususername": "cognita_model_rw",
+                        "nexusgroupid": "com.artifact"
+                },
+                "cdms" : {
+                  "client" : {
+                     "url": "http://mlp-cmn-data-svc:8003/ccds",
+                     "username": "ccds_client",
+                     "password": "ccds_client"
+                  }
+                }
+           }'
+       expose:
+           - 8083
+       ports:
+           - 8083:8083
+       links:
+           - mlp-cmn-data-svc-131:mlp-cmn-data-svc
+       depends_on:
+           - mlp-cmn-data-svc-131
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+   cognita-portal-fe-151:
+       container_name: cognita-portal-fe-151
+       image: cognita-nexus01.eastus.cloudapp.azure.com:8002/cognita-portal-fe:1.5.13
+       environment:
+           SPRING_APPLICATION_JSON: '{
+               "server" : { 
+                    "port" : 8086 
+                },
+                "zuul" : {
+                   "routes" : {
+                      "api" : {
+                        "url": "http://cognita-portal-be:8083"
+                      }
+                   }
+               }
+           }'
+       expose:
+           - 8086
+       ports:
+           - 8086:8086
+       links:
+           - cognita-portal-be-151:cognita-portal-be
+       depends_on:
+           - cognita-portal-be-151
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+   toscapythonserver:
+       container_name: toscapythonserver
+       image: cognita-nexus01.eastus.cloudapp.azure.com:8002/toscapythonserver:2.0.0
+       expose:
+           - 8080
+       ports:
+           - 8080:8080
+       volumes:
+           - cognita-logs:/maven/logs
+       logging:
+           driver: json-file
+
+# This persistent volume must be created externally:
+#	docker volume create cognita-logs
+volumes:
+    cognita-logs:
+        external: true

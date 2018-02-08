@@ -1,0 +1,166 @@
+# Jobs to scan repositories for undesired keywords
+# sorted on repo name
+---
+- project:
+    # Jenkins job name prefix
+    name: acumos-automation
+    # base name of Git repo
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: acumos-hippo-cms
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: acumos-python-client
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: acumos-r-client
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: acumos-azure-client
+    repo: cognita-azure-client
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: acumos-java-client
+    repo: cognita-java-client
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: common-dataservice
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: design-studio-composition-engine
+    repo: design-studio
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: acumos-sphinx-documentation
+    repo: documentation
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: face-privacy-filter
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: E5-Federated-Cognita-Release-Build
+    repo: federated-cognita
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: generic-model-runner
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: h2o-toolkit
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: image-classification
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: image-mood-classifier
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: iris-generic-java
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: model-schema
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: modeling-toolkit
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: on-boarding-service
+    repo: on-boarding
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: platform-oam
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: Cognita-Portal-MarketPlace-Code-Review
+    repo: portal-marketplace
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: runtime-orchestrator
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: system-integration
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: test-models
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: threat-analytics
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: validation-security
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
+
+- project:
+    name: vm-predictor
+    repo: '{name}'
+    jobs:
+      - '{name}-grep-bitbucket'
