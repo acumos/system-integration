@@ -1,0 +1,2 @@
+This model performs classification using the Iris data set; it was
+written in Python and created using keras/Tensorflow.

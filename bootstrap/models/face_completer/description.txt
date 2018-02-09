@@ -1,0 +1,5 @@
+Scikit-learn model predicting bottom half of faces from top halfs, trained on Olivetti face data using KNN. See
+
+http://scikit-learn.org/stable/auto_examples/plot_multioutput_face_completion.html
+
+for details.

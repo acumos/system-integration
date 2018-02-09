@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+message DataFrame {
+  repeated int64 day = 1;
+  repeated int64 weekday = 2;
+  repeated int64 hour = 3;
+  repeated int64 minute = 4;
+  repeated double hist_1D = 5;
+  repeated int64 VM_ID = 6;
+}
+
+message Prediction {
+  repeated double predictions = 1;
+}
+
+service Model {
+  rpc transform (DataFrame) returns (Prediction);
+}

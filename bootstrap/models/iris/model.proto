@@ -1,0 +1,17 @@
+syntax = "proto3";
+package FTkJINFrQegrNwPYHwgfUwEPjdhVfxyE;
+
+service Model {
+  rpc classify (IrisDataFrame) returns (ClassifyOut);
+}
+
+message IrisDataFrame {
+  repeated double petal_length = 1;
+  repeated double petal_width = 2;
+  repeated double sepal_length = 3;
+  repeated double sepal_width = 4;
+}
+
+message ClassifyOut {
+  repeated int64 value = 1;
+}

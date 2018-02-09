@@ -1,0 +1,14 @@
+syntax = "proto3";
+package gUaIdcAnPmuddyWWMAJvoZzYKeiPPIzN;
+
+service Model {
+  rpc transform (FlatImages) returns (FlatImages);
+}
+
+message FlatImage {
+  repeated double image = 1;
+}
+
+message FlatImages {
+  repeated FlatImage images = 1;
+}
