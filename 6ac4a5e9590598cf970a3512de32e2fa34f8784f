@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0450e50b_031b559c",
+        "filename": "bootstrap/properties.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-02-14T14:00:21Z",
+      "side": 1,
+      "message": "No cognita, no azure URLs go to LF",
+      "revId": "6ac4a5e9590598cf970a3512de32e2fa34f8784f",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
