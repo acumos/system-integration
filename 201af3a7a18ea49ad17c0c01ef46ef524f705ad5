@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d2e3b2f3_2a8cd2da",
+        "filename": "bootstrap/properties.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-02-19T16:59:31Z",
+      "side": 1,
+      "message": "Please do not commit passwords",
+      "revId": "201af3a7a18ea49ad17c0c01ef46ef524f705ad5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "40b7c4d2_d2f35e58",
+        "filename": "bootstrap/properties.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-02-19T16:59:31Z",
+      "side": 1,
+      "message": "Please do not commit cognita/azure URLs",
+      "revId": "201af3a7a18ea49ad17c0c01ef46ef524f705ad5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
