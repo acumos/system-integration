@@ -28,7 +28,7 @@ services:
        environment:
            SPRING_APPLICATION_JSON: "{
                 \"server\" : {
-                    \"port\" : ${ACUMOS_CCDS_PORT}
+                    \"port\" : ${ACUMOS_CDS_PORT}
                 },
                 \"security\" : {
                     \"user\" : {
@@ -56,9 +56,9 @@ services:
                  }
            }"
        expose:
-           - ${ACUMOS_CCDS_PORT}
+           - ${ACUMOS_CDS_PORT}
        ports:
-           - ${ACUMOS_CCDS_PORT}:${ACUMOS_CCDS_PORT}
+           - ${ACUMOS_CDS_PORT}:${ACUMOS_CDS_PORT}
        volumes:
            - acumos-logs:/maven/logs
        logging:
@@ -102,7 +102,7 @@ services:
                        \"nexusGroupId\": \"com.artifact\"
                },
                \"cmndatasvc\": {
-                       \"cmnDataSvcEndPoinURL\": \"http://${ACUMOS_CCDS_HOST}:${ACUMOS_CCDS_PORT}/ccds\",
+                       \"cmnDataSvcEndPoinURL\": \"http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds\",
                        \"cmnDataSvcUser\": \"ccds_client\",
                        \"cmnDataSvcPwd\": \"ccds_client\"
                },
@@ -145,7 +145,7 @@ services:
                 },
                 \"cdms\" : {
                   \"client\" : {
-                     \"url\": \"http://${ACUMOS_CCDS_HOST}:${ACUMOS_CCDS_PORT}/ccds\",
+                     \"url\": \"http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds\",
                      \"username\": \"ccds_client\",
                      \"password\": \"ccds_client\"
                      }
@@ -271,7 +271,7 @@ services:
                                 \"nexusgroupid\": \"com.artifact\"
                           },
                           \"cmndatasvc\": {
-                                \"cmndatasvcendpoinurl\": \"http://${ACUMOS_CCDS_HOST}:${ACUMOS_CCDS_PORT}/ccds\",
+                                \"cmndatasvcendpoinurl\": \"http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds\",
                                 \"cmndatasvcuser\": \"ccds_client\",
                                 \"cmndatasvcpwd\": \"ccds_client\"
                           },
@@ -419,7 +419,7 @@ services:
                 },
                 \"cdms\" : {
                   \"client\" : {
-                     \"url\": \"http://${ACUMOS_CCDS_HOST}:${ACUMOS_CCDS_PORT}/ccds\",
+                     \"url\": \"http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds\",
                      \"username\": \"ccds_client\",
                      \"password\": \"ccds_client\"
                   }
@@ -486,7 +486,7 @@ services:
                     \"groupId\": \"com.artifact\"
                 },
                 \"cmndatasvc\": {
-                    \"cmndatasvcendpoinurl\": \"http://${ACUMOS_CCDS_HOST}:${ACUMOS_CCDS_PORT}/ccds\",
+                    \"cmndatasvcendpoinurl\": \"http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds\",
                     \"cmndatasvcuser\": \"ccds_client\",
                     \"cmndatasvcpwd\": \"ccds_client\"
                 }
