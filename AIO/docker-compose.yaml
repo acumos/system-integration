@@ -23,6 +23,17 @@ version: '2'
 # TODO: remove or parameterize all credentials
 # TODO: scrub all attributes for current need
 services:
+   nexus:
+       image: sonatype/nexus3
+       expose:
+           - ${ACUMOS_NEXUS_PORT}
+       ports:
+           - ${ACUMOS_NEXUS_PORT}:8081
+       volumes:
+           - acumos-logs:/maven/logs
+       logging:
+           driver: json-file
+
    common-data-svc:
        image: ${COMMON_DATASERVICE_IMAGE}
        environment:

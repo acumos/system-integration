@@ -32,10 +32,6 @@ echo "Stop the running Acumos component containers"
 docker-compose down
 docker-compose rm -v
 
-echo "Stop the Nexus container"
-docker stop nexus
-docker rm -v nexus
-
 echo "Remove Acumos databases and users"
 # TODO: support centos also
 mysql --user=root --password=$MARIADB_PASSWORD -e "DROP DATABASE $ACUMOS_CDS_DB; DROP DATABASE acumos_comment;  DROP DATABASE acumos_cms; DROP USER 'acumos_opr'@'%';"

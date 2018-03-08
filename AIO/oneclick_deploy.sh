@@ -60,7 +60,7 @@ function setup_prereqs() {
 
     wait_dpkg; sudo apt-get update
     wait_dpkg; sudo apt-get upgrade -y
-    wait_dpkg; sudo apt-get install -y wget git jq
+    wait_dpkg; sudo apt-get install -y wget git jq apg
 
     echo; echo "prereqs.sh: ($(date)) Install latest docker"
     wait_dpkg; sudo apt-get install -y docker.io docker-compose
@@ -73,7 +73,7 @@ function setup_prereqs() {
     echo; echo "prereqs.sh: ($(date)) Basic prerequisites"
     sudo yum install -y epel-release
     sudo yum update -y
-    sudo yum install -y wget git jq
+    sudo yum install -y wget git jq apg
     echo; echo "prereqs.sh: ($(date)) Install latest docker"
     # per https://docs.docker.com/engine/installation/linux/docker-ce/centos/#install-from-a-package
     sudo yum install -y docker docker-compose
@@ -157,7 +157,6 @@ function setup_acumosdb() {
 }
 
 function setup_nexus() {
-  sudo docker run -d -p $ACUMOS_NEXUS_PORT:8081 --name nexus sonatype/nexus3
   while ! curl -v -u admin:admin123 http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_PORT/service/rest/v1/script ; do
     log "Waiting 10 seconds for nexus server to respond"
     sleep 10
@@ -266,5 +265,6 @@ source acumos-env.sh
 setup_prereqs
 setup_mariadb
 setup_acumosdb
-setup_nexus
 setup_acumos
+setup_nexus
+
