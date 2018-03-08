@@ -62,18 +62,30 @@ function setup_prereqs() {
     wait_dpkg; sudo apt-get upgrade -y
     wait_dpkg; sudo apt-get install -y wget git jq
 
-    echo; echo "prereqs.sh: ($(date)) Install latest docker"
-    wait_dpkg; sudo apt-get install -y docker.io docker-compose
-    # Alternate for 1.12.6
-    #sudo apt-get install -y libltdl7
-    #wget https://packages.docker.com/1.12/apt/repo/pool/main/d/docker-engine/docker-engine_1.12.6~cs8-0~ubuntu-xenial_amd64.deb
-    #sudo dpkg -i docker-engine_1.12.6~cs8-0~ubuntu-xenial_amd64.deb
+    echo; echo "prereqs.sh: ($(date)) Install latest docker-ce"
+    # Per https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
+    sudo apt-get remove -y docker docker-engine docker.io docker-ce
+    sudo apt-get update
+    sudo apt-get install -y \
+      linux-image-extra-$(uname -r) \
+      linux-image-extra-virtual
+    sudo apt-get install -y \
+      apt-transport-https \
+      ca-certificates \
+      curl \
+      software-properties-common
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    sudo add-apt-repository "deb [arch=amd64] \
+      https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    sudo apt-get update
+    sudo apt-get install -y docker-ce
     sudo service docker restart
   else
     echo; echo "prereqs.sh: ($(date)) Basic prerequisites"
     sudo yum install -y epel-release
     sudo yum update -y
     sudo yum install -y wget git jq
+
     echo; echo "prereqs.sh: ($(date)) Install latest docker"
     # per https://docs.docker.com/engine/installation/linux/docker-ce/centos/#install-from-a-package
     sudo yum install -y docker docker-compose
@@ -157,7 +169,6 @@ function setup_acumosdb() {
 }
 
 function setup_nexus() {
-  sudo docker run -d -p $ACUMOS_NEXUS_PORT:8081 --name nexus sonatype/nexus3
   while ! curl -v -u admin:admin123 http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_PORT/service/rest/v1/script ; do
     log "Waiting 10 seconds for nexus server to respond"
     sleep 10
@@ -266,5 +277,6 @@ source acumos-env.sh
 setup_prereqs
 setup_mariadb
 setup_acumosdb
-setup_nexus
 setup_acumos
+setup_nexus
+
