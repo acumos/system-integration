@@ -60,7 +60,7 @@ function setup_prereqs() {
 
     wait_dpkg; sudo apt-get update
     wait_dpkg; sudo apt-get upgrade -y
-    wait_dpkg; sudo apt-get install -y wget git jq apg
+    wait_dpkg; sudo apt-get install -y wget git jq
 
     echo; echo "prereqs.sh: ($(date)) Install latest docker"
     wait_dpkg; sudo apt-get install -y docker.io docker-compose
@@ -73,7 +73,7 @@ function setup_prereqs() {
     echo; echo "prereqs.sh: ($(date)) Basic prerequisites"
     sudo yum install -y epel-release
     sudo yum update -y
-    sudo yum install -y wget git jq apg
+    sudo yum install -y wget git jq
     echo; echo "prereqs.sh: ($(date)) Install latest docker"
     # per https://docs.docker.com/engine/installation/linux/docker-ce/centos/#install-from-a-package
     sudo yum install -y docker docker-compose
@@ -104,7 +104,7 @@ EOF
   sudo apt-get update -y
 
   log "Install MariaDB without password prompt"
-  MARIADB_PASSWORD=$(/usr/bin/apg -n 1 -m 16 -c cl_seed)
+  MARIADB_PASSWORD=$(uuidgen)
   echo "MARIADB_PASSWORD=\"$MARIADB_PASSWORD\"" >>acumos-env.sh
   echo "export MARIADB_PASSWORD" >>acumos-env.sh
   export MARIADB_PASSWORD
@@ -133,7 +133,7 @@ EOF
 
 function setup_acumosdb() {
   log "Setup Acumos databases"
-  MARIADB_USER_PASSWORD=$(/usr/bin/apg -n 1 -m 16 -c cl_seed)
+  MARIADB_USER_PASSWORD=$(uuidgen)
   echo "MARIADB_USER_PASSWORD=\"$MARIADB_USER_PASSWORD\"" >>acumos-env.sh
   echo "export MARIADB_USER_PASSWORD" >>acumos-env.sh
   export MARIADB_USER_PASSWORD
@@ -207,12 +207,12 @@ EOF
       http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_PORT/service/rest/v1/script/$repo/run
   done
 
-  ACUMOS_RO_USER_PASSWORD=$(/usr/bin/apg -n 1 -m 16 -c cl_seed)
+  ACUMOS_RO_USER_PASSWORD=$(uuidgen)
   echo "ACUMOS_RO_USER_PASSWORD=\"$ACUMOS_RO_USER_PASSWORD\"" >>acumos-env.sh
   echo "export ACUMOS_RO_USER_PASSWORD" >>acumos-env.sh
   export ACUMOS_RO_USER_PASSWORD
 
-  ACUMOS_RW_USER_PASSWORD=$(/usr/bin/apg -n 1 -m 16 -c cl_seed)
+  ACUMOS_RW_USER_PASSWORD=$(uuidgen)
   echo "ACUMOS_RW_USER_PASSWORD=\"$ACUMOS_RW_USER_PASSWORD\"" >>acumos-env.sh
   echo "export ACUMOS_RW_USER_PASSWORD" >>acumos-env.sh
   export ACUMOS_RW_USER_PASSWORD
