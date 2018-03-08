@@ -28,7 +28,11 @@ services:
        environment:
            SPRING_APPLICATION_JSON: "{
                 \"server\" : {
+<<<<<<< HEAD
                     \"port\" : ${ACUMOS_CCDS_PORT}
+=======
+                    \"port\" : ${ACUMOS_CDS_PORT}
+>>>>>>> 4708401... WIP: Baseline of all-in-one deploy process
                 },
                 \"security\" : {
                     \"user\" : {
@@ -56,9 +60,15 @@ services:
                  }
            }"
        expose:
+<<<<<<< HEAD
            - ${ACUMOS_CCDS_PORT}
        ports:
            - ${ACUMOS_CCDS_PORT}:${ACUMOS_CCDS_PORT}
+=======
+           - ${ACUMOS_CDS_PORT}
+       ports:
+           - ${ACUMOS_CDS_PORT}:${ACUMOS_CDS_PORT}
+>>>>>>> 4708401... WIP: Baseline of all-in-one deploy process
        volumes:
            - acumos-logs:/maven/logs
        logging:
@@ -102,7 +112,11 @@ services:
                        \"nexusGroupId\": \"com.artifact\"
                },
                \"cmndatasvc\": {
+<<<<<<< HEAD
                        \"cmnDataSvcEndPoinURL\": \"http://${ACUMOS_CCDS_HOST}:${ACUMOS_CCDS_PORT}/ccds\",
+=======
+                       \"cmnDataSvcEndPoinURL\": \"http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds\",
+>>>>>>> 4708401... WIP: Baseline of all-in-one deploy process
                        \"cmnDataSvcUser\": \"ccds_client\",
                        \"cmnDataSvcPwd\": \"ccds_client\"
                },
@@ -145,7 +159,11 @@ services:
                 },
                 \"cdms\" : {
                   \"client\" : {
+<<<<<<< HEAD
                      \"url\": \"http://${ACUMOS_CCDS_HOST}:${ACUMOS_CCDS_PORT}/ccds\",
+=======
+                     \"url\": \"http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds\",
+>>>>>>> 4708401... WIP: Baseline of all-in-one deploy process
                      \"username\": \"ccds_client\",
                      \"password\": \"ccds_client\"
                      }
@@ -271,7 +289,11 @@ services:
                                 \"nexusgroupid\": \"com.artifact\"
                           },
                           \"cmndatasvc\": {
+<<<<<<< HEAD
                                 \"cmndatasvcendpoinurl\": \"http://${ACUMOS_CCDS_HOST}:${ACUMOS_CCDS_PORT}/ccds\",
+=======
+                                \"cmndatasvcendpoinurl\": \"http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds\",
+>>>>>>> 4708401... WIP: Baseline of all-in-one deploy process
                                 \"cmndatasvcuser\": \"ccds_client\",
                                 \"cmndatasvcpwd\": \"ccds_client\"
                           },
@@ -419,7 +441,11 @@ services:
                 },
                 \"cdms\" : {
                   \"client\" : {
+<<<<<<< HEAD
                      \"url\": \"http://${ACUMOS_CCDS_HOST}:${ACUMOS_CCDS_PORT}/ccds\",
+=======
+                     \"url\": \"http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds\",
+>>>>>>> 4708401... WIP: Baseline of all-in-one deploy process
                      \"username\": \"ccds_client\",
                      \"password\": \"ccds_client\"
                   }
@@ -486,7 +512,11 @@ services:
                     \"groupId\": \"com.artifact\"
                 },
                 \"cmndatasvc\": {
+<<<<<<< HEAD
                     \"cmndatasvcendpoinurl\": \"http://${ACUMOS_CCDS_HOST}:${ACUMOS_CCDS_PORT}/ccds\",
+=======
+                    \"cmndatasvcendpoinurl\": \"http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds\",
+>>>>>>> 4708401... WIP: Baseline of all-in-one deploy process
                     \"cmndatasvcuser\": \"ccds_client\",
                     \"cmndatasvcpwd\": \"ccds_client\"
                 }

@@ -53,8 +53,13 @@ export ACUMOS_MARIADB_HOST=$host
 export ACUMOS_MARIADB_PORT=3306
 export ACUMOS_NEXUS_HOST=$host
 export ACUMOS_NEXUS_PORT=8001
+<<<<<<< HEAD
 export ACUMOS_CCDS_HOST=$host
 export ACUMOS_CCDS_PORT=8000
+=======
+export ACUMOS_CDS_HOST=$host
+export ACUMOS_CDS_PORT=8000
+>>>>>>> 4708401... WIP: Baseline of all-in-one deploy process
 export ACUMOS_ONBOARDING_HOST=$host
 export ACUMOS_ONBOARDING_PORT=8090
 export ACUMOS_TOSCA_PYTHON_HOST=$host
