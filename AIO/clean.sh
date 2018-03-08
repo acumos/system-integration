@@ -23,7 +23,7 @@
 # - If the docker-compose console is still running, showing the logs of the
 #   containers, ctrl-c to stop it and wait will all services are stopped.
 # Usage:
-# $ sudo clean.sh
+# $ sudo bash clean.sh
 #
 
 source acumos-env.sh
@@ -38,7 +38,7 @@ docker rm -v nexus
 
 echo "Remove Acumos databases and users"
 # TODO: support centos also
-mysql --user=root --password=$MARIADB_PASSWORD -e "DROP DATABASE acumos; DROP DATABASE acumos_comment; DROP USER 'acumos_opr'@'localhost'; DROP USER 'acumos_opr'@'%'"
+mysql --user=root --password=$MARIADB_PASSWORD -e "DROP DATABASE $ACUMOS_CDS_DB; DROP DATABASE acumos_comment;  DROP DATABASE acumos_cms; DROP USER 'acumos_opr'@'%';"
 
 echo "Remove mariadb-server"
 apt-get remove mariadb-server-10.2 -y
