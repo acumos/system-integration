@@ -88,6 +88,23 @@
     },
     {
       "key": {
+        "uuid": "1001f2f1_06fd5b26",
+        "filename": "acumos-kong-api/secure-acumos-api.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-09T21:00:09Z",
+      "side": 1,
+      "message": "I thought the goal here was to encrypt data coming over the open internet into Acumos.  In a real installation CDS will NOT be open to the world.  Are you trying to encrypt data transferred between Acumos components?",
+      "revId": "7b427a12dbabc50e675de28c2f834ff074d744ee",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cde2e837_858efb5c",
         "filename": "acumos-kong-api/secure-acumos-api.sh",
         "patchSetId": 4
