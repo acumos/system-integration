@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c677456c_6194d9b6",
+        "filename": "acumos-kong-api/secure-acumos-api.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-03-09T16:09:22Z",
+      "side": 1,
+      "message": "Replace this with \u003cyour hostname\u003e",
+      "range": {
+        "startLine": 10,
+        "startChar": 24,
+        "endLine": 10,
+        "endChar": 46
+      },
+      "revId": "1f2c102579df309671a0dd3007b6c56f95c0c486",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
