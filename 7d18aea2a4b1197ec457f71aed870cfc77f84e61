@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "349873d7_6f436ba4",
+        "filename": "docs/release-notes.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-09T20:56:23Z",
+      "side": 1,
+      "message": "This is not a delivered software component.  It is not likely to have release notes.",
+      "revId": "7d18aea2a4b1197ec457f71aed870cfc77f84e61",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e04fedb1_18bffa47",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-09T20:56:23Z",
+      "side": 1,
+      "message": "Maybe it\u0027s appropriate to move the KONG content to a kong-guide.rst file ?",
+      "revId": "7d18aea2a4b1197ec457f71aed870cfc77f84e61",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
