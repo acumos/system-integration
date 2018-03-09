@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4e995e33_62c07caf",
+        "filename": "acumos-kong-api/secure-acumos-api.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-03-09T15:55:16Z",
+      "side": 1,
+      "message": "should this be \u0027acumosmaster\u0027 ??",
+      "range": {
+        "startLine": 8,
+        "startChar": 41,
+        "endLine": 8,
+        "endChar": 54
+      },
+      "revId": "cd8887c890252bb47a17fd010282cc2bbfbfa095",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ed591613_116d8316",
+        "filename": "acumos-kong-api/secure-acumos-api.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-03-09T15:55:16Z",
+      "side": 1,
+      "message": "Please remove references to \"cognita\"",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 46
+      },
+      "revId": "cd8887c890252bb47a17fd010282cc2bbfbfa095",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
