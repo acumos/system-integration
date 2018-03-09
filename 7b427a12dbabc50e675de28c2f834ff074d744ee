@@ -1,0 +1,113 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b37c71c2_d2843c41",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-03-09T18:08:26Z",
+      "side": 1,
+      "message": "I created a Jira task so please add  Issue: ACUMOS-352",
+      "revId": "7b427a12dbabc50e675de28c2f834ff074d744ee",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2e7fe747_16bf0a9e",
+        "filename": "acumos-kong-api/secure-acumos-api.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-03-09T18:08:26Z",
+      "side": 1,
+      "message": "please change to ACUMOS_CDS_PORT",
+      "range": {
+        "startLine": 12,
+        "startChar": 14,
+        "endLine": 12,
+        "endChar": 18
+      },
+      "revId": "7b427a12dbabc50e675de28c2f834ff074d744ee",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e393de00_0bcf520d",
+        "filename": "acumos-kong-api/secure-acumos-api.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-03-09T18:08:26Z",
+      "side": 1,
+      "message": "what is \"dev-core\" ?",
+      "range": {
+        "startLine": 15,
+        "startChar": 17,
+        "endLine": 15,
+        "endChar": 25
+      },
+      "revId": "7b427a12dbabc50e675de28c2f834ff074d744ee",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "003805d1_19804c52",
+        "filename": "acumos-kong-api/secure-acumos-api.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-03-09T18:08:26Z",
+      "side": 1,
+      "message": "please change to cds",
+      "range": {
+        "startLine": 33,
+        "startChar": 8,
+        "endLine": 33,
+        "endChar": 12
+      },
+      "revId": "7b427a12dbabc50e675de28c2f834ff074d744ee",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cde2e837_858efb5c",
+        "filename": "acumos-kong-api/secure-acumos-api.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-03-09T18:08:26Z",
+      "side": 1,
+      "message": "please change to ACUMOS_CDS_PORT",
+      "range": {
+        "startLine": 37,
+        "startChar": 52,
+        "endLine": 37,
+        "endChar": 68
+      },
+      "revId": "7b427a12dbabc50e675de28c2f834ff074d744ee",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
