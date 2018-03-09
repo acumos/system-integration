@@ -1,0 +1,58 @@
+version: '2.0'
+
+services:
+  kong-database:
+    restart: on-failure
+    container_name: acumos-kong-database
+    image: postgres:9.4
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=kong
+      - POSTGRES_DB=kong
+    volumes:
+      - kong-db:/var/lib/postgresql
+
+  kong-migration:
+    image: kong:0.11.0
+    depends_on:
+      - kong-database
+    environment:
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=acumos-kong-database
+    command: >
+      /bin/bash -c "
+          echo sleeping;
+          sleep 10;
+          echo Connected! migration started;
+          kong migrations up;
+      "
+
+
+  kong:
+    restart: on-failure
+    container_name: acumos-kong
+    image: kong:0.11.0
+    depends_on:
+      - kong-database
+      - kong-migration
+    environment:
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=acumos-kong-database
+      - KONG_PG_DATABASE=kong
+    ports:
+      - "7000:8000"
+      - "7001:8001"
+      - "443:8443"
+      - "7004:8444"
+    command: >
+      /bin/bash -c "
+          echo sleeping;
+          sleep 30;
+          echo Connected!;
+          kong start;
+      "
+
+volumes:
+    kong-db:
+        external: true
