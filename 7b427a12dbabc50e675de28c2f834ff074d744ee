@@ -105,6 +105,24 @@
     },
     {
       "key": {
+        "uuid": "893a31a8_d6e6c29c",
+        "filename": "acumos-kong-api/secure-acumos-api.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-03-09T22:41:37Z",
+      "side": 1,
+      "message": "There is no Encryption between Acumos components. This part of the code exposes Swagger API over https. If this is not required, we should remove it.",
+      "parentUuid": "1001f2f1_06fd5b26",
+      "revId": "7b427a12dbabc50e675de28c2f834ff074d744ee",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cde2e837_858efb5c",
         "filename": "acumos-kong-api/secure-acumos-api.sh",
         "patchSetId": 4
