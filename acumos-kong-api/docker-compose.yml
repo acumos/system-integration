@@ -1,0 +1,87 @@
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+version: '2.0'
+
+services:
+  kong-database:
+    restart: on-failure
+    container_name: ${ACUMOS_KONG_API_DATABASE_CONTAINER_NAME}
+    image: ${ACUMOS_KONG_API_POSTGRES_DATABASE_IMAGE}
+    ports:
+      - "${ACUMOS_KONG_API_DATABASE_PORT}:5432"
+    environment:
+      - POSTGRES_USER=${ACUMOS_KONG_API_POSTGRES_USER}
+      - POSTGRES_DB=${ACUMOS_KONG_API_POSTGRES_USER}
+    volumes:
+      - kong-db:/var/lib/postgresql
+
+
+  kong-migration:
+    image: ${ACUMOS_KONG_API_IMAGE}
+    depends_on:
+      - kong-database
+    environment:
+      - KONG_DATABASE=${ACUMOS_KONG_API_DATABASE}
+      - KONG_PG_HOST=${ACUMOS_KONG_API_DATABASE_CONTAINER_NAME}
+       command: >
+         /bin/bash -c "
+             until [[ $$(curl -v http://kong-database:5432 2>&1 | grep -c \"Connected to \") -gt 0 ]]; do
+               echo \"kong-database is unavailable - sleeping 10 seconds\";
+               sleep 10;
+             done;
+             echo Connected! migration started;
+             kong migrations up;
+         "
+
+
+  kong:
+    restart: on-failure
+    container_name: acumos-kong
+    image: ${ACUMOS_KONG_API_IMAGE}
+    depends_on:
+      - kong-database
+      - kong-migration
+    environment:
+      - KONG_DATABASE=${ACUMOS_KONG_API_DATABASE}
+      - KONG_PG_HOST=${ACUMOS_KONG_API_DATABASE_CONTAINER_NAME}
+      - KONG_PG_DATABASE=${ACUMOS_KONG_API_POSTGRES_USER}
+      - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      - KONG_PROXY_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_ERROR_LOG=/dev/stderr
+    ports:
+      - "${ACUMOS_KONG_API_LISTENS_HTTP_TRAFFIC_PORT}:8000"
+      - "${ACUMOS_KONG_API_LISTENS_HTTP_ADMIN_API_PORT}:8001"
+      - "${ACUMOS_KONG_API_LISTENS_HTTPS_TRAFFIC_PORT}:8443"
+      - "${ACUMOS_KONG_API_LISTENS_HTTPS_ADMIN_API_PORT}:8444"
+       command: >
+         /bin/bash -c "
+             until [[ $$(curl -v http://kong-database:5432 2>&1 | grep -c \"Connected to \") -gt 0 ]]; do
+               echo \"kong-database is unavailable - sleeping 10 seconds\";
+               sleep 10;
+             done;
+             kong start -vv;
+             kong health -vv;
+             echo Connected!;
+         "
+
+volumes:
+    kong-db:
+        external: true
+
