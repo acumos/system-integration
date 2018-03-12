@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "1ae84b90_c451af30",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-03-12T21:28:10Z",
+      "side": 1,
+      "message": "Not so sure about this one. I think parameterizing helps when there *might* be some value in the user deploying this selecting an alternate value. In this case, the username is a strictly internal data item. Similar in fact to the parameters for the container ports... many of them are superfluous now that they are not exposed externally.",
+      "parentUuid": "6850d229_195b2501",
+      "revId": "acb6373d2aca03ecfa13563ced72f88106fd802b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "de3edd90_ec00d32e",
         "filename": "AIO/docker-compose.yaml",
         "patchSetId": 5
