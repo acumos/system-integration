@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "693f500a_2cd42507",
+        "filename": "acumos-kong-api/docker-compose.yml",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T15:37:03Z",
+      "side": 1,
+      "message": "Please see the approach used in IST and AIO: create a shell script \"docker-compose-kong.sh\" with all the values set into shell variables (for example: export FOO\u003d\"bar\"), then write $FOO in the docker-compose.yaml file instead of repeating the same value.",
+      "revId": "c894953e46a115320e23710f9ec6d8aa4385b5d0",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9c389756_acd092af",
+        "filename": "acumos-kong-api/docker-compose.yml",
+        "patchSetId": 5
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T15:37:03Z",
+      "side": 1,
+      "message": "depends_on is a docker-compose 2.0 feature, must ensure the right version of docker is installed.",
+      "revId": "c894953e46a115320e23710f9ec6d8aa4385b5d0",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d69e65aa_4f69c496",
+        "filename": "acumos-kong-api/docker-compose.yml",
+        "patchSetId": 5
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T15:37:03Z",
+      "side": 1,
+      "message": "Why sleep if there\u0027s a depends-on clause?  It\u0027s impossible to predict the amount of time to wait for the database.  In some environments it takes seconds, in others minutes.",
+      "revId": "c894953e46a115320e23710f9ec6d8aa4385b5d0",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "81be60f8_4f7e5732",
+        "filename": "acumos-kong-api/docker-compose.yml",
+        "patchSetId": 5
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T15:37:03Z",
+      "side": 1,
+      "message": "See comments above about waiting.  This is fragile.  Need a proper wait-for if you want to wait.",
+      "revId": "c894953e46a115320e23710f9ec6d8aa4385b5d0",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
