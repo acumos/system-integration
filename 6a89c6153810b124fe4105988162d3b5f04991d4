@@ -70,6 +70,23 @@
     },
     {
       "key": {
+        "uuid": "e859bee2_c5d56908",
+        "filename": "AIO/clean.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T15:58:17Z",
+      "side": 1,
+      "message": "Since oneclick-install adds docker-ce, should this remove docker-ce?",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "59408d64_257ec6fc",
         "filename": "AIO/docker-compose.yaml",
         "patchSetId": 1
