@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "6850d229_195b2501",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T21:16:40Z",
+      "side": 1,
+      "message": "This should be a parameter to avoid the repetition/hardcoding later in the file",
+      "revId": "acb6373d2aca03ecfa13563ced72f88106fd802b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "de3edd90_ec00d32e",
         "filename": "AIO/docker-compose.yaml",
         "patchSetId": 5
