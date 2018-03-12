@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5db299ff_7b7d2438",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 497,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T20:50:19Z",
+      "side": 1,
+      "message": "Why are we using \"kong-migration\"? We don\u0027t need to migrate from anything, do we?\n\nPlease use a tag to pin this to a known version.  Without a tag you get \"latest\" which could be anything.",
+      "revId": "8c422da1257dd31841ed2489a15d36da255adad2",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2bfce988_dc673236",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 513,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T20:50:19Z",
+      "side": 1,
+      "message": "Please use a tag to pin this to a known version.  Without a tag you get \"latest\" which could be anything.",
+      "revId": "8c422da1257dd31841ed2489a15d36da255adad2",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
