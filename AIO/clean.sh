@@ -23,24 +23,32 @@
 # - If the docker-compose console is still running, showing the logs of the
 #   containers, ctrl-c to stop it and wait will all services are stopped.
 # Usage:
-# $ sudo bash clean.sh
+# $ bash clean.sh
 #
+
+trap - ERR
 
 source acumos-env.sh
 
 echo "Stop the running Acumos component containers"
-docker-compose down
-docker-compose rm -v
+sudo bash docker-compose.sh down
+sudo bash docker-compose.sh rm -v
 
-echo "Remove Acumos databases and users"
-# TODO: support centos also
-mysql --user=root --password=$MARIADB_PASSWORD -e "DROP DATABASE $ACUMOS_CDS_DB; DROP DATABASE acumos_comment;  DROP DATABASE acumos_cms; DROP USER 'acumos_opr'@'%';"
+if [[ "$MARIADB_PASSWORD" != "" ]]; then
+  echo "Remove Acumos databases and users"
+  # TODO: support centos also
+  sudo mysql --user=root --password=$MARIADB_PASSWORD -e "DROP DATABASE $ACUMOS_CDS_DB; DROP DATABASE acumos_comment;  DROP DATABASE acumos_cms; DROP USER 'acumos_opr'@'%';"
+else
+  echo "Remove all mysql data"
+  # TODO: remove this workaround used in early testing
+  sudo rm -rf /var/lib/mysql
+fi
 
 echo "Remove mariadb-server"
-apt-get remove mariadb-server-10.2 -y
+sudo apt-get remove mariadb-server-10.2 -y
 
-echo "Remove all mysql data"
-# TODO: remove this workaround used in early testing
-rm -rf /var/lib/mysql
+echo "Remove Kong certs etc"
+rm -rf certs
+rm nexus-script.json
 
 echo "You should now be able to repeat the install via oneclick_deploy.sh"
