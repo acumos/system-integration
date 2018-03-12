@@ -435,6 +435,24 @@
       "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "94ef40e8_34501951",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 419,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T17:38:27Z",
+      "side": 1,
+      "message": "As discussed on the phone, CDS accepts the password either encoded or in the clear, your choice.",
+      "parentUuid": "1a546fb7_7636ec54",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
