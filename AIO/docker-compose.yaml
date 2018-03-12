@@ -18,7 +18,7 @@ version: '2'
 # ===============LICENSE_END=========================================================
 
 # docker-compose for all-in-one environment
-# uses localhost for nexus repo and database (running on same server)
+# uses localhost for database (running on same server)
 # TODO: remove ports: for services that do not need external exposure
 # TODO: remove or parameterize all credentials
 # TODO: scrub all attributes for current need
@@ -26,9 +26,12 @@ services:
    nexus:
        image: sonatype/nexus3
        expose:
-           - ${ACUMOS_NEXUS_PORT}
+           - ${ACUMOS_NEXUS_API_PORT}
        ports:
-           - ${ACUMOS_NEXUS_PORT}:8081
+           - ${ACUMOS_NEXUS_API_PORT}:8081
+           - ${ACUMOS_MAVEN_MODEL_PORT}:${ACUMOS_MAVEN_MODEL_PORT}
+           - ${ACUMOS_DOCKER_MODEL_PORT}:${ACUMOS_DOCKER_MODEL_PORT}
+           - ${ACUMOS_DOCKER_PLATFORM_PORT}:${ACUMOS_DOCKER_PLATFORM_PORT}
        volumes:
            - acumos-logs:/maven/logs
        logging:
@@ -44,7 +47,7 @@ services:
                 \"security\" : {
                     \"user\" : {
                         \"name\"     : \"ccds_client\",
-                        \"password\" : \"ENC(CTQD7Xk5bOIuC4MaqRZtzjW1K4ArjCjr)\"
+                        \"password\" : \"${ACUMOS_CDS_PASSWORD}\"
                     }
                 },
                 \"spring\" : {
@@ -83,11 +86,11 @@ services:
                     \"port\" : ${ACUMOS_ONBOARDING_PORT}
                 },
                \"docker\" : {
-                   \"host\" : \"localhost\",
+                   \"host\" : \"${ACUMOS_DOCKER_API_HOST}\",
                    \"port\" : 4243,
                    \"config\": \"/docker_host/.docker\",
                    \"registry\" :{
-                       \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_PORT}/\",
+                       \"url\": \"http://nexus:${ACUMOS_DOCKER_MODEL_PORT}/\",
                        \"username\" : \"acumos_rw\",
                        \"password\" : \"${ACUMOS_RW_USER_PASSWORD}\",
                        \"email\": \"acumos@example.com\"
@@ -99,32 +102,32 @@ services:
                        \"version\": \"1.23\"
                    },
                    \"imagetag\": {
-                       \"prefix\": \"${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_PORT}\"
+                       \"prefix\": \"nexus:${ACUMOS_DOCKER_MODEL_PORT}\"
                    },
                    \"max_total_connections\": \"1\",
                    \"max_per_route_connections\": \"1\"
                },
                \"http_proxy\": \"\",
                \"nexus\": {
-                       \"nexusEndPointURL\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_PORT}/repository/acumos_model_maven/\",
+                       \"nexusEndPointURL\": \"http://nexus:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
                        \"nexusUserName\": \"acumos_rw\",
                        \"nexusPassword\": \"${ACUMOS_RW_USER_PASSWORD}\",
                        \"nexusproxy\": \"\",
                        \"nexusGroupId\": \"com.artifact\"
                },
                \"cmndatasvc\": {
-                       \"cmnDataSvcEndPoinURL\": \"http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds\",
+                       \"cmnDataSvcEndPoinURL\": \"http://common-data-svc:${ACUMOS_CDS_PORT}/ccds\",
                        \"cmnDataSvcUser\": \"ccds_client\",
-                       \"cmnDataSvcPwd\": \"ccds_client\"
+                       \"cmnDataSvcPwd\": \"${ACUMOS_CDS_PASSWORD}\"
                },
                \"mktPlace\": {
-                    \"mktPlaceEndPoinURL\" : \"http://${ACUMOS_PORTAL_BE_HOST}:${ACUMOS_PORTAL_BE_PORT}\"
+                    \"mktPlaceEndPoinURL\" : \"http://acumos-portal-be:${ACUMOS_PORTAL_BE_PORT}\"
                },
                \"requirements\": {
-                       \"extraIndexURL\": \"http://localhost:8087/archive\",
-                       \"trustedHost\": \"localhost\"
+                       \"extraIndexURL\": \"http://${PYTHON_EXTRAINDEX_HOST}:8087/archive\",
+                       \"trustedHost\": \"${PYTHON_EXTRAINDEX_HOST}\"
                },
-               \"authenticationServiceURL\": \"http://${ACUMOS_PORTAL_BE_HOST}:${ACUMOS_PORTAL_BE_PORT}\"
+               \"authenticationServiceURL\": \"http://acumos-portal-be:${ACUMOS_PORTAL_BE_PORT}\"
        }"
        expose:
            - ${ACUMOS_ONBOARDING_PORT}
@@ -148,7 +151,7 @@ services:
                    \"port\" : ${ACUMOS_PORTAL_BE_PORT}
                 },
                 \"nexus\": {
-                        \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_PORT}/repository/acumos_model_maven/\",
+                        \"url\": \"http://nexus:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
                         \"proxy\": \"\",
                         \"password\": \"${ACUMOS_RW_USER_PASSWORD}\",
                         \"username\": \"acumos_rw\",
@@ -156,30 +159,30 @@ services:
                 },
                 \"cdms\" : {
                   \"client\" : {
-                     \"url\": \"http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds\",
+                     \"url\": \"http://common-data-svc:${ACUMOS_CDS_PORT}/ccds\",
                      \"username\": \"ccds_client\",
-                     \"password\": \"ccds_client\"
+                     \"password\": \"${ACUMOS_CDS_PASSWORD}\"
                      }
                 },
                 \"docker\" : {
-                   \"host\" : \"localhost\",
+                   \"host\" : \"${ACUMOS_DOCKER_API_HOST}\",
                    \"resgistry\" : {
-                      \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_PORT}/\",
+                      \"url\": \"http://nexus:${ACUMOS_DOCKER_MODEL_PORT}/\",
                       \"username\" : \"acumos_rw\",
                       \"password\" : \"${ACUMOS_RW_USER_PASSWORD}\",
                       \"email\": \"acumos@example.com\"
                    },
                    \"imagetag\" : {
-                       \"prefix\": \"${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_PORT}\"
+                       \"prefix\": \"nexus:${ACUMOS_DOCKER_MODEL_PORT}\"
                    }
                 },
                 \"qanda\" : {
-                   \"url\" : \"http://${ACUMOS_CMS_HOST}:${ACUMOS_CMS_PORT}\"
+                   \"url\" : \"http://acumos-cms-docker:${ACUMOS_CMS_PORT}\"
                 },
                 \"onboarding\" : {
                    \"push\" : {
                        \"model\" : {
-                          \"url\" : \"http://${ACUMOS_ONBOARDING_HOST}:${ACUMOS_ONBOARDING_PORT}/onboarding-app/v2/models\"
+                          \"url\" : \"http://onboarding-app:${ACUMOS_ONBOARDING_PORT}/onboarding-app/v2/models\"
                        }
                    }
                 },
@@ -198,7 +201,7 @@ services:
                       \"validateModel\" : \"false\"
                    },
                    \"submitValidation\" : {
-                      \"api\" : \"http://${ACUMOS_WRAPPER_HOST}:${ACUMOS_WRAPPER_PORT}/status/v1.0/tasks\"
+                      \"api\" : \"http://wrapper:${ACUMOS_WRAPPER_PORT}/status/v1.0/tasks\"
                    }
                 }
            }"
@@ -229,16 +232,16 @@ services:
                         \"url\": \"http://acumos-portal-be:${ACUMOS_PORTAL_BE_PORT}\"
                       },
                       \"dsce\": {
-                        \"url\": \"http://${ACUMOS_DSCE_HOST}:${ACUMOS_DSCE_PORT}\"
+                        \"url\": \"http://ds-compositionengine:${ACUMOS_DSCE_PORT}\"
                       },
                       \"site\" : {
-                        \"url\": \"http://${ACUMOS_CMS_HOST}:${ACUMOS_CMS_PORT}\"
+                        \"url\": \"http://acumos-cms-docker:${ACUMOS_CMS_PORT}\"
                       },
                       \"cmnt\" : {
-                         \"url\" : \"http://${ACUMOS_PLATON_HOST}:${ACUMOS_PLATON_PORT}\"
+                         \"url\" : \"http://delete-me:${ACUMOS_PLATON_PORT}\"
                       },
                       \"azure\" : {
-                          \"url\" : \"http://${ACUMOS_AZURE_CLIENT_HOST}:${ACUMOS_AZURE_CLIENT_PORT}\"
+                          \"url\" : \"http://azure-client:${ACUMOS_AZURE_CLIENT_PORT}\"
                       }
                    }
                },
@@ -252,7 +255,7 @@ services:
                }
            }"
        ports:
-           - ${ACUMOS_PORTAL_PORT}:${ACUMOS_PORTAL_FE_PORT}
+           - ${ACUMOS_PORTAL_FE_PORT}:${ACUMOS_PORTAL_FE_PORT}
        links:
            - acumos-portal-be:acumos-portal-be
        depends_on:
@@ -275,23 +278,23 @@ services:
                                 \"outputfolder\": \"/temp/output/\"
                           },
                           \"nexus\": {
-                                \"nexusendpointurl\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_PORT}/repository/acumos_model_maven/\",
+                                \"nexusendpointurl\": \"http://nexus:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
                                 \"nexusproxy\": \"\",
                                 \"nexuspassword\": \"${ACUMOS_RW_USER_PASSWORD}\",
                                 \"nexususername\": \"acumos_rw\",
                                 \"nexusgroupid\": \"com.artifact\"
                           },
                           \"cmndatasvc\": {
-                                \"cmndatasvcendpoinurl\": \"http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds\",
+                                \"cmndatasvcendpoinurl\": \"http://common-data-svc:${ACUMOS_CDS_PORT}/ccds\",
                                 \"cmndatasvcuser\": \"ccds_client\",
-                                \"cmndatasvcpwd\": \"ccds_client\"
+                                \"cmndatasvcpwd\": \"${ACUMOS_CDS_PASSWORD}\"
                           },
                           \"docker\": {
-                                \"host\": \"localhost\",
+                                \"host\": \"${ACUMOS_DOCKER_API_HOST}\",
                                 \"port\": 4243,
                                 \"config\": \"/docker_host/.docker\",
                                 \"registry\": {
-                                        \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_PORT}/\",
+                                        \"url\": \"http://nexus:${ACUMOS_DOCKER_MODEL_PORT}/\",
                                         \"username\": \"acumos_rw\",
                                         \"password\": \"${ACUMOS_RW_USER_PASSWORD}\",
                                         \"email\": \"acumos@example.com\"
@@ -299,7 +302,7 @@ services:
                                 \"tls\": {\"verify\": \"false\"},
                                 \"api\": {\"version\": \"1.23\"},
                                 \"imagetag\": {
-                                        \"prefix\": \"${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_PORT}\"
+                                        \"prefix\": \"nexus:${ACUMOS_DOCKER_MODEL_PORT}\"
                                             },
                                 \"max_total_connections\": \"1\",
                                 \"max_per_route_connections\": \"1\"
@@ -313,38 +316,6 @@ services:
        volumes:
            - acumos-logs:/maven/logs
            - acumos-output:/temp/
-       logging:
-           driver: json-file
-
-   acumos-platon:
-       image: ${PORTAL_PLATON_IMAGE}
-       environment:
-           SPRING_APPLICATION_JSON: "{
-                \"server\" : {
-                    \"port\" : ${ACUMOS_PLATON_PORT}
-                },
-                 \"spring\" : {
-                    \"datasource\" : {
-                        \"url\" : \"jdbc:mariadb://${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_PORT}/acumos_comment?useSSL=false\",
-                        \"username\" : \"acumos_opr\",
-                        \"password\" : \"${MARIADB_USER_PASSWORD}\"
-                    },
-                    \"jooq\" : {
-                        \"sql-dialect\": \"mariadb\"
-                    },
-                    \"platon\" : {
-                        \"input\" : {
-                           \"html_elements\" : \"h1, h2, h3, h4, h5, h6, br, p, hr, div, span, a, img, em, strong, ol, ul, li, blockquote, code, pre\"
-                         }
-                     }
-                 }
-           }"
-       expose:
-           - ${ACUMOS_PLATON_PORT}
-       ports:
-           - ${ACUMOS_PLATON_PORT}:${ACUMOS_PLATON_PORT}
-       volumes:
-           - acumos-logs:/maven/logs
        logging:
            driver: json-file
 
@@ -417,7 +388,7 @@ services:
                    }
                 },
                 \"nexus\": {
-                   \"nexusendpointurl\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_PORT}/repository/acumos_model_maven/\",
+                   \"nexusendpointurl\": \"http://nexus:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
                    \"nexusproxy\": \"\",
                    \"nexuspassword\": \"${ACUMOS_RW_USER_PASSWORD}\",
                    \"nexususername\": \"acumos_rw\",
@@ -430,9 +401,9 @@ services:
                 },
                 \"cdms\" : {
                   \"client\" : {
-                     \"url\": \"http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds\",
+                     \"url\": \"http://common-data-svc:${ACUMOS_CDS_PORT}/ccds\",
                      \"username\": \"ccds_client\",
-                     \"password\": \"ccds_client\"
+                     \"password\": \"${ACUMOS_CDS_PASSWORD}\"
                   }
                 }
            }"
@@ -467,7 +438,7 @@ services:
                 },
                 \"docker\" : {
                     \"containerNamePrefix\": \"acumos-e6e\",
-                    \"host\": \"localhost\",
+                    \"host\": \"${ACUMOS_DOCKER_API_HOST}\",
                     \"port\": \"4243\",
                     \"dockerVMUserName\": \"dockerUser\",
                     \"dockerVMPassword\": \"12NewPA$$w0rd!\",
@@ -479,27 +450,27 @@ services:
                         },
                         \"networkgroupName\": \"E6E-NSG\",
                         \"port\": \"80\",
-                        \"name\": \"${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_PORT}\",
-                        \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_PORT}/\",
+                        \"name\": \"${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}\",
+                        \"url\": \"http://nexus:${ACUMOS_DOCKER_MODEL_PORT}/\",
                         \"username\": \"acumos_rw\",
                         \"password\": \"${ACUMOS_RW_USER_PASSWORD}\"
                     }
                 },
                 \"blueprint\": {
-                    \"ImageName\": \"localhost:8002/blueprint-orchestrator:1.0.0-SNAPSHOT\",
+                    \"ImageName\": \"nexus:${ACUMOS_DOCKER_PLATFORM_PORT}/blueprint-orchestrator:1.0.0-SNAPSHOT\",
                     \"name\": \"blueprint-orchestrator\"
                 },
                 \"nexus\": {
-                    \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_PORT}/repository/acumos_model_maven/\",
+                    \"url\": \"http://nexus:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
                     \"nexusproxy\": \"\",
                     \"password\": \"${ACUMOS_RW_USER_PASSWORD}\",
                     \"username\": \"acumos_rw\",
                     \"groupId\": \"com.artifact\"
                 },
                 \"cmndatasvc\": {
-                    \"cmndatasvcendpoinurl\": \"http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds\",
+                    \"cmndatasvcendpoinurl\": \"http://common-data-svc:${ACUMOS_CDS_PORT}/ccds\",
                     \"cmndatasvcuser\": \"ccds_client\",
-                    \"cmndatasvcpwd\": \"ccds_client\"
+                    \"cmndatasvcpwd\": \"${ACUMOS_CDS_PASSWORD}\"
                 }
            }"
        expose:
@@ -511,13 +482,70 @@ services:
        logging:
            driver: json-file
 
-# This persistent volume must be created externally:
-#   docker volume create acumos-logs
-#   docker volume create acumos-output
+   kong-database:
+       restart: on-failure
+       image: postgres:9.5
+       ports:
+         - "${ACUMOS_KONG_DB_PORT}:${ACUMOS_KONG_DB_PORT}"
+       environment:
+         - POSTGRES_USER=kong
+         - POSTGRES_DB=kong
+       volumes:
+         - kong-db:/var/lib/postgresql
+
+   kong-migration:
+       image: kong
+       depends_on:
+         - kong-database
+       environment:
+         - KONG_DATABASE=postgres
+         - KONG_PG_HOST=kong-database
+       command: >
+         /bin/bash -c "
+             echo sleeping;
+             sleep 10;
+             echo Connected! migration started;
+             kong migrations up;
+         "
+
+   kong:
+       restart: on-failure
+       image: kong
+       depends_on:
+         - kong-database
+         - kong-migration
+       environment:
+         - KONG_DATABASE=postgres
+         - KONG_PG_HOST=kong-database
+         - KONG_PG_DATABASE=kong
+         - KONG_PROXY_ACCESS_LOG=/dev/stdout
+         - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+         - KONG_PROXY_ERROR_LOG=/dev/stderr
+         - KONG_ADMIN_ERROR_LOG=/dev/stderr
+         - KONG_ADMIN_LISTEN=0.0.0.0:8001
+         - KONG_ADMIN_LISTEN_SSL=0.0.0.0:8444
+       ports:
+         - "${ACUMOS_KONG_PROXY_PORT}:8000"
+         - "${ACUMOS_KONG_PROXY_SSL_PORT}:8443"
+         - "${ACUMOS_KONG_ADMIN_PORT}:8001"
+         - "${ACUMOS_KONG_ADMIN_SSL_PORT}:8444"
+       command: >
+         /bin/bash -c "
+             echo sleeping;
+             sleep 30;
+             kong start -vv;
+             kong health -vv;
+             echo Connected!;
+         "
+
+# Each persistent volume must be created externally:
+#   docker volume create <volume name>
 volumes:
     acumos-logs:
         external: true
     acumos-output:
         external: true
     acumosWebOnboarding:
+        external: true
+    kong-db:
         external: true

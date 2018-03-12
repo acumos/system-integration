@@ -26,6 +26,8 @@
 # $ sudo bash clean.sh
 #
 
+trap - ERR
+
 source acumos-env.sh
 
 echo "Stop the running Acumos component containers"
@@ -42,5 +44,8 @@ apt-get remove mariadb-server-10.2 -y
 echo "Remove all mysql data"
 # TODO: remove this workaround used in early testing
 rm -rf /var/lib/mysql
+
+echo "Remove Kong certs etc"
+rm -rf certs
 
 echo "You should now be able to repeat the install via oneclick_deploy.sh"

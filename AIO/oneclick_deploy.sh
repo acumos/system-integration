@@ -19,7 +19,7 @@
 #
 # What this is: All-in-One deployment of the Acumos platform.
 # Prerequisites:
-# - Ubuntu Xenial or Centos 7 server
+# - Ubuntu Xenial server (Centos 7 support is planned!)
 # Usage:
 # $ bash oneclick_deploy.sh
 #
@@ -55,50 +55,54 @@ function setup_prereqs() {
     echo "$(/sbin/ip route get 8.8.8.8 | awk '{print $NF; exit}') $HOSTNAME" \
       | sudo tee -a /etc/hosts
   fi
-  if [[ "$dist" == "ubuntu" ]]; then
-    echo; echo "prereqs.sh: ($(date)) Basic prerequisites"
 
-    wait_dpkg; sudo apt-get update
-    wait_dpkg; sudo apt-get upgrade -y
-    wait_dpkg; sudo apt-get install -y wget git jq
+  log "Basic prerequisites"
 
-    echo; echo "prereqs.sh: ($(date)) Install latest docker-ce"
-    # Per https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
-    sudo apt-get remove -y docker docker-engine docker.io docker-ce
-    sudo apt-get update
-    sudo apt-get install -y \
-      linux-image-extra-$(uname -r) \
-      linux-image-extra-virtual
-    sudo apt-get install -y \
-      apt-transport-https \
-      ca-certificates \
-      curl \
-      software-properties-common
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    sudo add-apt-repository "deb [arch=amd64] \
-      https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    sudo apt-get update
-    sudo apt-get install -y docker-ce
-    sudo service docker restart
-  else
-    echo; echo "prereqs.sh: ($(date)) Basic prerequisites"
-    sudo yum install -y epel-release
-    sudo yum update -y
-    sudo yum install -y wget git jq
+  wait_dpkg; sudo apt-get update
+  wait_dpkg; sudo apt-get upgrade -y
+  wait_dpkg; sudo apt-get install -y wget git jq
 
-    echo; echo "prereqs.sh: ($(date)) Install latest docker"
-    # per https://docs.docker.com/engine/installation/linux/docker-ce/centos/#install-from-a-package
-    sudo yum install -y docker docker-compose
-    sudo systemctl enable docker
-    sudo systemctl start docker
-  #  wget https://download.docker.com/linux/centos/7/x86_64/stable/Packages/docker-ce-17.09.0.ce-1.el7.centos.x86_64.rpm
-  #  sudo yum install -y docker-ce-17.09.0.ce-1.el7.centos.x86_64.rpm
-  #  sudo systemctl start docker
-  fi
+  log "Install latest docker-ce"
+  # Per https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
+  sudo apt-get remove -y docker docker-engine docker.io docker-ce
+  sudo apt-get update
+  sudo apt-get install -y \
+    linux-image-extra-$(uname -r) \
+    linux-image-extra-virtual
+  sudo apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    software-properties-common
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  sudo add-apt-repository "deb [arch=amd64] \
+    https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  sudo apt-get update
+  sudo apt-get install -y docker-ce docker-compose
+
+  log "Enable docker remote API"
+  sudo sed -i -- 's~ExecStart=/usr/bin/dockerd -H fd://~ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:4243~' /lib/systemd/system/docker.service
+  log "Enable non-secure docker repositories"
+cat << EOF | sudo tee /etc/docker/daemon.json
+{
+  "insecure-registries": [
+    "nexus:$ACUMOS_DOCKER_MODEL_PORT", "nexus:$ACUMOS_DOCKER_PLATFORM_PORT", "nexus:$ACUMOS_MAVEN_MODEL_PORT"
+  ],
+  "disable-legacy-registry": true
+}
+EOF
+  sudo systemctl daemon-reload
+  sudo service docker restart
+
   log "Create Volumes for Acumos application"
+  while ! curl http://$ACUMOS_DOCKER_API_HOST:4243 ; do
+    log "waiting 30 seconds for docker daemon to be ready"
+    sleep 30
+  done
   sudo docker volume create acumos-logs
   sudo docker volume create acumos-output
   sudo docker volume create acumosWebOnboarding
+  sudo docker volume create kong-db
 }
 
 function setup_mariadb() {
@@ -116,10 +120,6 @@ EOF
   sudo apt-get update -y
 
   log "Install MariaDB without password prompt"
-  MARIADB_PASSWORD=$(uuidgen)
-  echo "MARIADB_PASSWORD=\"$MARIADB_PASSWORD\"" >>acumos-env.sh
-  echo "export MARIADB_PASSWORD" >>acumos-env.sh
-  export MARIADB_PASSWORD
   sudo debconf-set-selections <<< "mariadb-server-$MARIADB_VERSION mysql-server/root_password password $MARIADB_PASSWORD"
   sudo debconf-set-selections <<< "mariadb-server-$MARIADB_VERSION mysql-server/root_password_again password $MARIADB_PASSWORD"
 
@@ -145,11 +145,6 @@ EOF
 
 function setup_acumosdb() {
   log "Setup Acumos databases"
-  MARIADB_USER_PASSWORD=$(uuidgen)
-  echo "MARIADB_USER_PASSWORD=\"$MARIADB_USER_PASSWORD\"" >>acumos-env.sh
-  echo "export MARIADB_USER_PASSWORD" >>acumos-env.sh
-  export MARIADB_USER_PASSWORD
-  source acumos-env.sh
 
   log "Create myqsl user acumos_opr"
   mysql --user=root --password=$MARIADB_PASSWORD -e "CREATE USER 'acumos_opr'@'%' IDENTIFIED BY \"$MARIADB_USER_PASSWORD\";"
@@ -168,33 +163,12 @@ function setup_acumosdb() {
   mysql --user=root --password=$MARIADB_PASSWORD -e "CREATE DATABASE acumos_cms; USE acumos_cms; GRANT ALL PRIVILEGES ON acumos_cms.* TO 'acumos_opr'@'%' IDENTIFIED BY \"$MARIADB_USER_PASSWORD\";"
 }
 
-function setup_nexus() {
-  while ! curl -v -u admin:admin123 http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_PORT/service/rest/v1/script ; do
-    log "Waiting 10 seconds for nexus server to respond"
-    sleep 10
-  done
-  log "Create Nexus repo acumos_model_maven"
-  # For into on Nexus script API and groovy scripts, see
+setup_nexus_repo() {
+  log "Create Nexus repo $1"
+  # For info on Nexus script API and groovy scripts, see
   # https://github.com/sonatype/nexus-book-examples/tree/nexus-3.x/scripting
   # https://help.sonatype.com/display/NXRM3/Examples
-  cat <<EOF >nexus-script.json
-{
-  "name": "acumos_model_maven",
-  "type": "groovy",
-  "content": "repository.createMavenHosted('acumos_model_maven')"
-}
-EOF
-  curl -v -u admin:admin123 -H "Content-Type: application/json" \
-    http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_PORT/service/rest/v1/script/ -d @nexus-script.json
-  # TODO: verify script creation via jq parse of
-  # curl -v -u admin:admin123 'http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_PORT/service/rest/v1/script'
-  curl -v -X POST -u admin:admin123 -H "Content-Type: text/plain" \
-    http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_PORT/service/rest/v1/script/acumos_model_maven/run
-
-  repos="acumos_model_docker acumos_platform_docker"
-  for repo in $repos ; do
-    log "Create Nexus repo $repo"
-  # Parameters per javadoc
+  # Create repo Parameters per javadoc
   # org.sonatype.nexus.repository.Repository createDockerHosted(String name,
   #   Integer httpPort,
   #   Integer httpsPort,
@@ -204,29 +178,38 @@ EOF
   #   org.sonatype.nexus.repository.storage.WritePolicy writePolicy)
   # Only first three parameters used due to unclear how to script blobstore
   # creation and how to specify writePolicy ('ALLOW' was not recognized)
+  if [[ "$2" == "Maven" ]]; then
     cat <<EOF >nexus-script.json
 {
-  "name": "$repo",
+  "name": "$1",
   "type": "groovy",
-  "content": "repository.createDockerHosted(\"$repo\", null, null)"
+  "content": "repository.create${2}Hosted(\"$1\")"
 }
 EOF
-    curl -v -u admin:admin123 -H "Content-Type: application/json" \
-      http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_PORT/service/rest/v1/script/ -d @nexus-script.json
-    # TODO: verify script creation
-    curl -v -X POST -u admin:admin123 -H "Content-Type: text/plain" \
-      http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_PORT/service/rest/v1/script/$repo/run
+  else
+    cat <<EOF >nexus-script.json
+{
+  "name": "$1",
+  "type": "groovy",
+  "content": "repository.create${2}Hosted(\"$1\", $3, null)"
+}
+EOF
+  fi
+  curl -v -u admin:admin123 -H "Content-Type: application/json" \
+    http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script/ -d @nexus-script.json
+  curl -v -X POST -u admin:admin123 -H "Content-Type: text/plain" \
+    http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script/$1/run
+}
+
+function setup_nexus() {
+  while ! curl -v -u admin:admin123 http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script ; do
+    log "Waiting 10 seconds for nexus server to respond"
+    sleep 10
   done
 
-  ACUMOS_RO_USER_PASSWORD=$(uuidgen)
-  echo "ACUMOS_RO_USER_PASSWORD=\"$ACUMOS_RO_USER_PASSWORD\"" >>acumos-env.sh
-  echo "export ACUMOS_RO_USER_PASSWORD" >>acumos-env.sh
-  export ACUMOS_RO_USER_PASSWORD
-
-  ACUMOS_RW_USER_PASSWORD=$(uuidgen)
-  echo "ACUMOS_RW_USER_PASSWORD=\"$ACUMOS_RW_USER_PASSWORD\"" >>acumos-env.sh
-  echo "export ACUMOS_RW_USER_PASSWORD" >>acumos-env.sh
-  export ACUMOS_RW_USER_PASSWORD
+  setup_nexus_repo 'acumos_model_maven' 'Maven' $ACUMOS_MAVEN_MODEL_PORT
+  setup_nexus_repo 'acumos_model_docker' 'Docker' $ACUMOS_DOCKER_MODEL_PORT
+  setup_nexus_repo 'acumos_platform_docker' 'Docker' $ACUMOS_DOCKER_PLATFORM_PORT
 
   log "Add nexus roles and users"
   cat <<EOF >nexus-script.json
@@ -237,10 +220,10 @@ EOF
 }
 EOF
   curl -v -u admin:admin123 -H "Content-Type: application/json" \
-    http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_PORT/service/rest/v1/script/ -d @nexus-script.json
+    http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script/ -d @nexus-script.json
   # TODO: verify script creation
   curl -v -X POST -u admin:admin123 -H "Content-Type: text/plain" \
-    http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_PORT/service/rest/v1/script/add-roles-users/run
+    http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script/add-roles-users/run
 
   log "Show nexus users"
   cat <<EOF >nexus-script.json
@@ -251,9 +234,15 @@ EOF
 }
 EOF
   curl -v -u admin:admin123 -H "Content-Type: application/json" \
-    http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_PORT/service/rest/v1/script/ -d @nexus-script.json
+    http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script/ -d @nexus-script.json
   curl -v -X POST -u admin:admin123 -H "Content-Type: text/plain" \
-    http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_PORT/service/rest/v1/script/list-users/run
+    http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script/list-users/run
+}
+
+function setup_localindex() {
+  log "Setup local python index"
+  sudo apt-get install -y python-twisted-core
+  nohup twistd -n web --port 8087 --path .  > /dev/null 2>&1 &
 }
 
 function setup_acumos() {
@@ -266,17 +255,117 @@ function setup_acumos() {
   sudo bash docker-compose.sh up -d
 }
 
+function setup_reverse_proxy() {
+  log "Install keytool"
+  sudo apt-get install -y openjdk-9-jre-headless
+
+  log "Generate public private key pair using keytool"
+  # TODO: use these randomly generated credentials
+  keypass=$(uuidgen)
+  storepass=$(uuidgen)
+  mkdir certs
+  keytool -genkeypair -keystore certs/acumos.jks -storepass password \
+   -alias acumos -keyalg RSA -keysize 2048 -validity 5000 -keypass password \
+   -dname 'CN=*.acumos, OU=Acumos, O=Acumos, L=Unspecified, ST=Unspecified, C=US' \
+   -ext "SAN=DNS:$ACUMOS_PORTAL_FE_HOSTNAME,DNS:$ACUMOS_ONBOARDING_HOSTNAME,DNS:acumos"
+
+  log "Generate PEM encoded public certificate file using keytool"
+  keytool -exportcert -keystore certs/acumos.jks -alias acumos -rfc \
+    -storepass password > certs/acumos.cert
+
+  log "Convert the Java specific keystore binary '.jks' file to a widely compatible PKCS12 keystore '.p12' file"
+  keytool -importkeystore -srckeystore certs/acumos.jks \
+    -destkeystore certs/acumos.p12 -deststoretype PKCS12 \
+    -srcstorepass password -deststorepass password \
+    -srckeypass password -alias acumos -destalias acumos
+
+  log "List new keystore file contents"
+  keytool -list -keystore certs/acumos.p12 -storetype PKCS12 -storepass password
+
+  log "Generate example.pem"
+  openssl pkcs12 -nokeys -in certs/acumos.p12 -out certs/acumos.pem \
+    -password pass:password
+
+  log "Extract unencrypted private key file from '.p12' keystore file"
+  openssl pkcs12 -nocerts -nodes -in certs/acumos.p12 -out certs/acumos.key \
+    -password pass:password
+
+  log "Pass cert and key to Kong admin"
+  curl -i -X POST http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/certificates \
+    -F "cert=@certs/acumos.pem" \
+    -F "key=@certs/acumos.key" \
+    -F "snis=$ACUMOS_PORTAL_FE_HOSTNAME,$ACUMOS_ONBOARDING_HOSTNAME,acumos"
+
+  log "Add proxy entries via Kong API"
+  curl -i -X POST \
+    --url http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis/ \
+    --data "https_only=true" \
+    --data "name=root" \
+    --data "upstream_url=http://$ACUMOS_PORTAL_FE_HOST:$ACUMOS_PORTAL_FE_PORT" \
+    --data "uris=/" \
+    --data "strip_uri=false"
+  curl -i -X POST \
+    --url http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis/ \
+    --data "name=onboarding-app" \
+    --data "upstream_url=http://$ACUMOS_HOSTNAME:$ACUMOS_ONBOARDING_PORT/onboarding-app" \
+    --data "uris=/onboarding-app" \
+    --data "strip_uri=false"
+
+  log "Dump of API endpoints as created"
+  curl http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis/
+
+  log "Add cert as CA to docker /etc/docker/certs.d"
+  # Required for docker daemon to accept the kong self-signed cert
+  # Per https://docs.docker.com/registry/insecure/#use-self-signed-certificates
+  sudo mkdir -p /etc/docker/certs.d/$ACUMOS_HOST
+  sudo cp certs/acumos.cert /etc/docker/certs.d/$ACUMOS_HOST/ca.crt
+}
+
+function setup_dns() {
+  log "Add Acumos hostnames to /etc/hosts"
+  sudo sed -i -- "/$ACUMOS_HOST/d" /etc/hosts
+  cat <<EOF | sudo tee -a /etc/hosts
+$ACUMOS_PORTAL_FE_HOST $ACUMOS_PORTAL_FE_HOSTNAME
+$ACUMOS_ONBOARDING_HOST $ACUMOS_ONBOARDING_HOSTNAME
+$ACUMOS_NEXUS_HOST nexus
+EOF
+}
+
 export WORK_DIR=$(pwd)
 log "Reset acumos-env.sh"
 sed -i -- '/MARIADB_PASSWORD/d' acumos-env.sh
 sed -i -- '/MARIADB_USER_PASSWORD/d' acumos-env.sh
 sed -i -- '/ACUMOS_RO_USER_PASSWORD/d' acumos-env.sh
 sed -i -- '/ACUMOS_RW_USER_PASSWORD/d' acumos-env.sh
+sed -i -- '/ACUMOS_HOST_DOCKER0/d' acumos-env.sh
+sed -i -- '/ACUMOS_CDS_PASSWORD/d' acumos-env.sh
+
+MARIADB_PASSWORD=$(uuidgen)
+echo "MARIADB_PASSWORD=\"$MARIADB_PASSWORD\"" >>acumos-env.sh
+echo "export MARIADB_PASSWORD" >>acumos-env.sh
+MARIADB_USER_PASSWORD=$(uuidgen)
+echo "MARIADB_USER_PASSWORD=\"$MARIADB_USER_PASSWORD\"" >>acumos-env.sh
+echo "export MARIADB_USER_PASSWORD" >>acumos-env.sh
+ACUMOS_RO_USER_PASSWORD=$(uuidgen)
+echo "ACUMOS_RO_USER_PASSWORD=\"$ACUMOS_RO_USER_PASSWORD\"" >>acumos-env.sh
+echo "export ACUMOS_RO_USER_PASSWORD" >>acumos-env.sh
+ACUMOS_RW_USER_PASSWORD=$(uuidgen)
+echo "ACUMOS_RW_USER_PASSWORD=\"$ACUMOS_RW_USER_PASSWORD\"" >>acumos-env.sh
+echo "export ACUMOS_RW_USER_PASSWORD" >>acumos-env.sh
+ACUMOS_CDS_PASSWORD=$(uuidgen)
+echo "ACUMOS_CDS_PASSWORD=\"$ACUMOS_CDS_PASSWORD\"" >>acumos-env.sh
+echo "export ACUMOS_CDS_PASSWORD" >>acumos-env.sh
+docker_ifs=$(ifconfig | grep 172. | cut -d ':' -f 2 | cut -d ' ' -f 1)
+#echo "ACUMOS_HOST_DNS=$(ifconfig | grep 172. | cut -d ':' -f 2 | cut -d ' ' -f 1)" >>acumos-env.sh
+echo "ACUMOS_HOST_DNS=172.18.0.1" >>acumos-env.sh
+echo "export ACUMOS_HOST_DNS" >>acumos-env.sh
 source acumos-env.sh
 
 setup_prereqs
+setup_dns
 setup_mariadb
 setup_acumosdb
+setup_localindex
 setup_acumos
 setup_nexus
-
+setup_reverse_proxy
