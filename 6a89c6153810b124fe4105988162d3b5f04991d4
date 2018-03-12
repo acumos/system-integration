@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2b57dac9_2a6be864",
+        "filename": "AIO/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T15:31:26Z",
+      "side": 1,
+      "message": "This is how people will start/stop following successful installation.",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a359f610_965eec03",
+        "filename": "AIO/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T15:31:26Z",
+      "side": 1,
+      "message": "Please add section \"Starting/Stopping\" to cover case of using AIO after successful installation",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c66351d3_def683f7",
+        "filename": "AIO/acumos-env.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T15:31:26Z",
+      "side": 1,
+      "message": "Remove platon",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "409ef0ca_e9775f8c",
+        "filename": "AIO/clean.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T15:31:26Z",
+      "side": 1,
+      "message": "Should be able to forget about acumos_comment",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "59408d64_257ec6fc",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T15:31:26Z",
+      "side": 1,
+      "message": "do not specify container names",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "308c66ae_514c080e",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T15:31:26Z",
+      "side": 1,
+      "message": "No need for expose if you\u0027re going to use ports",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "42f73581_984474d6",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T15:31:26Z",
+      "side": 1,
+      "message": "Do not specify container names",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a7b9a870_ab1fd870",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T15:31:26Z",
+      "side": 1,
+      "message": "No need for expose if you\u0027re going to use ports...",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3be11a9c_0faa92c9",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T15:31:26Z",
+      "side": 1,
+      "message": ".. but ideally should NOT use ports.  You mentioned things don\u0027t work.  Ouch.",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "731eec24_2c8847ba",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T15:31:26Z",
+      "side": 1,
+      "message": "Do not specify container names",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5987de21_3e3a36bf",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T15:31:26Z",
+      "side": 1,
+      "message": "use common-data-svc (not cds)",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "136f068d_4af7c1b1",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T15:31:26Z",
+      "side": 1,
+      "message": "Drop this, platon is gone",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1025be07_d7983209",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 419,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T15:31:26Z",
+      "side": 1,
+      "message": "should be parameterized",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
