@@ -18,7 +18,7 @@
 .. ===============LICENSE_END=========================================================
 -->
 
-# All In One for Acumos
+# All In One (AIO) for Acumos
 
 These scripts build an all-in-one instance of Acumos, with the database,
 Nexus repositories and docker containers all running on a single virtual machine.
@@ -26,9 +26,9 @@ Nexus repositories and docker containers all running on a single virtual machine
 ## Contents
 
 * oneclick_deploy.sh: the script you will run as “bash oneclick_deploy.sh”.
-* acumos-env.sh: environment setup script that will get customized as new env parameters get generated (e.g. passwords). Used by oneclick_deploy.sh and clean.sh. You can get the mysql root and user passwords from this if you want to do any manual database operations, e.g. see what tables/rows are created.
+* acumos-env.sh: environment setup script that will get customized as new env parameters get generated (e.g. passwords). Used by oneclick_deploy.sh and clean.sh. Post-install, you can get the mysql root and user passwords from this if you want to do any manual database operations, e.g. see what tables/rows are created.
 * clean.sh: script you can run as “bash clean.sh” to remove the Acumos install, to try it again etc.
-* cmn-data-svc-ddl-dml-mysql-1.13.sql: Common Dataservice database setup script. Used by oneclick_deploy.sh.
+* cmn-data-svc-ddl-dml-mysql-1.14.sql: Common Dataservice database setup script. Used by oneclick_deploy.sh.
 * docker-compose.sh: Script called by the other scripts as needed, to take action on the set of Acumos docker services. Used by oneclick_deploy.sh and clean.sh. You can also call this directly e.g. to tail the service container logs. See the script for details.
 * docker-compose.yaml: The docker services that will be acted upon, per the options passed to docker-compose.sh.
 
@@ -44,26 +44,43 @@ Note this can be another physical host, or a VM running on your workstation
 
 ### Install Process
 
+The notes below provide an overview of the default installation process. Note these scripts are a work in progress, and not all Acumos portal functions may work correctly at this time. See "Verified Features" below for a summary of what's been verified to work, at least in the test environments where this has been used so far.
+
 1. Open a shell session (bash recommended) on the host where you want to install Acumos, and clone the system-integration repo:
    * git clone https://gerrit.acumos.org/r/system-integration
 
-1. If you are deploying to a host that does not have a DNS-registered FQDN
-   * Add the following line to your workstation's hosts file:
-     * \<ip address of your AIO host\> \<name you want to use when browsing to that host\>, e.g. "10.0.0.2 acumos"
-   * If you want to use the domain name setup for the Acumos Portal out-of-the-box (as currently implemented), add this to your hosts file "\<ip address of your AIO host\> acumos-dev1-vm01-core.eastus.cloudapp.azure.com"
-     * Note that this approach may not work fully; some CMS content (e.g. in the On-Boarding By Command Line view) does not populate correctly; this is being investigated.
-
 1. In the system-integration/AIO folder, run the following command:
    * bash oneclick_deploy.sh
-     * The deployment will take 5-20 minutes depending upon whether this is the first time you have run this command before, and have pre-cached the Acumos docker images.
+   * The deployment will take 5-20 minutes depending upon whether this is the first time you have run this command before, and have pre-cached the Acumos docker images.
 
-1. When the deployment is complete, if you want to use a FQDN different from the default acumos-dev1-vm01-core.eastus.cloudapp.azure.com, you will need to configure Hippo CMS to use your AIO "acumos" service instance (this part will be automated asap):
+1. When the deployment is complete, you will need to complete one Hippo CMS setup step manually, so that all Acumos portal content is displayed correctly. This will be automated asap, but for now follow these steps:
    * In your browser goto the Hippo CMS component at http://acumos:9080 and login as "admin/admin"
    * One the left, click the + at "hst:hst" and then also at "hst:hosts"
-   * Right-click the "dev-env" entry and select "copy node", and enter the name "aio" (you can use any name you want here, it doesn't matter)
+   * Right-click the "dev-env" entry and select "copy node", and enter the name "aio" (you can use any name you want here, it doesn't matter), then click "OK"
    * Click the + at the new "aio" entry, and the same for the nodes as they appear: "com", "azure", "cloudapp", "eastus"
-   * Right-click on the "acumos-dev1-vm01-core" entry and select "move node". In the "Move Node" dialog, select the "aio" node, enter "acumos" at "To", and click "OK".
-     * The process above can also work for any FQDN with the changes: At each level in the domain name, replace the corresponding name with that for your chosen FQDN, and move/rename the "acumos-dev1-vm01-core" by selecting to the next-to-last subdomain name (e.g. "example", if your FQDN is "acumos.example.com"), and naming the node as the last subdomain name (e.g. "acumos", if your FQDN is "acumos.example.com")
+   * Right-click on the "acumos-dev1-vm01-core" entry and select "move node". In the "Move Node" dialog, select the "aio" node, enter "acumos" at "To", and click "OK"
    * On the upper right, select the "Write changes to repository" button
 
-1. You should now be able to browse to [http://acumos](http://acumos) and create a new account as an Acumos user.
+1. So that the default portal domain name "acumos" will resolve on your workstation (from which you will access the portal via your browser), add the following line to your workstation's hosts file:
+   * "\<ip address of your AIO host\> acumos"
+
+1. You should now be able to browse to [https://acumos](https://acumos) and create a new account as an Acumos user. If you get a browser warning, just accept the self-signed cert and proceed.
+
+### Verified Features
+
+The following Acumos portal workflows and related features have been verified as working so far. This list will be updated as more workflows are verified.
+* new user registration and login
+* portal web page asset integration through Hippo CMS (e.g. user guides under "On-Boarding Model")
+* model onboarding via command line (scikit-learn, python/tensorflow)
+
+### Additional Notes
+
+The scripts etc in this repo install Acumos with a default set of values for key environment variables. See acumos-env.sh for these defaults. You should be modify any explicit value (not variables) defined there, but some additional steps may be needed for the installed portal to work with the updated values. For example:
+* The Hippo CMS manual config process above can also work for any FQDN, with the changes:
+  * Under "hst:hosts", replace the host domain name elements at each level in the domain name, with the corresponding level name for your chosen FQDN, and move/rename the "acumos-dev1-vm01-core" by selecting to the next-to-last level (e.g. "example", if your FQDN is "acumos.example.com"), and naming the node as the last subdomain name (e.g. "acumos", if your FQDN is "acumos.example.com")
+* The latest verified Acumos platform docker images are specified in acumos-env.sh. This script will be updated as new versions are released to the stable or release repos of the Acumos.org nexus server.
+* As of this version, only a clean install is supported by this script, thus for each re-install you will need to recreate users, re-onboard models, etc. Test scripts to simplify this process will be provided asap.
+* If you want to test a different version of the common-dataservice component, you will need to copy the corresponding ".sql" script from the "cmn-data-svc-server/db-scripts/" folder in the common-dataservice repo, e.g. for CDS version 1.14.1, the file "cmn-data-svc-ddl-dml-mysql-1.14.sql". This is the current version included in this folder. If you select a different version, copy that file into this folder and update the related values in acumos-env.sh.
+
+This is an early version of this script. Various workarounds and incompletely verified functions may be included. Some examples:
+* For some models, the container image build process depends upon a Python Package Index (PyPI) server which contains python modules needed in the microservice build process. The current version of these scripts uses a local copy of the development PyPI index, and setup of a web server (see function setup_localindex in oneclick_deploy.sh) to serve the modules. ASAP, this script will be verified with the official LF PyPI server. 
