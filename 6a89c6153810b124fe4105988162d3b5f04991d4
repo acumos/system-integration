@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e7dca638_d3e86fe4",
+        "filename": "AIO/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-03-12T16:00:06Z",
+      "side": 1,
+      "message": "Not exactly. You can stop the services via this script, but it will not do everything needed to bring the service back online. There are various things that have to be setup for those services once they have been started, e.g. nexus and kong setup. So while the docker-compose.sh script is useful e.g. for tailing all the logs, it really doesn\u0027t have any use for manually starting/stopping the services, as it stands.",
+      "parentUuid": "2b57dac9_2a6be864",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a359f610_965eec03",
         "filename": "AIO/README.md",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2018-03-12T15:31:26Z",
       "side": 1,
       "message": "Please add section \"Starting/Stopping\" to cover case of using AIO after successful installation",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "52986f7d_0fe887e9",
+        "filename": "AIO/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-03-12T16:00:06Z",
+      "side": 1,
+      "message": "The system is fully functional (started) when the script completes. What\u0027s the use case for manually stopping/starting the services?",
+      "parentUuid": "a359f610_965eec03",
       "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "ec061874_b441df45",
+        "filename": "AIO/acumos-env.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-03-12T16:00:06Z",
+      "side": 1,
+      "message": "I asked some questions on this over email, and waiting for response before changing this:\nWhat are we supposed to do with the platon-related configuration in docker-compose.yaml, e.g. for the portal-fe container? Does the following line need to be removed?\n \n                      \\\"cmnt\\\" : {\n                         \\\"url\\\" : \\\"http://platon:${ACUMOS_PLATON_PORT}\\\"\n \nAre there any other changes needed for this, i.e. if the platon function is now part of the portal-fe component, is there no configuration for it, and no comment database? It would be good to have the effect of this change documented in a JIRA issue etc so we don\u0027t have to guess on the impact.",
+      "parentUuid": "c66351d3_def683f7",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "409ef0ca_e9775f8c",
         "filename": "AIO/clean.sh",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2018-03-12T15:31:26Z",
       "side": 1,
       "message": "Should be able to forget about acumos_comment",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f280548f_8ec58545",
+        "filename": "AIO/clean.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-03-12T16:00:06Z",
+      "side": 1,
+      "message": "Per my other comment - not sure if this will still be needed.",
+      "parentUuid": "409ef0ca_e9775f8c",
       "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "72e1afb2_4b4615f5",
+        "filename": "AIO/clean.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-03-12T16:00:06Z",
+      "side": 1,
+      "message": "The install script removes any prior docker installations before installing it, so not needed here.",
+      "parentUuid": "e859bee2_c5d56908",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "59408d64_257ec6fc",
         "filename": "AIO/docker-compose.yaml",
         "patchSetId": 1
@@ -98,6 +188,24 @@
       "writtenOn": "2018-03-12T15:31:26Z",
       "side": 1,
       "message": "do not specify container names",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "07e347b9_2cffd96e",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-03-12T16:00:06Z",
+      "side": 1,
+      "message": "I need to, for the other services to be able to connect to those containers over the docker network. These are names that get locally resolved once defined here.",
+      "parentUuid": "59408d64_257ec6fc",
       "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "ae6f1682_78d712de",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-03-12T16:00:06Z",
+      "side": 1,
+      "message": "I\u0027m still testing that. Expose here has a different meaning, and so far when I remove it things were not working. I will investigate this further but it\u0027s not a high priority change (it\u0027s not breaking anything)",
+      "parentUuid": "308c66ae_514c080e",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "42f73581_984474d6",
         "filename": "AIO/docker-compose.yaml",
         "patchSetId": 1
@@ -132,6 +258,24 @@
       "writtenOn": "2018-03-12T15:31:26Z",
       "side": 1,
       "message": "Do not specify container names",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f97781a_36c57691",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-03-12T16:00:06Z",
+      "side": 1,
+      "message": "As above",
+      "parentUuid": "42f73581_984474d6",
       "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
@@ -206,6 +350,24 @@
     },
     {
       "key": {
+        "uuid": "d951c2e8_c4b0078d",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-03-12T16:00:06Z",
+      "side": 1,
+      "message": "it\u0027s just a name that is used for locally resolving the container address, and easier to use when e.g. running a command in the container. There\u0027s no functional reason it needs to be named common-data-svc here.",
+      "parentUuid": "5987de21_3e3a36bf",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "136f068d_4af7c1b1",
         "filename": "AIO/docker-compose.yaml",
         "patchSetId": 1
@@ -223,6 +385,24 @@
     },
     {
       "key": {
+        "uuid": "69890c2f_f1da23b6",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-03-12T16:00:06Z",
+      "side": 1,
+      "message": "I need to know the other implications first.",
+      "parentUuid": "136f068d_4af7c1b1",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1025be07_d7983209",
         "filename": "AIO/docker-compose.yaml",
         "patchSetId": 1
@@ -234,6 +414,24 @@
       "writtenOn": "2018-03-12T15:31:26Z",
       "side": 1,
       "message": "should be parameterized",
+      "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a546fb7_7636ec54",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 419,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-03-12T16:00:06Z",
+      "side": 1,
+      "message": "It\u0027s unclear yet how to do this, since the CDS config includes an encoded form of this. I will look into how to encode a parameterized password and test it. But this is not high-priority, I will get to it asap.",
+      "parentUuid": "1025be07_d7983209",
       "revId": "6a89c6153810b124fe4105988162d3b5f04991d4",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
