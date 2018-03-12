@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8843f262_6b93162c",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T21:10:40Z",
+      "side": 1,
+      "message": "Please use a tag here to pin this to a known version, reduce surprises.",
+      "revId": "acb6373d2aca03ecfa13563ced72f88106fd802b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "de3edd90_ec00d32e",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T21:10:40Z",
+      "side": 1,
+      "message": "Please parameterize, just as you have done with password, it\u0027s repeated many times in this file.",
+      "revId": "acb6373d2aca03ecfa13563ced72f88106fd802b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "513b3574_a5aad7da",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T21:10:40Z",
+      "side": 1,
+      "message": "No alias needed, just a single name should be enough",
+      "revId": "acb6373d2aca03ecfa13563ced72f88106fd802b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6a71e139_a49a67c2",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T21:10:40Z",
+      "side": 1,
+      "message": "Don\u0027t think this should be running forever.",
+      "revId": "acb6373d2aca03ecfa13563ced72f88106fd802b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "55f7358d_846be730",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 497,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-12T21:10:40Z",
+      "side": 1,
+      "message": "Please add a tag here to pin the version down",
+      "revId": "acb6373d2aca03ecfa13563ced72f88106fd802b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
