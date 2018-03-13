@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14b323fb_d9cb9644",
+        "filename": "acumos-kong-api/docker-compose.yml",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T17:09:26Z",
+      "side": 1,
+      "message": "Kong will deployed together with all the other components.  Is this compose file only for testing or what?",
+      "revId": "ee45e9325746ff6a88bd13fcea29fe8858b1846b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
