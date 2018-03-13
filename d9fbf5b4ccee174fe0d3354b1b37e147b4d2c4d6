@@ -1,0 +1,310 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1e80751a_b8f73f25",
+        "filename": "AIO/README.md",
+        "patchSetId": 10
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T13:24:13Z",
+      "side": 1,
+      "message": "any word on a snapshot of the CMS database that can be loaded? I can create one from mine if that helps.",
+      "revId": "d9fbf5b4ccee174fe0d3354b1b37e147b4d2c4d6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "627ae850_446bfcda",
+        "filename": "AIO/clean.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T13:24:13Z",
+      "side": 1,
+      "message": "Since oneclick installs docker, maybe to be symmetric with mariaDb this should also remove docker?  I also think clean should nuke the docker images.",
+      "revId": "d9fbf5b4ccee174fe0d3354b1b37e147b4d2c4d6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fd1cd079_33ec6846",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T13:24:13Z",
+      "side": 1,
+      "message": "I don\u0027t think we need platform",
+      "revId": "d9fbf5b4ccee174fe0d3354b1b37e147b4d2c4d6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8537d940_8555d64a",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T13:24:13Z",
+      "side": 1,
+      "message": "maybe the registry host name should be parameterized?",
+      "revId": "d9fbf5b4ccee174fe0d3354b1b37e147b4d2c4d6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5c19ad9_219f32a0",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T13:24:13Z",
+      "side": 1,
+      "message": "I think any string that\u0027s repeated, like acumos_rw, should be externalized to a parameter to ensure it\u0027s always used correctly in this file",
+      "revId": "d9fbf5b4ccee174fe0d3354b1b37e147b4d2c4d6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7505aee3_06a207f7",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T13:24:13Z",
+      "side": 1,
+      "message": "This is wrong - we should clarify with onboarding people",
+      "revId": "d9fbf5b4ccee174fe0d3354b1b37e147b4d2c4d6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f4863b3b_bde93a9b",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T13:24:13Z",
+      "side": 1,
+      "message": "This is repeated, so should be parameterized",
+      "revId": "d9fbf5b4ccee174fe0d3354b1b37e147b4d2c4d6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a9af19c_29c44a96",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T13:24:13Z",
+      "side": 1,
+      "message": "This is repeated so should be a parameter",
+      "revId": "d9fbf5b4ccee174fe0d3354b1b37e147b4d2c4d6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "22717b91_490a9ec7",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T13:24:13Z",
+      "side": 1,
+      "message": "what happened to indentation here?",
+      "revId": "d9fbf5b4ccee174fe0d3354b1b37e147b4d2c4d6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fbd091a6_04fbb0f7",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T13:24:13Z",
+      "side": 1,
+      "message": "suggest making a parameter",
+      "revId": "d9fbf5b4ccee174fe0d3354b1b37e147b4d2c4d6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5d0a7f67_4c244852",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 446,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T13:24:13Z",
+      "side": 1,
+      "message": "This one is baffling.  What pushes this image into the local nexus platform registry !?",
+      "revId": "d9fbf5b4ccee174fe0d3354b1b37e147b4d2c4d6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d706613_ff81331f",
+        "filename": "AIO/oneclick_deploy.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T13:24:13Z",
+      "side": 1,
+      "message": "Why do you enable docker remote API?  Do you want to control this VM from elsewhere?",
+      "revId": "d9fbf5b4ccee174fe0d3354b1b37e147b4d2c4d6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da601354_0a5c9db1",
+        "filename": "AIO/oneclick_deploy.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T13:24:13Z",
+      "side": 1,
+      "message": "Do we need this?  I don\u0027t see why outside connections should be allowed by default",
+      "revId": "d9fbf5b4ccee174fe0d3354b1b37e147b4d2c4d6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0f85411d_3b61b3ef",
+        "filename": "AIO/oneclick_deploy.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T13:24:13Z",
+      "side": 1,
+      "message": "If you lock things down above, then probably need to add user@localhost",
+      "revId": "d9fbf5b4ccee174fe0d3354b1b37e147b4d2c4d6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8255fcf0_34b91d27",
+        "filename": "AIO/oneclick_deploy.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T13:24:13Z",
+      "side": 1,
+      "message": "I don\u0027t think we need acumos_platform_docker in the AIO",
+      "revId": "d9fbf5b4ccee174fe0d3354b1b37e147b4d2c4d6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "edd07228_64e98a58",
+        "filename": "AIO/oneclick_deploy.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T13:24:13Z",
+      "side": 1,
+      "message": "I know you are waiting responses from the Python experts, but I think the localindex should go away",
+      "revId": "d9fbf5b4ccee174fe0d3354b1b37e147b4d2c4d6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7b50aca2_029512a9",
+        "filename": "AIO/oneclick_deploy.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T13:24:13Z",
+      "side": 1,
+      "message": "We don\u0027t have any dockerfiles to build, what does this do??",
+      "revId": "d9fbf5b4ccee174fe0d3354b1b37e147b4d2c4d6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e21beaa1_a2d1ea58",
+        "filename": "AIO/oneclick_deploy.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T13:24:13Z",
+      "side": 1,
+      "message": "Not JDK 9 - just JDK 8 please.",
+      "revId": "d9fbf5b4ccee174fe0d3354b1b37e147b4d2c4d6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
