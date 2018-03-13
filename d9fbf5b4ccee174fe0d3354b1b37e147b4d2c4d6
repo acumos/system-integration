@@ -155,6 +155,23 @@
     },
     {
       "key": {
+        "uuid": "86de23f4_4f2ddf44",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-13T13:26:50Z",
+      "side": 1,
+      "message": "Suggest dropping suffix -docker",
+      "revId": "d9fbf5b4ccee174fe0d3354b1b37e147b4d2c4d6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fbd091a6_04fbb0f7",
         "filename": "AIO/docker-compose.yaml",
         "patchSetId": 10
