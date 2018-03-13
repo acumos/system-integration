@@ -307,7 +307,7 @@ function setup_reverse_proxy() {
   curl -i -X POST \
     --url http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis/ \
     --data "name=onboarding-app" \
-    --data "upstream_url=http://$ACUMOS_HOSTNAME:$ACUMOS_ONBOARDING_PORT/onboarding-app" \
+    --data "upstream_url=http://$ACUMOS_ONBOARDING_HOST:$ACUMOS_ONBOARDING_PORT" \
     --data "uris=/onboarding-app" \
     --data "strip_uri=false"
 
