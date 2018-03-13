@@ -16,6 +16,24 @@
       "revId": "ee45e9325746ff6a88bd13fcea29fe8858b1846b",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b1ca4ff7_ea39bfc3",
+        "filename": "acumos-kong-api/docker-compose.yml",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-03-13T18:25:28Z",
+      "side": 1,
+      "message": "Chris,\nI need this to implement the https secure onboarding for now. I have the real certificates for Research-DEV and Production, which I want to make sure they work and see if Ken and testing team deploy without errors. It could be merged with the overall docker-compose file or not since this has to run only ones when the system is being setup and should work for subsequent Acumos application updates. I will leave it up to you and Bryan to make that call.",
+      "parentUuid": "14b323fb_d9cb9644",
+      "revId": "ee45e9325746ff6a88bd13fcea29fe8858b1846b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
