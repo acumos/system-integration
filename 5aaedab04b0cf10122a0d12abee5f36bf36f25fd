@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c7f62f2_4a51f5e5",
+        "filename": "AIO/acumos-env.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-15T17:50:41Z",
+      "side": 1,
+      "message": "No. This is entirely specified via docker-compose.  Some lingering TESTS have stuff in them.",
+      "revId": "5aaedab04b0cf10122a0d12abee5f36bf36f25fd",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "81f0ff8a_2f6993f6",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-15T17:50:41Z",
+      "side": 1,
+      "message": "Even after the DDL/DML does the creation work, still need to change the password via this port :/",
+      "revId": "5aaedab04b0cf10122a0d12abee5f36bf36f25fd",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6727adbc_c5985aa0",
+        "filename": "AIO/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-15T17:50:41Z",
+      "side": 1,
+      "message": "I suggest not specifying expose if you specify ports.",
+      "revId": "5aaedab04b0cf10122a0d12abee5f36bf36f25fd",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c661ea8_d9ad7493",
+        "filename": "AIO/oneclick_deploy.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-15T17:50:41Z",
+      "side": 1,
+      "message": "Suggest dropping this, soon the DDL/DML will do that work.",
+      "revId": "5aaedab04b0cf10122a0d12abee5f36bf36f25fd",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "744e6118_1bf949fb",
+        "filename": "AIO/oneclick_deploy.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-15T17:50:41Z",
+      "side": 1,
+      "message": "Ignore the property files with this entry.",
+      "revId": "5aaedab04b0cf10122a0d12abee5f36bf36f25fd",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "453478bf_a3c69e35",
+        "filename": "AIO/oneclick_deploy.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-15T17:50:41Z",
+      "side": 1,
+      "message": "Think this should go away.",
+      "revId": "5aaedab04b0cf10122a0d12abee5f36bf36f25fd",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
