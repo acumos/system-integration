@@ -21,7 +21,9 @@
 # Prerequisites:
 # - Ubuntu Xenial server (Centos 7 support is planned!)
 # Usage:
-# $ bash oneclick_deploy.sh
+# $ bash oneclick_deploy.sh [admin_user]
+#   admin_user: optional username for admin user to be automatically created
+#     (default: 'test'). Password will be in acumos-env.sh.
 #
 
 set -x
@@ -255,46 +257,65 @@ function setup_acumos() {
   sudo bash docker-compose.sh up -d
 }
 
-function setup_reverse_proxy() {
+# Setup server cert, key, and keystore for the Kong reverse proxy
+# Currently the certs folder is also setup via docker-compose.yaml as a virtual
+# folder for the federation-gateway, which currently does not support http
+# access via the Kong proxy (only direct https access)
+# TODO: federation-gateway support for access via HTTP from Kong reverse proxy
+function setup_keystore() {
   log "Install keytool"
   sudo apt-get install -y openjdk-9-jre-headless
 
-  log "Generate public private key pair using keytool"
-  # TODO: use these randomly generated credentials
-  keypass=$(uuidgen)
-  storepass=$(uuidgen)
   mkdir certs
-  keytool -genkeypair -keystore certs/acumos.jks -storepass password \
-   -alias acumos -keyalg RSA -keysize 2048 -validity 5000 -keypass password \
-   -dname 'CN=*.acumos, OU=Acumos, O=Acumos, L=Unspecified, ST=Unspecified, C=US' \
-   -ext "SAN=DNS:$ACUMOS_PORTAL_FE_HOSTNAME,DNS:$ACUMOS_ONBOARDING_HOSTNAME,DNS:acumos"
+  log "Create self-signing CA"
+  openssl genrsa -des3 -out certs/acumosCA.key -passout pass:$ACUMOS_KEYPASS 4096
 
-  log "Generate PEM encoded public certificate file using keytool"
-  keytool -exportcert -keystore certs/acumos.jks -alias acumos -rfc \
-    -storepass password > certs/acumos.cert
+  openssl req -x509 -new -nodes -key certs/acumosCA.key -sha256 -days 1024 \
+   -out certs/acumosCA.crt -passin pass:$ACUMOS_KEYPASS \
+   -subj "/C=US/ST=Unspecified/L=Unspecified/O=Acumos/OU=Acumos/CN=$ACUMOS_DOMAIN"
 
-  log "Convert the Java specific keystore binary '.jks' file to a widely compatible PKCS12 keystore '.p12' file"
-  keytool -importkeystore -srckeystore certs/acumos.jks \
-    -destkeystore certs/acumos.p12 -deststoretype PKCS12 \
-    -srcstorepass password -deststorepass password \
-    -srckeypass password -alias acumos -destalias acumos
+  log "Create server certificate key"
+  openssl genrsa -out certs/acumos.key -passout pass:$ACUMOS_KEYPASS 2048
 
-  log "List new keystore file contents"
-  keytool -list -keystore certs/acumos.p12 -storetype PKCS12 -storepass password
+  log "Create a certificate signing request for the server cert"
+  openssl req -new -key certs/acumos.key -passin pass:$ACUMOS_KEYPASS \
+    -out certs/acumos.csr \
+    -subj "/C=US/ST=Unspecified/L=Unspecified/O=Acumos/OU=Acumos/CN=$ACUMOS_DOMAIN/SAN=$ACUMOS_HOST"
 
-  log "Generate example.pem"
-  openssl pkcs12 -nokeys -in certs/acumos.p12 -out certs/acumos.pem \
-    -password pass:password
+  log "Sign the CSR with the acumos CA"
+  openssl x509 -req -in certs/acumos.csr -CA certs/acumosCA.crt \
+    -CAkey certs/acumosCA.key -CAcreateserial -passin pass:$ACUMOS_KEYPASS \
+    -out certs/acumos.crt -days 500 -sha256
 
-  log "Extract unencrypted private key file from '.p12' keystore file"
-  openssl pkcs12 -nocerts -nodes -in certs/acumos.p12 -out certs/acumos.key \
-    -password pass:password
+  log "Create JKS format keystore with acumos server cert"
+  openssl pkcs12 -export -in certs/acumos.crt -passin pass:$ACUMOS_KEYPASS \
+    -inkey certs/acumos.key -certfile certs/acumos.crt \
+    -out certs/acumos_aio.p12 -passout pass:$ACUMOS_KEYPASS
 
+  log "Convert the JKS format keystore to PKCS12 format"
+  keytool -importkeystore -srckeystore certs/acumos_aio.jks -srcstoretype JKS \
+    -destkeystore certs/acumos_aio.p12 -deststoretype PKCS12 \
+    -srcstorepass $ACUMOS_KEYPASS -deststorepass $ACUMOS_KEYPASS \
+    -srckeypass $ACUMOS_KEYPASS -alias acumos -destalias acumos
+
+  log "List contents of the PKCS12 format keystore with acumos server cert"
+  keytool -list -keystore certs/acumos_aio.p12 -storetype PKCS12 \
+    -storepass $ACUMOS_KEYPASS
+
+  log "Create JKS format truststore with acumos CA cert"
+  keytool -import -file certs/acumosCA.crt -alias acumos -keypass $ACUMOS_KEYPASS \
+    -keystore certs/acumosTrustStore.jks -storepass $ACUMOS_KEYPASS -noprompt
+
+  log "List contents of the JKS format keystore with acumos CA cert"
+  keytool -list -keystore certs/acumosTrustStore.jks -storepass $ACUMOS_KEYPASS
+}
+
+function setup_reverse_proxy() {
   log "Pass cert and key to Kong admin"
   curl -i -X POST http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/certificates \
-    -F "cert=@certs/acumos.pem" \
+    -F "cert=@certs/acumos.crt" \
     -F "key=@certs/acumos.key" \
-    -F "snis=$ACUMOS_PORTAL_FE_HOSTNAME,$ACUMOS_ONBOARDING_HOSTNAME,acumos"
+    -F "snis=$ACUMOS_DOMAIN"
 
   log "Add proxy entries via Kong API"
   curl -i -X POST \
@@ -318,7 +339,7 @@ function setup_reverse_proxy() {
   # Required for docker daemon to accept the kong self-signed cert
   # Per https://docs.docker.com/registry/insecure/#use-self-signed-certificates
   sudo mkdir -p /etc/docker/certs.d/$ACUMOS_HOST
-  sudo cp certs/acumos.cert /etc/docker/certs.d/$ACUMOS_HOST/ca.crt
+  sudo cp certs/acumosCA.crt /etc/docker/certs.d/$ACUMOS_HOST/ca.crt
 }
 
 function setup_dns() {
@@ -331,6 +352,42 @@ $ACUMOS_NEXUS_HOST nexus
 EOF
 }
 
+function setup_admin() {
+  log "Create user $ADMIN_USER via CDS API"
+  while ! curl -X POST http://$ACUMOS_PORTAL_FE_HOST:$ACUMOS_PORTAL_FE_PORT/api/users/register \
+    -H "Content-Type: application/json" \
+    -d "{\"request_body\":{ \"firstName\":\"admin\", \"lastName\":\"user\", \"emailId\":\"admin@example.com\", \"username\":\"$ADMIN_USER\", \"password\":\"$ACUMOS_ADMIN_PASSWORD\", \"active\":true}}" ; do
+    log "Portal user creation API is not yet active, waiting 10 seconds"
+    sleep 10
+  done
+  echo "Portal user account $ADMIN_USER created"
+
+  log "Create role name 'Admin' via CDS API"
+  curl -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/role -H "accept: */*" -H "Content-Type: application/json" -d "{\"name\": \"Admin\"}"
+  roleId=$(jq -r '.roleId' /tmp/json)
+
+  log "Assign role name 'Admin' to user $ADMIN_USER via CDS API"
+
+  curl -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/user
+  users=$(jq -r '.content | length' /tmp/json)
+  i=0; userId=""
+  while [[ $i -lt $users && "$userId" == "" ]] ; do
+    loginName=$(jq -r ".content[$i].loginName" /tmp/json)
+    if [[ $loginName == "$ADMIN_USER" ]]; then
+      userId=$(jq -r ".content[$i].userId" /tmp/json)
+    fi
+  done
+  curl -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/user/$userId/role/$roleId
+  curl -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/user/$userId
+}
+
+setup_peer() {
+  # WIP, not yet working
+  "Create peer relationship for $ACUMOS_HOST"
+
+  curl -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer -H "accept: */*" -H "Content-Type: application/json" -d "{ \"name\":\"$ACUMOS_DOMAIN\", \"contact1\": \"admin@example.com\", \"subjectName\": \"$ACUMOS_DOMAIN\", \"apiUrl\": \"https://$ACUMOS_HOST:$ACUMOS_FEDERATION_PORT\" }"
+}
+
 export WORK_DIR=$(pwd)
 log "Reset acumos-env.sh"
 sed -i -- '/MARIADB_PASSWORD/d' acumos-env.sh
@@ -339,6 +396,8 @@ sed -i -- '/ACUMOS_RO_USER_PASSWORD/d' acumos-env.sh
 sed -i -- '/ACUMOS_RW_USER_PASSWORD/d' acumos-env.sh
 sed -i -- '/ACUMOS_HOST_DOCKER0/d' acumos-env.sh
 sed -i -- '/ACUMOS_CDS_PASSWORD/d' acumos-env.sh
+sed -i -- '/ACUMOS_KEYPASS/d' acumos-env.sh
+sed -i -- '/ACUMOS_ADMIN_PASSWORD/d' acumos-env.sh
 
 MARIADB_PASSWORD=$(uuidgen)
 echo "MARIADB_PASSWORD=\"$MARIADB_PASSWORD\"" >>acumos-env.sh
@@ -354,20 +413,37 @@ echo "ACUMOS_RW_USER_PASSWORD=\"$ACUMOS_RW_USER_PASSWORD\"" >>acumos-env.sh
 echo "export ACUMOS_RW_USER_PASSWORD" >>acumos-env.sh
 ACUMOS_CDS_PASSWORD=$(uuidgen)
 echo "ACUMOS_CDS_PASSWORD=\"$ACUMOS_CDS_PASSWORD\"" >>acumos-env.sh
+# TODO: Various components hardcode password ccds_client
+echo "ACUMOS_CDS_PASSWORD=ccds_client" >>acumos-env.sh
 echo "export ACUMOS_CDS_PASSWORD" >>acumos-env.sh
 docker_ifs=$(ifconfig | grep 172. | cut -d ':' -f 2 | cut -d ' ' -f 1)
 #echo "ACUMOS_HOST_DNS=$(ifconfig | grep 172. | cut -d ':' -f 2 | cut -d ' ' -f 1)" >>acumos-env.sh
 echo "ACUMOS_HOST_DNS=172.18.0.1" >>acumos-env.sh
 echo "export ACUMOS_HOST_DNS" >>acumos-env.sh
+ACUMOS_KEYPASS=$(uuidgen)
+echo "ACUMOS_KEYPASS=$ACUMOS_KEYPASS" >>acumos-env.sh
+echo "export ACUMOS_KEYPASS" >>acumos-env.sh
+ACUMOS_ADMIN_PASSWORD=$(uuidgen)
+echo "ACUMOS_ADMIN_PASSWORD=$ACUMOS_ADMIN_PASSWORD" >>acumos-env.sh
+echo "export ACUMOS_ADMIN_PASSWORD" >>acumos-env.sh
+
 source acumos-env.sh
 
 setup_prereqs
 setup_dns
 setup_mariadb
+setup_keystore
 setup_acumosdb
 setup_localindex
 setup_acumos
 setup_nexus
 setup_reverse_proxy
+if [[ "$1" == "" ]]; then
+  ADMIN_USER=test
+else
+  ADMIN_USER=$1
+fi
+setup_admin
+#setup_peer
 
-log "Deploy is complete. You can access the portal at https://$ACUMOS_DOMAIN, assuming you have added that hostname to your hosts file."
+log "Deploy is complete. You can access the portal at https://$ACUMOS_DOMAIN (assuming you have added that hostname to your hosts file) and login as $ADMIN_USER (password:$ACUMOS_ADMIN_PASSWORD)"

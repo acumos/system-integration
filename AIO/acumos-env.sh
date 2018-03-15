@@ -53,7 +53,8 @@ export ACUMOS_CDS_VERSION=1.14
 export ACUMOS_CDS_DB="acumos_1_14"
 export ACUMOS_MARIADB_HOST=$host
 export ACUMOS_MARIADB_PORT=3306
-export ACUMOS_CDS_USER=cds_client
+# TODO: Various components hardcode user name ccds_client
+export ACUMOS_CDS_USER=ccds_client
 export ACUMOS_CDS_HOST=$host
 export ACUMOS_CDS_PORT=8000
 export ACUMOS_NEXUS_HOST=$host
