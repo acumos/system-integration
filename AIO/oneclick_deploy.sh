@@ -29,7 +29,7 @@ set -x
 trap 'fail' ERR
 
 function fail() {
-  log $1
+  log "$1"
   exit 1
 }
 
@@ -48,6 +48,7 @@ function wait_dpkg() {
 }
 
 function setup_prereqs() {
+  trap 'fail' ERR
   dist=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
   if [[ $(grep -c $HOSTNAME /etc/hosts) -eq 0 ]]; then
     log "Add $HOSTNAME to /etc/hosts"
@@ -106,6 +107,7 @@ EOF
 }
 
 function setup_mariadb() {
+  trap 'fail' ERR
   log "Installing MariaDB 10.2"
   # default version
   MARIADB_VERSION='10.2'
@@ -113,10 +115,10 @@ function setup_mariadb() {
   log "Import mariadb repo key"
   sudo apt-get install software-properties-common -y
   sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
-  cat << 'EOF' | sudo tee /etc/apt/sources.list.d/mariadb.list
-deb [arch=amd64,i386] http://mirror.jmu.edu/pub/mariadb/repo/10.2/ubuntu xenial main
-deb-src http://mirror.jmu.edu/pub/mariadb/repo/10.2/ubuntu xenial main
-EOF
+  # May need to update to another mirror if you encounter issues
+  # See https://downloads.mariadb.org/mariadb/repositories/#mirror=accretive&distro=Ubuntu
+  sudo add-apt-repository \
+    'deb [arch=amd64,i386,ppc64el] http://sfo1.mirrors.digitalocean.com/mariadb/repo/10.2/ubuntu xenial main'
   sudo apt-get update -y
 
   log "Install MariaDB without password prompt"
@@ -144,6 +146,7 @@ EOF
 }
 
 function setup_acumosdb() {
+  trap 'fail' ERR
   log "Setup Acumos databases"
 
   log "Create myqsl user acumos_opr"
@@ -164,6 +167,7 @@ function setup_acumosdb() {
 }
 
 setup_nexus_repo() {
+  trap 'fail' ERR
   log "Create Nexus repo $1"
   # For info on Nexus script API and groovy scripts, see
   # https://github.com/sonatype/nexus-book-examples/tree/nexus-3.x/scripting
@@ -202,6 +206,7 @@ EOF
 }
 
 function setup_nexus() {
+  trap 'fail' ERR
   while ! curl -v -u admin:admin123 http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script ; do
     log "Waiting 10 seconds for nexus server to respond"
     sleep 10
@@ -240,12 +245,14 @@ EOF
 }
 
 function setup_localindex() {
+  trap 'fail' ERR
   log "Setup local python index"
   sudo apt-get install -y python-twisted-core
   nohup twistd -n web --port 8087 --path .  > /dev/null 2>&1 &
 }
 
 function setup_acumos() {
+  trap 'fail' ERR
   log "Log into LF Nexus Docker repos"
   sudo docker login https://nexus3.acumos.org:10004 -u docker -p docker
   sudo docker login https://nexus3.acumos.org:10003 -u docker -p docker
@@ -255,46 +262,56 @@ function setup_acumos() {
   sudo bash docker-compose.sh up -d
 }
 
-function setup_reverse_proxy() {
+# Setup server cert, key, and keystore for the Kong reverse proxy
+# Currently the certs folder is also setup via docker-compose.yaml as a virtual
+# folder for the federation-gateway, which currently does not support http
+# access via the Kong proxy (only direct https access)
+# TODO: federation-gateway support for access via HTTP from Kong reverse proxy
+function setup_keystore() {
+  trap 'fail' ERR
   log "Install keytool"
   sudo apt-get install -y openjdk-9-jre-headless
 
-  log "Generate public private key pair using keytool"
-  # TODO: use these randomly generated credentials
-  keypass=$(uuidgen)
-  storepass=$(uuidgen)
   mkdir certs
-  keytool -genkeypair -keystore certs/acumos.jks -storepass password \
-   -alias acumos -keyalg RSA -keysize 2048 -validity 5000 -keypass password \
-   -dname 'CN=*.acumos, OU=Acumos, O=Acumos, L=Unspecified, ST=Unspecified, C=US' \
-   -ext "SAN=DNS:$ACUMOS_PORTAL_FE_HOSTNAME,DNS:$ACUMOS_ONBOARDING_HOSTNAME,DNS:acumos"
+  log "Create self-signing CA"
+  openssl genrsa -des3 -out certs/acumosCA.key -passout pass:$ACUMOS_KEYPASS 4096
 
-  log "Generate PEM encoded public certificate file using keytool"
-  keytool -exportcert -keystore certs/acumos.jks -alias acumos -rfc \
-    -storepass password > certs/acumos.cert
+  openssl req -x509 -new -nodes -key certs/acumosCA.key -sha256 -days 1024 \
+   -config openssl.cnf -out certs/acumosCA.crt -passin pass:$ACUMOS_KEYPASS \
+   -subj "/C=US/ST=Unspecified/L=Unspecified/O=Acumos/OU=Acumos/CN=$ACUMOS_DOMAIN"
 
-  log "Convert the Java specific keystore binary '.jks' file to a widely compatible PKCS12 keystore '.p12' file"
-  keytool -importkeystore -srckeystore certs/acumos.jks \
-    -destkeystore certs/acumos.p12 -deststoretype PKCS12 \
-    -srcstorepass password -deststorepass password \
-    -srckeypass password -alias acumos -destalias acumos
+  log "Create server certificate key"
+  openssl genrsa -out certs/acumos.key -passout pass:$ACUMOS_KEYPASS 4096
 
-  log "List new keystore file contents"
-  keytool -list -keystore certs/acumos.p12 -storetype PKCS12 -storepass password
+  log "Create a certificate signing request for the server cert"
+  # ACUMOS_HOST is used as CN since it's assumed that the client's hostname
+  # is not resolvable via DNS for this AIO deploy
+  openssl req -new -key certs/acumos.key -passin pass:$ACUMOS_KEYPASS \
+    -out certs/acumos.csr \
+    -subj "/C=US/ST=Unspecified/L=Unspecified/O=Acumos/OU=Acumos/CN=$ACUMOS_DOMAIN/subjectAltName=$ACUMOS_HOST"
 
-  log "Generate example.pem"
-  openssl pkcs12 -nokeys -in certs/acumos.p12 -out certs/acumos.pem \
-    -password pass:password
+  log "Sign the CSR with the acumos CA"
+  openssl x509 -req -in certs/acumos.csr -CA certs/acumosCA.crt \
+    -CAkey certs/acumosCA.key -CAcreateserial -passin pass:$ACUMOS_KEYPASS \
+    -extfile openssl.cnf -out certs/acumos.crt -days 500 -sha256
 
-  log "Extract unencrypted private key file from '.p12' keystore file"
-  openssl pkcs12 -nocerts -nodes -in certs/acumos.p12 -out certs/acumos.key \
-    -password pass:password
+  log "Create PKCS12 format keystore with acumos server cert"
+  openssl pkcs12 -export -in certs/acumos.crt -passin pass:$ACUMOS_KEYPASS \
+    -inkey certs/acumos.key -certfile certs/acumos.crt \
+    -out certs/acumos_aio.p12 -passout pass:$ACUMOS_KEYPASS
 
+  log "Create JKS format truststore with acumos CA cert"
+  keytool -import -file certs/acumosCA.crt -alias acumosCA -keypass $ACUMOS_KEYPASS \
+    -keystore certs/acumosTrustStore.jks -storepass $ACUMOS_KEYPASS -noprompt
+}
+
+function setup_reverse_proxy() {
+  trap 'fail' ERR
   log "Pass cert and key to Kong admin"
   curl -i -X POST http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/certificates \
-    -F "cert=@certs/acumos.pem" \
+    -F "cert=@certs/acumos.crt" \
     -F "key=@certs/acumos.key" \
-    -F "snis=$ACUMOS_PORTAL_FE_HOSTNAME,$ACUMOS_ONBOARDING_HOSTNAME,acumos"
+    -F "snis=$ACUMOS_DOMAIN"
 
   log "Add proxy entries via Kong API"
   curl -i -X POST \
@@ -318,17 +335,33 @@ function setup_reverse_proxy() {
   # Required for docker daemon to accept the kong self-signed cert
   # Per https://docs.docker.com/registry/insecure/#use-self-signed-certificates
   sudo mkdir -p /etc/docker/certs.d/$ACUMOS_HOST
-  sudo cp certs/acumos.cert /etc/docker/certs.d/$ACUMOS_HOST/ca.crt
+  sudo cp certs/acumosCA.crt /etc/docker/certs.d/$ACUMOS_HOST/ca.crt
 }
 
 function setup_dns() {
+  trap 'fail' ERR
   log "Add Acumos hostnames to /etc/hosts"
-  sudo sed -i -- "/$ACUMOS_HOST/d" /etc/hosts
+  sudo sed -i -- "/$ACUMOS_PORTAL_FE_HOSTNAME/d" /etc/hosts
+  sudo sed -i -- "/nexus/d" /etc/hosts
   cat <<EOF | sudo tee -a /etc/hosts
 $ACUMOS_PORTAL_FE_HOST $ACUMOS_PORTAL_FE_HOSTNAME
-$ACUMOS_ONBOARDING_HOST $ACUMOS_ONBOARDING_HOSTNAME
 $ACUMOS_NEXUS_HOST nexus
 EOF
+}
+
+function setup_federation() {
+  trap 'fail' ERR
+  log "Create 'self' peer entry (required) via CDS API"
+  while ! curl -s -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer ; do
+    log "CDS API is not yet responding... waiting 10 seconds"
+    sleep 10
+  done
+  curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer -H "accept: */*" -H "Content-Type: application/json" -d "{ \"name\":\"$ACUMOS_DOMAIN\", \"self\": true, \"local\": false, \"contact1\": \"admin@example.com\", \"subjectName\": \"$ACUMOS_HOST\", \"apiUrl\": \"https://$ACUMOS_HOST:$ACUMOS_FEDERATION_PORT\",  \"statusCode\": \"AC\", \"validationStatusCode\": \"PS\" }"
+  created=$(jq -r '.created' /tmp/json)
+  if [[ "$created" == "null" ]]; then
+    cat /tmp/json
+    fail "Peer entry creation failed"
+  fi
 }
 
 export WORK_DIR=$(pwd)
@@ -339,6 +372,7 @@ sed -i -- '/ACUMOS_RO_USER_PASSWORD/d' acumos-env.sh
 sed -i -- '/ACUMOS_RW_USER_PASSWORD/d' acumos-env.sh
 sed -i -- '/ACUMOS_HOST_DOCKER0/d' acumos-env.sh
 sed -i -- '/ACUMOS_CDS_PASSWORD/d' acumos-env.sh
+sed -i -- '/ACUMOS_KEYPASS/d' acumos-env.sh
 
 MARIADB_PASSWORD=$(uuidgen)
 echo "MARIADB_PASSWORD=\"$MARIADB_PASSWORD\"" >>acumos-env.sh
@@ -354,20 +388,28 @@ echo "ACUMOS_RW_USER_PASSWORD=\"$ACUMOS_RW_USER_PASSWORD\"" >>acumos-env.sh
 echo "export ACUMOS_RW_USER_PASSWORD" >>acumos-env.sh
 ACUMOS_CDS_PASSWORD=$(uuidgen)
 echo "ACUMOS_CDS_PASSWORD=\"$ACUMOS_CDS_PASSWORD\"" >>acumos-env.sh
+# TODO: Various components hardcode password ccds_client
+echo "ACUMOS_CDS_PASSWORD=$ACUMOS_CDS_PASSWORD" >>acumos-env.sh
 echo "export ACUMOS_CDS_PASSWORD" >>acumos-env.sh
 docker_ifs=$(ifconfig | grep 172. | cut -d ':' -f 2 | cut -d ' ' -f 1)
 #echo "ACUMOS_HOST_DNS=$(ifconfig | grep 172. | cut -d ':' -f 2 | cut -d ' ' -f 1)" >>acumos-env.sh
 echo "ACUMOS_HOST_DNS=172.18.0.1" >>acumos-env.sh
 echo "export ACUMOS_HOST_DNS" >>acumos-env.sh
+ACUMOS_KEYPASS=$(uuidgen)
+echo "ACUMOS_KEYPASS=$ACUMOS_KEYPASS" >>acumos-env.sh
+echo "export ACUMOS_KEYPASS" >>acumos-env.sh
+
 source acumos-env.sh
 
 setup_prereqs
 setup_dns
 setup_mariadb
+setup_keystore
 setup_acumosdb
 setup_localindex
 setup_acumos
 setup_nexus
 setup_reverse_proxy
+setup_federation
 
-log "Deploy is complete. You can access the portal at https://$ACUMOS_DOMAIN, assuming you have added that hostname to your hosts file."
+log "Deploy is complete. You can access the portal at https://$ACUMOS_DOMAIN (assuming you have added that hostname to your hosts file)"

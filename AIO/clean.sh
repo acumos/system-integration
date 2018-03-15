@@ -34,18 +34,18 @@ echo "Stop the running Acumos component containers"
 sudo bash docker-compose.sh down
 sudo bash docker-compose.sh rm -v
 
-if [[ "$MARIADB_PASSWORD" != "" ]]; then
-  echo "Remove Acumos databases and users"
-  # TODO: support centos also
-  sudo mysql --user=root --password=$MARIADB_PASSWORD -e "DROP DATABASE $ACUMOS_CDS_DB; DROP DATABASE acumos_comment;  DROP DATABASE acumos_cms; DROP USER 'acumos_opr'@'%';"
-else
+echo "Remove Acumos databases and users"
+mysql --user=root --password=$MARIADB_PASSWORD -e "DROP DATABASE $ACUMOS_CDS_DB; DROP DATABASE acumos_comment;  DROP DATABASE acumos_cms; DROP USER 'acumos_opr'@'%';"
+ if [[ $? -eq 1 ]]; then
   echo "Remove all mysql data"
-  # TODO: remove this workaround used in early testing
   sudo rm -rf /var/lib/mysql
 fi
 
 echo "Remove mariadb-server"
 sudo apt-get remove mariadb-server-10.2 -y
+# To prevent issues later with apt-get update
+sudo rm /etc/apt/sources.list.d/mariadb.list
+sudo apt-get clean
 
 echo "Remove Kong certs etc"
 rm -rf certs
