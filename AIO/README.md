@@ -50,7 +50,8 @@ The notes below provide an overview of the default installation process. Note th
    * git clone https://gerrit.acumos.org/r/system-integration
 
 1. In the system-integration/AIO folder, run the following command:
-   * bash oneclick_deploy.sh
+   * bash oneclick_deploy.sh admin_user
+     * where admin_user is an optional user name for an automatically created user accound with the 'Admin' role. 
    * The deployment will take 5-20 minutes depending upon whether this is the first time you have run this command before, and have pre-cached the Acumos docker images.
 
 1. When the deployment is complete, you will need to complete one Hippo CMS setup step manually, so that all Acumos portal content is displayed correctly. This will be automated asap, but for now follow these steps:
@@ -65,9 +66,12 @@ The notes below provide an overview of the default installation process. Note th
 1. So that the default portal domain name "acumos" will resolve on your workstation (from which you will access the portal via your browser), add the following line to your workstation's hosts file:
    * "\<ip address of your AIO host\> acumos"
 
-1. You should now be able to browse to [https://acumos](https://acumos) and create a new account as an Acumos user. If you get a browser warning, just accept the self-signed cert and proceed.
+1. You should now be able to browse to [https://acumos](https://acumos), and
+   * login as the created admin user (see "ACUMOS_ADMIN_PASSWORD" for the password, in the file acumos-env.sh in the folder where you ran oneclick_deploy.sh)
+   * register new user accounts, etc
+   * If you get a browser warning, just accept the self-signed cert and proceed. Note: use of the Chrome browser is recommended, as it puts fewer roadblocks to accessing sites with self-signed certs.
 
-### Stopping, restarting, re-installing
+## Stopping, restarting, re-installing
 
 You can stop all the Acumos components (e.g. to suspend/shutdown your host) without losing their databases via the command:
 * sudo bash docker-compose.sh stop
@@ -79,14 +83,45 @@ You can clean the installation (including all data) and optionally reinstall usi
 * bash clean.sh
 * bash oneclick_deploy.sh
 
-### Verified Features
+## Verified Features
 
 The following Acumos portal workflows and related features have been verified as working so far. This list will be updated as more workflows are verified.
 * new user registration and login
 * portal web page asset integration through Hippo CMS (e.g. user guides under "On-Boarding Model")
 * model onboarding via command line (scikit-learn, python/tensorflow)
+* federated peer relationship creation via portal
 
-### Additional Notes
+### Notes on Verified Features
+
+#### Federation
+
+Federation setup is not yet automated (an automatic self-federation peer relationship is being developed). To manually setup a federation relationship:
+* Login to the portal as the automatically created admin user
+* Under the "SITE ADMIN" page, select "Add Peer", enter these values, and select "Done":
+   * Peer Name: acumos
+   * Server FQDN: acumos
+   * API Url: http://<ip address of your AIO host>:9084
+   * Peer Admin Email: any valid email address
+* Verify that the peer relationship was setup via executing these commands on the AIO host
+   * source acumos-env.sh
+   * curl -vk --cert certs/acumos.crt --key certs/acumos.key https://acumos:9084/solutions
+* You should see details of the HTTPS connection followed by
+  * {"error":null,"message":"available public solution for given filter","content":[]}
+* This indicates that the request for "solutions" was accepted (there are none defined so the array is empty)
+
+### Features Pending Verification
+
+* model onboarding via web
+* model private sharing with user
+* model publication to local marketplace
+* model publication to federated marketplace
+* solution federation
+* artifact federation
+* model launch
+* design studio
+* ...
+
+## Additional Notes
 
 The scripts etc in this repo install Acumos with a default set of values for key environment variables. See acumos-env.sh for these defaults. You should be modify any explicit value (not variables) defined there, but some additional steps may be needed for the installed portal to work with the updated values. For example:
 * To use a a non-default domain name for the acumos AIO server (default: acumos), change ACUMOS_DOMAIN in acumos-env.sh, and use the chosen domain name in the "Install Process" above, in place of "acumos".

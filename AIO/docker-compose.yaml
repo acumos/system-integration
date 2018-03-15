@@ -69,6 +69,10 @@ services:
            }"
        expose:
            - ${ACUMOS_CDS_PORT}
+# Use of ports here is temporary, for creation of an admin role through the swagger
+# API interface, at http://<portal IP>:${ACUMOS_CDS_PORT}/ccds/swagger-ui.html
+       ports:
+           - ${ACUMOS_CDS_PORT}:${ACUMOS_CDS_PORT}
        volumes:
            - acumos-logs:/maven/logs
        logging:
@@ -348,19 +352,19 @@ services:
            SPRING_APPLICATION_JSON: "{
                \"federation\" : {
                     \"instance\" : \"gateway\",
-                    \"instance.name\": \"ist\",
+                    \"instance.name\": \"aio\",
                     \"operator\" : \"bc0f5023-79c0-4a99-a7a3-46c83f9ef806\",
                     \"address\" : \"0.0.0.0\",
                     \"server\" : {
                        \"port\" : ${ACUMOS_FEDERATION_PORT}
                     },
                     \"ssl\" : {
-                       \"key-store\" : \"/app/certs/acumos_ist.pkcs12\",
-                       \"key-store-password\" : \"ist1\",
+                       \"key-store\" : \"/app/certs/acumos_aio.p12\",
+                       \"key-store-password\" : \"${ACUMOS_KEYPASS}\",
                        \"key-store-type\" : \"PKCS12\",
-                       \"key-password\" : \"ist1\",
+                       \"key-password\" : \"${ACUMOS_KEYPASS}\",
                        \"trust-store\" : \"/app/certs/acumosTrustStore.jks\",
-                       \"trust-store-password\" : \"acumos\"
+                       \"trust-store-password\" : \"${ACUMOS_KEYPASS}\"
                     }
                 },
                 \"local\" : {
@@ -369,12 +373,12 @@ services:
                       \"port\" : 9884
                    },
                    \"ssl\" : {
-                      \"key-store\" : \"file:///app/certs/acumos_ist.pkcs12\",
-                      \"key-store-password\" : \"ist1\",
+                      \"key-store\" : \"/app/certs/acumos_aio.p12\",
+                      \"key-store-password\" : \"${ACUMOS_KEYPASS}\",
                       \"key-store-type\" : \"PKCS12\",
-                      \"key-password\" : \"ist1\",
+                      \"key-password\" : \"${ACUMOS_KEYPASS}\",
                       \"trust-store\" : \"/app/certs/acumosTrustStore.jks\",
-                      \"trust-store-password\" : \"acumos\"
+                      \"trust-store-password\" : \"${ACUMOS_KEYPASS}\"
                    }
                 },
                 \"nexus\": {
@@ -399,13 +403,15 @@ services:
            }"
        expose:
            - ${ACUMOS_FEDERATION_PORT}
+       ports:
+           - ${ACUMOS_FEDERATION_PORT}:${ACUMOS_FEDERATION_PORT}
        links:
            - common-data-svc
        depends_on:
            - common-data-svc
        volumes:
            - acumos-logs:/maven/logs
-           - /home/acumosopr/app/certs:/app/certs
+           - /home/ubuntu/certs:/app/certs
        logging:
            driver: json-file
 
@@ -479,29 +485,11 @@ services:
        volumes:
          - kong-db:/var/lib/postgresql
 
-   kong-migration:
-       image: kong:0.11
-       depends_on:
-         - kong-database
-       environment:
-         - KONG_DATABASE=postgres
-         - KONG_PG_HOST=kong-database
-       command: >
-         /bin/bash -c "
-             until [[ $$(curl -v http://kong-database:5432 2>&1 | grep -c \"Connected to \") -gt 0 ]]; do
-               echo \"kong-database is unavailable - sleeping 10 seconds\";
-               sleep 10;
-             done;
-             echo Connected! migration started;
-             kong migrations up;
-         "
-
    kong:
        restart: on-failure
        image: kong:0.11
        depends_on:
          - kong-database
-         - kong-migration
        environment:
          - KONG_DATABASE=postgres
          - KONG_PG_HOST=kong-database
@@ -523,6 +511,7 @@ services:
                echo \"kong-database is unavailable - sleeping 10 seconds\";
                sleep 10;
              done;
+             kong migrations up;
              kong start -vv;
              kong health -vv;
              echo Connected!;

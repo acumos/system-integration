@@ -37,15 +37,15 @@ export RELEASE=nexus3.acumos.org:10002
 # docker.staging folder for the specific component, and verify the version
 export COMMON_DATASERVICE_IMAGE=$RELEASE/common-dataservice:1.14.1
 export ONBOARDING_IMAGE=$STAGING/onboarding-app:2.0.0
-export PORTAL_BE_IMAGE=$STAGING/acumos-portal-be:1.14.38
-export PORTAL_FE_IMAGE=$STAGING/acumos-portal-fe:1.14.38
-export PORTAL_CMS_IMAGE=$STAGING/acumos-cms-docker:1.3.1
+export PORTAL_BE_IMAGE=$STAGING/acumos-portal-be:1.14.42
+export PORTAL_FE_IMAGE=$STAGING/acumos-portal-fe:1.14.42
+export PORTAL_CMS_IMAGE=$STAGING/acumos-cms-docker:1.3.2
 export DESIGNSTUDIO_IMAGE=$RELEASE/ds-compositionengine:0.19.2
 export FEDERATION_IMAGE=$STAGING/federation-gateway:1.1.1
 export FILEBEAT_IMAGE=$STAGING/acumos-filebeat:1.0.1
 export AZURE_CLIENT_IMAGE=$STAGING/acumos-azure-client:1.78.0
 
-export ACUMOS_DOMAIN=acumos
+export ACUMOS_DOMAIN=$(hostname)
 host=$(ip route get 8.8.8.8 | awk '{print $NF; exit}')
 export ACUMOS_HOST=$host
 export ACUMOS_HOSTNAME=localhost
@@ -53,7 +53,8 @@ export ACUMOS_CDS_VERSION=1.14
 export ACUMOS_CDS_DB="acumos_1_14"
 export ACUMOS_MARIADB_HOST=$host
 export ACUMOS_MARIADB_PORT=3306
-export ACUMOS_CDS_USER=cds_client
+# TODO: Various components hardcode user name ccds_client
+export ACUMOS_CDS_USER=ccds_client
 export ACUMOS_CDS_HOST=$host
 export ACUMOS_CDS_PORT=8000
 export ACUMOS_NEXUS_HOST=$host
@@ -71,7 +72,6 @@ export ACUMOS_TOSCA_PYTHON_PORT=8080
 export ACUMOS_DSCE_HOST=$host
 export ACUMOS_DSCE_PORT=8088
 export ACUMOS_ONBOARDING_HOST=$host
-export ACUMOS_ONBOARDING_HOSTNAME=onboarding.$ACUMOS_DOMAIN
 export ACUMOS_ONBOARDING_PORT=8090
 export ACUMOS_CMS_HOST=$host
 export ACUMOS_CMS_PORT=9080
