@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "07fa9564_86e0b7ee",
+        "filename": "AIO/oneclick_deploy.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-20T20:33:55Z",
+      "side": 1,
+      "message": "Did you already test this with a generated password?  I firmly believe that the Docker-Compose properties override all the property files.",
+      "range": {
+        "startLine": 377,
+        "startChar": 0,
+        "endLine": 377,
+        "endChar": 54
+      },
+      "revId": "34593ba570da110e37765a825d4f01d89feb9710",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
