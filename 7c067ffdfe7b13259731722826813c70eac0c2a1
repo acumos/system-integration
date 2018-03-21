@@ -1,0 +1,152 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "260efa08_51e37532",
+        "filename": "AIO/create-peer.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-21T12:08:10Z",
+      "side": 1,
+      "message": "Maybe a comment on why this is not called?",
+      "revId": "7c067ffdfe7b13259731722826813c70eac0c2a1",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8cc8192e_671d19ed",
+        "filename": "AIO/create-user.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-21T12:08:10Z",
+      "side": 1,
+      "message": "...  via the PORTAL and the CDS APIs.\n\nBut WHY is the registration at Portal necessary?  Do they have a shadow database of users???????",
+      "revId": "7c067ffdfe7b13259731722826813c70eac0c2a1",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc2400a7_0dea1b4b",
+        "filename": "AIO/oneclick_deploy.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-21T12:08:10Z",
+      "side": 1,
+      "message": "Maybe digitalocean would be better placed in a variable at the top along with your comment about mirrors?",
+      "range": {
+        "startLine": 121,
+        "startChar": 42,
+        "endLine": 121,
+        "endChar": 46
+      },
+      "revId": "7c067ffdfe7b13259731722826813c70eac0c2a1",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "76f16c25_beb6ed0d",
+        "filename": "AIO/oneclick_deploy.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-21T12:08:10Z",
+      "side": 1,
+      "message": "I still recommend installing java 8, not 9.",
+      "revId": "7c067ffdfe7b13259731722826813c70eac0c2a1",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a56763b9_d87a0461",
+        "filename": "AIO/oneclick_deploy.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-21T12:08:10Z",
+      "side": 1,
+      "message": "Why Docker Zero?",
+      "revId": "7c067ffdfe7b13259731722826813c70eac0c2a1",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "60aea00e_ca4c2a5e",
+        "filename": "AIO/openssl.cnf",
+        "patchSetId": 4
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-21T12:08:10Z",
+      "side": 1,
+      "message": "No longer just an example, maybe worth adding Acumos AIO header?\n\nConsider removing all commented-out lines and just keep the relevant parts?",
+      "range": {
+        "startLine": 2,
+        "startChar": 10,
+        "endLine": 2,
+        "endChar": 17
+      },
+      "revId": "7c067ffdfe7b13259731722826813c70eac0c2a1",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "34d2a50d_f5c30214",
+        "filename": "AIO/peer-test.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-21T12:08:10Z",
+      "side": 1,
+      "message": "Maybe put this in a variable in this script instead of hardcoding several times?",
+      "revId": "7c067ffdfe7b13259731722826813c70eac0c2a1",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a9f46ee_ec268657",
+        "filename": "AIO/peer-test.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-03-21T12:08:10Z",
+      "side": 1,
+      "message": "I think a forward slash is missing between PORT and cms, probably should be\n\nhttps://$host1:$ACUMOS_CMS_PORT/cms",
+      "revId": "7c067ffdfe7b13259731722826813c70eac0c2a1",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
