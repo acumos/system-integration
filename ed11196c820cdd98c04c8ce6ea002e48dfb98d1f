@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "94eb4c41_3241b18f",
+        "filename": "docs/index.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 51
+      },
+      "writtenOn": "2018-03-23T21:05:27Z",
+      "side": 1,
+      "message": "https://wiki.acumos.org/pages/viewpage.action?spaceKey\u003dAC\u0026title\u003dLicense+Templates is different than this, please change",
+      "revId": "ed11196c820cdd98c04c8ce6ea002e48dfb98d1f",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0d5c4e26_c8046359",
+        "filename": "docs/release-notes.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 51
+      },
+      "writtenOn": "2018-03-23T21:05:27Z",
+      "side": 1,
+      "message": "https://wiki.acumos.org/pages/viewpage.action?spaceKey\u003dAC\u0026title\u003dLicense+Templates is different than this, please change",
+      "revId": "ed11196c820cdd98c04c8ce6ea002e48dfb98d1f",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f0cadae2_99a0937c",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 51
+      },
+      "writtenOn": "2018-03-23T21:05:27Z",
+      "side": 1,
+      "message": "https://wiki.acumos.org/pages/viewpage.action?spaceKey\u003dAC\u0026title\u003dLicense+Templates is different than this, please change",
+      "revId": "ed11196c820cdd98c04c8ce6ea002e48dfb98d1f",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
