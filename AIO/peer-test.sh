@@ -26,19 +26,16 @@
 # - Acumos deployed via oneclick_deploy.sh, and acumos-env.sh as updated by it
 # - key-based SSH access setup for running commands on the two target AIO hosts
 # - hostname of host1 and host2 resolvable in DNS or setup in /etc/hosts
+# - jq installed on the host
 #
 # Usage:
-# $ bash peer-test.sh <host1> <user1> <host2> <user2> [bootstrap]
+# $ bash peer-test.sh <host1> <user1> <host2> <user2> [models]
 #   host1: AIO deploy target hostname
 #   user1: user account on host1
 #   host2: AIO deploy target hostname
 #   user2: user account on host2
-#   bootstrap: optional folder for bootstrap.sh script and models
-#     NOTE: this optional because it has not been merged into an Acumos repo
-#     yet, and needs to be shared between testers directly for now.
+#   models: optional folder with models to onboard
 #
-
-set -x
 
 trap 'fail' ERR
 
@@ -59,15 +56,13 @@ function deploy() {
   log "Deploying Acumos AIO to $1 user $2"
   scp -r -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
     * $2@$1:/home/$2/.
-  scp -r -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    $3 $2@$1:/home/$2/.
+  # Run the commands separately to ensure failures are trapped
   ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    $2@$1 <<EOF
-trap 'exit 1' ERR
-bash clean.sh
-bash oneclick_deploy.sh 2>&1 | tee deploy.log
-bash create-user.sh test P@ssw0rd! test user test@acumos-aio.com admin
-EOF
+    $2@$1 bash clean.sh
+  ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+    $2@$1 bash oneclick_deploy.sh
+  ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+    $2@$1 bash create-user.sh test P@ssw0rd test user test@acumos-aio.com admin
 }
 
 export WORK_DIR=$(pwd)
@@ -77,10 +72,10 @@ host1=$1
 user1=$2
 host2=$3
 user2=$4
-bootstrap=$5
+models=$5
 
-deploy $host1 $user1 $bootstrap
-deploy $host2 $user2 $bootstrap
+deploy $host1 $user1
+deploy $host2 $user2
 
 log "Exchange peer CA certs and server certs"
 scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
@@ -108,18 +103,23 @@ bash create-peer.sh certs/peerCA.crt $host1 $host1 admin@example.com \
   https://$host1:$ACUMOS_FEDERATION_PORT
 EOF
 
-#curl -vk --cert certs/acumos.crt --key certs/acumos.key https://$host1:9084/solutions
+log "Verify $host1 can access federation API at $host2"
+ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+  $user1@$host1 curl -vk --cert certs/acumos.crt --key certs/acumos.key \
+  https://$host2:$ACUMOS_FEDERATION_PORT/solutions
 
-if [[ "$bootstrap" != "" ]]; then
+log "Verify $host2 can access federation API at $host1"
+ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+  $user2@$host2 curl -vk --cert certs/acumos.crt --key certs/acumos.key \
+  https://$host1:$ACUMOS_FEDERATION_PORT/solutions
+
+if [[ "$models" != "" ]]; then
   log "Bootstrap models at $host1"
-  cd $bootstrap
-  bash bootstrap.sh $host1 test P@ssw0rd!
+  source ./bootstrap.sh $host1 test P@ssw0rd $models
 
   log "Bootstrap models at $host2"
-  bash bootstrap.sh $host2 test P@ssw0rd!
+  source ./bootstrap.sh $host2 test P@ssw0rd $models
 fi
-
-cd $WORK_DIR
 
 echo <<EOF
 Deployment is complete at $host1 and $host2. Sample models have been onboarded

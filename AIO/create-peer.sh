@@ -91,6 +91,13 @@ function setup_peer() {
 
   log "Restart federation-gateway to apply new truststore entry"
   sudo bash docker-compose.sh restart federation-gateway
+
+  log "Verify federation API is accessible"
+  while ! curl -vk --cert certs/acumos.crt --key certs/acumos.key \
+  https://$ACUMOS_FEDERATION_HOST:$ACUMOS_FEDERATION_PORT/solutions ; do
+    log "federation API is not yet accessible. Waiting 10 seconds"
+    sleep 10
+  done
 }
 
 source acumos-env.sh
