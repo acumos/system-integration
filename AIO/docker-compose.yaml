@@ -69,8 +69,6 @@ services:
            }"
        expose:
            - ${ACUMOS_CDS_PORT}
-# Use of ports here is temporary, for creation of an admin role through the swagger
-# API interface, at http://<portal IP>:${ACUMOS_CDS_PORT}/ccds/swagger-ui.html
        ports:
            - ${ACUMOS_CDS_PORT}:${ACUMOS_CDS_PORT}
        volumes:
@@ -124,7 +122,7 @@ services:
                     \"mktPlaceEndPoinURL\" : \"http://acumos-portal-be:${ACUMOS_PORTAL_BE_PORT}\"
                },
                \"requirements\": {
-                       \"extraIndexURL\": \"http://${PYTHON_EXTRAINDEX_HOST}:8087/archive\",
+                       \"extraIndexURL\": \"${PYTHON_EXTRAINDEX}\",
                        \"trustedHost\": \"${PYTHON_EXTRAINDEX_HOST}\"
                },
                \"authenticationServiceURL\": \"http://acumos-portal-be:${ACUMOS_PORTAL_BE_PORT}\"
@@ -285,6 +283,7 @@ services:
                                 \"cmndatasvcuser\": \"${ACUMOS_CDS_USER}\",
                                 \"cmndatasvcpwd\": \"${ACUMOS_CDS_PASSWORD}\"
                           },
+                          \"databrokerImageURI\":\"$DATABROKER_ZIPBROKER_IMAGE\",
                           \"docker\": {
                                 \"host\": \"${ACUMOS_DOCKER_API_HOST}\",
                                 \"port\": 4243,

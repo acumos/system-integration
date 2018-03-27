@@ -37,13 +37,14 @@ export RELEASE=nexus3.acumos.org:10002
 # docker.staging folder for the specific component, and verify the version
 export COMMON_DATASERVICE_IMAGE=$RELEASE/common-dataservice:1.14.1
 export ONBOARDING_IMAGE=$STAGING/onboarding-app:2.0.0
-export PORTAL_BE_IMAGE=$STAGING/acumos-portal-be:1.14.42
-export PORTAL_FE_IMAGE=$STAGING/acumos-portal-fe:1.14.42
+export PORTAL_BE_IMAGE=$STAGING/acumos-portal-be:1.14.48
+export PORTAL_FE_IMAGE=$STAGING/acumos-portal-fe:1.14.48
 export PORTAL_CMS_IMAGE=$STAGING/acumos-cms-docker:1.3.2
-export DESIGNSTUDIO_IMAGE=$RELEASE/ds-compositionengine:0.19.2
+export DESIGNSTUDIO_IMAGE=$STAGING/ds-compositionengine:0.0.24
 export FEDERATION_IMAGE=$STAGING/federation-gateway:1.1.1
-export FILEBEAT_IMAGE=$STAGING/acumos-filebeat:1.0.1
-export AZURE_CLIENT_IMAGE=$STAGING/acumos-azure-client:1.78.0
+export FILEBEAT_IMAGE=$STAGING/acumos-filebeat:1.0.0
+export AZURE_CLIENT_IMAGE=$STAGING/acumos-azure-client:1.81.0
+export DATABROKER_ZIPBROKER_IMAGE=$STAGING/databroker-zipbroker:0.0.1
 
 export ACUMOS_DOMAIN=$(hostname)
 host=$(ip route get 8.8.8.8 | awk '{print $NF; exit}')
@@ -88,4 +89,5 @@ export ACUMOS_KONG_ADMIN_HOST=localhost
 export ACUMOS_KONG_ADMIN_PORT=8480
 export ACUMOS_KONG_ADMIN_SSL_PORT=8443
 export ACUMOS_DOCKER_API_HOST=$host
+export PYTHON_EXTRAINDEX=http://$host:8087/simple/
 export PYTHON_EXTRAINDEX_HOST=$host
