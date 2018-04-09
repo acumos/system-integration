@@ -178,7 +178,8 @@ services:
                 \"onboarding\" : {
                    \"push\" : {
                        \"model\" : {
-                          \"url\" : \"http://onboarding-app:${ACUMOS_ONBOARDING_PORT}/onboarding-app/v2/models\"
+                          \"url\" : \"http://onboarding-app:${ACUMOS_ONBOARDING_PORT}/onboarding-app/v2/models\",
+                          \"dcae_url\" : \"http://onboarding-app:${ACUMOS_ONBOARDING_PORT}/onboarding-app/v2/dcae_models\"
                        }
                    }
                 },
@@ -194,12 +195,31 @@ services:
                 },
                 \"portal\" : {
                    \"feature\" : {
-                      \"validateModel\" : \"false\"
+                      \"validateModel\" : \"false\",
+                      \"email_service\" : \"\",
+                      \"cas_enabled\" : \"false\"
                    },
                    \"submitValidation\" : {
                       \"api\" : \"http://wrapper:${ACUMOS_WRAPPER_PORT}/status/v1.0/tasks\"
+                   },
+                   \"dashboard\":{
+                      \"url\" : \"\"
                    }
+                },
+                \"client\" : {
+                   \"ssl\" : {
+                      \"key-store\" : \"/app/certs/acumos_aio.p12\",
+                      \"key-store-password\" : \"${ACUMOS_KEYPASS}\",
+                      \"key-store-type\" : \"PKCS12\",
+                      \"key-password\" : \"${ACUMOS_KEYPASS}\",
+                      \"trust-store\" : \"/app/certs/acumosTrustStore.jks\",
+                      \"trust-store-password\" : \"${ACUMOS_KEYPASS}\"
+                   }
+                },
+                \"gateway\" : {
+                   \"url\" : \"https://${ACUMOS_FEDERATION_HOST}:${ACUMOS_FEDERATION_LOCAL_PORT}\"
                 }
+
            }"
        expose:
            - ${ACUMOS_PORTAL_BE_PORT}
@@ -209,6 +229,7 @@ services:
            - common-data-svc
        volumes:
            - acumos-logs:/maven/logs
+           - /home/ubuntu/certs:/app/certs
            - acumosWebOnboarding:/acumosWebOnboarding
        logging:
            driver: json-file
@@ -369,7 +390,7 @@ services:
                 \"local\" : {
                    \"address\": \"0.0.0.0\",
                    \"server\" : {
-                      \"port\" : 9884
+                      \"port\" : ${ACUMOS_FEDERATION_LOCAL_PORT}
                    },
                    \"ssl\" : {
                       \"key-store\" : \"/app/certs/acumos_aio.p12\",
@@ -402,8 +423,10 @@ services:
            }"
        expose:
            - ${ACUMOS_FEDERATION_PORT}
+           - ${ACUMOS_FEDERATION_LOCAL_PORT}
        ports:
            - ${ACUMOS_FEDERATION_PORT}:${ACUMOS_FEDERATION_PORT}
+           - ${ACUMOS_FEDERATION_LOCAL_PORT}:${ACUMOS_FEDERATION_LOCAL_PORT}
        links:
            - common-data-svc
        depends_on:

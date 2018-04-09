@@ -245,9 +245,8 @@ authorityKeyIdentifier=keyid,issuer
 
 [ alt_names ]
 
-DNS.1 = acumos-aio.com
-#DNS.2 = localhost
-
+DNS.1 = <acumos-domain>
+IP.1 = <acumos-host>
 
 [ v3_ca ]
 

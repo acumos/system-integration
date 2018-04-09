@@ -72,7 +72,7 @@ host1=$1
 user1=$2
 host2=$3
 user2=$4
-models=$5
+models="$5"
 
 deploy $host1 $user1
 deploy $host2 $user2
@@ -115,10 +115,10 @@ ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
 
 if [[ "$models" != "" ]]; then
   log "Bootstrap models at $host1"
-  source ./bootstrap.sh $host1 test P@ssw0rd $models
+  bash ./bootstrap-models.sh $host1 test P@ssw0rd "$models"
 
   log "Bootstrap models at $host2"
-  source ./bootstrap.sh $host2 test P@ssw0rd $models
+  bash ./bootstrap-models.sh $host2 test P@ssw0rd "$models"
 fi
 
 echo <<EOF
