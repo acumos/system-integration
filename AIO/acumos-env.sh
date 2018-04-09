@@ -36,11 +36,11 @@ export RELEASE=nexus3.acumos.org:10002
 # If images are not found, goto https://nexus3.acumos.org and browse the
 # docker.staging folder for the specific component, and verify the version
 export COMMON_DATASERVICE_IMAGE=$RELEASE/common-dataservice:1.14.1
-export ONBOARDING_IMAGE=$STAGING/onboarding-app:2.0.0
-export PORTAL_BE_IMAGE=$STAGING/acumos-portal-be:1.14.48
-export PORTAL_FE_IMAGE=$STAGING/acumos-portal-fe:1.14.48
+export ONBOARDING_IMAGE=$STAGING/onboarding-app:1.17.0
+export PORTAL_BE_IMAGE=$STAGING/acumos-portal-be:1.14.50
+export PORTAL_FE_IMAGE=$STAGING/acumos-portal-fe:1.14.50
 export PORTAL_CMS_IMAGE=$STAGING/acumos-cms-docker:1.3.2
-export DESIGNSTUDIO_IMAGE=$STAGING/ds-compositionengine:0.0.24
+export DESIGNSTUDIO_IMAGE=$STAGING/ds-compositionengine:0.0.23
 export FEDERATION_IMAGE=$STAGING/federation-gateway:1.1.1
 export FILEBEAT_IMAGE=$STAGING/acumos-filebeat:1.0.0
 export AZURE_CLIENT_IMAGE=$STAGING/acumos-azure-client:1.81.0
@@ -82,6 +82,7 @@ export ACUMOS_PLATON_HOST=$host
 export ACUMOS_PLATON_PORT=9083
 export ACUMOS_FEDERATION_HOST=$host
 export ACUMOS_FEDERATION_PORT=9084
+export ACUMOS_FEDERATION_LOCAL_PORT=9011
 export ACUMOS_KONG_DB_PORT=5432
 export ACUMOS_KONG_PROXY_PORT=80
 export ACUMOS_KONG_PROXY_SSL_PORT=443

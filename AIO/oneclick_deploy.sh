@@ -253,12 +253,18 @@ function setup_localindex() {
   nohup twistd -n web --port 8087 --path .  > /dev/null 2>&1 &
 }
 
+function docker_login() {
+  while ! sudo docker login $1 -u docker -p docker ; do
+    log "Docker login failed at $1, trying again"
+  done
+}
+
 function setup_acumos() {
   trap 'fail' ERR
   log "Log into LF Nexus Docker repos"
-  sudo docker login https://nexus3.acumos.org:10004 -u docker -p docker
-  sudo docker login https://nexus3.acumos.org:10003 -u docker -p docker
-  sudo docker login https://nexus3.acumos.org:10002 -u docker -p docker
+  docker_login https://nexus3.acumos.org:10004
+  docker_login https://nexus3.acumos.org:10003
+  docker_login https://nexus3.acumos.org:10002
   log "Deploy Acumos docker containers"
   sudo bash docker-compose.sh build
   sudo bash docker-compose.sh up -d
@@ -290,7 +296,7 @@ function setup_keystore() {
   # is not resolvable via DNS for this AIO deploy
   openssl req -new -key certs/acumos.key -passin pass:$ACUMOS_KEYPASS \
     -out certs/acumos.csr \
-    -subj "/C=US/ST=Unspecified/L=Unspecified/O=Acumos/OU=Acumos/CN=$ACUMOS_DOMAIN/subjectAltName=$ACUMOS_HOST"
+    -subj "/C=US/ST=Unspecified/L=Unspecified/O=Acumos/OU=Acumos/CN=$ACUMOS_DOMAIN"
 
   log "Sign the CSR with the acumos CA"
   openssl x509 -req -in certs/acumos.csr -CA certs/acumosCA.crt \
@@ -316,6 +322,13 @@ function setup_reverse_proxy() {
     -F "snis=$ACUMOS_DOMAIN"
 
   log "Add proxy entries via Kong API"
+#  curl -i -X POST \
+#    --url http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis/ \
+#    --data "https_only=true" \
+#    --data "name=site" \
+#    --data "upstream_url=http://$ACUMOS_CMS_HOST:$ACUMOS_CMS_PORT" \
+#    --data "uris=/site" \
+#    --data "strip_uri=false"
   curl -i -X POST \
     --url http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis/ \
     --data "https_only=true" \

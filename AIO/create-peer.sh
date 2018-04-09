@@ -86,7 +86,7 @@ function setup_peer() {
   # workaround a way to use docker-compose.sh for this (tests of this command
   # with docker-compose.sh have not been successful)
   ip=$(host $subjectName | awk '{print $4}')
-  sudo docker exec ubuntu_federation-gateway_1 \
+  sudo docker exec $USER_federation-gateway_1 \
     /bin/sh -c "echo $ip $subjectName >>/etc/hosts"
 
   log "Restart federation-gateway to apply new truststore entry"
