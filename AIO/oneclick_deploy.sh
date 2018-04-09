@@ -51,13 +51,23 @@ function wait_dpkg() {
 
 function setup_prereqs() {
   trap 'fail' ERR
-  dist=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+
   if [[ $(grep -c $HOSTNAME /etc/hosts) -eq 0 ]]; then
     log "Add $HOSTNAME to /etc/hosts"
     # have to add "/sbin" to path of IP command for centos
     echo "$(/sbin/ip route get 8.8.8.8 | awk '{print $NF; exit}') $HOSTNAME" \
       | sudo tee -a /etc/hosts
   fi
+  log "/etc/hosts:"
+  cat /etc/hosts
+
+  # Add 'options ndots:5' to first resolve names using DNS search options
+  if [[ $(grep -c 'options ndots:5' /etc/resolv.conf) -eq 0 ]]; then
+    log "Add 'options ndots:5' to /etc/resolv.conf"
+    echo "options ndots:5" | sudo tee -a /etc/resolv.conf
+  fi
+  log "/etc/resolv.conf:"
+  cat /etc/resolv.conf
 
   log "Basic prerequisites"
 
@@ -209,6 +219,7 @@ EOF
 
 function setup_nexus() {
   trap 'fail' ERR
+  # TODO: change default nexus admin password
   while ! curl -v -u admin:admin123 http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script ; do
     log "Waiting 10 seconds for nexus server to respond"
     sleep 10
@@ -244,21 +255,35 @@ EOF
     http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script/ -d @nexus-script.json
   curl -v -X POST -u admin:admin123 -H "Content-Type: text/plain" \
     http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script/list-users/run
+
+  if [[ $(grep -c nexus /etc/hosts) -eq 0 ]]; then
+    log "Add nexus to /etc/hosts"
+    # have to add "/sbin" to path of IP command for centos
+    echo "$ACUMOS_NEXUS_HOST nexus" | sudo tee -a /etc/hosts
+  fi
 }
 
 function setup_localindex() {
+  # TODO: switch to public pypi index when compatible with models (currently
+  # failing when building models)
   trap 'fail' ERR
   log "Setup local python index"
   sudo apt-get install -y python-twisted-core
   nohup twistd -n web --port 8087 --path .  > /dev/null 2>&1 &
 }
 
+function docker_login() {
+  while ! sudo docker login $1 -u docker -p docker ; do
+    log "Docker login failed at $1, trying again"
+  done
+}
+
 function setup_acumos() {
   trap 'fail' ERR
   log "Log into LF Nexus Docker repos"
-  sudo docker login https://nexus3.acumos.org:10004 -u docker -p docker
-  sudo docker login https://nexus3.acumos.org:10003 -u docker -p docker
-  sudo docker login https://nexus3.acumos.org:10002 -u docker -p docker
+  docker_login https://nexus3.acumos.org:10004
+  docker_login https://nexus3.acumos.org:10003
+  docker_login https://nexus3.acumos.org:10002
   log "Deploy Acumos docker containers"
   sudo bash docker-compose.sh build
   sudo bash docker-compose.sh up -d
@@ -276,6 +301,10 @@ function setup_keystore() {
 
   mkdir certs
   log "Create self-signing CA"
+  # Customize openssl.cnf as this is needed to set CN (vs command options below)
+  sed -i -- "s/<acumos-domain>/$ACUMOS_DOMAIN/" openssl.cnf
+  sed -i -- "s/<acumos-host>/$ACUMOS_HOST/" openssl.cnf
+
   openssl genrsa -des3 -out certs/acumosCA.key -passout pass:$ACUMOS_KEYPASS 4096
 
   openssl req -x509 -new -nodes -key certs/acumosCA.key -sha256 -days 1024 \
@@ -290,7 +319,7 @@ function setup_keystore() {
   # is not resolvable via DNS for this AIO deploy
   openssl req -new -key certs/acumos.key -passin pass:$ACUMOS_KEYPASS \
     -out certs/acumos.csr \
-    -subj "/C=US/ST=Unspecified/L=Unspecified/O=Acumos/OU=Acumos/CN=$ACUMOS_DOMAIN/subjectAltName=$ACUMOS_HOST"
+    -subj "/C=US/ST=Unspecified/L=Unspecified/O=Acumos/OU=Acumos/CN=$ACUMOS_DOMAIN"
 
   log "Sign the CSR with the acumos CA"
   openssl x509 -req -in certs/acumos.csr -CA certs/acumosCA.crt \
@@ -316,6 +345,13 @@ function setup_reverse_proxy() {
     -F "snis=$ACUMOS_DOMAIN"
 
   log "Add proxy entries via Kong API"
+#  curl -i -X POST \
+#    --url http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis/ \
+#    --data "https_only=true" \
+#    --data "name=site" \
+#    --data "upstream_url=http://$ACUMOS_CMS_HOST:$ACUMOS_CMS_PORT" \
+#    --data "uris=/site" \
+#    --data "strip_uri=false"
   curl -i -X POST \
     --url http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis/ \
     --data "https_only=true" \
@@ -347,7 +383,7 @@ function setup_federation() {
     log "CDS API is not yet responding... waiting 10 seconds"
     sleep 10
   done
-  curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer -H "accept: */*" -H "Content-Type: application/json" -d "{ \"name\":\"$ACUMOS_DOMAIN\", \"self\": true, \"local\": false, \"contact1\": \"admin@example.com\", \"subjectName\": \"$ACUMOS_HOST\", \"apiUrl\": \"https://$ACUMOS_HOST:$ACUMOS_FEDERATION_PORT\",  \"statusCode\": \"AC\", \"validationStatusCode\": \"PS\" }"
+  curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer -H "accept: */*" -H "Content-Type: application/json" -d "{ \"name\":\"$ACUMOS_DOMAIN\", \"self\": true, \"local\": false, \"contact1\": \"admin@example.com\", \"subjectName\": \"$ACUMOS_DOMAIN\", \"apiUrl\": \"https://$ACUMOS_DOMAIN:$ACUMOS_FEDERATION_PORT\",  \"statusCode\": \"AC\", \"validationStatusCode\": \"PS\" }"
   created=$(jq -r '.created' /tmp/json)
   if [[ "$created" == "null" ]]; then
     cat /tmp/json

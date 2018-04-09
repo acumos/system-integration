@@ -35,8 +35,6 @@
 #   password: password for user
 #   models: optional folder with models to onboard
 
-set -x
-
 trap 'fail' ERR
 
 function fail() {
@@ -67,19 +65,24 @@ function bootstrap() {
     models=$(ls $models_dir)
     for model in $models
     do
-      echo "Onboarding model" $model "..."
-      curl -k -H "Authorization: $jwtToken"\
+      echo "Onboarding model $model ..."
+      curl -o /tmp/json -k -H "Authorization: $jwtToken"\
            -F "model=@$models_dir/$model/model.zip;type=application/zip" \
-	   -F "metadata=@$models_dir/$model/metadata.json;type=application/json"\
-	   -F "schema=@$models_dir/$model/model.proto;type=application/text" $PUSHURL
-      if [[ $? -eq 0 ]]; then
-        log "Onboarding $model succeeded"
-        # log "Adding image for model $model ..."
-        # curl -H "Authorization: $jwtToken" <rest of curl command to upload image for the model from models/$model/image.jpg>
-        # log "Adding descriptitive text for model $model ..."
-        # curl -H "Authorization: $jwtToken" <rest of curl command to upload description for the model from models/$model/description.txt>
+           -F "metadata=@$models_dir/$model/metadata.json;type=application/json"\
+           -F "schema=@$models_dir/$model/model.proto;type=application/text" $PUSHURL
+      if [[ $(grep -c "The upstream server is timing out" /tmp/json) -eq 1 ]]; then 
+        log "Onboarding $model failed: $(cat /tmp/json)"
       else
-        log "Onboarding $model failed"
+        status=$(jq -r '.status' /tmp/json)
+        if [[ "$status" != "ERROR" ]]; then
+          log "Onboarding $model succeeded"
+          # log "Adding image for model $model ..."
+          # curl -H "Authorization: $jwtToken" <rest of curl command to upload image for the model from models/$model/image.jpg>
+          # log "Adding descriptitive text for model $model ..."
+          # curl -H "Authorization: $jwtToken" <rest of curl command to upload description for the model from models/$model/description.txt>
+        else
+          log "Onboarding $model failed: $(cat /tmp/json)"
+        fi
       fi
     done
   else
@@ -88,8 +91,9 @@ function bootstrap() {
   fi
 }
 
+source acumos-env.sh
 host=$1
 user=$2
 pass=$3
-models_dir=$4
+models_dir="$4"
 bootstrap

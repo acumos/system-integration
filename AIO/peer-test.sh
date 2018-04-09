@@ -27,6 +27,11 @@
 # - key-based SSH access setup for running commands on the two target AIO hosts
 # - hostname of host1 and host2 resolvable in DNS or setup in /etc/hosts
 # - jq installed on the host
+# - For deployment of test models per the [models] option, a python localindex
+#   may need to be provided if the models are not packagable into containers
+#   by docker based upon the public pypi index. This local index is configured
+#   as per PYTHON_EXTRAINDEX and PYTHON_EXTRAINDEX_HOST in acumos-env.sh, and
+#   is served by twistd as setup in oneclick_deploy.sh 
 #
 # Usage:
 # $ bash peer-test.sh <host1> <user1> <host2> <user2> [models]
@@ -72,7 +77,7 @@ host1=$1
 user1=$2
 host2=$3
 user2=$4
-models=$5
+models="$5"
 
 deploy $host1 $user1
 deploy $host2 $user2
@@ -115,10 +120,10 @@ ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
 
 if [[ "$models" != "" ]]; then
   log "Bootstrap models at $host1"
-  source ./bootstrap.sh $host1 test P@ssw0rd $models
+  bash ./bootstrap-models.sh $host1 test P@ssw0rd "$models"
 
   log "Bootstrap models at $host2"
-  source ./bootstrap.sh $host2 test P@ssw0rd $models
+  bash ./bootstrap-models.sh $host2 test P@ssw0rd "$models"
 fi
 
 echo <<EOF
