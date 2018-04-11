@@ -35,8 +35,8 @@ export RELEASE=nexus3.acumos.org:10002
 # Images
 # If images are not found, goto https://nexus3.acumos.org and browse the
 # docker.staging folder for the specific component, and verify the version
-export COMMON_DATASERVICE_IMAGE=$RELEASE/common-dataservice:1.14.1
-export ONBOARDING_IMAGE=$STAGING/onboarding-app:2.0.0
+export COMMON_DATASERVICE_IMAGE=$RELEASE/common-dataservice:1.14.3
+export ONBOARDING_IMAGE=$STAGING/onboarding-app:1.18.1
 export PORTAL_BE_IMAGE=$STAGING/acumos-portal-be:1.14.50
 export PORTAL_FE_IMAGE=$STAGING/acumos-portal-fe:1.14.50
 export PORTAL_CMS_IMAGE=$STAGING/acumos-cms-docker:1.3.2
@@ -90,5 +90,5 @@ export ACUMOS_KONG_ADMIN_HOST=localhost
 export ACUMOS_KONG_ADMIN_PORT=8480
 export ACUMOS_KONG_ADMIN_SSL_PORT=8443
 export ACUMOS_DOCKER_API_HOST=$host
-export PYTHON_EXTRAINDEX=http://$host:8087/simple/
-export PYTHON_EXTRAINDEX_HOST=$host
+export PYTHON_EXTRAINDEX=
+export PYTHON_EXTRAINDEX_HOST=
