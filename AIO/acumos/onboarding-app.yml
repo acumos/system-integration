@@ -1,0 +1,87 @@
+version: '2'
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# docker-compose for onboarding-app
+# TODO: remove ports: for services that do not need external exposure
+# TODO: remove or parameterize all credentials
+# TODO: scrub all attributes for current need
+services:
+   onboarding-app:
+       image: ${ONBOARDING_IMAGE}
+       environment:
+          SPRING_APPLICATION_JSON: "{
+               \"server\" :{
+                    \"port\" : ${ACUMOS_ONBOARDING_PORT}
+                },
+               \"docker\" : {
+                   \"host\" : \"${ACUMOS_DOCKER_API_HOST}\",
+                   \"port\" : 4243,
+                   \"config\": \"/docker_host/.docker\",
+                   \"registry\" :{
+                       \"url\": \"http://nexus:${ACUMOS_DOCKER_MODEL_PORT}/\",
+                       \"username\" : \"acumos_rw\",
+                       \"password\" : \"${ACUMOS_RW_USER_PASSWORD}\",
+                       \"email\": \"acumos@example.com\"
+                   },
+                   \"tls\": {
+                       \"verify\": \"false\"
+                   },
+                   \"api\": {
+                       \"version\": \"1.23\"
+                   },
+                   \"imagetag\": {
+                       \"prefix\": \"nexus:${ACUMOS_DOCKER_MODEL_PORT}\"
+                   },
+                   \"max_total_connections\": \"1\",
+                   \"max_per_route_connections\": \"1\"
+               },
+               \"http_proxy\": \"''\",
+               \"nexus\": {
+                       \"nexusEndPointURL\": \"http://nexus:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
+                       \"nexusUserName\": \"acumos_rw\",
+                       \"nexusPassword\": \"${ACUMOS_RW_USER_PASSWORD}\",
+                       \"nexusproxy\": \"\",
+                       \"nexusGroupId\": \"com.artifact\"
+               },
+               \"cmndatasvc\": {
+                       \"cmnDataSvcEndPoinURL\": \"http://common-data-svc:${ACUMOS_CDS_PORT}/ccds\",
+                       \"cmnDataSvcUser\": \"${ACUMOS_CDS_USER}\",
+                       \"cmnDataSvcPwd\": \"${ACUMOS_CDS_PASSWORD}\"
+               },
+               \"mktPlace\": {
+                    \"mktPlaceEndPoinURL\" : \"http://portal-be:${ACUMOS_PORTAL_BE_PORT}\"
+               },
+               \"requirements\": {
+                       \"extraIndexURL\": \"${PYTHON_EXTRAINDEX}\",
+                       \"trustedHost\": \"${PYTHON_EXTRAINDEX_HOST}\"
+               },
+               \"authenticationServiceURL\": \"http://portal-be:${ACUMOS_PORTAL_BE_PORT}\"
+       }"
+       ports:
+           - ${ACUMOS_ONBOARDING_PORT}:${ACUMOS_ONBOARDING_PORT}
+       links:
+           - common-data-svc
+       depends_on:
+           - common-data-svc
+       volumes:
+           - acumos-logs:/maven/logs
+           - acumos-output:/temp/
+       logging:
+           driver: json-file
+
