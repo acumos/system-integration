@@ -1,0 +1,66 @@
+version: '2'
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# docker-compose for common-data-svc
+# uses localhost for database (running on same server)
+# TODO: remove ports: for services that do not need external exposure
+# TODO: remove or parameterize all credentials
+# TODO: scrub all attributes for current need
+services:
+   common-data-svc:
+       image: ${COMMON_DATASERVICE_IMAGE}
+       environment:
+           SPRING_APPLICATION_JSON: "{
+                \"server\" : {
+                    \"port\" : ${ACUMOS_CDS_PORT}
+                },
+                \"security\" : {
+                    \"user\" : {
+                        \"name\"     : \"${ACUMOS_CDS_USER}\",
+                        \"password\" : \"${ACUMOS_CDS_PASSWORD}\"
+                    }
+                },
+                \"spring\" : {
+                    \"database\" : {
+                        \"driver\" : {
+                            \"classname\" : \"org.mariadb.jdbc.Driver\"
+                        }
+                    },
+                    \"datasource\" : {
+                        \"url\" : \"jdbc:mysql://${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_PORT}/$ACUMOS_CDS_DB?useSSL=false\",
+                        \"username\" : \"acumos_opr\",
+                        \"password\" : \"${MARIADB_USER_PASSWORD}\"
+                    },
+                    \"jpa\" : {
+                        \"database-platform\" : \"org.hibernate.dialect.MySQLDialect\",
+                        \"hibernate\" : {
+                            \"ddl-auto\" : \"validate\"
+                        }
+                   }
+                 }
+           }"
+       expose:
+           - ${ACUMOS_CDS_PORT}
+       ports:
+           - ${ACUMOS_CDS_PORT}:${ACUMOS_CDS_PORT}
+       volumes:
+           - acumos-logs:/maven/logs
+       logging:
+           driver: json-file
+
