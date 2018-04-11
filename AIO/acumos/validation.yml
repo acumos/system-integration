@@ -1,0 +1,83 @@
+version: '2'
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# docker-compose for validation
+# TODO: remove ports: for services that do not need external exposure
+# TODO: remove or parameterize all credentials
+# TODO: scrub all attributes for current need
+services:
+   validation-client:
+       image: ${VALIDATION_CLIENT_IMAGE}
+       environment:
+           - URL_CCDS=http://common-data-svc:${ACUMOS_CDS_PORT}/ccds/config/site_config
+           - URL_PORTAL=http://portal-be:$ACUMOS_PORTAL_BE_PORT/validation
+           - APP_NAME=ValidationAndSecurity
+           - URL_INVOKE_TASK=http://validation-engine:$ACUMOS_VALIDATION_ENGINE_PORT/invoketask
+           - URL_TASK_STATUS=http://validation-engine:$ACUMOS_VALIDATION_ENGINE_PORT/status
+           - URL_TODO_TASK=http://validation-middleware:$ACUMOS_VALIDATION_MIDDLEWARE_PORT/todo/api/v1.0/tasks
+           - URL_SITE_CONFIG=http://portal-be:$ACUMOS_PORTAL_BE_PORT/admin/config
+           - URL_ONBOARDING_CONTROLLER=http://portal-be:$ACUMOS_PORTAL_BE_PORT/webBasedOnBoarding/stepResult/create
+           - IGNORE_LIST_CHECK=Disable
+       expose:
+           - $ACUMOS_VALIDATION_CLIENT_PORT
+       ports:
+           - $ACUMOS_VALIDATION_CLIENT_PORT:$ACUMOS_VALIDATION_CLIENT_PORT
+       volumes:
+           - acumos-logs:/validation-client-logs
+
+   validation-middleware:
+       image: ${VALIDATION_MIDDLEWARE_IMAGE}
+       environment:
+           - URL_CCDS=http://common-data-svc:${ACUMOS_CDS_PORT}/ccds/config/site_config
+           - URL_PORTAL=http://portal-be:$ACUMOS_PORTAL_BE_PORT/validation
+           - APP_NAME=ValidationAndSecurity
+           - URL_INVOKE_TASK=http://validation-engine:$ACUMOS_VALIDATION_ENGINE_PORT/invoketask
+           - URL_TASK_STATUS=http://validation-engine:$ACUMOS_VALIDATION_ENGINE_PORT/status
+           - URL_SITE_CONFIG=http://portal-be:$ACUMOS_PORTAL_BE_PORT/admin/config
+           - URL_ONBOARDING_CONTROLLER=http://portal-be:$ACUMOS_PORTAL_BE_PORT/webBasedOnBoarding/stepResult/create
+           - IGNORE_LIST_CHECK=Disable
+       expose:
+           - $ACUMOS_VALIDATION_MIDDLEWARE_PORT
+           - $ACUMOS_PORTAL_BE_PORT
+           - $ACUMOS_MAVEN_MODEL_PORT
+           - 8003
+       ports:
+           - $ACUMOS_VALIDATION_MIDDLEWARE_PORT:$ACUMOS_VALIDATION_MIDDLEWARE_PORT
+       volumes:
+           - acumos-logs:/validation-middleware-logs
+
+   validation-engine:
+       image: ${VALIDATION_ENGINE_IMAGE}
+       environment:
+           - URL_CCDS=http://common-data-svc:${ACUMOS_CDS_PORT}/ccds/config/site_config
+           - URL_PORTAL=http://portal-be:$ACUMOS_PORTAL_BE_PORT/validation
+           - APP_NAME=ValidationAndSecurity
+           - URL_TODO_TASK=http://validation-middleware:$ACUMOS_VALIDATION_MIDDLEWARE_PORT/todo/api/v1.0/tasks
+           - URL_SITE_CONFIG=http://portal-be:$ACUMOS_PORTAL_BE_PORT/admin/config
+           - URL_ONBOARDING_CONTROLLER=http://portal-be:$ACUMOS_PORTAL_BE_PORT/webBasedOnBoarding/stepResult/create
+           - IGNORE_LIST_CHECK=Disable
+           - CCDS_USERNAME=${ACUMOS_CDS_USER}
+           - CCDS_PASSWORD=${ACUMOS_CDS_PASSWORD}
+       expose:
+           - $ACUMOS_VALIDATION_ENGINE_PORT
+       ports:
+           - $ACUMOS_VALIDATION_ENGINE_PORT:$ACUMOS_VALIDATION_ENGINE_PORT
+       volumes:
+           - acumos-logs:/validation-engine-logs
+

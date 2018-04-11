@@ -63,7 +63,7 @@ function deploy() {
     * $2@$1:/home/$2/.
   # Run the commands separately to ensure failures are trapped
   ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    $2@$1 bash clean.sh
+    $2@$1 bash clean.sh force
   ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
     $2@$1 bash oneclick_deploy.sh
   ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \

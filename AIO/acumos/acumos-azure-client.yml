@@ -1,0 +1,75 @@
+version: '2'
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# docker-compose for azure-client
+# TODO: remove ports: for services that do not need external exposure
+# TODO: remove or parameterize all credentials
+# TODO: scrub all attributes for current need
+services:
+   azure-client:
+       image: ${AZURE_CLIENT_IMAGE}
+       environment:
+           SPRING_APPLICATION_JSON: "{
+               \"server\" : {
+                    \"port\" : ${ACUMOS_AZURE_CLIENT_PORT}
+                },
+                \"docker\" : {
+                    \"containerNamePrefix\": \"acumos-e6e\",
+                    \"host\": \"${ACUMOS_DOCKER_API_HOST}\",
+                    \"port\": \"4243\",
+                    \"dockerVMUserName\": \"dockerUser\",
+                    \"dockerVMPassword\": \"12NewPA$$w0rd!\",
+                    \"solutionPort\":\"8336\",
+                    \"registry\": {
+                        \"bluePrint\": {
+                            \"username\": \"acumos_ro\",
+                            \"password\": \"${ACUMOS_RW_USER_PASSWORD}\"
+                        },
+                        \"networkgroupName\": \"E6E-NSG\",
+                        \"port\": \"80\",
+                        \"name\": \"nexus:${ACUMOS_DOCKER_MODEL_PORT}\",
+                        \"url\": \"http://nexus:${ACUMOS_DOCKER_MODEL_PORT}/\",
+                        \"username\": \"acumos_rw\",
+                        \"password\": \"${ACUMOS_RW_USER_PASSWORD}\"
+                    }
+                },
+                \"blueprint\": {
+                    \"ImageName\": \"nexus:${ACUMOS_DOCKER_PLATFORM_PORT}/blueprint-orchestrator:1.0.0-SNAPSHOT\",
+                    \"name\": \"blueprint-orchestrator\"
+                },
+                \"nexus\": {
+                    \"url\": \"http://nexus:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
+                    \"nexusproxy\": \"\",
+                    \"password\": \"${ACUMOS_RW_USER_PASSWORD}\",
+                    \"username\": \"acumos_rw\",
+                    \"groupId\": \"com.artifact\"
+                },
+                \"cmndatasvc\": {
+                    \"cmndatasvcendpoinurl\": \"http://common-data-svc:${ACUMOS_CDS_PORT}/ccds\",
+                    \"cmndatasvcuser\": \"${ACUMOS_CDS_USER}\",
+                    \"cmndatasvcpwd\": \"${ACUMOS_CDS_PASSWORD}\"
+                }
+           }"
+       expose:
+           - ${ACUMOS_AZURE_CLIENT_PORT}
+       volumes:
+           - acumos-logs:/maven/logs
+       logging:
+           driver: json-file
+

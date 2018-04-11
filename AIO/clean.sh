@@ -23,7 +23,11 @@
 # - If the docker-compose console is still running, showing the logs of the
 #   containers, ctrl-c to stop it and wait will all services are stopped.
 # Usage:
-# $ bash clean.sh
+# $ bash clean.sh [force]
+#   force: for all docker containers to be stopped and removed. Use if some
+#   containers remain, e.g. due to the way that docker-compose prefixes names
+#   to the containers changing, leaving old containers running and thus
+#   ports allocated, causing errors in subsequent deploys.
 #
 
 trap - ERR
@@ -33,6 +37,10 @@ source acumos-env.sh
 echo "Stop the running Acumos component containers"
 sudo bash docker-compose.sh down
 sudo bash docker-compose.sh rm -v
+if [[ "$1" == "force" ]]; then
+  sudo docker stop $(sudo docker ps -aq)
+  sudo docker rm -v $(sudo docker ps -aq)
+fi
 
 echo "Remove Acumos databases and users"
 mysql --user=root --password=$MARIADB_PASSWORD -e "DROP DATABASE $ACUMOS_CDS_DB; DROP DATABASE acumos_comment;  DROP DATABASE acumos_cms; DROP USER 'acumos_opr'@'%';"
