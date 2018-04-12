@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8a19b193_9e1179ff",
+        "filename": "AIO/acumos/acumos-azure-client.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-04-12T14:27:47Z",
+      "side": 1,
+      "message": "Would you possibly consider renaming the new subdirectory from acumos to docker-compose or something descriptive like that?",
+      "revId": "f3aa923da626c5d01943d26754744f8b6e88e6d8",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
