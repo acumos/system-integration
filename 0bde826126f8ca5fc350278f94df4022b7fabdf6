@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "babc4cd2_46c84b53",
+        "filename": "AIO/acumos-env.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-04-12T12:51:06Z",
+      "side": 1,
+      "message": "Can the extraindex entries be removed entirely?",
+      "revId": "0bde826126f8ca5fc350278f94df4022b7fabdf6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
