@@ -37,7 +37,7 @@ services:
        expose:
            - $ACUMOS_VALIDATION_CLIENT_PORT
        ports:
-           - $ACUMOS_VALIDATION_CLIENT_PORT:$ACUMOS_VALIDATION_CLIENT_PORT
+           - $ACUMOS_VALIDATION_CLIENT_PORT:9603
        volumes:
            - acumos-logs:/validation-client-logs
 
