@@ -78,12 +78,12 @@ services:
                 },
                 \"portal\" : {
                    \"feature\" : {
-                      \"validateModel\" : \"false\",
+                      \"validateModel\" : \"true\",
                       \"email_service\" : \"\",
                       \"cas_enabled\" : \"false\"
                    },
                    \"submitValidation\" : {
-                      \"api\" : \"http://validation-middleware:$ACUMOS_VALIDATION_MIDDLEWARE_PORT/todo/api/v1.0/tasks\"
+                      \"api\" : \"http://validation-client:$ACUMOS_VALIDATION_CLIENT_PORT/api/v1.0/tasks\"
                    },
                    \"dashboard\":{
                       \"url\" : \"\"
