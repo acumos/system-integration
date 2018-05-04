@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f28e061a_97233c3d",
+        "filename": "AIO/acumos/federation-gateway.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-05-04T16:21:43Z",
+      "side": 1,
+      "message": "Please use just ONE entry - either expose OR ports, not both",
+      "revId": "01dc1faa02d143ea379f874cb0bdbd00030808c5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
