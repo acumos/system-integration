@@ -18,8 +18,6 @@ version: '2'
 # ===============LICENSE_END=========================================================
 
 # docker-compose for portal-be
-# TODO: remove ports: for services that do not need external exposure
-# TODO: remove or parameterize all credentials
 # TODO: scrub all attributes for current need
 services:
    portal-be:
@@ -78,7 +76,7 @@ services:
                 },
                 \"portal\" : {
                    \"feature\" : {
-                      \"validateModel\" : \"true\",
+                      \"validateModel\" : \"false\",
                       \"email_service\" : \"\",
                       \"cas_enabled\" : \"false\"
                    },
@@ -100,7 +98,7 @@ services:
                    }
                 },
                 \"gateway\" : {
-                   \"url\" : \"https://${ACUMOS_FEDERATION_HOST}:${ACUMOS_FEDERATION_LOCAL_PORT}\"
+                   \"url\" : \"https://federation-gateway:${ACUMOS_FEDERATION_LOCAL_PORT}\"
                 }
 
            }"

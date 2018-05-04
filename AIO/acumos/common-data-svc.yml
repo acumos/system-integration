@@ -19,8 +19,7 @@ version: '2'
 
 # docker-compose for common-data-svc
 # uses localhost for database (running on same server)
-# TODO: remove ports: for services that do not need external exposure
-# TODO: remove or parameterize all credentials
+# TODO: remove ports: when post-deploy/manual operations are not required
 # TODO: scrub all attributes for current need
 services:
    common-data-svc:

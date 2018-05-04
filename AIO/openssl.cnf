@@ -246,6 +246,8 @@ authorityKeyIdentifier=keyid,issuer
 [ alt_names ]
 
 DNS.1 = <acumos-domain>
+# federation-gateway: for portal-be access to federation local port via expose
+DNS.2 = federation-gateway
 IP.1 = <acumos-host>
 
 [ v3_ca ]
