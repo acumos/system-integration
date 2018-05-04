@@ -18,8 +18,6 @@ version: '2'
 # ===============LICENSE_END=========================================================
 
 # docker-compose for federation-gateway
-# TODO: remove ports: for services that do not need external exposure
-# TODO: remove or parameterize all credentials
 # TODO: scrub all attributes for current need
 services:
    federation-gateway:
@@ -82,7 +80,6 @@ services:
            - ${ACUMOS_FEDERATION_LOCAL_PORT}
        ports:
            - ${ACUMOS_FEDERATION_PORT}:${ACUMOS_FEDERATION_PORT}
-           - ${ACUMOS_FEDERATION_LOCAL_PORT}:${ACUMOS_FEDERATION_LOCAL_PORT}
        links:
            - common-data-svc
        depends_on:

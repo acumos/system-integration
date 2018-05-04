@@ -18,8 +18,6 @@ version: '2'
 # ===============LICENSE_END=========================================================
 
 # docker-compose for validation
-# TODO: remove ports: for services that do not need external exposure
-# TODO: remove or parameterize all credentials
 # TODO: scrub all attributes for current need
 services:
    validation-client:
@@ -36,8 +34,6 @@ services:
            - IGNORE_LIST_CHECK=Disable
        expose:
            - $ACUMOS_VALIDATION_CLIENT_PORT
-       ports:
-           - $ACUMOS_VALIDATION_CLIENT_PORT:$ACUMOS_VALIDATION_CLIENT_PORT
        volumes:
            - acumos-logs:/validation-client-logs
 
@@ -54,11 +50,6 @@ services:
            - IGNORE_LIST_CHECK=Disable
        expose:
            - $ACUMOS_VALIDATION_MIDDLEWARE_PORT
-           - $ACUMOS_PORTAL_BE_PORT
-           - $ACUMOS_MAVEN_MODEL_PORT
-           - 8003
-       ports:
-           - $ACUMOS_VALIDATION_MIDDLEWARE_PORT:$ACUMOS_VALIDATION_MIDDLEWARE_PORT
        volumes:
            - acumos-logs:/validation-middleware-logs
 
@@ -76,8 +67,6 @@ services:
            - CCDS_PASSWORD=${ACUMOS_CDS_PASSWORD}
        expose:
            - $ACUMOS_VALIDATION_ENGINE_PORT
-       ports:
-           - $ACUMOS_VALIDATION_ENGINE_PORT:$ACUMOS_VALIDATION_ENGINE_PORT
        volumes:
            - acumos-logs:/validation-engine-logs
 

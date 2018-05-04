@@ -19,9 +19,7 @@ version: '2'
 
 # docker-compose for cms
 # uses localhost for database (running on same server)
-# TODO: remove ports: for services that do not need external exposure
-# TODO: remove or parameterize all credentials
-# TODO: scrub all attributes for current need
+# TODO: remove ports: when post-deploy/manual CMS admin operations are not needed
 services:
    cms:
        image: ${PORTAL_CMS_IMAGE}
