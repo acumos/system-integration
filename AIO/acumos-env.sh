@@ -36,14 +36,14 @@ export RELEASE=nexus3.acumos.org:10002
 # If images are not found, goto https://nexus3.acumos.org and browse the
 # docker.staging folder for the specific component, and verify the version
 export COMMON_DATASERVICE_IMAGE=$RELEASE/common-dataservice:1.14.3
-export ONBOARDING_IMAGE=$STAGING/onboarding-app:1.20.0
-export PORTAL_BE_IMAGE=$STAGING/acumos-portal-be:1.15.10
-export PORTAL_FE_IMAGE=$STAGING/acumos-portal-fe:1.15.10
+export ONBOARDING_IMAGE=$STAGING/onboarding-app:1.22.0
+export PORTAL_BE_IMAGE=$STAGING/acumos-portal-be:1.15.16
+export PORTAL_FE_IMAGE=$STAGING/acumos-portal-fe:1.15.16
 export PORTAL_CMS_IMAGE=$STAGING/acumos-cms-docker:1.3.2
-export DESIGNSTUDIO_IMAGE=$STAGING/ds-compositionengine:0.0.24
+export DESIGNSTUDIO_IMAGE=$STAGING/ds-compositionengine:0.0.26
 export FEDERATION_IMAGE=$STAGING/federation-gateway:1.1.2
 export FILEBEAT_IMAGE=$STAGING/acumos-filebeat:1.0.0
-export AZURE_CLIENT_IMAGE=$STAGING/acumos-azure-client:1.92.0
+export AZURE_CLIENT_IMAGE=$STAGING/acumos-azure-client:1.96.0
 export DATABROKER_ZIPBROKER_IMAGE=$STAGING/databroker-zipbroker:0.0.1
 export VALIDATION_CLIENT_IMAGE=$STAGING/validation-client:1.2.1
 export VALIDATION_MIDDLEWARE_IMAGE=$STAGING/validation-middleware:1.2.1
