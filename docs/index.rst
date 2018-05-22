@@ -26,5 +26,6 @@ System Integration
  
        release-notes
        user-guide
+       k8s-deployment
  
 * :ref:`search`
