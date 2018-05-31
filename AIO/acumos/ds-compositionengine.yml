@@ -44,10 +44,13 @@ services:
                                 \"cmndatasvcuser\": \"${ACUMOS_CDS_USER}\",
                                 \"cmndatasvcpwd\": \"${ACUMOS_CDS_PASSWORD}\"
                           },
-                          \"databrokerImageURI\":\"$DATABROKER_ZIPBROKER_IMAGE\",
+                          \"imagedatabrokerURI\": \"$DATABROKER_ZIPBROKER_IMAGE\",
+                          \"csvdatabrokerURI\": \"DATABROKER_CSVBROKER_IMAGE\",
+                          \"jsondatabrokerURI\": \"NA\",
+                          \"sqldatabrokerURI\": \"NA\",
                           \"docker\": {
                                 \"host\": \"${ACUMOS_DOCKER_API_HOST}\",
-                                \"port\": 4243,
+                                \"port\": \"${ACUMOS_DOCKER_API_PORT}\",
                                 \"config\": \"/docker_host/.docker\",
                                 \"registry\": {
                                         \"url\": \"http://nexus:${ACUMOS_DOCKER_MODEL_PORT}/\",
