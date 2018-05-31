@@ -23,6 +23,7 @@ services:
    portal-fe:
        image: ${PORTAL_FE_IMAGE}
        environment:
+           log_level: "DEBUG"
            SPRING_APPLICATION_JSON: "{
                \"server\" : {
                     \"port\" : ${ACUMOS_PORTAL_FE_PORT}
@@ -44,6 +45,10 @@ services:
                       \"azure\" : {
                           \"url\" : \"http://azure-client:${ACUMOS_AZURE_CLIENT_PORT}\"
                       }
+                   },
+                    \"host\" : {
+                      \"connect-timeout-millis\" : 300000,
+                      \"socket-timeout-millis\" : 300000
                    }
                },
                \"spring\" : {

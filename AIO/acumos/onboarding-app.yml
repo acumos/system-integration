@@ -29,7 +29,7 @@ services:
                 },
                \"docker\" : {
                    \"host\" : \"${ACUMOS_DOCKER_API_HOST}\",
-                   \"port\" : 4243,
+                   \"port\" : ${ACUMOS_DOCKER_API_PORT},
                    \"config\": \"/docker_host/.docker\",
                    \"registry\" :{
                        \"url\": \"http://nexus:${ACUMOS_DOCKER_MODEL_PORT}/\",

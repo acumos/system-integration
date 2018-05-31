@@ -80,9 +80,6 @@ function setup_prereqs() {
   sudo apt-get remove -y docker docker-engine docker.io docker-ce
   sudo apt-get update
   sudo apt-get install -y \
-    linux-image-extra-$(uname -r) \
-    linux-image-extra-virtual
-  sudo apt-get install -y \
     apt-transport-https \
     ca-certificates \
     curl \
@@ -94,7 +91,7 @@ function setup_prereqs() {
   sudo apt-get install -y docker-ce docker-compose
 
   log "Enable docker remote API"
-  sudo sed -i -- 's~ExecStart=/usr/bin/dockerd -H fd://~ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:4243~' /lib/systemd/system/docker.service
+  sudo sed -i -- "s~ExecStart=/usr/bin/dockerd -H fd://~ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT~" /lib/systemd/system/docker.service
   log "Enable non-secure docker repositories"
 cat << EOF | sudo tee /etc/docker/daemon.json
 {
@@ -108,7 +105,7 @@ EOF
   sudo service docker restart
 
   log "Create Volumes for Acumos application"
-  while ! curl http://$ACUMOS_DOCKER_API_HOST:4243 ; do
+  while ! curl http://$ACUMOS_DOCKER_API_HOST:$ACUMOS_DOCKER_API_PORT ; do
     log "waiting 30 seconds for docker daemon to be ready"
     sleep 30
   done
@@ -356,13 +353,13 @@ function setup_reverse_proxy() {
     --url http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis/ \
     --data "https_only=true" \
     --data "name=root" \
-    --data "upstream_url=http://$ACUMOS_PORTAL_FE_HOST:$ACUMOS_PORTAL_FE_PORT" \
+    --data "upstream_url=http://portal-fe:$ACUMOS_PORTAL_FE_PORT" \
     --data "uris=/" \
     --data "strip_uri=false"
   curl -i -X POST \
     --url http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis/ \
     --data "name=onboarding-app" \
-    --data "upstream_url=http://$ACUMOS_ONBOARDING_HOST:$ACUMOS_ONBOARDING_PORT" \
+    --data "upstream_url=http://onboarding-app:$ACUMOS_ONBOARDING_PORT" \
     --data "uris=/onboarding-app" \
     --data "strip_uri=false"
 
@@ -383,10 +380,10 @@ function setup_federation() {
     log "CDS API is not yet responding... waiting 10 seconds"
     sleep 10
   done
-  curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer -H "accept: */*" -H "Content-Type: application/json" -d "{ \"name\":\"$ACUMOS_DOMAIN\", \"self\": true, \"local\": false, \"contact1\": \"admin@example.com\", \"subjectName\": \"$ACUMOS_DOMAIN\", \"apiUrl\": \"https://$ACUMOS_DOMAIN:$ACUMOS_FEDERATION_PORT\",  \"statusCode\": \"AC\", \"validationStatusCode\": \"PS\" }"
-  created=$(jq -r '.created' /tmp/json)
+  curl -s -o ~/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer -H "accept: */*" -H "Content-Type: application/json" -d "{ \"name\":\"$ACUMOS_DOMAIN\", \"self\": true, \"local\": false, \"contact1\": \"admin@example.com\", \"subjectName\": \"$ACUMOS_DOMAIN\", \"apiUrl\": \"https://$ACUMOS_DOMAIN:$ACUMOS_FEDERATION_PORT\",  \"statusCode\": \"AC\", \"validationStatusCode\": \"PS\" }"
+  created=$(jq -r '.created' ~/json)
   if [[ "$created" == "null" ]]; then
-    cat /tmp/json
+    cat ~/json
     fail "Peer entry creation failed"
   fi
 }

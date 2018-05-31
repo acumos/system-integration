@@ -57,6 +57,7 @@ services:
                echo \"kong-database is unavailable - sleeping 10 seconds\";
                sleep 10;
              done;
+             sed -i -- '/server {/a\ \ \ \ proxy_max_temp_file_size 0;' /usr/local/share/lua/5.1/kong/templates/nginx_kong.lua
              kong migrations up;
              kong start -vv;
              kong health -vv;
