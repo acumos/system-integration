@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c0679a7f_2c9a28bb",
+        "filename": "AIO/acumos-env.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-05T12:47:33Z",
+      "side": 1,
+      "message": "Assembly Acumos_1805241800 uses portal 1.15.23 and on-boarding 1.24.0.  Please be consistent with that.",
+      "revId": "78b28e8dcf68725bde9fef72f054126fadc2e7e2",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5d173d51_f3b4e7d7",
+        "filename": "AIO/acumos/acumos-azure-client.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-05T12:47:33Z",
+      "side": 1,
+      "message": "Maybe this username should also be moved to a variable?",
+      "revId": "78b28e8dcf68725bde9fef72f054126fadc2e7e2",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "223324fd_ea29e289",
+        "filename": "AIO/acumos/acumos-azure-client.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-05T12:47:33Z",
+      "side": 1,
+      "message": "Ditto",
+      "revId": "78b28e8dcf68725bde9fef72f054126fadc2e7e2",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f3088d75_a26681e8",
+        "filename": "AIO/acumos/acumos-azure-client.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-05T12:47:33Z",
+      "side": 1,
+      "message": "Ditto?",
+      "revId": "78b28e8dcf68725bde9fef72f054126fadc2e7e2",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "77e77431_04dec130",
+        "filename": "AIO/acumos/acumos-azure-client.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-05T12:47:33Z",
+      "side": 1,
+      "message": "As is done here?",
+      "revId": "78b28e8dcf68725bde9fef72f054126fadc2e7e2",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "777d81d3_3347c59d",
+        "filename": "AIO/acumos/ds-compositionengine.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-05T12:47:33Z",
+      "side": 1,
+      "message": "Maybe \"todo\" or \"coming soon\" ?",
+      "revId": "78b28e8dcf68725bde9fef72f054126fadc2e7e2",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
