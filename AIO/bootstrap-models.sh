@@ -66,14 +66,14 @@ function bootstrap() {
     for model in $models
     do
       echo "Onboarding model $model ..."
-      curl -o /tmp/json -k -H "Authorization: $jwtToken"\
+      curl -o ~/json -k -H "Authorization: $jwtToken"\
            -F "model=@$models_dir/$model/model.zip;type=application/zip" \
            -F "metadata=@$models_dir/$model/metadata.json;type=application/json"\
            -F "schema=@$models_dir/$model/model.proto;type=application/text" $PUSHURL
-      if [[ $(grep -c "The upstream server is timing out" /tmp/json) -eq 1 ]]; then 
-        log "Onboarding $model failed: $(cat /tmp/json)"
+      if [[ $(grep -c "The upstream server is timing out" ~/json) -eq 1 ]]; then 
+        log "Onboarding $model failed: $(cat ~/json)"
       else
-        status=$(jq -r '.status' /tmp/json)
+        status=$(jq -r '.status' ~/json)
         if [[ "$status" != "ERROR" ]]; then
           log "Onboarding $model succeeded"
           # log "Adding image for model $model ..."
@@ -81,7 +81,7 @@ function bootstrap() {
           # log "Adding descriptitive text for model $model ..."
           # curl -H "Authorization: $jwtToken" <rest of curl command to upload description for the model from models/$model/description.txt>
         else
-          log "Onboarding $model failed: $(cat /tmp/json)"
+          log "Onboarding $model failed: $(cat ~/json)"
         fi
       fi
     done

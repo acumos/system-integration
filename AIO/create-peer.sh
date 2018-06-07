@@ -50,20 +50,20 @@ function log() {
 function setup_subscription() {
   trap 'fail' ERR
   log "Get userId of 'test' user"
-  curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
+  curl -s -o ~/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
     http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/user
-  users=$(jq -r '.content | length' /tmp/json)
+  users=$(jq -r '.content | length' ~/json)
   i=0; userId=""
   while [[ $i -lt $users && "$userId" == "" ]] ; do
-    loginName=$(jq -r ".content[$i].loginName" /tmp/json)
+    loginName=$(jq -r ".content[$i].loginName" ~/json)
     if [[ "$loginName" == "test" ]]; then
-      userId=$(jq -r ".content[$i].userId" /tmp/json)
+      userId=$(jq -r ".content[$i].userId" ~/json)
     fi
     ((i++))
   done
 
   log "Subscribe to all solution types at $peerId"
-  curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer/sub -H "accept: */*" -H "Content-Type: application/json" -d "{ \"peerId\":\"$peerId\", \"ownerId\":\"$userId\", \"scopeType\":\"FL\", \"accessType\":\"PB\", \"options\":null, \"refreshInterval\":3600, \"maxArtifactSize\":null}"
+  curl -s -o ~/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer/sub -H "accept: */*" -H "Content-Type: application/json" -d "{ \"peerId\":\"$peerId\", \"ownerId\":\"$userId\", \"scopeType\":\"FL\", \"accessType\":\"PB\", \"options\":null, \"refreshInterval\":3600, \"maxArtifactSize\":null}"
 }
 
 function setup_peer() {
@@ -73,13 +73,13 @@ function setup_peer() {
     -keystore certs/acumosTrustStore.jks -storepass $ACUMOS_KEYPASS -noprompt
 
   log "Create peer relationship for $name via CDS API"
-  curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer -H "accept: */*" -H "Content-Type: application/json" -d "{ \"name\":\"$name\", \"self\": false, \"local\": false, \"contact1\": \"$contact\", \"subjectName\": \"$subjectName\", \"apiUrl\": \"$apiUrl\",   \"statusCode\": \"AC\", \"validationStatusCode\": \"PS\" }"
-  created=$(jq -r '.created' /tmp/json)
+  curl -s -o ~/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer -H "accept: */*" -H "Content-Type: application/json" -d "{ \"name\":\"$name\", \"self\": false, \"local\": false, \"contact1\": \"$contact\", \"subjectName\": \"$subjectName\", \"apiUrl\": \"$apiUrl\",   \"statusCode\": \"AC\", \"validationStatusCode\": \"PS\" }"
+  created=$(jq -r '.created' ~/json)
   if [[ "$created" == "null" ]]; then
-    cat /tmp/json
+    cat ~/json
     fail "Peer creation failed"
   fi
-  peerId=$(jq -r '.peerId' /tmp/json)
+  peerId=$(jq -r '.peerId' ~/json)
 
   log "Add hosts file entry for peer to support non-DNS resolvable hostnames"
   # TODO: find a way to setup these names in DNS, or if this is a longer term

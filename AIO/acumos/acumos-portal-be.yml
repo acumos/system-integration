@@ -43,7 +43,8 @@ services:
                 },
                 \"docker\" : {
                    \"host\" : \"${ACUMOS_DOCKER_API_HOST}\",
-                   \"resgistry\" : {
+                   \"port\" : \"${ACUMOS_DOCKER_API_PORT}\",
+                   \"registry\" : {
                       \"url\": \"http://nexus:${ACUMOS_DOCKER_MODEL_PORT}/\",
                       \"username\" : \"acumos_rw\",
                       \"password\" : \"${ACUMOS_RW_USER_PASSWORD}\",
