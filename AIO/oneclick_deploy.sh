@@ -75,23 +75,33 @@ function setup_prereqs() {
   wait_dpkg; sudo apt-get upgrade -y
   wait_dpkg; sudo apt-get install -y wget git jq
 
+  dce=$(dpkg -l | grep -c docker-ce)
+  if [[ $dce -eq 0 ]]; then
+    log "Install latest docker-ce"
+    # Per https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
+    sudo apt-get remove -y docker docker-engine docker.io docker-ce
+    sudo apt-get update
+    sudo apt-get install -y \
+      apt-transport-https \
+      ca-certificates \
+      curl \
+      software-properties-common
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    sudo add-apt-repository "deb [arch=amd64] \
+      https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    sudo apt-get update
+    sudo apt-get install -y docker-ce
+  fi
+
   log "Install latest docker-ce"
-  # Per https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
-  sudo apt-get remove -y docker docker-engine docker.io docker-ce
-  sudo apt-get update
-  sudo apt-get install -y \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    software-properties-common
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  sudo add-apt-repository "deb [arch=amd64] \
-    https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-  sudo apt-get update
-  sudo apt-get install -y docker-ce docker-compose
+  sudo apt-get install -y docker-compose
 
   log "Enable docker remote API"
-  sudo sed -i -- "s~ExecStart=/usr/bin/dockerd -H fd://~ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT~" /lib/systemd/system/docker.service
+  enabled=$(grep -c "\-H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT" /lib/systemd/system/docker.service)
+  if [[ $enabled -eq 0 ]]; then
+    sudo sed -i -- "s~ExecStart=/usr/bin/dockerd -H fd://~ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT~" /lib/systemd/system/docker.service
+  fi
+
   log "Enable non-secure docker repositories"
 cat << EOF | sudo tee /etc/docker/daemon.json
 {
