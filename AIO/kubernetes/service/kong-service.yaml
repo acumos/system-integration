@@ -1,4 +1,4 @@
-#!/bin/bash
+apiVersion: v1
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -16,35 +16,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
-#
-# What this is:
-# Sets environment variables needed by docker-compose in all-in-one environment
-# then invokes docker-compose with the command-line arguments.
-#
-# Usage:
-# - bash docker-compose.sh [options]
-#   options: optional parameters to docker-compose. some examples:
-#   $ sudo bash docker-compose.sh build
-#     Build all services defined in the docker-compose.yaml file.
-#   $ sudo bash docker-compose.sh up
-#     Start all service containers.
-#   $ sudo bash docker-compose.sh logs -f
-#     Tail the logs of all service containers.
-#   $ sudo bash docker-compose.sh down
-#     Stop all service containers.
-#   $ sudo bash docker-compose.sh rm -v
-#     Remove all service containers.
-#
 
-source acumos-env.sh
+# What this is: kubernetes template for Acumos portal-fe service
+# How to use:
+# - Replace fields in <> with actual values (k8s does not support env variables)
 
-set -x
+kind: Service
+metadata:
+  namespace: acumos
+  name: kong-service
+  labels:
+    app: kong
+spec:
+  selector:
+    app: kong
+  type: NodePort
+  ports:
+  - name: kong-db-port
+    port: <ACUMOS_KONG_DB_PORT>
+  - name: kong-proxy-port
+    nodePort: <ACUMOS_KONG_PROXY_PORT>
+    port: 8000
+    targetPort: 8000
+  - name: kong-proxy-ssl-port
+    nodePort: <ACUMOS_KONG_PROXY_SSL_PORT>
+    port: 8443
+    targetPort: 8443
+  - name: kong-admin-port
+    nodePort: <ACUMOS_KONG_ADMIN_PORT>
+    port: 81
+    targetPort: 81
+  - name: kong-admin-ssl-port
+    nodePort: <ACUMOS_KONG_ADMIN_SSL_PORT>
+    port: 444
+    targetPort: 444
 
-opts=""
-files=$(ls docker/acumos)
-for file in $files ; do
- opts="$opts -f acumos/$file"
-done    
-
-cd docker
-docker-compose $opts $*

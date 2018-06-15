@@ -17,13 +17,17 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# What this is: All-in-One deployment of the Acumos platform.
+# What this is: All-in-One deployment of the Acumos platform. FOR TEST PURPOSES
+# ONLY.
 # Prerequisites:
 # - Ubuntu Xenial server (Centos 7 support is planned!)
 # - All hostnames specified in acumos-env.sh must be DNS-resolvable on all hosts
 #   (entries in /etc/hosts or in an actual DNS server)
+# - For kubernetes based deplpyment: Kubernetes cluster deployed
 # Usage:
-# $ bash oneclick_deploy.sh
+# $ bash oneclick_deploy.sh <docker|k8s>
+#   docker: install all components under docker-ce using docker-compose
+#   k8s: install kong+nexus under docker-ce, and the rest under kubernetes
 #
 
 set -x
@@ -36,9 +40,11 @@ function fail() {
 }
 
 function log() {
-  f=$(caller 0 | awk '{print $2}')
-  l=$(caller 0 | awk '{print $1}')
-  echo; echo "$f:$l ($(date)) $1"
+  set +x
+  fname=$(caller 0 | awk '{print $2}')
+  fline=$(caller 0 | awk '{print $1}')
+  echo; echo "$fname:$fline ($(date)) $1"
+  set -x
 }
 
 function wait_dpkg() {
@@ -52,6 +58,8 @@ function wait_dpkg() {
 function setup_prereqs() {
   trap 'fail' ERR
 
+  log "/etc/hosts customizations"
+  # Ensure cluster hostname resolves inside the cluster
   if [[ $(grep -c $HOSTNAME /etc/hosts) -eq 0 ]]; then
     log "Add $HOSTNAME to /etc/hosts"
     # have to add "/sbin" to path of IP command for centos
@@ -72,57 +80,75 @@ function setup_prereqs() {
   log "Basic prerequisites"
 
   wait_dpkg; sudo apt-get update
-  wait_dpkg; sudo apt-get upgrade -y
+# TODO: fix need to skip upgrade as this sometimes updates the kube-system
+# services and they then stay in "pending", blocking k8s-based deployment
+#  wait_dpkg; sudo apt-get upgrade -y
   wait_dpkg; sudo apt-get install -y wget git jq
 
-  dce=$(dpkg -l | grep -c docker-ce)
-  if [[ $dce -eq 0 ]]; then
-    log "Install latest docker-ce"
-    # Per https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
-    sudo apt-get remove -y docker docker-engine docker.io docker-ce
-    sudo apt-get update
-    sudo apt-get install -y \
-      apt-transport-https \
-      ca-certificates \
-      curl \
-      software-properties-common
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    sudo add-apt-repository "deb [arch=amd64] \
-      https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    sudo apt-get update
-    sudo apt-get install -y docker-ce
-  fi
+  if [[ "$DEPLOYED_UNDER" = "docker" ]]; then
+    if [[ $(dpkg -l | grep -c docker-ce) -eq 0 ]]; then
+      log "Install latest docker-ce"
+      # Per https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
+      sudo apt-get remove -y docker docker-engine docker.io docker-ce
+      sudo apt-get update
+      sudo apt-get install -y \
+        apt-transport-https \
+        ca-certificates \
+        curl \
+        software-properties-common
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+      sudo add-apt-repository "deb [arch=amd64] \
+        https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+      sudo apt-get update
+      sudo apt-get install -y docker-ce
+    fi
 
-  log "Install latest docker-ce"
-  sudo apt-get install -y docker-compose
+    if [[ $(dpkg -l | grep -c docker-compose) -eq 0 ]]; then
+      log "Install latest docker-compose"
+      sudo apt-get install -y docker-compose
+    fi
 
-  log "Enable docker remote API"
-  enabled=$(grep -c "\-H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT" /lib/systemd/system/docker.service)
-  if [[ $enabled -eq 0 ]]; then
-    sudo sed -i -- "s~ExecStart=/usr/bin/dockerd -H fd://~ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT~" /lib/systemd/system/docker.service
-  fi
+    log "Enable docker remote API"
+    if [[ $(grep -c "\-H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT" /lib/systemd/system/docker.service) -eq 0 ]]; then
+      sudo sed -i -- "s~ExecStart=/usr/bin/dockerd -H fd://~ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT~" /lib/systemd/system/docker.service
+    fi
 
-  log "Enable non-secure docker repositories"
-cat << EOF | sudo tee /etc/docker/daemon.json
+    log "Enable non-secure docker repositories"
+    cat << EOF | sudo tee /etc/docker/daemon.json
 {
   "insecure-registries": [
-    "nexus:$ACUMOS_DOCKER_MODEL_PORT", "nexus:$ACUMOS_DOCKER_PLATFORM_PORT", "nexus:$ACUMOS_MAVEN_MODEL_PORT"
+    "$ACUMOS_NEXUS_HOST:$ACUMOS_DOCKER_MODEL_PORT"
   ],
   "disable-legacy-registry": true
 }
 EOF
-  sudo systemctl daemon-reload
-  sudo service docker restart
 
-  log "Create Volumes for Acumos application"
-  while ! curl http://$ACUMOS_DOCKER_API_HOST:$ACUMOS_DOCKER_API_PORT ; do
-    log "waiting 30 seconds for docker daemon to be ready"
-    sleep 30
-  done
-  sudo docker volume create acumos-logs
-  sudo docker volume create acumos-output
-  sudo docker volume create acumosWebOnboarding
-  sudo docker volume create kong-db
+    sudo systemctl daemon-reload
+    sudo service docker restart
+
+    log "Create docker volumes for Acumos docker-based components"
+    while ! curl http://$ACUMOS_DOCKER_API_HOST:$ACUMOS_DOCKER_API_PORT ; do
+      log "waiting 30 seconds for docker daemon to be ready"
+      sleep 30
+    done
+    sudo docker volume create kong-db
+    sudo docker volume create acumos-logs
+    sudo docker volume create acumos-output
+    sudo docker volume create acumosWebOnboarding
+  fi
+
+  sudo rm -rf /var/acumos
+  sudo mkdir /var/acumos
+  sudo chown $USER:$USER /var/acumos
+  mkdir -p /var/acumos/certs
+
+  if [[ "$DEPLOYED_UNDER" = "k8s" ]]; then
+    log "Create local shared folders for Acumos k8s-based components"
+    mkdir /var/acumos/logs
+    mkdir /var/acumos/output
+    mkdir /var/acumos/WebOnboarding
+    mkdir /var/acumos/kong-db/
+  fi
 }
 
 function setup_mariadb() {
@@ -231,16 +257,15 @@ function setup_nexus() {
     sleep 10
   done
 
-  setup_nexus_repo 'acumos_model_maven' 'Maven' $ACUMOS_MAVEN_MODEL_PORT
+  setup_nexus_repo 'acumos_model_maven' 'Maven'
   setup_nexus_repo 'acumos_model_docker' 'Docker' $ACUMOS_DOCKER_MODEL_PORT
-  setup_nexus_repo 'acumos_platform_docker' 'Docker' $ACUMOS_DOCKER_PLATFORM_PORT
 
   log "Add nexus roles and users"
   cat <<EOF >nexus-script.json
 {
   "name": "add-roles-users",
   "type": "groovy",
-  "content": "security.addRole(\"acumos_ro\", \"acumos_ro\", \"Read Only\", [\"nx-search-read\", \"nx-repository-view-*-*-read\", \"nx-repository-view-*-*-browse\"], []); security.addRole(\"acumos_rw\", \"acumos_rw\", \"Read Write\", [\"nx-search-read\", \"nx-repository-view-*-*-read\", \"nx-repository-view-*-*-browse\", \"nx-repository-view-*-*-add\", \"nx-repository-view-*-*-edit\", \"nx-apikey-all\"], []); security.addUser(\"acumos_ro\", \"Acumos\", \"Read Only\", \"acumos@example.com\", true, \"$ACUMOS_RO_USER_PASSWORD\", [\"acumos_ro\"]); security.addUser(\"acumos_rw\", \"Acumos\", \"Read Write\", \"acumos@example.com\", true, \"$ACUMOS_RW_USER_PASSWORD\", [\"acumos_rw\"]);"
+  "content": "security.addRole(\"$ACUMOS_RO_USER\", \"$ACUMOS_RO_USER\", \"Read Only\", [\"nx-search-read\", \"nx-repository-view-*-*-read\", \"nx-repository-view-*-*-browse\"], []); security.addRole(\"$ACUMOS_RW_USER\", \"$ACUMOS_RW_USER\", \"Read Write\", [\"nx-search-read\", \"nx-repository-view-*-*-read\", \"nx-repository-view-*-*-browse\", \"nx-repository-view-*-*-add\", \"nx-repository-view-*-*-edit\", \"nx-apikey-all\"], []); security.addUser(\"$ACUMOS_RO_USER\", \"Acumos\", \"Read Only\", \"acumos@example.com\", true, \"$ACUMOS_RO_USER_PASSWORD\", [\"$ACUMOS_RO_USER\"]); security.addUser(\"$ACUMOS_RW_USER\", \"Acumos\", \"Read Write\", \"acumos@example.com\", true, \"$ACUMOS_RW_USER_PASSWORD\", [\"$ACUMOS_RW_USER\"]);"
 }
 EOF
   curl -v -u admin:admin123 -H "Content-Type: application/json" \
@@ -261,43 +286,88 @@ EOF
     http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script/ -d @nexus-script.json
   curl -v -X POST -u admin:admin123 -H "Content-Type: text/plain" \
     http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script/list-users/run
-
-  if [[ $(grep -c nexus /etc/hosts) -eq 0 ]]; then
-    log "Add nexus to /etc/hosts"
-    # have to add "/sbin" to path of IP command for centos
-    echo "$ACUMOS_NEXUS_HOST nexus" | sudo tee -a /etc/hosts
-  fi
-}
-
-function setup_localindex() {
-  # TODO: switch to public pypi index when compatible with models (currently
-  # failing when building models)
-  trap 'fail' ERR
-  log "Setup local python index"
-  sudo apt-get install -y python-twisted-core
-  nohup twistd -n web --port 8087 --path .  > /dev/null 2>&1 &
 }
 
 function docker_login() {
-  while ! sudo docker login $1 -u docker -p docker ; do
+  while ! sudo docker login $1 -u $ACUMOS_PROJECT_NEXUS_USERNAME -p $ACUMOS_PROJECT_NEXUS_PASSWORD ; do
     log "Docker login failed at $1, trying again"
   done
 }
 
 function setup_acumos() {
   trap 'fail' ERR
-  log "Update docker-compose files for current user as needed"
-  if [[ "$USER" != "ubuntu" ]]; then
-    sed -i -- "s/ubuntu/$USER/" acumos/acumos-portal-be.yml
-    sed -i -- "s/ubuntu/$USER/" acumos/federation-gateway.yml
-  fi
   log "Log into LF Nexus Docker repos"
   docker_login https://nexus3.acumos.org:10004
   docker_login https://nexus3.acumos.org:10003
   docker_login https://nexus3.acumos.org:10002
-  log "Deploy Acumos docker containers"
-  sudo bash docker-compose.sh build
-  sudo bash docker-compose.sh up -d
+  sudo chown -R $USER:$USER ~/.docker
+
+  if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
+    log "Deploy Acumos docker-based components"
+    sudo bash docker-compose.sh build
+    sudo bash docker-compose.sh up -d
+  else
+    log "Create namespace acumos"
+    while ! kubectl create namespace acumos; do
+      log "kubectl API is not yet ready ... waiting 10 seconds"
+      sleep 10
+    done
+
+    log "Create k8s secret for image pulling from docker"
+    b64=$(cat ~/.docker/config.json | base64 -w 0)
+    cat <<EOF >acumos-registry.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: acumos-registry
+  namespace: acumos
+data:
+  .dockerconfigjson: $b64
+type: kubernetes.io/dockerconfigjson
+EOF
+
+    kubectl create -f acumos-registry.yaml
+
+    log "Deploy Acumos kubernetes-based components"
+    log "Set variable values in k8s templates"
+    depvars="ACUMOS_MARIADB_HOST ACUMOS_MARIADB_PORT MARIADB_USER_PASSWORD ACUMOS_NEXUS_API_PORT ACUMOS_NEXUS_HOST ACUMOS_RW_USER ACUMOS_RO_USER ACUMOS_RW_USER_PASSWORD ACUMOS_RO_USER_PASSWORD ACUMOS_DOCKER_API_HOST ACUMOS_DOCKER_API_PORT ACUMOS_DOCKER_MODEL_PORT ACUMOS_KONG_DB_PORT ACUMOS_KONG_PROXY_PORT ACUMOS_KONG_PROXY_SSL_PORT ACUMOS_KONG_ADMIN_PORT ACUMOS_KONG_ADMIN_SSL_PORT ACUMOS_DOCKER_API_PORT ACUMOS_PROJECT_NEXUS_USERNAME ACUMOS_PROJECT_NEXUS_PASSWORD"
+    compvars="ACUMOS_AZURE_CLIENT_PORT ACUMOS_CDS_PORT ACUMOS_CDS_DB ACUMOS_CDS_PASSWORD ACUMOS_CDS_USER ACUMOS_CMS_PORT ACUMOS_DSCE_PORT ACUMOS_FEDERATION_PORT ACUMOS_ONBOARDING_PORT ACUMOS_PORTAL_BE_PORT ACUMOS_PORTAL_FE_PORT ACUMOS_KEYPASS ACUMOS_DATA_BROKER_INTERNAL_PORT ACUMOS_DATA_BROKER_PORT ACUMOS_DEPLOYED_SOLUTION_PORT ACUMOS_DEPLOYED_VM_PASSWORD ACUMOS_DEPLOYED_VM_USER ACUMOS_PROBE_PORT ACUMOS_OPERATOR_ID"
+    set +x
+    vs="$depvars $compvars"
+    for f in kubernetes/service/*.yaml kubernetes/deployment/*.yaml; do
+      for v in $vs ; do
+        eval vv=\$$v
+        sed -i -- "s/<$v>/$vv/g" $f
+      done
+    done
+    set -x
+
+    log "Set image references in k8s templates"
+    sed -i -- "s~<AZURE_CLIENT_IMAGE>~$AZURE_CLIENT_IMAGE~g" kubernetes/deployment/azure-client-deployment.yaml
+    sed -i -- "s~<BLUEPRINT_ORCHESTRATOR_IMAGE>~$BLUEPRINT_ORCHESTRATOR_IMAGE~g" kubernetes/deployment/azure-client-deployment.yaml
+    sed -i -- "s~<PORTAL_CMS_IMAGE>~$PORTAL_CMS_IMAGE~g" kubernetes/deployment/cms-deployment.yaml
+    sed -i -- "s~<COMMON_DATASERVICE_IMAGE>~$COMMON_DATASERVICE_IMAGE~g" kubernetes/deployment/common-data-svc-deployment.yaml
+    sed -i -- "s~<DESIGNSTUDIO_IMAGE>~$DESIGNSTUDIO_IMAGE~g" kubernetes/deployment/dsce-deployment.yaml
+    sed -i -- "s~<DATABROKER_ZIPBROKER_IMAGE>~$DATABROKER_ZIPBROKER_IMAGE~g" kubernetes/deployment/dsce-deployment.yaml
+    sed -i -- "s~<DATABROKER_CSVBROKER_IMAGE>~$DATABROKER_CSVBROKER_IMAGE~g" kubernetes/deployment/dsce-deployment.yaml
+    sed -i -- "s~<FEDERATION_IMAGE>~$FEDERATION_IMAGE~g" kubernetes/deployment/federation-deployment.yaml
+    sed -i -- "s~<FILEBEAT_IMAGE>~$FILEBEAT_IMAGE~g" kubernetes/deployment/filebeat-deployment.yaml
+    sed -i -- "s~<ONBOARDING_IMAGE>~$ONBOARDING_IMAGE~g" kubernetes/deployment/onboarding-deployment.yaml
+    sed -i -- "s~<ONBOARDING_BASE_IMAGE>~$ONBOARDING_BASE_IMAGE~g" kubernetes/deployment/onboarding-deployment.yaml
+    sed -i -- "s~<PORTAL_BE_IMAGE>~$PORTAL_BE_IMAGE~g" kubernetes/deployment/portal-be-deployment.yaml
+    sed -i -- "s~<PORTAL_FE_IMAGE>~$PORTAL_FE_IMAGE~g" kubernetes/deployment/portal-fe-deployment.yaml
+
+    log "Deploy the k8s based components"
+    # Create services first... see https://github.com/kubernetes/kubernetes/issues/16448
+    for f in kubernetes/service/*.yaml ; do
+      log "Creating service from $f"
+      kubectl create -f $f
+    done
+    for f in kubernetes/deployment/*.yaml ; do
+      log "Creating deployment from $f"
+      kubectl create -f $f
+    done
+  fi
 }
 
 # Setup server cert, key, and keystore for the Kong reverse proxy
@@ -310,49 +380,54 @@ function setup_keystore() {
   log "Install keytool"
   sudo apt-get install -y openjdk-8-jre-headless
 
-  mkdir certs
   log "Create self-signing CA"
   # Customize openssl.cnf as this is needed to set CN (vs command options below)
   sed -i -- "s/<acumos-domain>/$ACUMOS_DOMAIN/" openssl.cnf
   sed -i -- "s/<acumos-host>/$ACUMOS_HOST/" openssl.cnf
 
-  openssl genrsa -des3 -out certs/acumosCA.key -passout pass:$ACUMOS_KEYPASS 4096
+  openssl genrsa -des3 -out /var/acumos/certs/acumosCA.key -passout pass:$ACUMOS_KEYPASS 4096
 
-  openssl req -x509 -new -nodes -key certs/acumosCA.key -sha256 -days 1024 \
-   -config openssl.cnf -out certs/acumosCA.crt -passin pass:$ACUMOS_KEYPASS \
+  openssl req -x509 -new -nodes -key /var/acumos/certs/acumosCA.key -sha256 -days 1024 \
+   -config openssl.cnf -out /var/acumos/certs/acumosCA.crt -passin pass:$ACUMOS_KEYPASS \
    -subj "/C=US/ST=Unspecified/L=Unspecified/O=Acumos/OU=Acumos/CN=$ACUMOS_DOMAIN"
 
   log "Create server certificate key"
-  openssl genrsa -out certs/acumos.key -passout pass:$ACUMOS_KEYPASS 4096
+  openssl genrsa -out /var/acumos/certs/acumos.key -passout pass:$ACUMOS_KEYPASS 4096
 
   log "Create a certificate signing request for the server cert"
   # ACUMOS_HOST is used as CN since it's assumed that the client's hostname
   # is not resolvable via DNS for this AIO deploy
-  openssl req -new -key certs/acumos.key -passin pass:$ACUMOS_KEYPASS \
-    -out certs/acumos.csr \
+  openssl req -new -key /var/acumos/certs/acumos.key -passin pass:$ACUMOS_KEYPASS \
+    -out /var/acumos/certs/acumos.csr \
     -subj "/C=US/ST=Unspecified/L=Unspecified/O=Acumos/OU=Acumos/CN=$ACUMOS_DOMAIN"
 
   log "Sign the CSR with the acumos CA"
-  openssl x509 -req -in certs/acumos.csr -CA certs/acumosCA.crt \
-    -CAkey certs/acumosCA.key -CAcreateserial -passin pass:$ACUMOS_KEYPASS \
-    -extfile openssl.cnf -out certs/acumos.crt -days 500 -sha256
+  openssl x509 -req -in /var/acumos/certs/acumos.csr -CA /var/acumos/certs/acumosCA.crt \
+    -CAkey /var/acumos/certs/acumosCA.key -CAcreateserial -passin pass:$ACUMOS_KEYPASS \
+    -extfile openssl.cnf -out /var/acumos/certs/acumos.crt -days 500 -sha256
 
   log "Create PKCS12 format keystore with acumos server cert"
-  openssl pkcs12 -export -in certs/acumos.crt -passin pass:$ACUMOS_KEYPASS \
-    -inkey certs/acumos.key -certfile certs/acumos.crt \
-    -out certs/acumos_aio.p12 -passout pass:$ACUMOS_KEYPASS
+  openssl pkcs12 -export -in /var/acumos/certs/acumos.crt -passin pass:$ACUMOS_KEYPASS \
+    -inkey /var/acumos/certs/acumos.key -certfile /var/acumos/certs/acumos.crt \
+    -out /var/acumos/certs/acumos_aio.p12 -passout pass:$ACUMOS_KEYPASS
 
   log "Create JKS format truststore with acumos CA cert"
-  keytool -import -file certs/acumosCA.crt -alias acumosCA -keypass $ACUMOS_KEYPASS \
-    -keystore certs/acumosTrustStore.jks -storepass $ACUMOS_KEYPASS -noprompt
+  keytool -import -file /var/acumos/certs/acumosCA.crt -alias acumosCA -keypass $ACUMOS_KEYPASS \
+    -keystore /var/acumos/certs/acumosTrustStore.jks -storepass $ACUMOS_KEYPASS -noprompt
 }
 
 function setup_reverse_proxy() {
   trap 'fail' ERR
+  log "Verify kong admin API is ready"
+  while ! curl http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis; do
+    log "Kong admin API is not ready... waiting 10 seconds"
+    sleep 10
+  done
+
   log "Pass cert and key to Kong admin"
   curl -i -X POST http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/certificates \
-    -F "cert=@certs/acumos.crt" \
-    -F "key=@certs/acumos.key" \
+    -F "cert=@/var/acumos/certs/acumos.crt" \
+    -F "key=@/var/acumos/certs/acumos.key" \
     -F "snis=$ACUMOS_DOMAIN"
 
   log "Add proxy entries via Kong API"
@@ -367,13 +442,14 @@ function setup_reverse_proxy() {
     --url http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis/ \
     --data "https_only=true" \
     --data "name=root" \
-    --data "upstream_url=http://portal-fe:$ACUMOS_PORTAL_FE_PORT" \
+    --data "upstream_url=http://portal-fe-service:$ACUMOS_PORTAL_FE_PORT" \
     --data "uris=/" \
     --data "strip_uri=false"
   curl -i -X POST \
     --url http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis/ \
+    --data "https_only=true" \
     --data "name=onboarding-app" \
-    --data "upstream_url=http://onboarding-app:$ACUMOS_ONBOARDING_PORT" \
+    --data "upstream_url=http://onboarding-service:$ACUMOS_ONBOARDING_PORT" \
     --data "uris=/onboarding-app" \
     --data "strip_uri=false"
 
@@ -384,7 +460,7 @@ function setup_reverse_proxy() {
   # Required for docker daemon to accept the kong self-signed cert
   # Per https://docs.docker.com/registry/insecure/#use-self-signed-certificates
   sudo mkdir -p /etc/docker/certs.d/$ACUMOS_HOST
-  sudo cp certs/acumosCA.crt /etc/docker/certs.d/$ACUMOS_HOST/ca.crt
+  sudo cp /var/acumos/certs/acumosCA.crt /etc/docker/certs.d/$ACUMOS_HOST/ca.crt
 }
 
 function setup_federation() {
@@ -404,7 +480,7 @@ function setup_federation() {
 
 export WORK_DIR=$(pwd)
 log "Reset acumos-env.sh"
-sed -i -- '/ACUMOS_HOST_DNS/d' acumos-env.sh
+sed -i -- '/DEPLOYED_UNDER/d' acumos-env.sh
 sed -i -- '/MARIADB_PASSWORD/d' acumos-env.sh
 sed -i -- '/MARIADB_USER_PASSWORD/d' acumos-env.sh
 sed -i -- '/ACUMOS_RO_USER_PASSWORD/d' acumos-env.sh
@@ -412,6 +488,11 @@ sed -i -- '/ACUMOS_RW_USER_PASSWORD/d' acumos-env.sh
 sed -i -- '/ACUMOS_CDS_PASSWORD/d' acumos-env.sh
 sed -i -- '/ACUMOS_KEYPASS/d' acumos-env.sh
 
+if [[ "$1" == "k8s" ]]; then DEPLOYED_UNDER=k8s
+else DEPLOYED_UNDER=docker
+fi
+echo "DEPLOYED_UNDER=\"$DEPLOYED_UNDER\"" >>acumos-env.sh
+echo "export DEPLOYED_UNDER" >>acumos-env.sh
 MARIADB_PASSWORD=$(uuidgen)
 echo "MARIADB_PASSWORD=\"$MARIADB_PASSWORD\"" >>acumos-env.sh
 echo "export MARIADB_PASSWORD" >>acumos-env.sh
@@ -429,21 +510,16 @@ echo "ACUMOS_CDS_PASSWORD=\"$ACUMOS_CDS_PASSWORD\"" >>acumos-env.sh
 # TODO: Various components hardcode password ccds_client
 echo "ACUMOS_CDS_PASSWORD=ccds_client" >>acumos-env.sh
 echo "export ACUMOS_CDS_PASSWORD" >>acumos-env.sh
-docker_ifs=$(ifconfig | grep 172. | cut -d ':' -f 2 | cut -d ' ' -f 1)
-#echo "ACUMOS_HOST_DNS=$(ifconfig | grep 172. | cut -d ':' -f 2 | cut -d ' ' -f 1)" >>acumos-env.sh
-echo "ACUMOS_HOST_DNS=172.18.0.1" >>acumos-env.sh
-echo "export ACUMOS_HOST_DNS" >>acumos-env.sh
 ACUMOS_KEYPASS=$(uuidgen)
 echo "ACUMOS_KEYPASS=$ACUMOS_KEYPASS" >>acumos-env.sh
 echo "export ACUMOS_KEYPASS" >>acumos-env.sh
 
-source acumos-env.sh
+source acumos-env.sh $DEPLOYED_UNDER
 
 setup_prereqs
 setup_mariadb
 setup_keystore
 setup_acumosdb
-setup_localindex
 setup_acumos
 setup_nexus
 setup_reverse_proxy

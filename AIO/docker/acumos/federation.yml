@@ -20,14 +20,15 @@ version: '2'
 # docker-compose for federation-gateway
 # TODO: scrub all attributes for current need
 services:
-   federation-gateway:
+   federation-service:
        image: ${FEDERATION_IMAGE}
        environment:
+           log_level: "DEBUG"
            SPRING_APPLICATION_JSON: "{
                \"federation\" : {
                     \"instance\" : \"gateway\",
                     \"instance.name\": \"aio\",
-                    \"operator\" : \"bc0f5023-79c0-4a99-a7a3-46c83f9ef806\",
+                    \"operator\" : \"${ACUMOS_OPERATOR_ID}\",
                     \"address\" : \"0.0.0.0\",
                     \"server\" : {
                        \"port\" : ${ACUMOS_FEDERATION_PORT}
@@ -56,11 +57,11 @@ services:
                    }
                 },
                 \"nexus\": {
-                   \"nexusendpointurl\": \"http://nexus:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
-                   \"nexusproxy\": \"\",
-                   \"nexuspassword\": \"${ACUMOS_RW_USER_PASSWORD}\",
-                   \"nexususername\": \"acumos_rw\",
-                   \"nexusgroupid\": \"com.artifact\"
+                   \"endpointurl\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
+                   \"proxy\": \"\",
+                   \"password\": \"${ACUMOS_RW_USER_PASSWORD}\",
+                   \"username\": \"${ACUMOS_RW_USER}\",
+                   \"groupid\": \"com.artifact\"
                 },
                 \"peer\": {
                     \"jobchecker\": {
@@ -69,7 +70,7 @@ services:
                 },
                 \"cdms\" : {
                   \"client\" : {
-                     \"url\": \"http://common-data-svc:${ACUMOS_CDS_PORT}/ccds\",
+                     \"url\": \"http://cds-service:${ACUMOS_CDS_PORT}/ccds\",
                      \"username\": \"${ACUMOS_CDS_USER}\",
                      \"password\": \"${ACUMOS_CDS_PASSWORD}\"
                   }
@@ -80,12 +81,12 @@ services:
        ports:
            - ${ACUMOS_FEDERATION_PORT}:${ACUMOS_FEDERATION_PORT}
        links:
-           - common-data-svc
+           - cds-service
        depends_on:
-           - common-data-svc
+           - cds-service
        volumes:
            - acumos-logs:/maven/logs
-           - /home/ubuntu/certs:/app/certs
+           - /var/acumos/certs:/app/certs
        logging:
            driver: json-file
 
