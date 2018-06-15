@@ -1,4 +1,4 @@
-#!/bin/bash
+version: '2'
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -16,35 +16,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
-#
-# What this is:
-# Sets environment variables needed by docker-compose in all-in-one environment
-# then invokes docker-compose with the command-line arguments.
-#
-# Usage:
-# - bash docker-compose.sh [options]
-#   options: optional parameters to docker-compose. some examples:
-#   $ sudo bash docker-compose.sh build
-#     Build all services defined in the docker-compose.yaml file.
-#   $ sudo bash docker-compose.sh up
-#     Start all service containers.
-#   $ sudo bash docker-compose.sh logs -f
-#     Tail the logs of all service containers.
-#   $ sudo bash docker-compose.sh down
-#     Stop all service containers.
-#   $ sudo bash docker-compose.sh rm -v
-#     Remove all service containers.
-#
 
-source acumos-env.sh
+# docker-compose for filebeat
+# TODO: scrub all attributes for current need
+services:
+   filebeat-service:
+       image: ${FILEBEAT_IMAGE}
+       volumes:
+           - acumos-logs:/filebeat-logs
+       environment:
+           - LOGSTASH_HOST=logcollector
+           - LOGSTASH_PORT=5601
 
-set -x
-
-opts=""
-files=$(ls docker/acumos)
-for file in $files ; do
- opts="$opts -f acumos/$file"
-done    
-
-cd docker
-docker-compose $opts $*

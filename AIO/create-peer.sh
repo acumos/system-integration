@@ -25,7 +25,7 @@
 #   (entries in /etc/hosts or in an actual DNS server)
 #.Usage:
 #.$ bash create-peer.sh <CAcert> <name> <subjectName> <contact> <apiUrl>
-#.  CAcert: CA certificate to add to truststore ~/certs/acumosTrustStore.jks
+#.  CAcert: CA certificate to add to truststore /var/acumos/certs/acumosTrustStore.jks
 #.  name: name to assign to this peer
 #.  subjectName: subjectName (FQDN) from the cert
 #.  contact: admin email address
@@ -70,7 +70,7 @@ function setup_peer() {
   trap 'fail' ERR
   log "Import peer CA cert into truststore"
   keytool -import -file $CAcert -alias ${subjectName}CA \
-    -keystore certs/acumosTrustStore.jks -storepass $ACUMOS_KEYPASS -noprompt
+    -keystore /var/acumos/certs/acumosTrustStore.jks -storepass $ACUMOS_KEYPASS -noprompt
 
   log "Create peer relationship for $name via CDS API"
   curl -s -o ~/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer -H "accept: */*" -H "Content-Type: application/json" -d "{ \"name\":\"$name\", \"self\": false, \"local\": false, \"contact1\": \"$contact\", \"subjectName\": \"$subjectName\", \"apiUrl\": \"$apiUrl\",   \"statusCode\": \"AC\", \"validationStatusCode\": \"PS\" }"
@@ -86,14 +86,36 @@ function setup_peer() {
   # workaround a way to use docker-compose.sh for this (tests of this command
   # with docker-compose.sh have not been successful)
   ip=$(host $subjectName | awk '{print $4}')
-  sudo docker exec acumos_federation-gateway_1 \
-    /bin/sh -c "echo $ip $subjectName >>/etc/hosts"
+  if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
+    pod=$(kubectl get pods -n acumos | awk '/federation/ {print $1}')
+    kubectl exec -n acumos $pod -- /bin/sh -c "echo $ip $subjectName >>/etc/hosts"
+  else
+    sudo docker exec acumos_federation-service_1 \
+      /bin/sh -c "echo $ip $subjectName >>/etc/hosts"
+  fi
 
-  log "Restart federation-gateway to apply new truststore entry"
-  sudo bash docker-compose.sh restart federation-gateway
+  log "Restart federation-service to apply new truststore entry"
+  if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
+    # Hack to restart a deployment, per
+    # https://github.com/kubernetes/kubernetes/issues/27081
+    a=$(uuidgen)
+    kubectl patch deployment -n acumos federation -p "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"date\":\"$a\"}}}}}"
+    log "Wait for federation deployment to be terminated and restarted as new pod"
+    newpod=$pod
+    while [[ $pod == $newpod ]] ; do
+      line=$(kubectl get pods -n acumos | awk '/federation/')
+      newpod=$(echo $line | awk '{print $1}')
+      status=$(echo $line | awk '{print $3}')
+      log "Federation pod $newpod is $status"
+      sleep 5
+    done
+  else
+    sudo bash docker-compose.sh restart federation-service
+  fi
 
   log "Verify federation API is accessible"
-  while ! curl -vk --cert certs/acumos.crt --key certs/acumos.key \
+  while ! curl -vk --cert /var/acumos/certs/acumos.crt \
+  --key /var/acumos/certs/acumos.key \
   https://$ACUMOS_FEDERATION_HOST:$ACUMOS_FEDERATION_PORT/solutions ; do
     log "federation API is not yet accessible. Waiting 10 seconds"
     sleep 10

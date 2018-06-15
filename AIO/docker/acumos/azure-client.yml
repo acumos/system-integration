@@ -22,7 +22,7 @@ version: '2'
 # TODO: remove or parameterize all credentials
 # TODO: scrub all attributes for current need
 services:
-   azure-client:
+   azure-client-service:
        image: ${AZURE_CLIENT_IMAGE}
        environment:
            log_level: "DEBUG"
@@ -43,42 +43,42 @@ services:
                     \"vnet\": \"Acumos-OAM-vnet\",
                     \"sleepTimeFirst\": \"30000\",
                     \"sleepTimeSecond\": \"50000\",
-                    \"nexusRegistyUserName\": \"docker\",
-                    \"nexusRegistyPwd\": \"docker\",
+                    \"nexusRegistyUserName\": \"${ACUMOS_PROJECT_NEXUS_USERNAME}\",
+                    \"nexusRegistyPwd\": \"${ACUMOS_PROJECT_NEXUS_PASSWORD}\",
                     \"nexusRegistyName\": \"nexus3.acumos.org\",
-                    \"otherRegistyName\": \"nexus\",
+                    \"otherRegistyName\": \"${ACUMOS_NEXUS_HOST}\",
                     \"exposeDataBrokerPort\": \"${ACUMOS_DATA_BROKER_PORT}\",
                     \"internalDataBrokerPort\": \"${ACUMOS_DATA_BROKER_INTERNAL_PORT}\",
                     \"registry\": {
                         \"bluePrint\": {
-                            \"username\": \"acumos_ro\",
+                            \"username\": \"$ACUMOS_RO_USER\",
                             \"password\": \"${ACUMOS_RW_USER_PASSWORD}\"
                         },
                         \"probe\": {
-                            \"username\": \"acumos_ro\",
+                            \"username\": \"$ACUMOS_RO_USER\",
                             \"password\": \"${ACUMOS_RW_USER_PASSWORD}\"
                         },
                         \"networkgroupName\": \"acumos-nsg\",
                         \"port\": \"80\",
-                        \"name\": \"nexus:${ACUMOS_DOCKER_MODEL_PORT}\",
-                        \"url\": \"http://nexus:${ACUMOS_DOCKER_MODEL_PORT}/\",
-                        \"username\": \"acumos_rw\",
+                        \"name\": \"${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}\",
+                        \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/\",
+                        \"username\": \"${ACUMOS_RW_USER}\",
                         \"password\": \"${ACUMOS_RW_USER_PASSWORD}\"
                     }
                 },
                 \"blueprint\": {
-                    \"ImageName\": \"nexus:${ACUMOS_DOCKER_PLATFORM_PORT}/blueprint-orchestrator:1.0.0-SNAPSHOT\",
+                    \"ImageName\": \"${BLUEPRINT_ORCHESTRATOR_IMAGE}\",
                     \"name\": \"blueprint-orchestrator\"
                 },
                 \"nexus\": {
-                    \"url\": \"http://nexus:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
+                    \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
                     \"nexusproxy\": \"NA\",
                     \"password\": \"${ACUMOS_RW_USER_PASSWORD}\",
-                    \"username\": \"acumos_rw\",
+                    \"username\": \"${ACUMOS_RW_USER}\",
                     \"groupId\": \"com.artifact\"
                 },
                 \"cmndatasvc\": {
-                    \"cmndatasvcendpoinurl\": \"http://common-data-svc:${ACUMOS_CDS_PORT}/ccds\",
+                    \"cmndatasvcendpoinurl\": \"http://cds-service:${ACUMOS_CDS_PORT}/ccds\",
                     \"cmndatasvcuser\": \"${ACUMOS_CDS_USER}\",
                     \"cmndatasvcpwd\": \"${ACUMOS_CDS_PASSWORD}\"
                 },
@@ -86,7 +86,7 @@ services:
                     \"ImageName\": \"${PROTO_VIEWER_IMAGE}\",
                     \"name\": \"proto_viewer\",
                     \"internalPort\": \"${ACUMOS_PROBE_PORT}\",
-                    \"probeNexusEndPoint\": \"http://nexus:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven\"
+                    \"probeNexusEndPoint\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven\"
                 }
            }"
        expose:

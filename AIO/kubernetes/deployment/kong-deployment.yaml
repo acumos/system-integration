@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# What this is: kubernetes template for Acumos kong deployment
+# How to use:
+# - Replace fields in <> with actual values (k8s does not support env variables)services:
+
+kind: Deployment
+metadata:
+  namespace: acumos
+  name: kong
+  labels:
+    app: kong
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kong
+  template:
+    metadata:
+      labels:
+        app: kong
+    spec:
+      containers:
+      - name: kong-database
+        image: postgres:9.5
+        env:
+        - name: POSTGRES_USER
+          value: kong
+        - name: POSTGRES_DB
+          value: kong
+        ports:
+        - containerPort: <ACUMOS_KONG_DB_PORT>
+        volumeMounts:
+        - mountPath: /var/lib/postgresql
+          name: kong-db
+      - name: kong
+        image: kong:0.11
+        env:
+        - name: log_level
+          value: "DEBUG"
+        - name: KONG_DATABASE
+          value: postgres
+        - name: KONG_PG_HOST
+          value: kong-service
+        - name: KONG_PROXY_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_ADMIN_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_PROXY_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_ADMIN_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_LOG_LEVEL
+          value: debug
+        - name: KONG_ADMIN_LISTEN
+          value: 0.0.0.0:81
+        - name: KONG_ADMIN_LISTEN_SSL
+          value: 0.0.0.0:444
+        ports:
+        - containerPort: 8000
+        - containerPort: 8443
+        - containerPort: 81
+        - containerPort: 444
+        command: ['/bin/bash', '-c', 'until [[ $$(curl -v http://kong-service:<ACUMOS_KONG_DB_PORT> 2>&1 | grep -c "Connected to ") -gt 0 ]]; do echo "kong-database is unavailable - sleeping 10 seconds"; sleep 10; done; sed -i -- "s/\ \ \ \ proxy_max_temp_file_size 0;//" /usr/local/share/lua/5.1/kong/templates/nginx_kong.lua; sed -i -- "/server {/a\ \ \ \ proxy_max_temp_file_size 0;" /usr/local/share/lua/5.1/kong/templates/nginx_kong.lua; kong migrations up; kong start -vv; kong health -vv; echo Connected!; sleep 3600']
+      restartPolicy: Always
+      volumes:
+      - name: kong-db
+        hostPath:
+          path: /var/acumos/kong-db

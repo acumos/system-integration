@@ -20,32 +20,33 @@ version: '2'
 # docker-compose for ds-compositionengine
 # TODO: scrub all attributes for current need
 services:
-   ds-compositionengine:
+   dsce-service:
        image: ${DESIGNSTUDIO_IMAGE}
        environment:
+           log_level: "DEBUG"
            SPRING_APPLICATION_JSON: "{
                           \"server\": {
                                 \"port\": ${ACUMOS_DSCE_PORT}
                           },
                           \"dateformat\": \"yyyy-MM-dd-HH-mm-ss-SSS\",
-                          \"lib\":\"/maven/\",
+                          \"lib\": \"/maven/\",
                           \"tosca\": {
                                 \"outputfolder\": \"/temp/output/\"
                           },
                           \"nexus\": {
-                                \"nexusendpointurl\": \"http://nexus:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
+                                \"nexusendpointurl\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
                                 \"nexusproxy\": \"\",
                                 \"nexuspassword\": \"${ACUMOS_RW_USER_PASSWORD}\",
-                                \"nexususername\": \"acumos_rw\",
+                                \"nexususername\": \"${ACUMOS_RW_USER}\",
                                 \"nexusgroupid\": \"com.artifact\"
                           },
                           \"cmndatasvc\": {
-                                \"cmndatasvcendpoinurl\": \"http://common-data-svc:${ACUMOS_CDS_PORT}/ccds\",
+                                \"cmndatasvcendpoinurl\": \"http://cds-service:${ACUMOS_CDS_PORT}/ccds\",
                                 \"cmndatasvcuser\": \"${ACUMOS_CDS_USER}\",
                                 \"cmndatasvcpwd\": \"${ACUMOS_CDS_PASSWORD}\"
                           },
-                          \"imagedatabrokerURI\": \"$DATABROKER_ZIPBROKER_IMAGE\",
-                          \"csvdatabrokerURI\": \"DATABROKER_CSVBROKER_IMAGE\",
+                          \"imagedatabrokerURI\": \"${DATABROKER_ZIPBROKER_IMAGE}\",
+                          \"csvdatabrokerURI\": \"${DATABROKER_CSVBROKER_IMAGE}\",
                           \"jsondatabrokerURI\": \"NA\",
                           \"sqldatabrokerURI\": \"NA\",
                           \"docker\": {
@@ -53,15 +54,15 @@ services:
                                 \"port\": \"${ACUMOS_DOCKER_API_PORT}\",
                                 \"config\": \"/docker_host/.docker\",
                                 \"registry\": {
-                                        \"url\": \"http://nexus:${ACUMOS_DOCKER_MODEL_PORT}/\",
-                                        \"username\": \"acumos_rw\",
+                                        \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/\",
+                                        \"username\": \"${ACUMOS_RW_USER}\",
                                         \"password\": \"${ACUMOS_RW_USER_PASSWORD}\",
                                         \"email\": \"acumos@example.com\"
                                             },
                                 \"tls\": {\"verify\": \"false\"},
                                 \"api\": {\"version\": \"1.23\"},
                                 \"imagetag\": {
-                                        \"prefix\": \"nexus:${ACUMOS_DOCKER_MODEL_PORT}\"
+                                        \"prefix\": \"${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}\"
                                             },
                                 \"max_total_connections\": \"1\",
                                 \"max_per_route_connections\": \"1\"

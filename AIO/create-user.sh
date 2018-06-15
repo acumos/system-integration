@@ -52,8 +52,8 @@ function log() {
 function setup_user() {
   trap 'fail' ERR
   log "Create user $username"
-  while ! curl -s -o ~/json -X POST \
-    http://$ACUMOS_PORTAL_FE_HOST:$ACUMOS_PORTAL_FE_PORT/api/users/register \
+  while ! curl -k -s -o ~/json -X POST \
+    https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/api/users/register \
     -H "Content-Type: application/json" \
     -d "{\"request_body\":{ \"firstName\":\"$firstName\", 
          \"lastName\":\"$lastName\", \"emailId\":\"$emailId\", 

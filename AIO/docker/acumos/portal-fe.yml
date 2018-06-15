@@ -20,7 +20,7 @@ version: '2'
 # docker-compose for portal-fe
 # TODO: scrub all attributes for current need
 services:
-   portal-fe:
+   portal-fe-service:
        image: ${PORTAL_FE_IMAGE}
        environment:
            log_level: "DEBUG"
@@ -31,19 +31,19 @@ services:
                \"zuul\" : {
                    \"routes\" : {
                       \"api\" : {
-                        \"url\": \"http://portal-be:${ACUMOS_PORTAL_BE_PORT}\"
+                        \"url\": \"http://portal-be-service:${ACUMOS_PORTAL_BE_PORT}\"
                       },
                       \"dsce\": {
-                        \"url\": \"http://ds-compositionengine:${ACUMOS_DSCE_PORT}\"
+                        \"url\": \"http://dsce-service:${ACUMOS_DSCE_PORT}\"
                       },
                       \"site\" : {
-                        \"url\": \"http://cms:${ACUMOS_CMS_PORT}\"
+                        \"url\": \"http://cms-service:${ACUMOS_CMS_PORT}\"
                       },
                       \"cmnt\" : {
                          \"url\" : \"http://delete-me:${ACUMOS_PLATON_PORT}\"
                       },
                       \"azure\" : {
-                          \"url\" : \"http://azure-client:${ACUMOS_AZURE_CLIENT_PORT}\"
+                          \"url\" : \"http://azure-client-service:${ACUMOS_AZURE_CLIENT_PORT}\"
                       }
                    },
                     \"host\" : {
@@ -63,9 +63,9 @@ services:
        ports:
            - ${ACUMOS_PORTAL_FE_PORT}:${ACUMOS_PORTAL_FE_PORT}
        links:
-           - portal-be
+           - portal-be-service
        depends_on:
-           - portal-be
+           - portal-be-service
        volumes:
            - acumos-logs:/maven/logs
        logging:
