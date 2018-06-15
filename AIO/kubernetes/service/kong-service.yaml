@@ -1,4 +1,4 @@
-version: '2'
+apiVersion: v1
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -17,20 +17,35 @@ version: '2'
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 
-# docker-compose for nexus
-# Ports are exposed since docker build server needs access to 
-# TODO: remove or parameterize all credentials
-# TODO: scrub all attributes for current need
-services:
-   nexus:
-       image: sonatype/nexus3:3.9.0
-       ports:
-           - ${ACUMOS_NEXUS_API_PORT}:8081
-           - ${ACUMOS_MAVEN_MODEL_PORT}:${ACUMOS_MAVEN_MODEL_PORT}
-           - ${ACUMOS_DOCKER_MODEL_PORT}:${ACUMOS_DOCKER_MODEL_PORT}
-           - ${ACUMOS_DOCKER_PLATFORM_PORT}:${ACUMOS_DOCKER_PLATFORM_PORT}
-       volumes:
-           - acumos-logs:/maven/logs
-       logging:
-           driver: json-file
+# What this is: kubernetes template for Acumos portal-fe service
+# How to use:
+# - Replace fields in <> with actual values (k8s does not support env variables)
+
+kind: Service
+metadata:
+  namespace: acumos
+  name: kong-service
+spec:
+  selector:
+    app: kong
+  type: NodePort
+  ports:
+  - name: kong-db-port
+    port: <ACUMOS_KONG_DB_PORT>
+  - name: kong-proxy-port
+    nodePort: <ACUMOS_KONG_PROXY_PORT>
+    port: 80
+    targetPort: 80
+  - name: kong-proxy-ssl-port
+    nodePort: <ACUMOS_KONG_PROXY_SSL_PORT>
+    port: 443
+    targetPort: 443
+  - name: kong-admin-port
+    nodePort: <ACUMOS_KONG_ADMIN_PORT>
+    port: 81
+    targetPort: 81
+  - name: kong-admin-ssl-port
+    nodePort: <ACUMOS_KONG_ADMIN_SSL_PORT>
+    port: 444
+    targetPort: 444
 

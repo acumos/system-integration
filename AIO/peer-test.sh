@@ -34,11 +34,13 @@
 #   is served by twistd as setup in oneclick_deploy.sh 
 #
 # Usage:
-# $ bash peer-test.sh <host1> <user1> <host2> <user2> [models]
+# $ bash peer-test.sh <host1> <user1> <under1> <host2> <user2> <under2> [models]
 #   host1: AIO deploy target hostname
 #   user1: user account on host1
+#   under1: docker|k8s
 #   host2: AIO deploy target hostname
 #   user2: user account on host2
+#   under2: docker|k8s
 #   models: optional folder with models to onboard
 #
 
@@ -63,9 +65,9 @@ function deploy() {
     * $2@$1:/home/$2/.
   # Run the commands separately to ensure failures are trapped
   ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    $2@$1 bash clean.sh force
+    $2@$1 bash clean.sh
   ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    $2@$1 bash oneclick_deploy.sh
+    $2@$1 bash oneclick_deploy.sh $3
   ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
     $2@$1 bash create-user.sh test P@ssw0rd test user test@acumos-aio.com admin
 }
@@ -75,47 +77,51 @@ source acumos-env.sh
 
 host1=$1
 user1=$2
-host2=$3
-user2=$4
-models="$5"
+under1=$3
+host2=$4
+user2=$5
+under2=$6
+models="$7"
 
-deploy $host1 $user1
-deploy $host2 $user2
+deploy $host1 $user1 $under1
+deploy $host2 $user2 $under2
 
 log "Exchange peer CA certs and server certs"
 scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-  $user1@$host1:/home/$user1/certs/acumosCA.crt /tmp/${host1}CA.crt
+  $user1@$host1:/var/acumos/certs/acumosCA.crt /tmp/${host1}CA.crt
 scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-  $user2@$host2:/home/$user2/certs/acumosCA.crt /tmp/${host2}CA.crt
+  $user2@$host2:/var/acumos/certs/acumosCA.crt /tmp/${host2}CA.crt
 scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-  /tmp/${host1}CA.crt $user2@$host2:/home/$user2/certs/peerCA.crt
+  /tmp/${host1}CA.crt $user2@$host2:/var/acumos/certs/peerCA.crt
 scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-  /tmp/${host2}CA.crt $user1@$host1:/home/$user1/certs/peerCA.crt
+  /tmp/${host2}CA.crt $user1@$host1:/var/acumos/certs/peerCA.crt
 
 log "Create $host2 peer at $host1"
 ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
   $user1@$host1 <<EOF
 source acumos-env.sh
-bash create-peer.sh certs/peerCA.crt $host2 $host2 admin@example.com \
-  https://$host2:$ACUMOS_FEDERATION_PORT
+bash create-peer.sh /var/acumos/certs/peerCA.crt $host2 $host2 \
+  admin@example.com https://$host2:$ACUMOS_FEDERATION_PORT
 EOF
 
 log "Create $host1 peer at $host2"
 ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
   $user2@$host2 <<EOF
 source acumos-env.sh
-bash create-peer.sh certs/peerCA.crt $host1 $host1 admin@example.com \
-  https://$host1:$ACUMOS_FEDERATION_PORT
+bash create-peer.sh /var/acumos/certs/peerCA.crt $host1 $host1 \
+  admin@example.com https://$host1:$ACUMOS_FEDERATION_PORT
 EOF
 
 log "Verify $host1 can access federation API at $host2"
 ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-  $user1@$host1 curl -vk --cert certs/acumos.crt --key certs/acumos.key \
+  $user1@$host1 curl -vk --cert /var/acumos/certs/acumos.crt \
+  --key /var/acumos/certs/acumos.key \
   https://$host2:$ACUMOS_FEDERATION_PORT/solutions
 
 log "Verify $host2 can access federation API at $host1"
 ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-  $user2@$host2 curl -vk --cert certs/acumos.crt --key certs/acumos.key \
+  $user2@$host2 curl -vk --cert /var/acumos/certs/acumos.crt \
+  --key /var/acumos/certs/acumos.key \
   https://$host1:$ACUMOS_FEDERATION_PORT/solutions
 
 if [[ "$models" != "" ]]; then

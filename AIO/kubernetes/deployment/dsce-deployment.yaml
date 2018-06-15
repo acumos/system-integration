@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# What this is: kubernetes template for Acumos dsce deployment
+# How to use:
+# - Replace fields in <> with actual values (k8s does not support env variables)
+
+kind: Deployment
+metadata:
+  namespace: acumos
+  name: dsce
+  labels:
+    app: dsce
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dsce
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: dsce
+    spec:
+      imagePullSecrets:
+      - name: dsce
+      containers:
+      - name: dsce
+        image: <AZURE_CLIENT_IMAGE>
+        env:
+        - name: SPRING_APPLICATION_JSON
+          value: '{ 
+                    "server": {
+                      "port": 8088
+                    },
+                    "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
+                    "lib":"/maven/",
+                    "tosca": {
+                      "outputfolder": "/temp/output/"
+                    },
+                    "nexus": {
+                      "nexusendpointurl": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/repository/acumos_model_maven/",
+                      "nexusproxy": "",
+                      "nexuspassword": "<ACUMOS_RW_USER_PASSWORD>",
+                      "nexususername": "acumos_rw",
+                      "nexusgroupid": "com.artifact"
+                    },
+                    "cmndatasvc": {
+                      "cmndatasvcendpoinurl": "http://cds-service.default.svc.cluster.local:8000/ccds",
+                      "cmndatasvcuser": "<ACUMOS_CDS_USER>",
+                      "cmndatasvcpwd": "<ACUMOS_CDS_PASSWORD>"
+                    },
+                    "imagedatabrokerURI": "<DATABROKER_ZIPBROKER_IMAGE>",
+                    "csvdatabrokerURI": "DATABROKER_CSVBROKER_IMAGE",
+                    "jsondatabrokerURI": "NA",
+                    "sqldatabrokerURI": "NA",
+                    "docker": {
+                      "host": "<ACUMOS_DOCKER_API_HOST>",
+                      "port": "4243",
+                      "config": "/docker_host/.docker",
+                      "registry": {
+                        "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_DOCKER_MODEL_PORT>/",
+                        "username": "acumos_rw",
+                        "password": "<ACUMOS_RW_USER_PASSWORD>",
+                        "email": "acumos@example.com"
+                      },
+                      "tls": {"verify": "false"},
+                      "api": {"version": "1.23"},
+                      "imagetag": {
+                        "prefix": "<ACUMOS_NEXUS_HOST>:<ACUMOS_DOCKER_MODEL_PORT>"
+                      },
+                      "max_total_connections": "1",
+                      "max_per_route_connections": "1"
+                    }
+                 }'
+        ports:
+        - containerPort: 8088
+        volumeMounts:
+        - mountPath: /maven/logs
+          name: acumos-logs
+        - mountPath: /temp
+          name: acumos-output
+      restartPolicy: Always
+      volumes:
+      - name: acumos-logs
+        hostPath:
+          path: /var/acumos/logs
+      - name: acumos-output
+        hostPath:
+          path: /var/acumos/output

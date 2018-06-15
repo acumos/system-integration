@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# What this is: kubernetes template for Acumos filebeat deployment
+# How to use:
+# - Replace fields in <> with actual values (k8s does not support env variables)
+
+kind: Deployment
+metadata:
+  namespace: acumos
+  name: filebeat
+  labels:
+    app: filebeat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: filebeat
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: filebeat
+    spec:
+      imagePullSecrets:
+      - name: filebeat
+      containers:
+      - name: filebeat
+        image: <FILEBEAT_IMAGE>
+        env:
+        - name: LOGSTASH_HOST
+          value: logcollector
+        - name: LOGSTASH_PORT
+          value: "5601"
+        ports:
+        - containerPort: 8099
+        volumeMounts:
+        - mountPath: /filebeat-logs
+          name: acumos-logs
+      restartPolicy: Always
+      volumes:
+      - name: acumos-logs
+        hostPath:
+          path: /var/acumos/logs

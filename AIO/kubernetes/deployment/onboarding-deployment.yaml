@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# What this is: kubernetes template for Acumos onboarding deployment
+# How to use:
+# - Replace fields in <> with actual values (k8s does not support env variables)
+
+kind: Deployment
+metadata:
+  namespace: acumos
+  name: onboarding
+  labels:
+    app: onboarding
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: onboarding
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: onboarding
+    spec:
+      imagePullSecrets:
+      - name: onboarding
+      containers:
+      - name: onboarding
+        image: <ONBOARDING_IMAGE>
+        env:
+        - name: SPRING_APPLICATION_JSON
+          value: '{ 
+                   "server" :{
+                     "port" : "8090"
+                    },
+                   "docker" : {
+                     "host" : "<ACUMOS_DOCKER_API_HOST>",
+                     "port" : "4243",
+                     "config": "/docker_host/.docker",
+                     "registry" :{
+                       "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_DOCKER_MODEL_PORT>/",
+                       "username" : "acumos_rw",
+                       "password" : "<ACUMOS_RW_USER_PASSWORD>",
+                       "email": "acumos@example.com"
+                     },
+                     "tls": {
+                       "verify": "false"
+                     },
+                     "api": {
+                       "version": "1.23"
+                     },
+                     "imagetag": {
+                       "prefix": "<ACUMOS_NEXUS_HOST>:<ACUMOS_DOCKER_MODEL_PORT>"
+                     },
+                     "max_total_connections": "1",
+                     "max_per_route_connections": "1"
+                   },
+                   "http_proxy": "\"\"",
+                   "nexus": {
+                     "nexusEndPointURL": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/repository/acumos_model_maven/",
+                     "nexusUserName": "acumos_rw",
+                     "nexusPassword": "<ACUMOS_RW_USER_PASSWORD>",
+                     "nexusproxy": "",
+                     "nexusGroupId": "com.artifact"
+                   },
+                   "cmndatasvc": {
+                     "cmnDataSvcEndPoinURL": "http://cds-service.default.svc.cluster.local:8000/ccds",
+                     "cmnDataSvcUser": "<ACUMOS_CDS_USER>",
+                     "cmnDataSvcPwd": "<ACUMOS_CDS_PASSWORD>"
+                   },
+                   "mktPlace": {
+                     "mktPlaceEndPoinURL" : "http://portal-be-service.default.svc.cluster.local:8083"
+                   },
+                   "requirements": {
+                     "extraIndexURL": "",
+                     "trustedHost": ""
+                   },
+                   "authenticationServiceURL": "http://portal-be-service.default.svc.cluster.local:8083"
+                  }'
+        ports:
+        - containerPort: 8090
+        volumeMounts:
+        - mountPath: /maven/logs
+          name: acumos-logs
+        - mountPath: /temp
+          name: acumos-output
+      restartPolicy: Always
+      volumes:
+      - name: acumos-logs
+        hostPath:
+          path: /var/acumos/logs
+      - name: acumos-output
+        hostPath:
+          path: /var/acumos/output
