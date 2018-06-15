@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# What this is: kubernetes template for Acumos federation deployment
+# How to use:
+# - Replace fields in <> with actual values (k8s does not support env variables)
+
+kind: Deployment
+metadata:
+  name: federation
+  labels:
+    app: federation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: federation
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: federation
+    spec:
+      imagePullSecrets:
+      - name: federation
+      containers:
+      - name: federation
+        image: <FEDERATION_IMAGE>
+        env:
+        - name: SPRING_APPLICATION_JSON
+          value: '{ 
+                    "federation" : {
+                      "instance" : "gateway",
+                      "instance.name": "aio",
+                      "operator" : "bc0f5023-79c0-4a99-a7a3-46c83f9ef806",
+                      "address" : "0.0.0.0",
+                      "server" : {
+                        "port" : "9084"
+                      },
+                      "ssl" : {
+                        "key-store" : "/app/certs/acumos_aio.p12",
+                        "key-store-password" : "<ACUMOS_KEYPASS>",
+                        "key-store-type" : "PKCS12",
+                        "key-password" : "<ACUMOS_KEYPASS>",
+                        "trust-store" : "/app/certs/acumosTrustStore.jks",
+                        "trust-store-password" : "<ACUMOS_KEYPASS>"
+                      }
+                    },
+                    "local" : {
+                      "address": "0.0.0.0",
+                      "server" : {
+                        "port" : "9011"
+                      },
+                      "ssl" : {
+                        "key-store" : "/app/certs/acumos_aio.p12",
+                        "key-store-password" : "<ACUMOS_KEYPASS>",
+                        "key-store-type" : "PKCS12",
+                        "key-password" : "<ACUMOS_KEYPASS>",
+                        "trust-store" : "/app/certs/acumosTrustStore.jks",
+                        "trust-store-password" : "<ACUMOS_KEYPASS>"
+                      }
+                    },
+                    "nexus": {
+                      "nexusendpointurl": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/repository/acumos_model_maven/",
+                      "nexusproxy": "",
+                      "nexuspassword": "<ACUMOS_RW_USER_PASSWORD>",
+                      "nexususername": "acumos_rw",
+                      "nexusgroupid": "com.artifact"
+                    },
+                    "peer": {
+                      "jobchecker": {
+                        "interval": 300
+                      }
+                    },
+                    "cdms" : {
+                      "client" : {
+                        "url": "http://cds-service.default.svc.cluster.local:8000/ccds",
+                        "username": "<ACUMOS_CDS_USER>",
+                        "password": "<ACUMOS_CDS_PASSWORD>"
+                      }
+                    }
+                  }'
+        ports:
+        - containerPort: 9084
+        - containerPort: 9011
+        volumeMounts:
+        - mountPath: /maven/logs
+          name: acumos-logs
+        - mountPath: /app/certs
+          name: acumos-certs
+      restartPolicy: Always
+      volumes:
+      - name: acumos-logs
+        hostPath:
+          path: /var/acumos/logs
+      - name: acumos-certs
+        hostPath:
+          path: /var/acumos/certs

@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# What this is: kubernetes template for Acumos azure-client deployment
+# How to use:
+# - Replace fields in <> with actual values (k8s does not support env variables)
+
+kind: Deployment
+metadata:
+  name: azure-client
+  labels:
+    app: azure-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: azure-client
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: azure-client
+    spec:
+      imagePullSecrets:
+      - name: azure-client
+      containers:
+      - name: azure-client
+        image: <AZURE_CLIENT_IMAGE>
+        env:
+        - name: SPRING_APPLICATION_JSON
+          value: '{ 
+                    "server": {
+                      "port": "9081"
+                    },
+                    "docker": {
+                      "containerNamePrefix": "E6E-NSG",
+                      "host": "<ACUMOS_DOCKER_API_HOST>",
+                      "port": "4243",
+                      "dockerVMUserName": "<ACUMOS_DEPLOYED_VM_USER>",
+                      "dockerVMPassword": "<ACUMOS_DEPLOYED_VM_PASSWORD>",
+                      "replaceChar": "^",
+                      "ignordoller": "TRUE",
+                      "solutionPort": "<ACUMOS_DEPLOYED_SOLUTION_PORT>",
+                      "subnet": "Acumos-OAM-vsubnet",
+                      "vnet": "Acumos-OAM-vnet",
+                      "sleepTimeFirst": "30000",
+                      "sleepTimeSecond": "50000",
+                      "nexusRegistyUserName": "docker",
+                      "nexusRegistyPwd": "docker",
+                      "nexusRegistyName": "nexus3.acumos.org",
+                      "otherRegistyName": "<ACUMOS_NEXUS_HOST>",
+                      "exposeDataBrokerPort": "<ACUMOS_DATA_BROKER_PORT>",
+                      "internalDataBrokerPort": "<ACUMOS_DATA_BROKER_INTERNAL_PORT>",
+                      "registry": {
+                        "bluePrint": {
+                          "username": "acumos_ro",
+                          "password": "<ACUMOS_RW_USER_PASSWORD>"
+                        },
+                        "probe": {
+                          "username": "acumos_ro",
+                          "password": "<ACUMOS_RW_USER_PASSWORD>"
+                        },
+                        "networkgroupName": "acumos-nsg",
+                        "port": "80",
+                        "name": "<ACUMOS_NEXUS_HOST>:<ACUMOS_DOCKER_MODEL_PORT>",
+                        "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_DOCKER_MODEL_PORT>/",
+                        "username": "acumos_rw",
+                        "password": "<ACUMOS_RW_USER_PASSWORD>"
+                      }
+                    },
+                    "blueprint": {
+                      "ImageName": "<ACUMOS_NEXUS_HOST>:<ACUMOS_DOCKER_PLATFORM_PORT>/blueprint-orchestrator:1.0.0-SNAPSHOT",
+                      "name": "blueprint-orchestrator"
+                    },
+                    "nexus": {
+                      "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/repository/acumos_model_maven/",
+                      "nexusproxy": "NA",
+                      "password": "<ACUMOS_RW_USER_PASSWORD>",
+                      "username": "acumos_rw",
+                      "groupId": "com.artifact"
+                    },
+                    "cmndatasvc": {
+                      "cmndatasvcendpoinurl": "http://cds-service.default.svc.cluster.local:8000/ccds",
+                      "cmndatasvcuser": "<ACUMOS_CDS_USER>",
+                      "cmndatasvcpwd": "<ACUMOS_CDS_PASSWORD>"
+                    },
+                    "probe": {
+                      "ImageName": "<PROTO_VIEWER_IMAGE>",
+                      "name": "proto_viewer",
+                      "internalPort": "<ACUMOS_PROBE_PORT>",
+                      "probeNexusEndPoint": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/repository/acumos_model_maven"
+                    }
+                  }'
+        ports:
+        - containerPort: 9081
+        volumeMounts:
+        - mountPath: /maven/logs
+          name: acumos-logs
+      restartPolicy: Always
+      volumes:
+      - name: acumos-logs
+        hostPath:
+          path: /var/acumos/logs

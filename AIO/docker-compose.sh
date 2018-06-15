@@ -38,10 +38,18 @@
 
 source acumos-env.sh
 
-opts=""
-files=$(ls acumos)
-for file in $files ; do
- opts="$opts -f acumos/$file"
-done
+set -x
 
+opts=""
+if [[ "$DEPLOYED_UNDER" == "docker" || "$DEPLOYED_UNDER" == "" ]]; then
+  files=$(ls docker/acumos)
+  for file in $files ; do
+   opts="$opts -f acumos/$file"
+  done    
+else
+  # k8s based deployment, except for
+  opts="-f acumos/kong.yml -f acumos/nexus.yml"
+fi
+
+cd docker
 docker-compose $opts $*

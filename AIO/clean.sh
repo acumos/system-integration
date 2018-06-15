@@ -23,23 +23,31 @@
 # - If the docker-compose console is still running, showing the logs of the
 #   containers, ctrl-c to stop it and wait will all services are stopped.
 # Usage:
-# $ bash clean.sh [force]
-#   force: for all docker containers to be stopped and removed. Use if some
-#   containers remain, e.g. due to the way that docker-compose prefixes names
-#   to the containers changing, leaving old containers running and thus
-#   ports allocated, causing errors in subsequent deploys.
+# $ bash clean.sh
 #
 
 trap - ERR
 
+set -x
+
 source acumos-env.sh
 
-echo "Stop the running Acumos component containers"
+echo "Stop Acumos docker-based components"
 sudo bash docker-compose.sh down
-sudo bash docker-compose.sh rm -v
-if [[ "$1" == "force" ]]; then
-  sudo docker stop $(sudo docker ps -aq)
-  sudo docker rm -v $(sudo docker ps -aq)
+
+if [[ "$DEPLOYED_UNDER" == "k8s" || "$DEPLOYED_UNDER" == "" ]]; then
+  echo "Stop the running Acumos component services under kubernetes"
+  kubectl delete service azure-client-service cds-service cms-service \
+    filebeat-service onboarding-service portal-be-service portal-fe-service \
+     dsce-service federation-service
+
+  echo "Stop the running Acumos component deployments under kubernetes"
+  kubectl delete deployment azure-client cds cms filebeat onboarding portal-be \
+    portal-fe dsce federation
+
+  echo "Delete image pull secrets from kubernetes"
+  kubectl delete secret azure-client cds cms filebeat onboarding portal-be \
+    portal-fe dsce federation
 fi
 
 echo "Remove Acumos databases and users"
@@ -56,7 +64,7 @@ sudo rm /etc/apt/sources.list.d/mariadb.list
 sudo apt-get clean
 
 echo "Remove Kong certs etc"
-rm -rf certs
+rm /var/acumos/certs/*
 rm nexus-script.json
 
 echo "You should now be able to repeat the install via oneclick_deploy.sh"

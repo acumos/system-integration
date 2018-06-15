@@ -85,7 +85,7 @@ services:
            - common-data-svc
        volumes:
            - acumos-logs:/maven/logs
-           - /home/ubuntu/certs:/app/certs
+           - /var/acumos/certs:/app/certs
        logging:
            driver: json-file
 
