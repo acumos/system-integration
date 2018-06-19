@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3201d6d2_f44b31f7",
+        "filename": "AIO/acumos-env.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-19T21:19:50Z",
+      "side": 1,
+      "message": "Is this needed?  I see you have 1.14.4 image tag, and CDS_DB variable with acumos_1_14.  Just wondering why this one is here.",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 30
+      },
+      "revId": "ddcc12497a4e0c73598b9eb088e264a9683aa2ac",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
