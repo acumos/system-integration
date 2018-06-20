@@ -22,6 +22,30 @@
       "revId": "ddcc12497a4e0c73598b9eb088e264a9683aa2ac",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f67d9e39_b2090435",
+        "filename": "AIO/acumos-env.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-06-20T19:02:25Z",
+      "side": 1,
+      "message": "This is used to reference the database script, since it does not have the same version (it is minus the .4). it is used in  oneclick_deploy.sh command \"mysql --user\u003dacumos_opr --password\u003d$MARIADB_USER_PASSWORD \u003c cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql\"",
+      "parentUuid": "3201d6d2_f44b31f7",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 30
+      },
+      "revId": "ddcc12497a4e0c73598b9eb088e264a9683aa2ac",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
