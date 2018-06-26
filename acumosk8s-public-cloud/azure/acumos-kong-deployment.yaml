@@ -1,0 +1,61 @@
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: acumos-kong-deployment
+  namespace: ${ACUMOS_NAMESPACE}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: acumos-kong-deployment
+        app: acumos-kong
+    spec:
+      containers:
+      - name: acumos-kong
+        image: kong
+        env:
+          - name: KONG_ADMIN_LISTEN
+            value: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
+          - name: KONG_PG_PASSWORD
+            value: ${ACUMOS_KONG_PG_PASSWORD}
+          - name: KONG_PG_HOST
+            value: acumos-postgres.${ACUMOS_NAMESPACE}
+          - name: KONG_PROXY_ACCESS_LOG
+            value: "/dev/stdout"
+          - name: KONG_ADMIN_ACCESS_LOG
+            value: "/dev/stdout"
+          - name: KONG_PROXY_ERROR_LOG
+            value: "/dev/stderr"
+          - name: KONG_ADMIN_ERROR_LOG
+            value: "/dev/stderr"
+        ports:
+        - name: acumos-admin
+          containerPort: ${ACUMOS_KONG_ADMIN_PORT}
+          protocol: TCP
+        - name: acumos-proxy
+          containerPort: ${ACUMOS_KONG_PROXY_PORT}
+          protocol: TCP
+        - name: acumos-kong-ssl
+          containerPort: ${ACUMOS_KONG_SSL_PORT}
+          protocol: TCP
+        - name: acumos-adm-ssl
+          containerPort: ${ACUMOS_KONG_ADM_SSL_PORT}
+          protocol: TCP
