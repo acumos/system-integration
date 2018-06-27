@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "126c44bf_f015deab",
+        "filename": "acumosk8s-public-cloud/azure/acumos-deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2018-06-27T13:43:00Z",
+      "side": 1,
+      "message": "Can you please parameterize this value too?",
+      "range": {
+        "startLine": 99,
+        "startChar": 28,
+        "endLine": 99,
+        "endChar": 53
+      },
+      "revId": "9492c9aba2fadef24d0c58f2cc5b606f9eef9333",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "94c45e29_d4db0e16",
+        "filename": "acumosk8s-public-cloud/azure/acumos-deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2018-06-27T13:43:00Z",
+      "side": 1,
+      "message": "Can you please parameterize this value too?",
+      "range": {
+        "startLine": 128,
+        "startChar": 35,
+        "endLine": 128,
+        "endChar": 49
+      },
+      "revId": "9492c9aba2fadef24d0c58f2cc5b606f9eef9333",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
