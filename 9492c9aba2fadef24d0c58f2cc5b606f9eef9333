@@ -45,6 +45,29 @@
       "revId": "9492c9aba2fadef24d0c58f2cc5b606f9eef9333",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c45d8362_6e465f0a",
+        "filename": "acumosk8s-public-cloud/azure/acumos-secret.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-06-27T14:34:34Z",
+      "side": 1,
+      "message": "This contains actual secrets (credentials-derived authentication tokens) and references Cognita etc - and should not be in this repo in this form. it would be better to show in the docs or in a script how to use the kubectl create secret command generically, and not include specific credentials.",
+      "range": {
+        "startLine": 24,
+        "startChar": 3,
+        "endLine": 24,
+        "endChar": 19
+      },
+      "revId": "9492c9aba2fadef24d0c58f2cc5b606f9eef9333",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
