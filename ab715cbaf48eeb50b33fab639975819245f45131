@@ -1,0 +1,274 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4c4eb6be_32fef17a",
+        "filename": "acumosk8s-public-cloud/azure/acumos-deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-28T19:31:27Z",
+      "side": 1,
+      "message": "Please format so it\u0027s readable like the other blocks",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 76
+      },
+      "revId": "ab715cbaf48eeb50b33fab639975819245f45131",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b7f074a5_f3c2c7db",
+        "filename": "acumosk8s-public-cloud/azure/acumos-deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-28T19:31:27Z",
+      "side": 1,
+      "message": "this is bogus",
+      "range": {
+        "startLine": 92,
+        "startChar": 32,
+        "endLine": 92,
+        "endChar": 48
+      },
+      "revId": "ab715cbaf48eeb50b33fab639975819245f45131",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "985c162c_195d38be",
+        "filename": "acumosk8s-public-cloud/azure/acumos-deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-28T19:31:27Z",
+      "side": 1,
+      "message": "Namespace??",
+      "range": {
+        "startLine": 104,
+        "startChar": 51,
+        "endLine": 104,
+        "endChar": 67
+      },
+      "revId": "ab715cbaf48eeb50b33fab639975819245f45131",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a8387302_251e44e9",
+        "filename": "acumosk8s-public-cloud/azure/acumos-deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-28T19:31:27Z",
+      "side": 1,
+      "message": "Do you mean hostname or domain?",
+      "range": {
+        "startLine": 137,
+        "startChar": 48,
+        "endLine": 137,
+        "endChar": 64
+      },
+      "revId": "ab715cbaf48eeb50b33fab639975819245f45131",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cc004e9c_fc79082a",
+        "filename": "acumosk8s-public-cloud/azure/acumos-deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-28T19:31:27Z",
+      "side": 1,
+      "message": "See above",
+      "range": {
+        "startLine": 187,
+        "startChar": 48,
+        "endLine": 187,
+        "endChar": 64
+      },
+      "revId": "ab715cbaf48eeb50b33fab639975819245f45131",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bc08ba82_71931858",
+        "filename": "acumosk8s-public-cloud/azure/acumos-deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-28T19:31:27Z",
+      "side": 1,
+      "message": "Please fix format",
+      "range": {
+        "startLine": 247,
+        "startChar": 0,
+        "endLine": 277,
+        "endChar": 32
+      },
+      "revId": "ab715cbaf48eeb50b33fab639975819245f45131",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8e166ef6_0a7caf7e",
+        "filename": "acumosk8s-public-cloud/azure/acumos-deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-28T19:31:27Z",
+      "side": 1,
+      "message": "Please fix format",
+      "range": {
+        "startLine": 284,
+        "startChar": 0,
+        "endLine": 290,
+        "endChar": 15
+      },
+      "revId": "ab715cbaf48eeb50b33fab639975819245f45131",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba056fed_e7912ef3",
+        "filename": "acumosk8s-public-cloud/azure/acumos-deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-28T19:31:27Z",
+      "side": 1,
+      "message": "Is this considered a security issue?",
+      "range": {
+        "startLine": 311,
+        "startChar": 0,
+        "endLine": 311,
+        "endChar": 50
+      },
+      "revId": "ab715cbaf48eeb50b33fab639975819245f45131",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8c462e36_3ffa72c5",
+        "filename": "acumosk8s-public-cloud/azure/acumos-deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-28T19:31:27Z",
+      "side": 1,
+      "message": "Is this a security issue?",
+      "range": {
+        "startLine": 355,
+        "startChar": 15,
+        "endLine": 355,
+        "endChar": 27
+      },
+      "revId": "ab715cbaf48eeb50b33fab639975819245f45131",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c242d5c0_09dc2914",
+        "filename": "acumosk8s-public-cloud/azure/acumos-deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-28T19:31:27Z",
+      "side": 1,
+      "message": "Please clean whitespace",
+      "revId": "ab715cbaf48eeb50b33fab639975819245f45131",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cd5d8d2f_a860bc1f",
+        "filename": "acumosk8s-public-cloud/azure/acumos-kubectl-env.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-28T19:31:27Z",
+      "side": 1,
+      "message": "this is old",
+      "range": {
+        "startLine": 50,
+        "startChar": 48,
+        "endLine": 50,
+        "endChar": 50
+      },
+      "revId": "ab715cbaf48eeb50b33fab639975819245f45131",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "350cd594_fc3aea60",
+        "filename": "acumosk8s-public-cloud/azure/acumos-kubectl-env.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-06-28T19:31:27Z",
+      "side": 1,
+      "message": "this is very old",
+      "range": {
+        "startLine": 51,
+        "startChar": 52,
+        "endLine": 51,
+        "endChar": 54
+      },
+      "revId": "ab715cbaf48eeb50b33fab639975819245f45131",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
