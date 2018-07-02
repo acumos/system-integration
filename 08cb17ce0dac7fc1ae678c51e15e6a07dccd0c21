@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c47b8c07_5bd420de",
+        "filename": "acumosk8s-public-cloud/azure/acumos-kubectl-env.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-07-02T13:59:14Z",
+      "side": 1,
+      "message": "Please check the assembly versions very carefully.  This should be 1.14.4 at least.",
+      "range": {
+        "startLine": 57,
+        "startChar": 43,
+        "endLine": 57,
+        "endChar": 49
+      },
+      "revId": "08cb17ce0dac7fc1ae678c51e15e6a07dccd0c21",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
