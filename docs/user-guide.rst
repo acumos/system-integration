@@ -32,7 +32,7 @@ Backend Architecture
 
 .. image:: images/AcumosKongAPI.jpg	
 
-*Note: All the configuration data sent through the Admin API is stored in Kong's data store. Kong is capable of supporting both Postgres and Cassandra as storage backend. We have chosen Postgres. 
+*Note*: All the configuration data sent through the Admin API is stored in Kong's data store. Kong is capable of supporting both Postgres and Cassandra as storage backend. We have chosen Postgres. 
 
 
 Kong API component versions
@@ -76,7 +76,7 @@ Acumos Kong is running on port
 	:7004 on which the Admin API listens for HTTPS traffic.	  
 	
 	
-*Note: Acumos Kong API docker-compose.yml and shell script can be run before or after the main docker-compose. Ensure before access the service URL via acumos Kong API all the services which we are going to access should be up and running.
+*Note*: Acumos Kong API docker-compose.yml and shell script can be run before or after the main docker-compose. Ensure before access the service URL via acumos Kong API all the services which we are going to access should be up and running.
 	
 Prerequisites
 -------------
@@ -174,8 +174,8 @@ Run the "secure-acumos-api.sh" script, Please ensure that Acumos Kong API contai
      ./secure-acumos-api.sh         
    
    
- Expose new service:
---------------------------
+Expose new service:
+-------------------
 
 Use the Admin API port 7001 to configure Kong. Acumos standard sample to expose the service is present in shell script:
 
@@ -184,5 +184,4 @@ Use the Admin API port 7001 to configure Kong. Acumos standard sample to expose 
      ./secure-acumos-api.sh         
    
    
-For more details visit `Kong documentation <https://getkong.org/docs/0.5.x/admin-api/>`_, 
-     
+For more details visit `Kong Admin API documentation <https://getkong.org/docs/0.5.x/admin-api/>`_, 
