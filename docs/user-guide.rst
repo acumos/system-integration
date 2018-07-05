@@ -32,7 +32,7 @@ Backend Architecture
 
 .. image:: images/AcumosKongAPI.jpg	
 
-*Note: All the configuration data sent through the Admin API is stored in Kong's data store. Kong is capable of supporting both Postgres and Cassandra as storage backend. We have chosen Postgres. 
+*Note*: All the configuration data sent through the Admin API is stored in Kong's data store. Kong is capable of supporting both Postgres and Cassandra as storage backend. We have chosen Postgres.
 
 
 Kong API component versions
@@ -40,19 +40,19 @@ Kong API component versions
 
 - postgres:9.4
 - kong:0.11.0
-	 
+
 Acumos Kong API setup
 ---------------------
 
 Kong API completely containerized solution is automated with docker compose. It installed with its own docker-compose file.
 
-In dockers-compose definition, there are three services: 
+In dockers-compose definition, there are three services:
 
 - kong-database
 - kong-migration
 - kong
 
-Kong uses an external datastore to store its configuration such as registered APIs, Consumers and Plugins. 
+Kong uses an external datastore to store its configuration such as registered APIs, Consumers and Plugins.
 The entire configuration data is stored in Kong's data store. The kong-migration service is used to create the objects in the kong-database. This bootstrap functionality is not provided by kong service, so kong-migration service run once inside the container.
 
 By default Kong listens on the following ports:
@@ -63,9 +63,9 @@ By default Kong listens on the following ports:
 	
 	:8001 on which the Admin API used to configure Kong listens.
 	
-	:8444 on which the Admin API listens for HTTPS traffic.	  
+	:8444 on which the Admin API listens for HTTPS traffic.
 	
-Acumos Kong is running on port 
+Acumos Kong is running on port
 
 	:7000 on which Acumos Kong listens for incoming HTTP traffic from your clients, and forwards it to your upstream services.
 	
@@ -73,10 +73,10 @@ Acumos Kong is running on port
 	
 	:7001 on which the Admin API used to configure Acumos Kong listens.
 	
-	:7004 on which the Admin API listens for HTTPS traffic.	  
+	:7004 on which the Admin API listens for HTTPS traffic.
 	
 	
-*Note: Acumos Kong API docker-compose.yml and shell script can be run before or after the main docker-compose. Ensure before access the service URL via acumos Kong API all the services which we are going to access should be up and running.
+*Note*: Acumos Kong API docker-compose.yml and shell script can be run before or after the main docker-compose. Ensure before access the service URL via acumos Kong API all the services which we are going to access should be up and running.
 	
 Prerequisites
 -------------
@@ -86,26 +86,26 @@ Prerequisites
 Steps
 -----
 
-1. Clone the system-integration repository 
+1. Clone the system-integration repository
 
 .. code-block:: bash
-   
+
    $ git clone https://gerrit.acumos.org/r/system-integration
-  
+
 2. Builds, (re)creates, starts, and attaches to containers for kong, postgres.
 
 .. code-block:: bash
 	
    $ ./docker-compose-kong.sh up -d  	
 				
-		 
-3. To stop the running containers without removing them 
+
+3. To stop the running containers without removing them
 
 .. code-block:: bash	
 
-   $ ./docker-compose-kong.sh stop   
-   
-  
+   $ ./docker-compose-kong.sh stop
+
+
 
 Steps to create self signed in certificate
 ------------------------------------------
@@ -136,9 +136,8 @@ Steps to create self signed in certificate
 .. code-block:: bash
 
       openssl x509 -req -in server.csr -signkey server.key -out server.crt -sha256
-	  
 
-	  
+
 Acumos API configuration
 ------------------------
 
@@ -150,39 +149,37 @@ Please update the configuration settings in "secure-acumos-api.sh" script to mat
 
 .. code-block:: bash
 
-   
-      export ACUMOS_KONG_CERTIFICATE_PATH=./certs
-	  
-      export ACUMOS_CRT=localhost.csr
-	  
-      export ACUMOS_KEY=localhost.key
-	  
-      export ACUMOS_HOST_NAME=<your hostname>
-	  
-      export ACUMOS_HOME_PAGE_PORT=8085
-	  
-      export ACUMOS_CCDS_PORT=8003
-	  
-      export ACUMOS_ONBOARDING_PORT=8090
-	  
 
-	  
+      export ACUMOS_KONG_CERTIFICATE_PATH=./certs
+
+      export ACUMOS_CRT=localhost.csr
+
+      export ACUMOS_KEY=localhost.key
+
+      export ACUMOS_HOST_NAME=<your hostname>
+
+      export ACUMOS_HOME_PAGE_PORT=8085
+
+      export ACUMOS_CCDS_PORT=8003
+
+      export ACUMOS_ONBOARDING_PORT=8090
+
+
 Run the "secure-acumos-api.sh" script, Please ensure that Acumos Kong API container is up.
 
 .. code-block:: bash
 
-     ./secure-acumos-api.sh         
-   
-   
- Expose new service:
---------------------------
+     ./secure-acumos-api.sh
+
+
+Expose new service:
+-------------------
 
 Use the Admin API port 7001 to configure Kong. Acumos standard sample to expose the service is present in shell script:
 
 .. code-block:: bash
 
-     ./secure-acumos-api.sh         
-   
-   
-For more details visit `Kong documentation <https://getkong.org/docs/0.5.x/admin-api/>`_, 
-     
+     ./secure-acumos-api.sh
+
+
+For more details visit `Kong Admin API documentation <https://getkong.org/docs/0.5.x/admin-api/>`_,
