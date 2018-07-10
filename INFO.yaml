@@ -1,0 +1,52 @@
+---
+project: 'system-integration'
+project_creation_date: '2018-11-17'
+project_category: ''
+lifecycle_state: 'Incubation'
+project_lead: &acumos_system-integration_ptl
+    name: 'Bryan Sullivan'
+    email: 'bryan.sullivan@att.com'
+    id: 'blsaws'
+    company: 'ATT'
+    timezone: 'America/Los_Angeles'
+primary_contact: '*acumos_system-integration_ptl'
+issue_tracking:
+    type: 'jira'
+    url: 'https://jira.acumos.org/projects/ACUMOS'
+    key: 'ACUMOS'
+mailing_list:
+    type: 'groups.io'
+    url: 'lists.acumos.org'
+    tag: '<[sub-project_name]>'
+realtime_discussion:
+    type: 'irc'
+    server: 'freenode.net'
+    channel: '#acumos'
+meetings:
+    - type: 'zoom'
+      agenda: ''
+      url: 'https://zoom.us/j/4906631713'
+      server: 'n/a'
+      channel: '#acumos-meeting'
+      repeats: 'weekly'
+      time: '11:00 ET'
+repositories:
+    - 'system-integration'
+committers:
+    - <<: *acumos_system-integration_ptl
+    - name: 'Aimee Ukasick'
+      email: 'aimeeu@research.att.com'
+      company: 'ATT'
+      id: 'aimeeu'
+      timezone: 'America/Chicago'
+    - name: 'Chris Lott'
+      email: 'cl778h@att.com'
+      company: 'ATT'
+      id: 'cl778h'
+      timezone: 'America/New_York'
+tsc:
+    approval: ''
+    changes:
+        - type: ''
+          name: ''
+          link: ''
