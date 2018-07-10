@@ -428,6 +428,29 @@
       "revId": "0a91fe1707c22c51481062241cbac9c4115ae0e7",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "874d4fcf_cc2897c0",
+        "filename": "AIO/oneclick_deploy.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 528,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-07-10T18:16:31Z",
+      "side": 1,
+      "message": "This needs to be updated to https://acumos:30443",
+      "range": {
+        "startLine": 528,
+        "startChar": 54,
+        "endLine": 528,
+        "endChar": 75
+      },
+      "revId": "0a91fe1707c22c51481062241cbac9c4115ae0e7",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
