@@ -31,12 +31,13 @@ services:
        volumes:
          - kong-db:/var/lib/postgresql
 
-   kong:
+   kong-service:
        restart: on-failure
        image: kong:0.11
        depends_on:
          - kong-database
        environment:
+         - log_level=DEBUG
          - KONG_DATABASE=postgres
          - KONG_PG_HOST=kong-database
          - KONG_PG_DATABASE=kong
@@ -57,6 +58,7 @@ services:
                echo \"kong-database is unavailable - sleeping 10 seconds\";
                sleep 10;
              done;
+             sed -i -- 's/\ \ \ \ proxy_max_temp_file_size 0;//' /usr/local/share/lua/5.1/kong/templates/nginx_kong.lua
              sed -i -- '/server {/a\ \ \ \ proxy_max_temp_file_size 0;' /usr/local/share/lua/5.1/kong/templates/nginx_kong.lua
              kong migrations up;
              kong start -vv;

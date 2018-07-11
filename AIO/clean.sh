@@ -23,24 +23,54 @@
 # - If the docker-compose console is still running, showing the logs of the
 #   containers, ctrl-c to stop it and wait will all services are stopped.
 # Usage:
-# $ bash clean.sh [force]
-#   force: for all docker containers to be stopped and removed. Use if some
-#   containers remain, e.g. due to the way that docker-compose prefixes names
-#   to the containers changing, leaving old containers running and thus
-#   ports allocated, causing errors in subsequent deploys.
+# $ bash clean.sh
 #
+# If clean does not stop all docker based containers, force cleanup via:
+# $ cs=$(sudo docker ps -a | awk '{print $1}'); for c in $cs; do sudo docker stop $c; sudo docker rm -v $c; done
+# To periodically clean up extra docker volumes:
+# $ vs=$(sudo ls -1 /var/lib/docker/volumes); for v in $vs; do sudo docker volume rm $v; done
 
 trap - ERR
 
+set -x
+
 source acumos-env.sh
 
-echo "Stop the running Acumos component containers"
-sudo bash docker-compose.sh down
-sudo bash docker-compose.sh rm -v
-if [[ "$1" == "force" ]]; then
-  sudo docker stop $(sudo docker ps -aq)
-  sudo docker rm -v $(sudo docker ps -aq)
+if [[ "$DEPLOYED_UNDER" == "docker" || "$DEPLOYED_UNDER" == "" ]]; then
+  echo "Stop Acumos docker-based components"
+  sudo bash docker-compose.sh down
+  sudo docker volume rm kong-db
+  sudo docker volume rm acumos-logs
+  sudo docker volume rm acumos-output
+  sudo docker volume rm acumosWebOnboarding
 fi
+
+if [[ "$DEPLOYED_UNDER" == "k8s" || "$DEPLOYED_UNDER" == "" ]]; then
+  echo "Stop the running Acumos component services under kubernetes"
+  kubectl delete service -n acumos azure-client-service cds-service cms-service\
+    filebeat-service onboarding-service portal-be-service portal-fe-service \
+    dsce-service federation-service kong-service nexus-service
+
+  echo "Stop the running Acumos component deployments under kubernetes"
+  kubectl delete deployment -n acumos azure-client cds cms filebeat onboarding\
+    portal-be portal-fe dsce federation kong nexus
+
+  echo "Delete image pull secrets from kubernetes"
+  kubectl delete secret acumos-registry
+
+  echo "Delete namespace acumos"
+  kubectl delete namespace acumos
+  while kubectl get namespace acumos; do
+    echo "Waiting 10 seconds for namespace acumos to be deleted"
+    sleep 10
+  done
+fi
+
+echo "Cleanup acumos data"
+rm -rf /var/acumos
+
+echo "Reset /etc/hosts customizations"
+sudo sed -i -- '/nexus-service/d' /etc/hosts
 
 echo "Remove Acumos databases and users"
 mysql --user=root --password=$MARIADB_PASSWORD -e "DROP DATABASE $ACUMOS_CDS_DB; DROP DATABASE acumos_comment;  DROP DATABASE acumos_cms; DROP USER 'acumos_opr'@'%';"
@@ -56,7 +86,7 @@ sudo rm /etc/apt/sources.list.d/mariadb.list
 sudo apt-get clean
 
 echo "Remove Kong certs etc"
-rm -rf certs
+rm /var/acumos/certs/*
 rm nexus-script.json
 
 echo "You should now be able to repeat the install via oneclick_deploy.sh"

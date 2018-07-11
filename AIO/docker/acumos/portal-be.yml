@@ -20,23 +20,24 @@ version: '2'
 # docker-compose for portal-be
 # TODO: scrub all attributes for current need
 services:
-   portal-be:
+   portal-be-service:
        image: ${PORTAL_BE_IMAGE}
        environment:
+           log_level: "DEBUG"
            SPRING_APPLICATION_JSON: "{
                 \"server\" : {
                    \"port\" : ${ACUMOS_PORTAL_BE_PORT}
                 },
                 \"nexus\": {
-                        \"url\": \"http://nexus:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
+                        \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
                         \"proxy\": \"\",
                         \"password\": \"${ACUMOS_RW_USER_PASSWORD}\",
-                        \"username\": \"acumos_rw\",
+                        \"username\": \"${ACUMOS_RW_USER}\",
                         \"groupid\": \"com.artifact\"
                 },
                 \"cdms\" : {
                   \"client\" : {
-                     \"url\": \"http://common-data-svc:${ACUMOS_CDS_PORT}/ccds\",
+                     \"url\": \"http://cds-service:${ACUMOS_CDS_PORT}/ccds\",
                      \"username\": \"${ACUMOS_CDS_USER}\",
                      \"password\": \"${ACUMOS_CDS_PASSWORD}\"
                      }
@@ -45,23 +46,23 @@ services:
                    \"host\" : \"${ACUMOS_DOCKER_API_HOST}\",
                    \"port\" : \"${ACUMOS_DOCKER_API_PORT}\",
                    \"registry\" : {
-                      \"url\": \"http://nexus:${ACUMOS_DOCKER_MODEL_PORT}/\",
-                      \"username\" : \"acumos_rw\",
+                      \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/\",
+                      \"username\" : \"${ACUMOS_RW_USER}\",
                       \"password\" : \"${ACUMOS_RW_USER_PASSWORD}\",
                       \"email\": \"acumos@example.com\"
                    },
                    \"imagetag\" : {
-                       \"prefix\": \"nexus:${ACUMOS_DOCKER_MODEL_PORT}\"
+                       \"prefix\": \"${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}\"
                    }
                 },
                 \"qanda\" : {
-                   \"url\" : \"http://cms:${ACUMOS_CMS_PORT}\"
+                   \"url\" : \"http://cms-service:${ACUMOS_CMS_PORT}\"
                 },
                 \"onboarding\" : {
                    \"push\" : {
                        \"model\" : {
-                          \"url\" : \"http://onboarding-app:${ACUMOS_ONBOARDING_PORT}/onboarding-app/v2/models\",
-                          \"dcae_url\" : \"http://onboarding-app:${ACUMOS_ONBOARDING_PORT}/onboarding-app/v2/dcae_models\"
+                          \"url\" : \"http://onboarding-service:${ACUMOS_ONBOARDING_PORT}/onboarding-app/v2/models\",
+                          \"dcae_url\" : \"http://onboarding-service:${ACUMOS_ONBOARDING_PORT}/onboarding-app/v2/dcae_models\"
                        }
                    }
                 },
@@ -99,19 +100,19 @@ services:
                    }
                 },
                 \"gateway\" : {
-                   \"url\" : \"https://federation-gateway:${ACUMOS_FEDERATION_LOCAL_PORT}\"
+                   \"url\" : \"https://federation-service:${ACUMOS_FEDERATION_LOCAL_PORT}\"
                 }
 
            }"
        expose:
            - ${ACUMOS_PORTAL_BE_PORT}
        links:
-           - common-data-svc
+           - cds-service
        depends_on:
-           - common-data-svc
+           - cds-service
        volumes:
            - acumos-logs:/maven/logs
-           - /home/ubuntu/certs:/app/certs
+           - /var/acumos/certs:/app/certs
            - acumosWebOnboarding:/acumosWebOnboarding
        logging:
            driver: json-file

@@ -20,9 +20,10 @@ version: '2'
 # docker-compose for onboarding-app
 # TODO: scrub all attributes for current need
 services:
-   onboarding-app:
+   onboarding-service:
        image: ${ONBOARDING_IMAGE}
        environment:
+          log_level: "DEBUG"
           SPRING_APPLICATION_JSON: "{
                \"server\" :{
                     \"port\" : ${ACUMOS_ONBOARDING_PORT}
@@ -32,8 +33,8 @@ services:
                    \"port\" : ${ACUMOS_DOCKER_API_PORT},
                    \"config\": \"/docker_host/.docker\",
                    \"registry\" :{
-                       \"url\": \"http://nexus:${ACUMOS_DOCKER_MODEL_PORT}/\",
-                       \"username\" : \"acumos_rw\",
+                       \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/\",
+                       \"username\" : \"${ACUMOS_RW_USER}\",
                        \"password\" : \"${ACUMOS_RW_USER_PASSWORD}\",
                        \"email\": \"acumos@example.com\"
                    },
@@ -44,39 +45,48 @@ services:
                        \"version\": \"1.23\"
                    },
                    \"imagetag\": {
-                       \"prefix\": \"nexus:${ACUMOS_DOCKER_MODEL_PORT}\"
+                       \"prefix\": \"${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}\"
                    },
                    \"max_total_connections\": \"1\",
                    \"max_per_route_connections\": \"1\"
                },
                \"http_proxy\": \"''\",
                \"nexus\": {
-                       \"nexusEndPointURL\": \"http://nexus:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
-                       \"nexusUserName\": \"acumos_rw\",
+                       \"nexusEndPointURL\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
+                       \"nexusUserName\": \"${ACUMOS_RW_USER}\",
                        \"nexusPassword\": \"${ACUMOS_RW_USER_PASSWORD}\",
                        \"nexusproxy\": \"\",
                        \"nexusGroupId\": \"com.artifact\"
                },
                \"cmndatasvc\": {
-                       \"cmnDataSvcEndPoinURL\": \"http://common-data-svc:${ACUMOS_CDS_PORT}/ccds\",
+                       \"cmnDataSvcEndPoinURL\": \"http://cds-service:${ACUMOS_CDS_PORT}/ccds\",
                        \"cmnDataSvcUser\": \"${ACUMOS_CDS_USER}\",
                        \"cmnDataSvcPwd\": \"${ACUMOS_CDS_PASSWORD}\"
                },
+               \"base_image\": {
+                       \"rimage\": \"${ONBOARDING_BASE_IMAGE}\",
+                       \"dockerusername\": \"${ACUMOS_PROJECT_NEXUS_USERNAME}\",
+                       \"dockerpassword\": \"${ACUMOS_PROJECT_NEXUS_PASSWORD}\"
+               },
+               \"tosca\": {
+                       \"OutputFolder\" : \"/temp/\",
+                       \"GeneratorEndPointURL\": \"http://delete-me/model_create\"
+               },
                \"mktPlace\": {
-                    \"mktPlaceEndPoinURL\" : \"http://portal-be:${ACUMOS_PORTAL_BE_PORT}\"
+                    \"mktPlaceEndPoinURL\" : \"http://portal-be-service:${ACUMOS_PORTAL_BE_PORT}\"
                },
                \"requirements\": {
                        \"extraIndexURL\": \"${PYTHON_EXTRAINDEX}\",
                        \"trustedHost\": \"${PYTHON_EXTRAINDEX_HOST}\"
                },
-               \"authenticationServiceURL\": \"http://portal-be:${ACUMOS_PORTAL_BE_PORT}\"
+               \"authenticationServiceURL\": \"http://portal-be-service:${ACUMOS_PORTAL_BE_PORT}\"
        }"
        ports:
            - ${ACUMOS_ONBOARDING_PORT}:${ACUMOS_ONBOARDING_PORT}
        links:
-           - common-data-svc
+           - cds-service
        depends_on:
-           - common-data-svc
+           - cds-service
        volumes:
            - acumos-logs:/maven/logs
            - acumos-output:/temp/

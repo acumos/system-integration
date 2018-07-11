@@ -1,0 +1,149 @@
+apiVersion: apps/v1
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# What this is: kubernetes template for Acumos portal-be deployment
+# How to use:
+# - Replace fields in <> with actual values (k8s does not support env variables)
+
+kind: Deployment
+metadata:
+  namespace: acumos
+  name: portal-be
+  labels:
+    app: portal-be
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: portal-be
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: portal-be
+    spec:
+      imagePullSecrets:
+      - name: acumos-registry
+      containers:
+      - name: portal-be
+        image: <PORTAL_BE_IMAGE>
+        env:
+        - name: log_level
+          value: debug
+        - name: SPRING_APPLICATION_JSON
+          value: '{ 
+                    "server" : {
+                      "port" : 8083
+                    },
+                    "nexus": {
+                      "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/repository/acumos_model_maven/",
+                      "proxy": "",
+                      "password": "<ACUMOS_RW_USER_PASSWORD>",
+                      "username": "<ACUMOS_RW_USER>",
+                      "groupid": "com.artifact"
+                    },
+                    "cdms" : {
+                      "client" : {
+                        "url": "http://cds-service:8000/ccds",
+                        "username": "<ACUMOS_CDS_USER>",
+                        "password": "<ACUMOS_CDS_PASSWORD>"
+                      }
+                    },
+                    "docker" : {
+                      "host" : "docker-service",
+                      "port" : "<ACUMOS_DOCKER_API_PORT>",
+                      "registry" : {
+                        "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_DOCKER_MODEL_PORT>/",
+                        "username" : "<ACUMOS_RW_USER>",
+                        "password" : "<ACUMOS_RW_USER_PASSWORD>",
+                        "email": "acumos@example.com"
+                      },
+                      "imagetag" : {
+                        "prefix": "nexus:<ACUMOS_DOCKER_MODEL_PORT>"
+                      }
+                    },
+                    "qanda" : {
+                      "url" : "http://cms-service:9080"
+                    },
+                    "onboarding" : {
+                      "push" : {
+                        "model" : {
+                          "url" : "http://onboarding-service:8090/onboarding-app/v2/models",
+                          "dcae_url" : "http://onboarding-service:8090/onboarding-app/v2/dcae_models"
+                        }
+                      }
+                    },
+                    "model" : {
+                      "storage" : {
+                        "folder" : {
+                          "name" : "/acumosWebOnboarding"
+                        }
+                      }
+                    },
+                    "doc" : {
+                      "url" : "https://wiki.acumos.org"
+                    },
+                    "portal" : {
+                      "feature" : {
+                        "validateModel" : "false",
+                        "email_service" : "",
+                        "cas_enabled" : "false"
+                      },
+                      "submitValidation" : {
+                        "api" : "http://validation-client-service:9603/status/v1.0/tasks"
+                      },
+                      "dashboard":{
+                        "url" : ""
+                      }
+                    },
+                    "client" : {
+                      "ssl" : {
+                        "key-store" : "/app/certs/acumos_aio.p12",
+                        "key-store-password" : "<ACUMOS_KEYPASS>",
+                        "key-store-type" : "PKCS12",
+                        "key-password" : "<ACUMOS_KEYPASS>",
+                        "trust-store" : "/app/certs/acumosTrustStore.jks",
+                        "trust-store-password" : "<ACUMOS_KEYPASS>"
+                      }
+                    },
+                    "gateway" : {
+                      "url" : "https://federation-service:9011"
+                    }
+                  }'
+        ports:
+        - containerPort: 8083
+        volumeMounts:
+        - mountPath: /maven/logs
+          name: acumos-logs
+        - mountPath: /app/certs
+          name: acumos-certs
+        - mountPath: /acumosWebOnboarding
+          name: acumos-webonboarding
+      restartPolicy: Always
+      volumes:
+      - name: acumos-logs
+        hostPath:
+          path: /var/acumos/logs
+      - name: acumos-certs
+        hostPath:
+          path: /var/acumos/certs
+      - name: acumos-webonboarding
+        hostPath:
+          path: /var/acumos/WebOnboarding

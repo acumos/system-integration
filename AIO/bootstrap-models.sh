@@ -30,7 +30,7 @@
 #
 # Usage:
 # $ bash bootstrap-models.sh <host> <username> <password> <models>
-#   host: host of the model onboarding service
+#   host: host:port of the model onboarding service accesible via HTTPS
 #   username: username to onboard models for
 #   password: password for user
 #   models: optional folder with models to onboard
@@ -49,49 +49,62 @@ function log() {
   echo; echo "$f:$l ($(date)) $1"
 }
 
+function onboard_model() {
+  echo "Onboarding model $2 at $host ..."
+  curl -o ~/json -k -H "Authorization: $jwtToken"\
+       -F "model=@$1/$2/model.zip;type=application/zip" \
+       -F "metadata=@$1/$2/metadata.json;type=application/json"\
+       -F "schema=@$1/$2/model.proto;type=application/text" $PUSHURL
+  if [[ $(grep -c -e "The upstream server is timing out" -e "Service unavailable" ~/json) -gt 0 ]]; then 
+    log "Onboarding $2 failed at host $host"
+    cat ~/json
+  else
+    status=$(jq -r '.status' ~/json)
+    if [[ "$status" != "ERROR" ]]; then
+      log "Onboarding $2 succeeded at host $host"
+      # log "Adding image for model $model ..."
+      # curl -H "Authorization: $jwtToken" <rest of curl command to upload image for the model from models/$model/image.jpg>
+      # log "Adding descriptitive text for model $model ..."
+      # curl -H "Authorization: $jwtToken" <rest of curl command to upload description for the model from models/$model/description.txt>
+    else
+      log "Onboarding $2 failed at host $host"
+      cat ~/json
+    fi
+  fi
+}
+
 function bootstrap() {
   trap 'fail' ERR
   AUTHURL=https://$host/onboarding-app/v2/auth
   PUSHURL=https://$host/onboarding-app/v2/models
 
-  log "Query rest service to get token"
-  resp=$(curl -k -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' $AUTHURL -d "{\"request_body\":{\"username\":\"$user\",\"password\":\"$pass\"}}")
-  jwtToken=$(echo "$resp" | jq -r '.jwtToken')
+  log "Query rest service at host $host to get token"
+  curl -o ~/json -k -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' $AUTHURL -d "{\"request_body\":{\"username\":\"$user\",\"password\":\"$pass\"}}"
+  if [[ $(grep -c "doctype html" ~/json) -gt 0 ]]; then 
+    cat ~/json
+    fail "Authentication failed at host $host"
+  fi
+  jwtToken=$(jq -r '.jwtToken' ~/json)
+  if [[ "$jwtToken" == "null" ]]; then 
+    cat ~/json
+    fail "Authentication failed at hpst $host"
+  fi
 
   # Use this jwtToken for all the bootstrap onboarding
-  if [ "$jwtToken" != "null" ]
-  then
-    log "Authentication successful"
-    models=$(ls $models_dir)
-    for model in $models
-    do
-      echo "Onboarding model $model ..."
-      curl -o ~/json -k -H "Authorization: $jwtToken"\
-           -F "model=@$models_dir/$model/model.zip;type=application/zip" \
-           -F "metadata=@$models_dir/$model/metadata.json;type=application/json"\
-           -F "schema=@$models_dir/$model/model.proto;type=application/text" $PUSHURL
-      if [[ $(grep -c "The upstream server is timing out" ~/json) -eq 1 ]]; then 
-        log "Onboarding $model failed: $(cat ~/json)"
-      else
-        status=$(jq -r '.status' ~/json)
-        if [[ "$status" != "ERROR" ]]; then
-          log "Onboarding $model succeeded"
-          # log "Adding image for model $model ..."
-          # curl -H "Authorization: $jwtToken" <rest of curl command to upload image for the model from models/$model/image.jpg>
-          # log "Adding descriptitive text for model $model ..."
-          # curl -H "Authorization: $jwtToken" <rest of curl command to upload description for the model from models/$model/description.txt>
-        else
-          log "Onboarding $model failed: $(cat ~/json)"
-        fi
-      fi
-    done
+  log "Authentication successful"
+  if [[ -f $models_dir/model.zip ]]; then
+    model=$(echo $models_dir | grep -o '[^,/]*$')
+    dir=$(echo $models_dir | sed -- "s~/$model~~")
+    log "Selected $model from $dir"
+    onboard_model $dir $model
   else
-      log 'Authentication failed, response = ' $resp
-      log 'Cannot continue, exiting'
+    models=$(ls $models_dir)
+    for model in $models; do
+      onboard_model $models_dir $model
+    done
   fi
 }
 
-source acumos-env.sh
 host=$1
 user=$2
 pass=$3

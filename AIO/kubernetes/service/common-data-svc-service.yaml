@@ -1,4 +1,4 @@
-version: '2'
+apiVersion: v1
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -17,14 +17,21 @@ version: '2'
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 
-# docker-compose for filebeat
-# TODO: scrub all attributes for current need
-services:
-   filebeat:
-       image: ${FILEBEAT_IMAGE}
-       volumes:
-           - acumos-logs:/filebeat-logs
-       environment:
-           - LOGSTASH_HOST=logcollector
-           - LOGSTASH_PORT=5601
+# What this is: kubernetes template for Acumos common-data-svc service
+# How to use:
+# - Replace fields in <> with actual values (k8s does not support env variables)
 
+kind: Service
+metadata:
+  namespace: acumos
+  name: cds-service
+  labels:
+    app: cds
+spec:
+  selector:
+    app: cds
+  type: NodePort
+  ports:
+  - nodePort: <ACUMOS_CDS_PORT>
+    port: 8000
+    targetPort: 8000
