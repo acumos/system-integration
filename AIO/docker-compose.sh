@@ -44,7 +44,7 @@ opts=""
 files=$(ls docker/acumos)
 for file in $files ; do
  opts="$opts -f acumos/$file"
-done    
+done
 
 cd docker
 docker-compose $opts $*

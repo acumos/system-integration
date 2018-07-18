@@ -55,7 +55,7 @@ function onboard_model() {
        -F "model=@$1/$2/model.zip;type=application/zip" \
        -F "metadata=@$1/$2/metadata.json;type=application/json"\
        -F "schema=@$1/$2/model.proto;type=application/text" $PUSHURL
-  if [[ $(grep -c -e "The upstream server is timing out" -e "Service unavailable" ~/json) -gt 0 ]]; then 
+  if [[ $(grep -c -e "The upstream server is timing out" -e "Service unavailable" ~/json) -gt 0 ]]; then
     log "Onboarding $2 failed at host $host"
     cat ~/json
   else
@@ -80,12 +80,12 @@ function bootstrap() {
 
   log "Query rest service at host $host to get token"
   curl -o ~/json -k -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' $AUTHURL -d "{\"request_body\":{\"username\":\"$user\",\"password\":\"$pass\"}}"
-  if [[ $(grep -c "doctype html" ~/json) -gt 0 ]]; then 
+  if [[ $(grep -c "doctype html" ~/json) -gt 0 ]]; then
     cat ~/json
     fail "Authentication failed at host $host"
   fi
   jwtToken=$(jq -r '.jwtToken' ~/json)
-  if [[ "$jwtToken" == "null" ]]; then 
+  if [[ "$jwtToken" == "null" ]]; then
     cat ~/json
     fail "Authentication failed at hpst $host"
   fi

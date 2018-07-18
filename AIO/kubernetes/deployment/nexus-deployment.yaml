@@ -20,7 +20,7 @@ apiVersion: apps/v1
 # What this is: kubernetes template for Acumos nexus deployment
 # How to use:
 # - Replace fields in <> with actual values (k8s does not support env variables)
-# 
+#
 # Notes:
 # ACUMOS_DOCKER_MODEL_PORT is parameterized since it's assumed that nexus
 # service may be deployed outside the acumos docker/k8s cluster, thus a

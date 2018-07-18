@@ -44,15 +44,12 @@ export PORTAL_CMS_IMAGE=$STAGING/acumos-cms-docker:1.3.4
 export DESIGNSTUDIO_IMAGE=$STAGING/ds-compositionengine:0.0.30
 export FEDERATION_IMAGE=$STAGING/federation-gateway:1.1.2
 export FILEBEAT_IMAGE=$STAGING/acumos-filebeat:1.0.0
-export METRICBEAT_IMAGE=$STAGING/acumos-metricbeat:1.0.0
+export METRICBEAT_IMAGE=$STAGING/acumos-metricbeat:1.1.0
 export AZURE_CLIENT_IMAGE=$STAGING/acumos-azure-client:1.2.4
-export VALIDATION_CLIENT_IMAGE=$STAGING/validation-client:1.2.1
-export VALIDATION_MIDDLEWARE_IMAGE=$STAGING/validation-middleware:1.2.1
-export VALIDATION_ENGINE_IMAGE=$STAGING/validation-engine:1.2.2
-export BLUEPRINT_ORCHESTRATOR_IMAGE=$STAGING/blueprint-orchestrator:1.0.7
+export BLUEPRINT_ORCHESTRATOR_IMAGE=$STAGING/blueprint-orchestrator:1.0.13
 export DATABROKER_ZIPBROKER_IMAGE=$STAGING/databroker-zipbroker:0.0.1
 export DATABROKER_CSVBROKER_IMAGE=$STAGING/csvdatabroker:0.0.1
-export PROTO_VIEWER_IMAGE=$SNAPSHOT/acumos_proto_viewer:1.4.1
+export PROTO_VIEWER_IMAGE=$SNAPSHOT/acumos_proto_viewer:1.5.3
 export ACUMOS_PROJECT_NEXUS_USERNAME=docker
 export ACUMOS_PROJECT_NEXUS_PASSWORD=docker
 
@@ -77,6 +74,8 @@ export ACUMOS_KONG_ADMIN_SSL_PORT=30444
 export ACUMOS_KONG_DB_PORT=5432
 export ACUMOS_KONG_PROXY_PORT=30080
 export ACUMOS_KONG_PROXY_SSL_PORT=30443
+export HTTP_PROXY=""
+export HTTPS_PROXY=""
 
 # Component options
 export ACUMOS_AZURE_CLIENT_HOST=$ACUMOS_DOMAIN

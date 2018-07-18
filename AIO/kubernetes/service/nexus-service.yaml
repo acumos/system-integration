@@ -20,7 +20,7 @@ apiVersion: v1
 # What this is: kubernetes template for Acumos nexus service
 # How to use:
 # - Replace fields in <> with actual values (k8s does not support env variables)
-# 
+#
 # Notes:
 # Ports are exposed since it's assumed that nexus service may be deployed
 # outside the acumos docker/k8s cluster, thus a nodeport-range (30000-32767)
