@@ -73,11 +73,11 @@ spec:
                       "internalDataBrokerPort": "<ACUMOS_DATA_BROKER_INTERNAL_PORT>",
                       "registry": {
                         "bluePrint": {
-                          "username": "<ACUMOS_RO_USER>",
+                          "username": "<ACUMOS_RW_USER>",
                           "password": "<ACUMOS_RW_USER_PASSWORD>"
                         },
                         "probe": {
-                          "username": "<ACUMOS_RO_USER>",
+                          "username": "<ACUMOS_RW_USER>",
                           "password": "<ACUMOS_RW_USER_PASSWORD>"
                         },
                         "networkgroupName": "acumos-nsg",

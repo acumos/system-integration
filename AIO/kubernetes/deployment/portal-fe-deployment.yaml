@@ -45,8 +45,6 @@ spec:
       - name: portal-fe
         image: <PORTAL_FE_IMAGE>
         env:
-        - name: log_level
-          value: debug
         - name: SPRING_APPLICATION_JSON
           value: '{ 
                     "server" : {

@@ -45,8 +45,6 @@ spec:
       - name: federation
         image: <FEDERATION_IMAGE>
         env:
-        - name: log_level
-          value: "DEBUG"
         - name: SPRING_APPLICATION_JSON
           value: '{ 
                     "federation" : {

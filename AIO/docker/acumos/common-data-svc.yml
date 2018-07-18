@@ -25,7 +25,6 @@ services:
    cds-service:
        image: ${COMMON_DATASERVICE_IMAGE}
        environment:
-           log_level: "DEBUG"
            SPRING_APPLICATION_JSON: "{
                 \"server\" : {
                     \"port\" : ${ACUMOS_CDS_PORT}
