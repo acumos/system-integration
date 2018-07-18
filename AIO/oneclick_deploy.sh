@@ -26,8 +26,8 @@
 # - For kubernetes based deplpyment: Kubernetes cluster deployed
 # Usage:
 # $ bash oneclick_deploy.sh <docker|k8s>
-#   docker: install all components under docker-ce using docker-compose
-#   k8s: install kong+nexus under docker-ce, and the rest under kubernetes
+#   docker: install all components other than mariadb under docker-ce
+#   k8s: install all components other than mariadb under kubernetes
 #
 
 set -x
@@ -167,8 +167,8 @@ function setup_mariadb() {
   sudo apt-get update -y
 
   log "Install MariaDB without password prompt"
-  sudo debconf-set-selections <<< "mariadb-server-$MARIADB_VERSION mysql-server/root_password password $MARIADB_PASSWORD"
-  sudo debconf-set-selections <<< "mariadb-server-$MARIADB_VERSION mysql-server/root_password_again password $MARIADB_PASSWORD"
+  sudo debconf-set-selections <<< "mariadb-server-$MARIADB_VERSION mysql-server/root_password password $ACUMOS_MARIADB_PASSWORD"
+  sudo debconf-set-selections <<< "mariadb-server-$MARIADB_VERSION mysql-server/root_password_again password $ACUMOS_MARIADB_PASSWORD"
 
   log "Install MariaDB"
   sudo apt-get install -y -q mariadb-server-$MARIADB_VERSION
@@ -187,7 +187,7 @@ EOF
 
   sudo service mysql restart
   log "Secure mysql installation"
-  mysql --user=root --password=$MARIADB_PASSWORD -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1','::1'); DELETE FROM mysql.user WHERE User=''; DELETE FROM mysql.db WHERE Db='test' OR Db='test_%'; FLUSH PRIVILEGES;"
+  mysql --user=root --password=$ACUMOS_MARIADB_PASSWORD -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1','::1'); DELETE FROM mysql.user WHERE User=''; DELETE FROM mysql.db WHERE Db='test' OR Db='test_%'; FLUSH PRIVILEGES;"
 }
 
 function setup_acumosdb() {
@@ -195,20 +195,19 @@ function setup_acumosdb() {
   log "Setup Acumos databases"
 
   log "Create myqsl user acumos_opr"
-  mysql --user=root --password=$MARIADB_PASSWORD -e "CREATE USER 'acumos_opr'@'%' IDENTIFIED BY \"$MARIADB_USER_PASSWORD\";"
+  mysql --user=root --password=$ACUMOS_MARIADB_PASSWORD -e "CREATE USER 'acumos_opr'@'%' IDENTIFIED BY \"$ACUMOS_MARIADB_USER_PASSWORD\";"
 
   log "Setup database $ACUMOS_CDS_DB"
-  mysql --user=root --password=$MARIADB_PASSWORD -e "CREATE DATABASE $ACUMOS_CDS_DB; USE $ACUMOS_CDS_DB; GRANT ALL PRIVILEGES ON $ACUMOS_CDS_DB.* TO 'acumos_opr'@'%' IDENTIFIED BY \"$MARIADB_USER_PASSWORD\";"
-  # Will use this command when public access is enabled
-  # wget https://gerrit.acumos.org/r/gitweb?p=common-dataservice.git;a=blob_plain;f=cmn-data-svc-server/db-scripts/cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql;hb=HEAD
-  sed -i -- "1s/^/use $ACUMOS_CDS_DB;\n/" cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql
-  mysql --user=acumos_opr --password=$MARIADB_USER_PASSWORD < cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql
+  mysql --user=root --password=$ACUMOS_MARIADB_PASSWORD -e "CREATE DATABASE $ACUMOS_CDS_DB; USE $ACUMOS_CDS_DB; GRANT ALL PRIVILEGES ON $ACUMOS_CDS_DB.* TO 'acumos_opr'@'%' IDENTIFIED BY \"$ACUMOS_MARIADB_USER_PASSWORD\";"
 
-  log "Setup database 'acumos_comment'"
-  mysql --user=root --password=$MARIADB_PASSWORD -e "CREATE DATABASE acumos_comment; USE acumos_comment; GRANT ALL PRIVILEGES ON acumos_comment.* TO 'acumos_opr'@'%' IDENTIFIED BY \"$MARIADB_USER_PASSWORD\";"
+  log "Retrieve and customize database script for CDS version $ACUMOS_CDS_VERSION"
+  if [[ -f cmn-data-svc-ddl-dml-mysql* ]]; then rm cmn-data-svc-ddl-dml-mysql*; fi
+  wget https://raw.githubusercontent.com/acumos/common-dataservice/master/cmn-data-svc-server/db-scripts/cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql
+  sed -i -- "1s/^/use $ACUMOS_CDS_DB;\n/" cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql
+  mysql --user=acumos_opr --password=$ACUMOS_MARIADB_USER_PASSWORD < cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql
 
   log "Setup database 'acumos_cms'"
-  mysql --user=root --password=$MARIADB_PASSWORD -e "CREATE DATABASE acumos_cms; USE acumos_cms; GRANT ALL PRIVILEGES ON acumos_cms.* TO 'acumos_opr'@'%' IDENTIFIED BY \"$MARIADB_USER_PASSWORD\";"
+  mysql --user=root --password=$ACUMOS_MARIADB_PASSWORD -e "CREATE DATABASE acumos_cms; USE acumos_cms; GRANT ALL PRIVILEGES ON acumos_cms.* TO 'acumos_opr'@'%' IDENTIFIED BY \"$ACUMOS_MARIADB_USER_PASSWORD\";"
 }
 
 setup_nexus_repo() {
@@ -330,8 +329,8 @@ EOF
 
     log "Deploy Acumos kubernetes-based components"
     log "Set variable values in k8s templates"
-    depvars="ACUMOS_MARIADB_HOST ACUMOS_MARIADB_PORT MARIADB_USER_PASSWORD ACUMOS_NEXUS_API_PORT ACUMOS_NEXUS_HOST ACUMOS_RW_USER ACUMOS_RO_USER ACUMOS_RW_USER_PASSWORD ACUMOS_RO_USER_PASSWORD ACUMOS_DOCKER_API_HOST ACUMOS_DOCKER_API_PORT ACUMOS_DOCKER_MODEL_PORT ACUMOS_KONG_DB_PORT ACUMOS_KONG_PROXY_PORT ACUMOS_KONG_PROXY_SSL_PORT ACUMOS_KONG_ADMIN_PORT ACUMOS_KONG_ADMIN_SSL_PORT ACUMOS_DOCKER_API_PORT ACUMOS_PROJECT_NEXUS_USERNAME ACUMOS_PROJECT_NEXUS_PASSWORD"
-    compvars="ACUMOS_AZURE_CLIENT_PORT ACUMOS_CDS_PORT ACUMOS_CDS_DB ACUMOS_CDS_PASSWORD ACUMOS_CDS_USER ACUMOS_CMS_PORT ACUMOS_DSCE_PORT ACUMOS_FEDERATION_PORT ACUMOS_ONBOARDING_PORT ACUMOS_PORTAL_BE_PORT ACUMOS_PORTAL_FE_PORT ACUMOS_KEYPASS ACUMOS_DATA_BROKER_INTERNAL_PORT ACUMOS_DATA_BROKER_PORT ACUMOS_DEPLOYED_SOLUTION_PORT ACUMOS_DEPLOYED_VM_PASSWORD ACUMOS_DEPLOYED_VM_USER ACUMOS_PROBE_PORT ACUMOS_OPERATOR_ID"
+    depvars="ACUMOS_MARIADB_HOST ACUMOS_MARIADB_PORT ACUMOS_MARIADB_USER_PASSWORD ACUMOS_NEXUS_API_PORT ACUMOS_NEXUS_HOST ACUMOS_RW_USER ACUMOS_RO_USER ACUMOS_RW_USER_PASSWORD ACUMOS_RO_USER_PASSWORD ACUMOS_DOCKER_API_HOST ACUMOS_DOCKER_API_PORT ACUMOS_DOCKER_MODEL_PORT ACUMOS_KONG_DB_PORT ACUMOS_KONG_PROXY_PORT ACUMOS_KONG_PROXY_SSL_PORT ACUMOS_KONG_ADMIN_PORT ACUMOS_KONG_ADMIN_SSL_PORT ACUMOS_DOCKER_API_PORT ACUMOS_PROJECT_NEXUS_USERNAME ACUMOS_PROJECT_NEXUS_PASSWORD"
+    compvars="ACUMOS_AZURE_CLIENT_PORT ACUMOS_CDS_PORT ACUMOS_CDS_DB ACUMOS_CDS_PASSWORD ACUMOS_CDS_USER ACUMOS_CMS_PORT ACUMOS_DSCE_PORT ACUMOS_FEDERATION_PORT ACUMOS_ONBOARDING_PORT ACUMOS_PORTAL_BE_PORT ACUMOS_PORTAL_FE_PORT ACUMOS_KEYPASS ACUMOS_DATA_BROKER_INTERNAL_PORT ACUMOS_DATA_BROKER_PORT ACUMOS_DEPLOYED_SOLUTION_PORT ACUMOS_DEPLOYED_VM_PASSWORD ACUMOS_DEPLOYED_VM_USER ACUMOS_PROBE_PORT ACUMOS_OPERATOR_ID HTTP_PROXY HTTPS_PROXY"
     set +x
     vs="$depvars $compvars"
     for f in kubernetes/service/*.yaml kubernetes/deployment/*.yaml; do
@@ -444,14 +443,23 @@ function setup_reverse_proxy() {
     --data "name=root" \
     --data "upstream_url=http://portal-fe-service:$ACUMOS_PORTAL_FE_PORT" \
     --data "uris=/" \
-    --data "strip_uri=false"
+    --data "strip_uri=false" \
+    --data "upstream_connect_timeout=60000" \
+    --data "upstream_read_timeout=60000" \
+    --data "upstream_send_timeout=60000" \
+    --data "retries=5"
+
   curl -i -X POST \
     --url http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis/ \
     --data "https_only=true" \
     --data "name=onboarding-app" \
     --data "upstream_url=http://onboarding-service:$ACUMOS_ONBOARDING_PORT" \
     --data "uris=/onboarding-app" \
-    --data "strip_uri=false"
+    --data "strip_uri=false" \
+    --data "upstream_connect_timeout=60000" \
+    --data "upstream_read_timeout=600000" \
+    --data "upstream_send_timeout=600000" \
+    --data "retries=5"
 
   log "Dump of API endpoints as created"
   curl http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis/
@@ -481,8 +489,8 @@ function setup_federation() {
 export WORK_DIR=$(pwd)
 log "Reset acumos-env.sh"
 sed -i -- '/DEPLOYED_UNDER/d' acumos-env.sh
-sed -i -- '/MARIADB_PASSWORD/d' acumos-env.sh
-sed -i -- '/MARIADB_USER_PASSWORD/d' acumos-env.sh
+sed -i -- '/ACUMOS_MARIADB_PASSWORD/d' acumos-env.sh
+sed -i -- '/ACUMOS_MARIADB_USER_PASSWORD/d' acumos-env.sh
 sed -i -- '/ACUMOS_RO_USER_PASSWORD/d' acumos-env.sh
 sed -i -- '/ACUMOS_RW_USER_PASSWORD/d' acumos-env.sh
 sed -i -- '/ACUMOS_CDS_PASSWORD/d' acumos-env.sh
@@ -493,12 +501,12 @@ else DEPLOYED_UNDER=docker
 fi
 echo "DEPLOYED_UNDER=\"$DEPLOYED_UNDER\"" >>acumos-env.sh
 echo "export DEPLOYED_UNDER" >>acumos-env.sh
-MARIADB_PASSWORD=$(uuidgen)
-echo "MARIADB_PASSWORD=\"$MARIADB_PASSWORD\"" >>acumos-env.sh
-echo "export MARIADB_PASSWORD" >>acumos-env.sh
-MARIADB_USER_PASSWORD=$(uuidgen)
-echo "MARIADB_USER_PASSWORD=\"$MARIADB_USER_PASSWORD\"" >>acumos-env.sh
-echo "export MARIADB_USER_PASSWORD" >>acumos-env.sh
+ACUMOS_MARIADB_PASSWORD=$(uuidgen)
+echo "ACUMOS_MARIADB_PASSWORD=\"$ACUMOS_MARIADB_PASSWORD\"" >>acumos-env.sh
+echo "export ACUMOS_MARIADB_PASSWORD" >>acumos-env.sh
+ACUMOS_MARIADB_USER_PASSWORD=$(uuidgen)
+echo "ACUMOS_MARIADB_USER_PASSWORD=\"$ACUMOS_MARIADB_USER_PASSWORD\"" >>acumos-env.sh
+echo "export ACUMOS_MARIADB_USER_PASSWORD" >>acumos-env.sh
 ACUMOS_RO_USER_PASSWORD=$(uuidgen)
 echo "ACUMOS_RO_USER_PASSWORD=\"$ACUMOS_RO_USER_PASSWORD\"" >>acumos-env.sh
 echo "export ACUMOS_RO_USER_PASSWORD" >>acumos-env.sh
@@ -507,8 +515,6 @@ echo "ACUMOS_RW_USER_PASSWORD=\"$ACUMOS_RW_USER_PASSWORD\"" >>acumos-env.sh
 echo "export ACUMOS_RW_USER_PASSWORD" >>acumos-env.sh
 ACUMOS_CDS_PASSWORD=$(uuidgen)
 echo "ACUMOS_CDS_PASSWORD=\"$ACUMOS_CDS_PASSWORD\"" >>acumos-env.sh
-# TODO: Various components hardcode password ccds_client
-echo "ACUMOS_CDS_PASSWORD=ccds_client" >>acumos-env.sh
 echo "export ACUMOS_CDS_PASSWORD" >>acumos-env.sh
 ACUMOS_KEYPASS=$(uuidgen)
 echo "ACUMOS_KEYPASS=$ACUMOS_KEYPASS" >>acumos-env.sh

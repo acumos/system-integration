@@ -24,7 +24,6 @@ services:
    cms-service:
        image: ${PORTAL_CMS_IMAGE}
        environment:
-           log_level: "DEBUG"
            SPRING_APPLICATION_JSON: "{
                 \"server\" : {
                     \"port\" : ${ACUMOS_CMS_PORT}
@@ -33,7 +32,7 @@ services:
                     \"datasource\" : {
                         \"url\" : \"jdbc:mysql://${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_PORT}/acumos_cms?useSSL=false\",
                         \"username\" : \"acumos_opr\",
-                        \"password\" : \"${MARIADB_USER_PASSWORD}\"
+                        \"password\" : \"${ACUMOS_MARIADB_USER_PASSWORD}\"
                   }
                 },
                 \"parameters\": {
@@ -41,7 +40,7 @@ services:
                       \"dataSource\" : {
                         \"url\" : \"jdbc:mysql://${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_PORT}/acumos_cms?useSSL=false\",
                         \"username\" : \"acumos_opr\",
-                        \"password\" : \"${MARIADB_USER_PASSWORD}\"
+                        \"password\" : \"${ACUMOS_MARIADB_USER_PASSWORD}\"
                       }
                    }
                 }

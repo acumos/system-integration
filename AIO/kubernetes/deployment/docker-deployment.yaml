@@ -64,6 +64,10 @@ spec:
         securityContext: 
             privileged: true
         env:
+          - name: HTTP_PROXY
+            value: "<HTTP_PROXY>"
+          - name: HTTPS_PROXY
+            value: "<HTTPS_PROXY>"
           - name: DIND_INSECURE_REGISTRIES
             value: "[\"0.0.0.0/0\"]"
           - name: DOCKER_OPTS

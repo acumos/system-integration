@@ -45,8 +45,6 @@ spec:
       - name: cds
         image: <COMMON_DATASERVICE_IMAGE>
         env:
-        - name: log_level
-          value: "DEBUG"
         - name: SPRING_APPLICATION_JSON
           value: '{ 
                     "server" : { 
@@ -67,7 +65,7 @@ spec:
                       "datasource" : {
                         "url" : "jdbc:mysql://<ACUMOS_MARIADB_HOST>:<ACUMOS_MARIADB_PORT>/<ACUMOS_CDS_DB>?useSSL=false",
                         "username" : "acumos_opr",
-                        "password" : "<MARIADB_USER_PASSWORD>"
+                        "password" : "<ACUMOS_MARIADB_USER_PASSWORD>"
                       },
                       "jpa" : {
                         "database-platform" : "org.hibernate.dialect.MySQLDialect",

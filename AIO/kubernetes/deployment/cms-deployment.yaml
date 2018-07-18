@@ -45,8 +45,6 @@ spec:
       - name: cms
         image: <PORTAL_CMS_IMAGE>
         env:
-        - name: log_level
-          value: "DEBUG"
         - name: SPRING_APPLICATION_JSON
           value: '{ 
                     "server" : {
@@ -56,7 +54,7 @@ spec:
                       "datasource" : {
                       "url" : "jdbc:mysql://<ACUMOS_MARIADB_HOST>:<ACUMOS_MARIADB_PORT>/acumos_cms?useSSL=false",
                       "username" : "acumos_opr",
-                      "password" : "<MARIADB_USER_PASSWORD>"
+                      "password" : "<ACUMOS_MARIADB_USER_PASSWORD>"
                     }
                   },
                   "parameters": {
@@ -64,7 +62,7 @@ spec:
                       "dataSource" : {
                         "url" : "jdbc:mysql://<ACUMOS_MARIADB_HOST>:<ACUMOS_MARIADB_PORT>/acumos_cms?useSSL=false",
                         "username" : "acumos_opr",
-                        "password" : "<MARIADB_USER_PASSWORD>"
+                        "password" : "<ACUMOS_MARIADB_USER_PASSWORD>"
                         }
                       }
                     }

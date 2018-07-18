@@ -46,8 +46,6 @@ spec:
         image: <ONBOARDING_IMAGE>
         env:
         env:
-        - name: log_level
-          value: debug
         - name: SPRING_APPLICATION_JSON
           value: '{ 
                    "server" :{

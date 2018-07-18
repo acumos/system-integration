@@ -61,6 +61,8 @@ function log() {
 function deploy() {
   trap 'fail' ERR
   log "Deploying Acumos AIO to $1 user $2"
+  ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+    $2@$1 rm -rf docker kubernetes
   scp -r -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
     * $2@$1:/home/$2/.
   # Run the commands separately to ensure failures are trapped
@@ -70,6 +72,22 @@ function deploy() {
     $2@$1 bash oneclick_deploy.sh $3
   ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
     $2@$1 bash create-user.sh test P@ssw0rd test user test@acumos-aio.com admin
+}
+
+function verify_federation_api_access() {
+  log "Verify federation API access at $3 for $1"
+  ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $2@$1 \
+    curl -vk -o json \
+    --cert /var/acumos/certs/acumos.crt \
+    --key /var/acumos/certs/acumos.key \
+    https://$3:$ACUMOS_FEDERATION_PORT/solutions
+  scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+    $2@$1:/home/$2/json json
+  cat json
+  err=$(jq -r '.error' json)
+  if [[ "$err" != "null" ]]; then
+    fail "Solution retrieval failed"
+  fi
 }
 
 export WORK_DIR=$(pwd)
@@ -112,17 +130,8 @@ bash create-peer.sh /var/acumos/certs/peerCA.crt $host1 $host1 \
   admin@example.com https://$host1:$ACUMOS_FEDERATION_PORT
 EOF
 
-log "Verify $host1 can access federation API at $host2"
-ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-  $user1@$host1 curl -vk --cert /var/acumos/certs/acumos.crt \
-  --key /var/acumos/certs/acumos.key \
-  https://$host2:$ACUMOS_FEDERATION_PORT/solutions
-
-log "Verify $host2 can access federation API at $host1"
-ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-  $user2@$host2 curl -vk --cert /var/acumos/certs/acumos.crt \
-  --key /var/acumos/certs/acumos.key \
-  https://$host1:$ACUMOS_FEDERATION_PORT/solutions
+verify_federation_api_access $host1 $user1 $host2
+verify_federation_api_access $host2 $user2 $host1
 
 if [[ "$models" != "" ]]; then
   log "Bootstrap models at $host1"

@@ -69,15 +69,19 @@ spec:
                       "nexusRegistyPwd": "<ACUMOS_PROJECT_NEXUS_PASSWORD>",
                       "nexusRegistyName": "nexus3.acumos.org",
                       "otherRegistyName": "<ACUMOS_NEXUS_HOST>",
+                      "nginxMapFolder": "/home/artifacts",
+                      "nginxWebFolder": "/usr/share/nginx/html",
+                      "nginxImageName": "nginx:latest",
+                      "nginxInternalPort": "80",
                       "exposeDataBrokerPort": "<ACUMOS_DATA_BROKER_PORT>",
                       "internalDataBrokerPort": "<ACUMOS_DATA_BROKER_INTERNAL_PORT>",
                       "registry": {
                         "bluePrint": {
-                          "username": "<ACUMOS_RO_USER>",
+                          "username": "<ACUMOS_RW_USER>",
                           "password": "<ACUMOS_RW_USER_PASSWORD>"
                         },
                         "probe": {
-                          "username": "<ACUMOS_RO_USER>",
+                          "username": "<ACUMOS_RW_USER>",
                           "password": "<ACUMOS_RW_USER_PASSWORD>"
                         },
                         "networkgroupName": "acumos-nsg",
