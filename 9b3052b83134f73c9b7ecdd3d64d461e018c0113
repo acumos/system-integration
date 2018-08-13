@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "f4e98dc0_a1c56690",
+        "filename": "AIO/docker/acumos/acumos-cms.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-08-13T13:24:47Z",
+      "side": 1,
+      "message": "I don\u0027t get what you are getting at. This is a line I just inherited from the docker-compose files. Is this an observation or a request for change?",
+      "parentUuid": "73525d12_304cdea9",
+      "range": {
+        "startLine": 33,
+        "startChar": 1,
+        "endLine": 34,
+        "endChar": 1
+      },
+      "revId": "9b3052b83134f73c9b7ecdd3d64d461e018c0113",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5807baeb_9559013f",
         "filename": "AIO/kubernetes/deployment/common-data-svc-deployment.yaml",
         "patchSetId": 2
@@ -53,6 +77,30 @@
       "writtenOn": "2018-08-13T12:55:32Z",
       "side": 1,
       "message": "Is this the gerrit mirror?",
+      "range": {
+        "startLine": 205,
+        "startChar": 15,
+        "endLine": 205,
+        "endChar": 41
+      },
+      "revId": "9b3052b83134f73c9b7ecdd3d64d461e018c0113",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8a47a365_5823d67d",
+        "filename": "AIO/oneclick_deploy.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-08-13T13:24:47Z",
+      "side": 1,
+      "message": "No, it\u0027s the github mirror of the gerrit repo.",
+      "parentUuid": "34cf2ae5_2acb840b",
       "range": {
         "startLine": 205,
         "startChar": 15,
