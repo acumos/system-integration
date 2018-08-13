@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "73525d12_304cdea9",
+        "filename": "AIO/docker/acumos/acumos-cms.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-08-13T12:55:32Z",
+      "side": 1,
+      "message": "I love how this database config must be repeated.  As if you can\u0027t look up any property from within your code ...",
+      "range": {
+        "startLine": 33,
+        "startChar": 1,
+        "endLine": 34,
+        "endChar": 1
+      },
+      "revId": "9b3052b83134f73c9b7ecdd3d64d461e018c0113",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5807baeb_9559013f",
+        "filename": "AIO/kubernetes/deployment/common-data-svc-deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-08-13T12:55:32Z",
+      "side": 1,
+      "message": "Maybe, possibly, this trailing whitespace could be cleaned?",
+      "revId": "9b3052b83134f73c9b7ecdd3d64d461e018c0113",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "34cf2ae5_2acb840b",
+        "filename": "AIO/oneclick_deploy.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-08-13T12:55:32Z",
+      "side": 1,
+      "message": "Is this the gerrit mirror?",
+      "range": {
+        "startLine": 205,
+        "startChar": 15,
+        "endLine": 205,
+        "endChar": 41
+      },
+      "revId": "9b3052b83134f73c9b7ecdd3d64d461e018c0113",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
