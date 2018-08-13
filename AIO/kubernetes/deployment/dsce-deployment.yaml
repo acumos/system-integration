@@ -45,10 +45,8 @@ spec:
       - name: dsce
         image: <DESIGNSTUDIO_IMAGE>
         env:
-        - name: log_level
-          value: "DEBUG"
         - name: SPRING_APPLICATION_JSON
-          value: '{ 
+          value: '{
                     "server": {
                       "port": 8088
                     },

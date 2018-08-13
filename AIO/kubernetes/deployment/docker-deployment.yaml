@@ -46,8 +46,8 @@ spec:
       containers:
       - name: docker-cmds
         image: docker:dind
-        securityContext: 
-            privileged: true 
+        securityContext:
+            privileged: true
         command: ['/bin/sh', '-c', 'while ! docker run -d -p 80:80 httpd:latest; do echo "docker-API not ready"; sleep 10; done; sleep 3600']
         env:
         - name: log_level
@@ -61,9 +61,13 @@ spec:
       # Docker-Daemon-container
       - name: docker-daemon
         image: docker:dind
-        securityContext: 
+        securityContext:
             privileged: true
         env:
+          - name: HTTP_PROXY
+            value: "<HTTP_PROXY>"
+          - name: HTTPS_PROXY
+            value: "<HTTPS_PROXY>"
           - name: DIND_INSECURE_REGISTRIES
             value: "[\"0.0.0.0/0\"]"
           - name: DOCKER_OPTS
