@@ -36,8 +36,11 @@ services:
            - ${ACUMOS_DOCKER_MODEL_PORT}:${ACUMOS_DOCKER_MODEL_PORT}
        volumes:
            - acumos-logs:/maven/logs
+           - nexus-data:/nexus-data
        logging:
            driver: json-file
 volumes:
     acumos-logs:
+        external: true
+    nexus-data:
         external: true
