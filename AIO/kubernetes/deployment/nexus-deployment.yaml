@@ -59,8 +59,13 @@ spec:
         volumeMounts:
         - mountPath: /maven/logs
           name: acumos-logs
+        - mountPath: /nexus-data
+          name: nexus-data
       restartPolicy: Always
       volumes:
       - name: acumos-logs
         hostPath:
           path: /var/acumos/logs
+      - name: nexus-data
+        hostPath:
+          path: /var/acumos/nexus-data

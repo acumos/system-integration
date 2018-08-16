@@ -43,6 +43,7 @@ if [[ "$DEPLOYED_UNDER" == "docker" || "$DEPLOYED_UNDER" == "" ]]; then
   sudo docker volume rm acumos-logs
   sudo docker volume rm acumos-output
   sudo docker volume rm acumosWebOnboarding
+  sudo docker volume rm nexus-data
 fi
 
 if [[ "$DEPLOYED_UNDER" == "k8s" || "$DEPLOYED_UNDER" == "" ]]; then
@@ -56,7 +57,7 @@ if [[ "$DEPLOYED_UNDER" == "k8s" || "$DEPLOYED_UNDER" == "" ]]; then
     portal-be portal-fe dsce federation kong nexus
 
   echo "Delete image pull secrets from kubernetes"
-  kubectl delete secret acumos-registry
+  kubectl delete secret -n acumos acumos-registry
 
   echo "Delete namespace acumos"
   kubectl delete namespace acumos
@@ -67,13 +68,13 @@ if [[ "$DEPLOYED_UNDER" == "k8s" || "$DEPLOYED_UNDER" == "" ]]; then
 fi
 
 echo "Cleanup acumos data"
-rm -rf /var/acumos
+sudo rm -rf /var/acumos
 
 echo "Reset /etc/hosts customizations"
 sudo sed -i -- '/nexus-service/d' /etc/hosts
 
 echo "Remove Acumos databases and users"
-mysql --user=root --password=$MARIADB_PASSWORD -e "DROP DATABASE $ACUMOS_CDS_DB; DROP DATABASE acumos_comment;  DROP DATABASE acumos_cms; DROP USER 'acumos_opr'@'%';"
+mysql --user=root --password=$MARIADB_PASSWORD -e "DROP DATABASE $ACUMOS_CDS_DB; DROP DATABASE acumos_cms; DROP USER 'acumos_opr'@'%';"
  if [[ $? -eq 1 ]]; then
   echo "Remove all mysql data"
   sudo rm -rf /var/lib/mysql
@@ -85,8 +86,7 @@ sudo apt-get remove mariadb-server-10.2 -y
 sudo rm /etc/apt/sources.list.d/mariadb.list
 sudo apt-get clean
 
-echo "Remove Kong certs etc"
-rm /var/acumos/certs/*
+echo "Remove misc files"
 rm nexus-script.json
 
 echo "You should now be able to repeat the install via oneclick_deploy.sh"

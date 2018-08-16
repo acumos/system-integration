@@ -29,6 +29,18 @@
 # $ bash oneclick_deploy.sh <docker|k8s>
 #   docker: install all components other than mariadb under docker-ce
 #   k8s: install all components other than mariadb under kubernetes
+#  
+# NOTE: if redeploying with an existing Acumos database, or to upgrade an
+# existing Acumos CDS database, ensure that acumos-env.sh contains the following values
+# from acumos-env.sh as updated when the previous version was installed, as
+# these will not be updated by this script:
+#   ACUMOS_MARIADB_PASSWORD
+#   ACUMOS_MARIADB_USER_PASSWORD
+# Also set:
+#   ACUMOS_CDS_PREVIOUS_VERSION to the previous data version
+#   ACUMOS_CDS_VERSION to the upgraded version (or to the current version if
+#     just redeploying with an existing, current version database
+#   ACUMOS_CDS_DB to the same as the previous installed database
 #
 
 set -x
@@ -127,28 +139,34 @@ EOF
     sudo systemctl daemon-reload
     sudo service docker restart
 
-    log "Create docker volumes for Acumos docker-based components"
-    while ! curl http://$ACUMOS_DOCKER_API_HOST:$ACUMOS_DOCKER_API_PORT ; do
-      log "waiting 30 seconds for docker daemon to be ready"
-      sleep 30
-    done
-    sudo docker volume create kong-db
-    sudo docker volume create acumos-logs
-    sudo docker volume create acumos-output
-    sudo docker volume create acumosWebOnboarding
+    if [[ $(sudo docker volume ls | grep -c acumos-logs) -eq 0 ]]; then
+      log "Create docker volumes for Acumos docker-based components"
+      while ! curl http://$ACUMOS_DOCKER_API_HOST:$ACUMOS_DOCKER_API_PORT ; do
+        log "waiting 30 seconds for docker daemon to be ready"
+        sleep 30
+      done
+      sudo docker volume create kong-db
+      sudo docker volume create acumos-logs
+      sudo docker volume create acumos-output
+      sudo docker volume create acumosWebOnboarding
+      sudo docker volume create nexus-data
+    fi
   fi
 
-  sudo rm -rf /var/acumos
-  sudo mkdir /var/acumos
-  sudo chown $USER:$USER /var/acumos
-  mkdir -p /var/acumos/certs
+  if [[ ! -d /var/acumos ]]; then
+    sudo mkdir -p /var/acumos
+    sudo chown $USER:$USER /var/acumos
+    mkdir /var/acumos/certs
 
-  if [[ "$DEPLOYED_UNDER" = "k8s" ]]; then
-    log "Create local shared folders for Acumos k8s-based components"
-    mkdir /var/acumos/logs
-    mkdir /var/acumos/output
-    mkdir /var/acumos/WebOnboarding
-    mkdir /var/acumos/kong-db/
+    if [[ "$DEPLOYED_UNDER" = "k8s" ]]; then
+      log "Create local shared folders for Acumos k8s-based components"
+      mkdir -p /var/acumos/logs
+      mkdir /var/acumos/output
+      mkdir /var/acumos/WebOnboarding
+      mkdir /var/acumos/kong-db
+      mkdir /var/acumos/nexus-data
+      sudo chown -R 200 /var/acumos/nexus-data
+    fi
   fi
 }
 
@@ -194,21 +212,31 @@ EOF
 function setup_acumosdb() {
   trap 'fail' ERR
   log "Setup Acumos databases"
+  if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
+    log "Create myqsl user acumos_opr"
+    mysql --user=root --password=$ACUMOS_MARIADB_PASSWORD -e "CREATE USER 'acumos_opr'@'%' IDENTIFIED BY \"$ACUMOS_MARIADB_USER_PASSWORD\";"
 
-  log "Create myqsl user acumos_opr"
-  mysql --user=root --password=$ACUMOS_MARIADB_PASSWORD -e "CREATE USER 'acumos_opr'@'%' IDENTIFIED BY \"$ACUMOS_MARIADB_USER_PASSWORD\";"
+    log "Setup database $ACUMOS_CDS_DB"
+    mysql --user=root --password=$ACUMOS_MARIADB_PASSWORD -e "CREATE DATABASE $ACUMOS_CDS_DB; USE $ACUMOS_CDS_DB; GRANT ALL PRIVILEGES ON $ACUMOS_CDS_DB.* TO 'acumos_opr'@'%' IDENTIFIED BY \"$ACUMOS_MARIADB_USER_PASSWORD\";"
 
-  log "Setup database $ACUMOS_CDS_DB"
-  mysql --user=root --password=$ACUMOS_MARIADB_PASSWORD -e "CREATE DATABASE $ACUMOS_CDS_DB; USE $ACUMOS_CDS_DB; GRANT ALL PRIVILEGES ON $ACUMOS_CDS_DB.* TO 'acumos_opr'@'%' IDENTIFIED BY \"$ACUMOS_MARIADB_USER_PASSWORD\";"
+    log "Retrieve and customize database script for CDS version $ACUMOS_CDS_VERSION"
+    if [[ -f cmn-data-svc-ddl-dml-mysql* ]]; then rm cmn-data-svc-ddl-dml-mysql*; fi
+    wget https://raw.githubusercontent.com/acumos/common-dataservice/master/cmn-data-svc-server/db-scripts/cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql
+    sed -i -- "1s/^/use $ACUMOS_CDS_DB;\n/" cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql
+    mysql --user=acumos_opr --password=$ACUMOS_MARIADB_USER_PASSWORD < cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql
 
-  log "Retrieve and customize database script for CDS version $ACUMOS_CDS_VERSION"
-  if [[ -f cmn-data-svc-ddl-dml-mysql* ]]; then rm cmn-data-svc-ddl-dml-mysql*; fi
-  wget https://raw.githubusercontent.com/acumos/common-dataservice/master/cmn-data-svc-server/db-scripts/cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql
-  sed -i -- "1s/^/use $ACUMOS_CDS_DB;\n/" cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql
-  mysql --user=acumos_opr --password=$ACUMOS_MARIADB_USER_PASSWORD < cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql
-
-  log "Setup database 'acumos_cms'"
-  mysql --user=root --password=$ACUMOS_MARIADB_PASSWORD -e "CREATE DATABASE acumos_cms; USE acumos_cms; GRANT ALL PRIVILEGES ON acumos_cms.* TO 'acumos_opr'@'%' IDENTIFIED BY \"$ACUMOS_MARIADB_USER_PASSWORD\";"
+    log "Setup database 'acumos_cms'"
+    mysql --user=root --password=$ACUMOS_MARIADB_PASSWORD -e "CREATE DATABASE acumos_cms; USE acumos_cms; GRANT ALL PRIVILEGES ON acumos_cms.* TO 'acumos_opr'@'%' IDENTIFIED BY \"$ACUMOS_MARIADB_USER_PASSWORD\";"
+  else
+    if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" != "$ACUMOS_CDS_VERSION" ]]; then
+      log "Upgrading database script for from CDS version $ACUMOS_CDS_PREVIOUS_VERSION to $ACUMOS_CDS_VERSION"
+      upgrade="cds-mysql-upgrade-${ACUMOS_CDS_PREVIOUS_VERSION}-to-${ACUMOS_CDS_VERSION}.sql"
+      if [[ -f $upgrade* ]]; then rm $upgrade*; fi
+      wget https://raw.githubusercontent.com/acumos/common-dataservice/master/cmn-data-svc-server/db-scripts/$upgrade
+      sed -i -- "1s/^/use $ACUMOS_CDS_DB;\n/" $upgrade
+      mysql --user=acumos_opr --password=$ACUMOS_MARIADB_USER_PASSWORD < $upgrade
+    fi
+  fi
 }
 
 setup_nexus_repo() {
@@ -252,7 +280,8 @@ EOF
 
 function setup_nexus() {
   trap 'fail' ERR
-  while ! curl -v -u $ACUMOS_NEXUS_ADMIN_USERNAME:$ACUMOS_NEXUS_ADMIN_PASSWORD http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script ; do
+  # Add -m 10 since for some reason curl seems to hang waiting for a response
+  while ! curl -v -m 10 -u $ACUMOS_NEXUS_ADMIN_USERNAME:$ACUMOS_NEXUS_ADMIN_PASSWORD http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script ; do
     log "Waiting 10 seconds for nexus server to respond"
     sleep 10
   done
@@ -307,6 +336,27 @@ function setup_acumos() {
     sudo bash docker-compose.sh build
     sudo bash docker-compose.sh up -d
   else
+    if [[ $(kubectl get namespaces | grep -c 'acumos ') == 1 ]]; then
+      echo "Stop any running Acumos component services under kubernetes"
+      kubectl delete service -n acumos azure-client-service cds-service cms-service\
+        filebeat-service onboarding-service portal-be-service portal-fe-service \
+        dsce-service federation-service kong-service nexus-service
+
+      echo "Stop any running Acumos component deployments under kubernetes"
+      kubectl delete deployment -n acumos azure-client cds cms filebeat onboarding\
+        portal-be portal-fe dsce federation kong nexus
+
+      echo "Delete acumos image pull secret from kubernetes"
+      kubectl delete secret -n acumos acumos-registry
+
+      echo "Delete namespace acumos from kubernetes"
+      kubectl delete namespace acumos
+      while kubectl get namespace acumos; do
+        echo "Waiting 10 seconds for namespace acumos to be deleted"
+        sleep 10
+      done
+    fi
+
     log "Create namespace acumos"
     while ! kubectl create namespace acumos; do
       log "kubectl API is not yet ready ... waiting 10 seconds"
@@ -333,8 +383,10 @@ EOF
     depvars="ACUMOS_MARIADB_HOST ACUMOS_MARIADB_PORT ACUMOS_MARIADB_USER_PASSWORD ACUMOS_NEXUS_API_PORT ACUMOS_NEXUS_HOST ACUMOS_RW_USER ACUMOS_RO_USER ACUMOS_RW_USER_PASSWORD ACUMOS_RO_USER_PASSWORD ACUMOS_DOCKER_API_HOST ACUMOS_DOCKER_API_PORT ACUMOS_DOCKER_MODEL_PORT ACUMOS_KONG_DB_PORT ACUMOS_KONG_PROXY_PORT ACUMOS_KONG_PROXY_SSL_PORT ACUMOS_KONG_ADMIN_PORT ACUMOS_KONG_ADMIN_SSL_PORT ACUMOS_DOCKER_API_PORT ACUMOS_PROJECT_NEXUS_USERNAME ACUMOS_PROJECT_NEXUS_PASSWORD"
     compvars="ACUMOS_AZURE_CLIENT_PORT ACUMOS_CDS_PORT ACUMOS_CDS_DB ACUMOS_CDS_PASSWORD ACUMOS_CDS_USER ACUMOS_CMS_PORT ACUMOS_DSCE_PORT ACUMOS_FEDERATION_PORT ACUMOS_ONBOARDING_PORT ACUMOS_PORTAL_BE_PORT ACUMOS_PORTAL_FE_PORT ACUMOS_KEYPASS ACUMOS_DATA_BROKER_INTERNAL_PORT ACUMOS_DATA_BROKER_PORT ACUMOS_DEPLOYED_SOLUTION_PORT ACUMOS_DEPLOYED_VM_PASSWORD ACUMOS_DEPLOYED_VM_USER ACUMOS_PROBE_PORT ACUMOS_OPERATOR_ID HTTP_PROXY HTTPS_PROXY"
     set +x
+    mkdir -p ~/deploy/kubernetes
+    cp -r kubernetes/* ~/deploy/kubernetes/.
     vs="$depvars $compvars"
-    for f in kubernetes/service/*.yaml kubernetes/deployment/*.yaml; do
+    for f in  ~/deploy/kubernetes/service/*.yaml  ~/deploy/kubernetes/deployment/*.yaml; do
       for v in $vs ; do
         eval vv=\$$v
         sed -i -- "s/<$v>/$vv/g" $f
@@ -343,27 +395,27 @@ EOF
     set -x
 
     log "Set image references in k8s templates"
-    sed -i -- "s~<AZURE_CLIENT_IMAGE>~$AZURE_CLIENT_IMAGE~g" kubernetes/deployment/azure-client-deployment.yaml
-    sed -i -- "s~<BLUEPRINT_ORCHESTRATOR_IMAGE>~$BLUEPRINT_ORCHESTRATOR_IMAGE~g" kubernetes/deployment/azure-client-deployment.yaml
-    sed -i -- "s~<PORTAL_CMS_IMAGE>~$PORTAL_CMS_IMAGE~g" kubernetes/deployment/cms-deployment.yaml
-    sed -i -- "s~<COMMON_DATASERVICE_IMAGE>~$COMMON_DATASERVICE_IMAGE~g" kubernetes/deployment/common-data-svc-deployment.yaml
-    sed -i -- "s~<DESIGNSTUDIO_IMAGE>~$DESIGNSTUDIO_IMAGE~g" kubernetes/deployment/dsce-deployment.yaml
-    sed -i -- "s~<DATABROKER_ZIPBROKER_IMAGE>~$DATABROKER_ZIPBROKER_IMAGE~g" kubernetes/deployment/dsce-deployment.yaml
-    sed -i -- "s~<DATABROKER_CSVBROKER_IMAGE>~$DATABROKER_CSVBROKER_IMAGE~g" kubernetes/deployment/dsce-deployment.yaml
-    sed -i -- "s~<FEDERATION_IMAGE>~$FEDERATION_IMAGE~g" kubernetes/deployment/federation-deployment.yaml
-    sed -i -- "s~<FILEBEAT_IMAGE>~$FILEBEAT_IMAGE~g" kubernetes/deployment/filebeat-deployment.yaml
-    sed -i -- "s~<ONBOARDING_IMAGE>~$ONBOARDING_IMAGE~g" kubernetes/deployment/onboarding-deployment.yaml
-    sed -i -- "s~<ONBOARDING_BASE_IMAGE>~$ONBOARDING_BASE_IMAGE~g" kubernetes/deployment/onboarding-deployment.yaml
-    sed -i -- "s~<PORTAL_BE_IMAGE>~$PORTAL_BE_IMAGE~g" kubernetes/deployment/portal-be-deployment.yaml
-    sed -i -- "s~<PORTAL_FE_IMAGE>~$PORTAL_FE_IMAGE~g" kubernetes/deployment/portal-fe-deployment.yaml
+    sed -i -- "s~<AZURE_CLIENT_IMAGE>~$AZURE_CLIENT_IMAGE~g"  ~/deploy/kubernetes/deployment/azure-client-deployment.yaml
+    sed -i -- "s~<BLUEPRINT_ORCHESTRATOR_IMAGE>~$BLUEPRINT_ORCHESTRATOR_IMAGE~g"  ~/deploy/kubernetes/deployment/azure-client-deployment.yaml
+    sed -i -- "s~<PORTAL_CMS_IMAGE>~$PORTAL_CMS_IMAGE~g"  ~/deploy/kubernetes/deployment/cms-deployment.yaml
+    sed -i -- "s~<COMMON_DATASERVICE_IMAGE>~$COMMON_DATASERVICE_IMAGE~g"  ~/deploy/kubernetes/deployment/common-data-svc-deployment.yaml
+    sed -i -- "s~<DESIGNSTUDIO_IMAGE>~$DESIGNSTUDIO_IMAGE~g"  ~/deploy/kubernetes/deployment/dsce-deployment.yaml
+    sed -i -- "s~<DATABROKER_ZIPBROKER_IMAGE>~$DATABROKER_ZIPBROKER_IMAGE~g"  ~/deploy/kubernetes/deployment/dsce-deployment.yaml
+    sed -i -- "s~<DATABROKER_CSVBROKER_IMAGE>~$DATABROKER_CSVBROKER_IMAGE~g"  ~/deploy/kubernetes/deployment/dsce-deployment.yaml
+    sed -i -- "s~<FEDERATION_IMAGE>~$FEDERATION_IMAGE~g"  ~/deploy/kubernetes/deployment/federation-deployment.yaml
+    sed -i -- "s~<FILEBEAT_IMAGE>~$FILEBEAT_IMAGE~g"  ~/deploy/kubernetes/deployment/filebeat-deployment.yaml
+    sed -i -- "s~<ONBOARDING_IMAGE>~$ONBOARDING_IMAGE~g"  ~/deploy/kubernetes/deployment/onboarding-deployment.yaml
+    sed -i -- "s~<ONBOARDING_BASE_IMAGE>~$ONBOARDING_BASE_IMAGE~g"  ~/deploy/kubernetes/deployment/onboarding-deployment.yaml
+    sed -i -- "s~<PORTAL_BE_IMAGE>~$PORTAL_BE_IMAGE~g"  ~/deploy/kubernetes/deployment/portal-be-deployment.yaml
+    sed -i -- "s~<PORTAL_FE_IMAGE>~$PORTAL_FE_IMAGE~g"  ~/deploy/kubernetes/deployment/portal-fe-deployment.yaml
 
     log "Deploy the k8s based components"
     # Create services first... see https://github.com/kubernetes/kubernetes/issues/16448
-    for f in kubernetes/service/*.yaml ; do
+    for f in  ~/deploy/kubernetes/service/*.yaml ; do
       log "Creating service from $f"
       kubectl create -f $f
     done
-    for f in kubernetes/deployment/*.yaml ; do
+    for f in  ~/deploy/kubernetes/deployment/*.yaml ; do
       log "Creating deployment from $f"
       kubectl create -f $f
     done
@@ -490,46 +542,56 @@ function setup_federation() {
 export WORK_DIR=$(pwd)
 log "Reset acumos-env.sh"
 sed -i -- '/DEPLOYED_UNDER/d' acumos-env.sh
-sed -i -- '/ACUMOS_MARIADB_PASSWORD/d' acumos-env.sh
-sed -i -- '/ACUMOS_MARIADB_USER_PASSWORD/d' acumos-env.sh
-sed -i -- '/ACUMOS_RO_USER_PASSWORD/d' acumos-env.sh
-sed -i -- '/ACUMOS_RW_USER_PASSWORD/d' acumos-env.sh
-sed -i -- '/ACUMOS_CDS_PASSWORD/d' acumos-env.sh
-sed -i -- '/ACUMOS_KEYPASS/d' acumos-env.sh
 
 if [[ "$1" == "k8s" ]]; then DEPLOYED_UNDER=k8s
 else DEPLOYED_UNDER=docker
 fi
 echo "DEPLOYED_UNDER=\"$DEPLOYED_UNDER\"" >>acumos-env.sh
 echo "export DEPLOYED_UNDER" >>acumos-env.sh
-ACUMOS_MARIADB_PASSWORD=$(uuidgen)
-echo "ACUMOS_MARIADB_PASSWORD=\"$ACUMOS_MARIADB_PASSWORD\"" >>acumos-env.sh
-echo "export ACUMOS_MARIADB_PASSWORD" >>acumos-env.sh
-ACUMOS_MARIADB_USER_PASSWORD=$(uuidgen)
-echo "ACUMOS_MARIADB_USER_PASSWORD=\"$ACUMOS_MARIADB_USER_PASSWORD\"" >>acumos-env.sh
-echo "export ACUMOS_MARIADB_USER_PASSWORD" >>acumos-env.sh
-ACUMOS_RO_USER_PASSWORD=$(uuidgen)
-echo "ACUMOS_RO_USER_PASSWORD=\"$ACUMOS_RO_USER_PASSWORD\"" >>acumos-env.sh
-echo "export ACUMOS_RO_USER_PASSWORD" >>acumos-env.sh
-ACUMOS_RW_USER_PASSWORD=$(uuidgen)
-echo "ACUMOS_RW_USER_PASSWORD=\"$ACUMOS_RW_USER_PASSWORD\"" >>acumos-env.sh
-echo "export ACUMOS_RW_USER_PASSWORD" >>acumos-env.sh
-ACUMOS_CDS_PASSWORD=$(uuidgen)
-echo "ACUMOS_CDS_PASSWORD=\"$ACUMOS_CDS_PASSWORD\"" >>acumos-env.sh
-echo "export ACUMOS_CDS_PASSWORD" >>acumos-env.sh
-ACUMOS_KEYPASS=$(uuidgen)
-echo "ACUMOS_KEYPASS=$ACUMOS_KEYPASS" >>acumos-env.sh
-echo "export ACUMOS_KEYPASS" >>acumos-env.sh
+source acumos-env.sh
 
-source acumos-env.sh $DEPLOYED_UNDER
+# Create the following only if deploying with a new DB
+if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
+  sed -i -- '/ACUMOS_CDS_PASSWORD/d' acumos-env.sh
+  sed -i -- '/ACUMOS_KEYPASS/d' acumos-env.sh
+  sed -i -- '/ACUMOS_MARIADB_PASSWORD/d' acumos-env.sh
+  sed -i -- '/ACUMOS_MARIADB_USER_PASSWORD/d' acumos-env.sh
+  sed -i -- '/ACUMOS_RO_USER_PASSWORD/d' acumos-env.sh
+  sed -i -- '/ACUMOS_RW_USER_PASSWORD/d' acumos-env.sh
+  ACUMOS_MARIADB_PASSWORD=$(uuidgen)
+  echo "ACUMOS_MARIADB_PASSWORD=\"$ACUMOS_MARIADB_PASSWORD\"" >>acumos-env.sh
+  echo "export ACUMOS_MARIADB_PASSWORD" >>acumos-env.sh
+  ACUMOS_MARIADB_USER_PASSWORD=$(uuidgen)
+  echo "ACUMOS_MARIADB_USER_PASSWORD=\"$ACUMOS_MARIADB_USER_PASSWORD\"" >>acumos-env.sh
+  echo "export ACUMOS_MARIADB_USER_PASSWORD" >>acumos-env.sh
+
+  ACUMOS_RO_USER_PASSWORD=$(uuidgen)
+  echo "ACUMOS_RO_USER_PASSWORD=\"$ACUMOS_RO_USER_PASSWORD\"" >>acumos-env.sh
+  echo "export ACUMOS_RO_USER_PASSWORD" >>acumos-env.sh
+  ACUMOS_RW_USER_PASSWORD=$(uuidgen)
+  echo "ACUMOS_RW_USER_PASSWORD=\"$ACUMOS_RW_USER_PASSWORD\"" >>acumos-env.sh
+  echo "export ACUMOS_RW_USER_PASSWORD" >>acumos-env.sh
+  ACUMOS_CDS_PASSWORD=$(uuidgen)
+  echo "ACUMOS_CDS_PASSWORD=\"$ACUMOS_CDS_PASSWORD\"" >>acumos-env.sh
+  echo "export ACUMOS_CDS_PASSWORD" >>acumos-env.sh
+  ACUMOS_KEYPASS=$(uuidgen)
+  echo "ACUMOS_KEYPASS=$ACUMOS_KEYPASS" >>acumos-env.sh
+  echo "export ACUMOS_KEYPASS" >>acumos-env.sh
+fi
+
+source acumos-env.sh
 
 setup_prereqs
-setup_mariadb
-setup_keystore
-setup_acumosdb
+if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
+  setup_mariadb
+  setup_keystore
+  setup_acumosdb
+fi
 setup_acumos
-setup_nexus
 setup_reverse_proxy
-setup_federation
+if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
+  setup_nexus
+  setup_federation
+fi
 
 log "Deploy is complete. You can access the portal at https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT (assuming you have added that hostname to your hosts file)"
