@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "598704a5_3b9c27b3",
+        "filename": "AIO/acumos-env.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-08-16T15:01:00Z",
+      "side": 1,
+      "message": "I hope you will soon upgrade to an assembly that uses cds 1.16, or at least 1.15.",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 84,
+        "endChar": 30
+      },
+      "revId": "0ae189b6dd59b320f7fbf5840385c55ebad16ffc",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
