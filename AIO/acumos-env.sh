@@ -35,24 +35,23 @@ export RELEASE=nexus3.acumos.org:10002
 # Images
 # If images are not found, goto https://nexus3.acumos.org and browse the
 # docker.staging folder for the specific component, and verify the version
-export COMMON_DATASERVICE_IMAGE=$STAGING/common-dataservice:1.14.4
-export ONBOARDING_IMAGE=$STAGING/onboarding-app:1.27.0
-export ONBOARDING_BASE_IMAGE=$STAGING/onboarding-base-r:1.0
-export PORTAL_BE_IMAGE=$STAGING/acumos-portal-be:1.15.33
-export PORTAL_FE_IMAGE=$STAGING/acumos-portal-fe:1.15.33
+export PORTAL_BE_IMAGE=$STAGING/acumos-portal-be:1.15.39
+export PORTAL_FE_IMAGE=$STAGING/acumos-portal-fe:1.15.39
+export AZURE_CLIENT_IMAGE=$STAGING/acumos-azure-client:1.2.13
+export DESIGNSTUDIO_IMAGE=$STAGING/ds-compositionengine:0.0.34
 export PORTAL_CMS_IMAGE=$STAGING/acumos-cms-docker:1.3.4
-export DESIGNSTUDIO_IMAGE=$STAGING/ds-compositionengine:0.0.30
-export FEDERATION_IMAGE=$STAGING/federation-gateway:1.1.2
+export ONBOARDING_IMAGE=$STAGING/onboarding-app:1.31.0_R1280
+export COMMON_DATASERVICE_IMAGE=$STAGING/common-dataservice:1.16.1
+export ONBOARDING_BASE_IMAGE=$STAGING/onboarding-base-r:1.0
 export FILEBEAT_IMAGE=$STAGING/acumos-filebeat:1.0.0
+export FEDERATION_IMAGE=$STAGING/federation-gateway:1.16.0
 export METRICBEAT_IMAGE=$STAGING/acumos-metricbeat:1.1.0
-export AZURE_CLIENT_IMAGE=$STAGING/acumos-azure-client:1.2.4
 export BLUEPRINT_ORCHESTRATOR_IMAGE=$STAGING/blueprint-orchestrator:1.0.13
+export PROTO_VIEWER_IMAGE=$SNAPSHOT/acumos_proto_viewer:1.5.4
 export DATABROKER_ZIPBROKER_IMAGE=$STAGING/databroker-zipbroker:0.0.1
 export DATABROKER_CSVBROKER_IMAGE=$STAGING/csvdatabroker:0.0.1
-export PROTO_VIEWER_IMAGE=$SNAPSHOT/acumos_proto_viewer:1.5.3
 export ACUMOS_PROJECT_NEXUS_USERNAME=docker
 export ACUMOS_PROJECT_NEXUS_PASSWORD=docker
-
 
 export ACUMOS_DOMAIN=$(hostname)
 host=$(ip route get 8.8.8.8 | awk '{print $NF; exit}')
@@ -81,7 +80,7 @@ export HTTPS_PROXY=""
 export ACUMOS_AZURE_CLIENT_HOST=$ACUMOS_DOMAIN
 export ACUMOS_AZURE_CLIENT_PORT=9081
 export ACUMOS_CDS_PREVIOUS_VERSION=
-export ACUMOS_CDS_VERSION=1.14
+export ACUMOS_CDS_VERSION=1.16
 export ACUMOS_CDS_DB="acumos_cds"
 export ACUMOS_CDS_HOST=$ACUMOS_DOMAIN
 export ACUMOS_CDS_PORT=30800

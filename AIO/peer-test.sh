@@ -71,7 +71,7 @@ function deploy() {
   ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
     $2@$1 bash oneclick_deploy.sh $3
   ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    $2@$1 bash create-user.sh test P@ssw0rd test user test@acumos-aio.com admin
+    $2@$1 bash create-user.sh test P@ssw0rd test user test@acumos-aio.com Admin
 }
 
 function verify_federation_api_access() {

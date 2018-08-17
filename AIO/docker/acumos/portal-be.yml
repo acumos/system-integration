@@ -79,7 +79,16 @@ services:
                    \"feature\" : {
                       \"validateModel\" : \"false\",
                       \"email_service\" : \"\",
-                      \"cas_enabled\" : \"false\"
+                      \"cas_enabled\" : \"false\",
+                      \"verifyAccount\" : \"false\",
+                      \"verifyToken\" : {
+                         \"exp_time\" : 24  
+                      }
+                   },
+                   \"ui\" : {
+                     \"server\" : {
+                        \"address\" : \"http://notused.com\"
+                     }
                    },
                    \"submitValidation\" : {
                       \"api\" : \"http://validation-client:$ACUMOS_VALIDATION_CLIENT_PORT/status/v1.0/tasks\"

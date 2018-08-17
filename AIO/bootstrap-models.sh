@@ -23,7 +23,7 @@
 #   from host1 to host2.
 #
 # Prerequisites:
-# - Acumos deployed via oneclick_deploy.sh, and acumos-env.sh as updated by it
+# - Acumos deployed via oneclick_deploy.sh
 # - key-based SSH access setup for running commands on the two target AIO hosts
 # - hostname of host1 and host2 resolvable in DNS or setup in /etc/hosts
 # - jq installed on the host
