@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1cbeddb3_1890a61c",
+        "filename": "AIO/acumos-env.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-08-21T12:50:12Z",
+      "side": 1,
+      "message": "This looks ancient - Deven is up to version 2.0.8 - maybe it didn\u0027t get communicated properly to the release management team??",
+      "range": {
+        "startLine": 49,
+        "startChar": 45,
+        "endLine": 49,
+        "endChar": 74
+      },
+      "revId": "b1b189690e3676a91d2f556a6e1459ca059e1cb0",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
