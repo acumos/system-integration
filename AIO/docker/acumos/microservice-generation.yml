@@ -20,12 +20,12 @@ version: '2'
 # docker-compose for onboarding-app
 # TODO: scrub all attributes for current need
 services:
-   onboarding-service:
-       image: ${ONBOARDING_IMAGE}
+   microservice-generation:
+       image: ${MICROSERVICE-GENERATION}
        environment:
           SPRING_APPLICATION_JSON: "{
                \"server\" :{
-                    \"port\" : ${ACUMOS_ONBOARDING_PORT}
+                    \"port\" : ${ACUMOS_MICROSERVICE_PORT}
                 },
                \"docker\" : {
                    \"host\" : \"${ACUMOS_DOCKER_API_HOST}\",
@@ -84,7 +84,7 @@ services:
                \"authenticationServiceURL\": \"http://portal-be-service:${ACUMOS_PORTAL_BE_PORT}\"
        }"
        ports:
-           - ${ACUMOS_ONBOARDING_PORT}:${ACUMOS_ONBOARDING_PORT}
+           - ${ACUMOS_MICROSERVICE_PORT}:${ACUMOS_MICROSERVICE_PORT}
        links:
            - cds-service
        depends_on:
