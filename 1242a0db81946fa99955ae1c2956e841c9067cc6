@@ -33,6 +33,29 @@
       "revId": "1242a0db81946fa99955ae1c2956e841c9067cc6",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d332d0c_93f1f756",
+        "filename": "AIO/docker/acumos/onboarding.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-08-22T14:39:29Z",
+      "side": 1,
+      "message": "Replace tabs with spaces, and align with the other elements at this level. I will download and test this patch for AIO etc deployment.\nWill this change be backward compatible with previous build assemblies, i.e. if the new parameter is not recognized by an earlier version, will it cause an issue?",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 17
+      },
+      "revId": "1242a0db81946fa99955ae1c2956e841c9067cc6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
