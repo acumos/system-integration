@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1cefd568_77accc39",
+        "filename": "AIO/docker/acumos/microservice-generation.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-08-22T14:30:25Z",
+      "side": 1,
+      "message": "please use spaces, not tabs, in YAML",
+      "revId": "1242a0db81946fa99955ae1c2956e841c9067cc6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "54876b65_ba960058",
+        "filename": "AIO/docker/acumos/onboarding.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-08-22T14:30:25Z",
+      "side": 1,
+      "message": "Please fix indentation.  Yaml uses spaces, not tabs.",
+      "revId": "1242a0db81946fa99955ae1c2956e841c9067cc6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
