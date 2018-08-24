@@ -22,6 +22,30 @@
       "revId": "b1b189690e3676a91d2f556a6e1459ca059e1cb0",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e2900ac7_15b908c2",
+        "filename": "AIO/acumos-env.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-08-24T16:49:07Z",
+      "side": 1,
+      "message": "That\u0027s the version per https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_1808041700. I work off the released assemblies.",
+      "parentUuid": "1cbeddb3_1890a61c",
+      "range": {
+        "startLine": 49,
+        "startChar": 45,
+        "endLine": 49,
+        "endChar": 74
+      },
+      "revId": "b1b189690e3676a91d2f556a6e1459ca059e1cb0",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
