@@ -51,7 +51,7 @@ export ACUMOS_DATA_BROKER_PORT=8556
 export ACUMOS_DATA_BROKER_INTERNAL_PORT=8080
 export ACUMOS_DOCKER_PLATFORM_PORT=8002
 export ACUMOS_PROBE_PORT=5006
-export ACUMOS_FILEBEAT_PORT=8099
+export ACUMOS_FILEBEAT_PORT=5000
 export ACUMOS_OPENSTACK_CLIENT_PORT=8007
 export ACUMOS_BLUEPRINT_PORT=8555
 export ACUMOS_OPENSTACK_SOLUTION_PORT=8336
@@ -59,26 +59,30 @@ export ACUMOS_METRICBEAT_PORT=8098
 export ACUMOS_ELASTICSEARCH_PORT=9200
 export ACUMOS_VALIDATION_MIDDLEWARE_PORT=9604
 export ACUMOS_VALIDATION_ENGINE_PORT=9605
+export ACUMOS_LOGSTASH_PORT=5044
 
 
 # Images
-export ACUMOS_ONBOARDING_IMAGE=onboarding-app:1.29.0
-export ACUMOS_PORTAL_BE_IMAGE=acumos-portal-be:1.15.36
-export ACUMOS_PORTAL_FE_IMAGE=acumos-portal-fe:1.15.36
+export ACUMOS_ONBOARDING_IMAGE=onboarding-app:1.31.0
+export ACUMOS_PORTAL_BE_IMAGE=acumos-portal-be:1.15.40
+export ACUMOS_PORTAL_FE_IMAGE=acumos-portal-fe:1.15.40
 export ACUMOS_CMS_IMAGE=acumos-cms-docker:1.3.4
-export ACUMOS_DESIGN_STUDIO_IMAGE=ds-compositionengine:0.0.32
+export ACUMOS_DESIGN_STUDIO_IMAGE=ds-compositionengine:0.0.34
 export ACUMOS_DATA_BROKER_IMAGE=databroker-zipbroker:0.0.1
 export ACUMOS_CSV_DATA_BROKER_IMAGE=csvdatabroker:0.0.1
-export ACUMOS_CDS_IMAGE=common-dataservice:1.15.3
-export ACUMOS_FEDERATION_IMAGE=federation-gateway:1.1.5
-export ACUMOS_FILEBEAT_IMAGE=acumos-filebeat:1.0.0
-export ACUMOS_METRICBEAT_IMAGE=acumos-metricbeat:1.1.0
-export ACUMOS_AZURE_CLIENT_IMAGE=acumos-azure-client:1.2.9
+export ACUMOS_CDS_IMAGE=common-dataservice:1.16.1
+export ACUMOS_FEDERATION_IMAGE=federation-gateway:1.16.0
+export ACUMOS_FILEBEAT_IMAGE=acumos-filebeat:1.2.0
+export ACUMOS_LOGSTASH_IMAGE=acumos-logstash:1.2.0
+export ACUMOS_KIBANA_IMAGE=acumos-kibana:1.2.0
+export ACUMOS_ELASTICSEARCH_IMAGE=acumos-elasticsearch:1.2.0
+export ACUMOS_METRICBEAT_IMAGE=acumos-metricbeat:1.2.0
+export ACUMOS_AZURE_CLIENT_IMAGE=acumos-azure-client:1.2.13
 export ACUMOS_VALIDATION_CLIENT=validation-client:1.2
 export ACUMOS_VALIDATION_ENGINE=validation-engine:1.2.2
 export ACUMOS_VALIDATION_MIDDLEWARE=validation-middleware:1.2
-export ACUMOS_OPENSTACK=openstack-client:1.1.5
-export ACUMOS_PROTO_VIEWER=acumos_proto_viewer:1.4.1
+export ACUMOS_OPENSTACK=openstack-client:1.1.11
+export ACUMOS_PROTO_VIEWER=acumos_proto_viewer:1.5.4
 export ACUMOS_BLUE_PRINT_ORCHESTRATOR=blueprint-orchestrator:1.0.13
 export ACUMOS_ONBOARDING_BASE_R=onboarding-base-r:1.0
 
@@ -139,7 +143,7 @@ export ACUMOS_MAILJET_SECRET_KEY=xxxxxxxxxxxxx
 export ACUMOS_TRUST_STORE_PWD=xxxxxx
 export ACUMOS_KEY_STORE_PWD=xxxxxx
 export ACUMOS_DOCKER_REGISTRY_EMAIL=user@domainname
-export ACUMOS_LOGSTASH_HOST=logcollector
+export ACUMOS_LOGSTASH_HOST=logstash-service.acumos-ns01
 export ACUMOS_ELK_HOST=
 
 

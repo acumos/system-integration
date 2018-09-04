@@ -1,0 +1,121 @@
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: acumos-elk-deployment
+  namespace: ${ACUMOS_NAMESPACE}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: elk
+      annotations:
+        pod.beta.kubernetes.io/init-containers: '[
+          {
+          "name": "sysctl",
+            "image": "busybox",
+            "imagePullPolicy": "IfNotPresent",
+            "command": ["sysctl", "-w", "vm.max_map_count=262144"],
+            "securityContext": {
+              "privileged": true
+            }
+          }
+        ]'
+    spec:
+      containers:
+        - name: elasticsearch
+          image: ${NEXUS3_RELEASE_REGISTRY_LF}/${ACUMOS_ELASTICSEARCH_IMAGE}
+          ports:
+          - containerPort: ${ACUMOS_ELASTICSEARCH_PORT}
+          env:
+          - name: ES_JAVA_OPTS
+            value: "-Xmx1g -Xms1g"
+          volumeMounts:
+            - name: elasticsearch
+              mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+              subPath: elasticsearch.yml
+          imagePullPolicy: Always
+        - name: logstash
+          image: ${NEXUS3_RELEASE_REGISTRY_LF}/${ACUMOS_LOGSTASH_IMAGE}
+          ports:
+          - containerPort: ${ACUMOS_LOGSTASH_PORT}
+          env:
+          - name: ACUMOS_ELK_JDBC_DRIVER_LIBRARY
+            value: "/usr/share/logstash/vendor/bundle/mariadb-java-client-2.1.0.jar"
+          - name: ACUMOS_ELK_JDBC_DRIVER_CLASS
+            value: "org.mariadb.jdbc.Driver"
+          - name: ACUMOS_ELK_JDBC_CONNECTION_STRING
+            value: "jdbc:mariadb://acumos-mysql.${ACUMOS_NAMESPACE}:${ACUMOS_MARIADB_PORT}/${ACUMOS_CDS_DB}"
+          - name: ACUMOS_ELK_JDBC_USERNAME
+            value: "${ACUMOS_MARIADB_USER}"
+          - name: ACUMOS_ELK_JDBC_PASSWORD
+            value: "${ACUMOS_MARIADB_PASSWORD}"
+          volumeMounts:
+            - name: config
+              mountPath: /usr/share/logstash/config/logstash.yml
+              subPath: logstash.yml
+              readOnly: true
+            - name: pipeline
+              mountPath: /usr/share/logstash/pipeline
+              readOnly: true
+          args:
+          - -f
+          - /usr/share/logstash/pipeline/logstash.conf
+          imagePullPolicy: Always
+        - name: kibana
+          image: ${NEXUS3_RELEASE_REGISTRY_LF}/${ACUMOS_KIBANA_IMAGE}
+          ports:
+          - containerPort: ${ACUMOS_KIBANA_PORT}
+          env:
+          - name: ELASTICSEARCH_URL
+            value: http://elasticsearch.${ACUMOS_NAMESPACE}:${ACUMOS_ELASTICSEARCH_PORT}
+          volumeMounts:
+            - name: kibana
+              mountPath: /usr/share/kibana/config/kibana.yml
+              subPath: kibana.yml
+          imagePullPolicy: Always
+      volumes:
+        - name: elasticsearch
+          configMap:
+            name: es-config
+            items:
+            - key: elasticsearch.yml
+              path: elasticsearch.yml
+        - name: pipeline
+          configMap:
+            name: logstash-config
+            items:
+            - key: logstash.conf
+              path: logstash.conf
+        - name: config
+          configMap:
+            name: logstash-config
+            items:
+            - key: logstash.yml
+              path: logstash.yml
+         - name: kibana
+          configMap:
+            name: kibana-config
+            items:
+            - key: kibana.yml
+              path: kibana.yml
+      imagePullSecrets:
+        - name: acumossecret
+            

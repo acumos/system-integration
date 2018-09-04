@@ -418,7 +418,7 @@ spec:
                       "name": "blueprint-orchestrator"
                     },
                     "nexus": {
-                      "url": "http://${ACUMOS_NEXUS_SERVICE}.${ACUMOS_NAMESPACE}:${ACUMOS_NEXUS_ENDPOINT_PORT}/repository/acumos_model_maven/",
+                      "url": "http://${ACUMOS_NEXUS_SERVICE}.${ACUMOS_NAMESPACE}:${ACUMOS_NEXUS_ENDPOINT_PORT}/repository/acumos-k8-models-maven/",
                       "nexusproxy": "NA",
                       "password": "${ACUMOS_NEXUS_PASSWORD}",
                       "username": "${ACUMOS_NEXUS_USERNAME}",
@@ -433,7 +433,7 @@ spec:
                       "ImageName": "${NEXUS3_RELEASE_REGISTRY_LF}/${ACUMOS_PROTO_VIEWER}",
                       "name": "proto_viewer",
                       "internalPort": "${ACUMOS_PROBE_PORT}",
-                      "probeNexusEndPoint": "http://${ACUMOS_NEXUS_SERVICE}.${ACUMOS_NAMESPACE}:${ACUMOS_NEXUS_ENDPOINT_PORT}/repository/acumos_model_maven"
+                      "probeNexusEndPoint": "http://${ACUMOS_NEXUS_SERVICE}.${ACUMOS_NAMESPACE}:${ACUMOS_NEXUS_ENDPOINT_PORT}/repository/acumos-k8-models-maven"
                     }
                   }'
          volumeMounts:
@@ -479,7 +479,7 @@ spec:
                          }
                     },
                     "nexus": {
-                      "url": "http://${ACUMOS_NEXUS_SERVICE}.${ACUMOS_NAMESPACE}:${ACUMOS_NEXUS_ENDPOINT_PORT}/repository/acumos_model_maven/",
+                      "url": "http://${ACUMOS_NEXUS_SERVICE}.${ACUMOS_NAMESPACE}:${ACUMOS_NEXUS_ENDPOINT_PORT}/repository/acumos-k8-models-maven/",
                       "nexusproxy": "NA",
                       "password": "${ACUMOS_NEXUS_PASSWORD}",
                       "username": "${ACUMOS_NEXUS_USERNAME}",
@@ -504,7 +504,7 @@ spec:
            - name: LOGSTASH_HOST
              value: ${ACUMOS_LOGSTASH_HOST}
            - name: LOGSTASH_PORT
-             value: "${ACUMOS_KIBANA_PORT}"
+             value: "${ACUMOS_LOGSTASH_PORT}"
          volumeMounts:
            - mountPath: /filebeat-logs
              name: acumos-logs
