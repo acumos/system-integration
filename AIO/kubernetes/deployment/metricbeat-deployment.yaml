@@ -17,65 +17,81 @@ apiVersion: apps/v1
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 
-# What this is: kubernetes template for Acumos docker-engine deployment
+# What this is: kubernetes template for Acumos metricbeat deployment
 # How to use:
 # - Replace fields in <> with actual values (k8s does not support env variables)
 
 kind: Deployment
 metadata:
   namespace: acumos
-  name: docker
+  name: metricbeat
   labels:
-    app: docker
+    app: metricbeat
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: docker
+      app: metricbeat
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: docker
+        app: metricbeat
     spec:
-      volumes:
-      - name: docker-volume
-        emptyDir: {}
-      # Docker-commands-container
+      imagePullSecrets:
+      - name: acumos-registry
       containers:
-      - name: docker-cmds
-        image: docker:dind
-        securityContext:
-            privileged: true
-        command: ['/bin/sh', '-c', 'while ! docker run -d -p 80:80 httpd:latest; do echo "docker-API not ready"; sleep 10; done; sleep 3600']
+      - name: metricbeat
+        image: <METRICBEAT_IMAGE>
         env:
         - name: log_level
           value: "DEBUG"
-        - name: DOCKER_HOST
-          value: "tcp://0.0.0.0:<ACUMOS_DOCKER_API_PORT>"
+        - name: ELASTICSEARCH_HOST
+          value: "<ACUMOS_ELK_ELASTICSEARCH_HOST>"
+        - name: ELASTICSEARCH_PORT
+          value: "<ACUMOS_ELK_ELASTICSEARCH_PORT>"
+        - name: PROCS
+          value: ".*"
+        - name: PERIOD
+          value: "10s"
+        - name: SHIPPER_NAME
+          value: "acumos-aio"
         ports:
-        - name: docker-api-port
-          containerPort: <ACUMOS_DOCKER_API_PORT>
-          protocol: TCP
-      # Docker-Daemon-container
-      - name: docker-daemon
-        image: docker:dind
-        securityContext:
-            privileged: true
-        env:
-          - name: HTTP_PROXY
-            value: "<HTTP_PROXY>"
-          - name: HTTPS_PROXY
-            value: "<HTTPS_PROXY>"
-          - name: DIND_INSECURE_REGISTRIES
-            value: "[\"0.0.0.0/0\"]"
-          - name: DOCKER_OPTS
-            value: '--insecure-registry=<ACUMOS_NEXUS_HOST>:<ACUMOS_DOCKER_MODEL_PORT>'
-        args: ["$(DOCKER_OPTS)"]
+        - containerPort: 8098
+        command: ['metricbeat', '-e', '-strict.perms=false', '-system.hostfs=/hostfs']
         volumeMounts:
-        - name: docker-volume
-          mountPath: /var/lib/docker
+        - mountPath: /hostfs/proc
+          name: proc
+          readOnly: true
+        - mountPath: /hostfs/sys/fs/cgroup
+          name: cgroup
+          readOnly: true
+        - mountPath: /hostfs
+          name: root
+          readOnly: true
+        - mountPath: /var/run
+          name: run
+          readOnly: false
+        - mountPath: /var/run/docker.sock
+          name: sock
+      restartPolicy: Always
+      volumes:
+      - name: proc
+        hostPath:
+          path: /proc
+      - name: cgroup
+        hostPath:
+          path: /sys/fs/cgroup
+      - name: root
+        hostPath:
+          path: /
+      - name: run
+        hostPath:
+          path: /var/run
+      - name: sock
+        hostPath:
+          path: /var/run/docker.sock
       hostAliases:
       - ip: "<ACUMOS_HOST>"
         hostnames:

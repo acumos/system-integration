@@ -47,35 +47,35 @@ spec:
         env:
         - name: SPRING_APPLICATION_JSON
           value: '{
-                    "server" : {
-                      "port" : 8085
+                    "server": {
+                      "port": 8085
                     },
-                    "zuul" : {
-                      "routes" : {
-                        "api" : {
+                    "zuul": {
+                      "routes": {
+                        "api": {
                           "url": "http://portal-be-service:8083"
                         },
                         "dsce": {
                           "url": "http://dsce-service:8088"
                         },
-                        "site" : {
+                        "site": {
                           "url": "http://cms-service:9080"
                         },
-                        "cmnt" : {
-                          "url" : "http://delete-me"
+                        "cmnt": {
+                          "url": "http://delete-me"
                         },
-                        "azure" : {
-                          "url" : "http://azure-client-service:9081"
+                        "azure": {
+                          "url": "http://azure-client-service:9081"
                         }
                       },
-                      "host" : {
-                        "connect-timeout-millis" : 300000,
-                        "socket-timeout-millis" : 300000
+                      "host": {
+                        "connect-timeout-millis": 300000,
+                        "socket-timeout-millis": 300000
                       }
                     },
-                    "spring" : {
-                      "http" : {
-                        "multipart" : {
+                    "spring": {
+                      "http": {
+                        "multipart": {
                           "max-file-size": -1,
                           "max-request-size": -1
                         }
@@ -92,3 +92,7 @@ spec:
       - name: acumos-logs
         hostPath:
           path: /var/acumos/logs
+      hostAliases:
+      - ip: "<ACUMOS_HOST>"
+        hostnames:
+        - "<ACUMOS_DOMAIN>"

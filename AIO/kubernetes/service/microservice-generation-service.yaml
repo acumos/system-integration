@@ -1,4 +1,4 @@
-version: '2'
+apiVersion: v1
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -17,14 +17,20 @@ version: '2'
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 
-# docker-compose for Acumos logging component filebeat
-#
-services:
-  filebeat-service:
-    image: ${FILEBEAT_IMAGE}
-    volumes:
-      - acumos-logs:/filebeat-logs
-    environment:
-      - LOGSTASH_HOST=${ACUMOS_ELK_LOGSTASH_HOST}
-      - LOGSTASH_PORT=${ACUMOS_ELK_LOGSTASH_PORT}
+# What this is: kubernetes template for Acumos microservice-generation service
+# How to use:
+# - Replace fields in <> with actual values (k8s does not support env variables)
 
+kind: Service
+metadata:
+  namespace: acumos
+  name: msg-service
+  labels:
+    app: msg
+spec:
+  selector:
+    app: msg
+  type: ClusterIP
+  ports:
+  - port: <ACUMOS_MICROSERVICE_GENERATION_PORT>
+    targetPort: 8336

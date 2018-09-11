@@ -17,39 +17,39 @@ apiVersion: apps/v1
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 
-# What this is: kubernetes template for Acumos onboarding deployment
+# What this is: kubernetes template for Acumos microservice-generation deployment
 # How to use:
 # - Replace fields in <> with actual values (k8s does not support env variables)
 
 kind: Deployment
 metadata:
   namespace: acumos
-  name: onboarding
+  name: microservice-generation
   labels:
-    app: onboarding
+    app: msg
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: onboarding
+      app: msg
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: onboarding
+        app: msg
     spec:
       imagePullSecrets:
       - name: acumos-registry
       containers:
-      - name: onboarding
-        image: <ONBOARDING_IMAGE>
+      - name: msg
+        image: <MICROSERVICE_GENERATION_IMAGE>
         env:
         env:
         - name: SPRING_APPLICATION_JSON
           value: '{
                    "server":{
-                     "port": 8090
+                     "port": 8336
                    },
                    "docker": {
                      "host": "docker-service",
@@ -101,10 +101,6 @@ spec:
                      "dockerusername": "<ACUMOS_PROJECT_NEXUS_USERNAME>",
                      "dockerpassword": "<ACUMOS_PROJECT_NEXUS_PASSWORD>"
                    },
-                   "tosca": {
-                     "OutputFolder": "/temp/",
-                     "GeneratorEndPointURL": "http://delete-me/model_create"
-                   },
                    "spring": {
                      "http": {
                        "multipart": {
@@ -115,7 +111,7 @@ spec:
                    }
                  }'
         ports:
-        - containerPort: 8090
+        - containerPort: 8336
         volumeMounts:
         - mountPath: /maven/logs
           name: acumos-logs

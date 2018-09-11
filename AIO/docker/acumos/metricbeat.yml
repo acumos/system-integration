@@ -17,14 +17,25 @@ version: '2'
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 
-# docker-compose for Acumos logging component filebeat
+# docker-compose for Acumos logging component metricbeat
 #
 services:
-  filebeat-service:
-    image: ${FILEBEAT_IMAGE}
+  metricbeat-service:
+    image: ${METRICBEAT_IMAGE}
+    network_mode: host
     volumes:
-      - acumos-logs:/filebeat-logs
+    #Mount the host filesystem to enable Metricbeat to monitor the host rather than the Metricbeat container.
+      - /proc:/hostfs/proc:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /:/hostfs:ro
+      - /var/run:/var/run:rw
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: metricbeat -e -strict.perms=false -system.hostfs=/hostfs
     environment:
-      - LOGSTASH_HOST=${ACUMOS_ELK_LOGSTASH_HOST}
-      - LOGSTASH_PORT=${ACUMOS_ELK_LOGSTASH_PORT}
-
+      - ELASTICSEARCH_HOST=${ACUMOS_ELK_ELASTICSEARCH_HOST}
+      - ELASTICSEARCH_PORT=${ACUMOS_ELK_ELASTICSEARCH_PORT}
+      - PROCS=.*
+      - PERIOD=10s
+      - SHIPPER_NAME=acumos-aio
+    extra_hosts:
+      - "elasticsearch-service:${ACUMOS_HOST}"

@@ -48,9 +48,9 @@ spec:
         - name: log_level
           value: "DEBUG"
         - name: LOGSTASH_HOST
-          value: logcollector
+          value: "<ACUMOS_ELK_LOGSTASH_HOST>"
         - name: LOGSTASH_PORT
-          value: "5601"
+          value: "<ACUMOS_ELK_LOGSTASH_PORT>"
         ports:
         - containerPort: 8099
         volumeMounts:
@@ -61,3 +61,7 @@ spec:
       - name: acumos-logs
         hostPath:
           path: /var/acumos/logs
+      hostAliases:
+      - ip: "<ACUMOS_HOST>"
+        hostnames:
+        - "<ACUMOS_DOMAIN>"

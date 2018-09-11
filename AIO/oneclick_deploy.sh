@@ -121,9 +121,21 @@ function setup_prereqs() {
       sudo apt-get install -y docker-compose
     fi
 
-    log "Enable docker remote API"
+    log "Enable docker API"
     if [[ $(grep -c "\-H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT" /lib/systemd/system/docker.service) -eq 0 ]]; then
       sudo sed -i -- "s~ExecStart=/usr/bin/dockerd -H fd://~ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT~" /lib/systemd/system/docker.service
+    fi
+
+    log "Block host-external access to docker API"
+    if [[ $(sudo iptables -S | grep -c '172.18.0.0/16 .* 2375') -eq 0 ]]; then
+      sudo iptables -A INPUT -p tcp --dport 2375 ! -s 172.18.0.0/16 -j DROP
+    fi
+    if [[ $(sudo iptables -S | grep -c '127.0.0.1/32 .* 2375') -eq 0 ]]; then
+      sudo iptables -I INPUT -s localhost -p tcp -m tcp --dport 2375 -j ACCEPT
+    fi
+    host_ip=$(/sbin/ip route get 8.8.8.8 | awk '{print $NF; exit}')
+    if [[ $(sudo iptables -S | grep -c "$host_ip .* 2375") -eq 0 ]]; then
+      sudo iptables -I INPUT -s $host_ip -p tcp -m tcp --dport 2375 -j ACCEPT
     fi
 
     log "Enable non-secure docker repositories"
@@ -323,6 +335,35 @@ function docker_login() {
   done
 }
 
+function setup_elk() {
+  if [[ "$DEPLOYED_UNDER" = "docker" ]]; then
+		if [[ $(sudo docker volume ls | grep -c acumos-esdata) -eq 0 ]]; then
+      log "Create docker volume for ElasticSearch persistent data"
+		  sudo docker volume create acumos-esdata
+		fi
+  else
+    log "Create local shared folder for ElasticSearch persistent data"
+    mkdir -p /var/acumos/esdata
+  fi
+
+  log "Prepare ELK stack component configs for AIO deploy"
+  if [[ -d platform-oam ]]; then rm -rf platform-oam; fi
+  git clone https://gerrit.acumos.org/r/platform-oam
+  cp -r platform-oam/elk-stack/elasticsearch /var/acumos/.
+  cat <<EOF >/var/acumos/elasticsearch/config/jvm.options
+-Xmx${ACUMOS_ELK_LS_JAVA_HEAP_MAX_SIZE}
+-Xms${ACUMOS_ELK_LS_JAVA_HEAP_MIN_SIZE}
+EOF
+  log "Correct references to elasticsearch-service for AIO deploy"
+  sed -i -- 's/elasticsearch:9200/elasticsearch-service:9200/g' \
+    platform-oam/elk-stack/logstash/pipeline/logstash.conf
+  sed -i -- 's/elasticsearch:9200/elasticsearch-service:9200/g' \
+    platform-oam/elk-stack/kibana/config/kibana.yml
+  log "Copy ELK stack component configs to /;var/acumos"
+  cp -r platform-oam/elk-stack/kibana /var/acumos/.
+  cp -r platform-oam/elk-stack/logstash /var/acumos/.
+}
+
 function setup_acumos() {
   trap 'fail' ERR
   log "Log into LF Nexus Docker repos"
@@ -331,10 +372,28 @@ function setup_acumos() {
   docker_login https://nexus3.acumos.org:10002
   sudo chown -R $USER:$USER ~/.docker
 
+  setup_elk
+
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     log "Deploy Acumos docker-based components"
     sudo bash docker-compose.sh build
-    sudo bash docker-compose.sh up -d
+    log "Start ELK stack first and wait for ElasticSearch to be active"
+    # metricbeat will exit if ElasticSearch isn't listening on its exposed port
+    sudo bash docker-compose.sh up -d \
+      elasticsearch-service logstash-service kibana-service
+    url=http://$ACUMOS_HOST:$ACUMOS_ELK_ELASTICSEARCH_PORT
+    while ! curl $url ; do
+      log "ElasticSearch is not yet responding at $url, waiting 10 seconds"
+      sleep 10
+    done
+    sudo bash docker-compose.sh up -d \
+      elasticsearch-service logstash-service kibana-service
+    sudo bash docker-compose.sh up -d kong-service nexus-service 
+    sudo bash docker-compose.sh up -d \
+      cms-service azure-client-service cds-service dsce-service \
+      federation-service onboarding-service portal-be-service portal-fe-service
+    sudo bash docker-compose.sh up -d \
+      metricbeat-service filebeat-service
   else
     if [[ $(kubectl get namespaces | grep -c 'acumos ') == 1 ]]; then
       echo "Stop any running Acumos component services under kubernetes"
@@ -380,8 +439,9 @@ EOF
 
     log "Deploy Acumos kubernetes-based components"
     log "Set variable values in k8s templates"
-    depvars="ACUMOS_MARIADB_HOST ACUMOS_MARIADB_PORT ACUMOS_MARIADB_USER_PASSWORD ACUMOS_NEXUS_API_PORT ACUMOS_NEXUS_HOST ACUMOS_RW_USER ACUMOS_RO_USER ACUMOS_RW_USER_PASSWORD ACUMOS_RO_USER_PASSWORD ACUMOS_DOCKER_API_HOST ACUMOS_DOCKER_API_PORT ACUMOS_DOCKER_MODEL_PORT ACUMOS_KONG_DB_PORT ACUMOS_KONG_PROXY_PORT ACUMOS_KONG_PROXY_SSL_PORT ACUMOS_KONG_ADMIN_PORT ACUMOS_KONG_ADMIN_SSL_PORT ACUMOS_DOCKER_API_PORT ACUMOS_PROJECT_NEXUS_USERNAME ACUMOS_PROJECT_NEXUS_PASSWORD"
-    compvars="ACUMOS_AZURE_CLIENT_PORT ACUMOS_CDS_PORT ACUMOS_CDS_DB ACUMOS_CDS_PASSWORD ACUMOS_CDS_USER ACUMOS_CMS_PORT ACUMOS_DSCE_PORT ACUMOS_FEDERATION_PORT ACUMOS_ONBOARDING_PORT ACUMOS_PORTAL_BE_PORT ACUMOS_PORTAL_FE_PORT ACUMOS_KEYPASS ACUMOS_DATA_BROKER_INTERNAL_PORT ACUMOS_DATA_BROKER_PORT ACUMOS_DEPLOYED_SOLUTION_PORT ACUMOS_DEPLOYED_VM_PASSWORD ACUMOS_DEPLOYED_VM_USER ACUMOS_PROBE_PORT ACUMOS_OPERATOR_ID HTTP_PROXY HTTPS_PROXY"
+    depvars="ACUMOS_HOST ACUMOS_DOMAIN ACUMOS_MARIADB_HOST ACUMOS_MARIADB_PORT ACUMOS_MARIADB_USER_PASSWORD ACUMOS_NEXUS_API_PORT ACUMOS_NEXUS_HOST ACUMOS_RW_USER ACUMOS_RO_USER ACUMOS_RW_USER_PASSWORD ACUMOS_RO_USER_PASSWORD ACUMOS_DOCKER_API_HOST ACUMOS_DOCKER_API_PORT ACUMOS_DOCKER_MODEL_PORT ACUMOS_KONG_DB_PORT ACUMOS_KONG_PROXY_PORT ACUMOS_KONG_PROXY_SSL_PORT ACUMOS_KONG_ADMIN_PORT ACUMOS_KONG_ADMIN_SSL_PORT ACUMOS_DOCKER_API_PORT ACUMOS_PROJECT_NEXUS_USERNAME ACUMOS_PROJECT_NEXUS_PASSWORD ACUMOS_ELK_ELASTICSEARCH_HOST ACUMOS_ELK_ELASTICSEARCH_PORT ACUMOS_ELK_NODEPORT ACUMOS_ELK_LOGSTASH_HOST ACUMOS_ELK_LOGSTASH_PORT ACUMOS_ELK_KIBANA_PORT ACUMOS_ELK_KIBANA_NODEPORT ACUMOS_ELK_ES_JAVA_HEAP_MIN_SIZE ACUMOS_ELK_ES_JAVA_HEAP_MAX_SIZE ACUMOS_ELK_LS_JAVA_HEAP_MIN_SIZE ACUMOS_ELK_LS_JAVA_HEAP_MAX_SIZE ACUMOS_METRICBEAT_PORT"
+
+    compvars="ACUMOS_AZURE_CLIENT_PORT ACUMOS_CDS_PORT ACUMOS_CDS_DB ACUMOS_CDS_PASSWORD ACUMOS_CDS_USER ACUMOS_CMS_PORT ACUMOS_DSCE_PORT ACUMOS_FEDERATION_PORT ACUMOS_FILEBEAT_PORT  ACUMOS_MICROSERVICE_GENERATION_PORT ACUMOS_ONBOARDING_PORT ACUMOS_PORTAL_BE_PORT ACUMOS_PORTAL_FE_PORT ACUMOS_KEYPASS ACUMOS_DATA_BROKER_INTERNAL_PORT ACUMOS_DATA_BROKER_PORT ACUMOS_DEPLOYED_SOLUTION_PORT ACUMOS_DEPLOYED_VM_PASSWORD ACUMOS_DEPLOYED_VM_USER ACUMOS_PROBE_PORT ACUMOS_OPERATOR_ID HTTP_PROXY HTTPS_PROXY"
     set +x
     mkdir -p ~/deploy/kubernetes
     cp -r kubernetes/* ~/deploy/kubernetes/.
@@ -404,10 +464,16 @@ EOF
     sed -i -- "s~<DATABROKER_CSVBROKER_IMAGE>~$DATABROKER_CSVBROKER_IMAGE~g"  ~/deploy/kubernetes/deployment/dsce-deployment.yaml
     sed -i -- "s~<FEDERATION_IMAGE>~$FEDERATION_IMAGE~g"  ~/deploy/kubernetes/deployment/federation-deployment.yaml
     sed -i -- "s~<FILEBEAT_IMAGE>~$FILEBEAT_IMAGE~g"  ~/deploy/kubernetes/deployment/filebeat-deployment.yaml
+    sed -i -- "s~<MICROSERVICE_GENERATION_IMAGE>~$MICROSERVICE_GENERATION_IMAGE~g"  ~/deploy/kubernetes/deployment/microservice-generation-deployment.yaml
     sed -i -- "s~<ONBOARDING_IMAGE>~$ONBOARDING_IMAGE~g"  ~/deploy/kubernetes/deployment/onboarding-deployment.yaml
     sed -i -- "s~<ONBOARDING_BASE_IMAGE>~$ONBOARDING_BASE_IMAGE~g"  ~/deploy/kubernetes/deployment/onboarding-deployment.yaml
     sed -i -- "s~<PORTAL_BE_IMAGE>~$PORTAL_BE_IMAGE~g"  ~/deploy/kubernetes/deployment/portal-be-deployment.yaml
     sed -i -- "s~<PORTAL_FE_IMAGE>~$PORTAL_FE_IMAGE~g"  ~/deploy/kubernetes/deployment/portal-fe-deployment.yaml
+    sed -i -- "s~<ELASTICSEARCH_IMAGE>~$ELASTICSEARCH_IMAGE~g"  ~/deploy/kubernetes/deployment/elk-deployment.yaml
+    sed -i -- "s~<LOGSTASH_IMAGE>~$LOGSTASH_IMAGE~g"  ~/deploy/kubernetes/deployment/elk-deployment.yaml
+    sed -i -- "s~<KIBANA_IMAGE>~$KIBANA_IMAGE~g"  ~/deploy/kubernetes/deployment/elk-deployment.yaml
+    sed -i -- "s~<FILEBEAT_IMAGE>~$FILEBEAT_IMAGE~g"  ~/deploy/kubernetes/deployment/filebeat-deployment.yaml
+    sed -i -- "s~<METRICBEAT_IMAGE>~$METRICBEAT_IMAGE~g"  ~/deploy/kubernetes/deployment/metricbeat-deployment.yaml
 
     log "Deploy the k8s based components"
     # Create services first... see https://github.com/kubernetes/kubernetes/issues/16448

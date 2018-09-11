@@ -17,16 +17,16 @@ version: '2'
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 
-# docker-compose for onboarding-app
+# docker-compose for microservice-generation
 # TODO: scrub all attributes for current need
 services:
-   onboarding-service:
-       image: ${ONBOARDING_IMAGE}
+   microservice-generation:
+       image: ${MICROSERVICE_GENERATION_IMAGE}
        environment:
           SPRING_APPLICATION_JSON: "{
                \"server\":{
-                    \"port\": ${ACUMOS_ONBOARDING_PORT}
-                },
+                    \"port\": ${ACUMOS_MICROSERVICE_GENERATION_PORT}
+               },
                \"docker\": {
                    \"host\": \"${ACUMOS_DOCKER_API_HOST}\",
                    \"port\": ${ACUMOS_DOCKER_API_PORT},
@@ -55,7 +55,7 @@ services:
                    \"nexusUserName\": \"${ACUMOS_RW_USER}\",
                    \"nexusPassword\": \"${ACUMOS_RW_USER_PASSWORD}\",
                    \"nexusproxy\": \"\",
-                   \"nexusGroupId\": \"com.artifact\"
+                   \"nexusGroupId\": \"org.acumos\"
                },
                \"cmndatasvc\": {
                    \"cmnDataSvcEndPoinURL\": \"http://cds-service:${ACUMOS_CDS_PORT}/ccds\",
@@ -77,10 +77,6 @@ services:
                    \"dockerusername\": \"${ACUMOS_PROJECT_NEXUS_USERNAME}\",
                    \"dockerpassword\": \"${ACUMOS_PROJECT_NEXUS_PASSWORD}\"
                },
-               \"tosca\": {
-                   \"OutputFolder\": \"/temp/\",
-                   \"GeneratorEndPointURL\": \"http://delete-me/model_create\"
-               },
                \"spring\": {
                    \"http\": {
                        \"multipart\": {
@@ -91,7 +87,7 @@ services:
                }
        }"
        ports:
-           - ${ACUMOS_ONBOARDING_PORT}:${ACUMOS_ONBOARDING_PORT}
+           - ${ACUMOS_MICROSERVICE_GENERATION_PORT}:${ACUMOS_MICROSERVICE_GENERATION_PORT}
        links:
            - cds-service
        depends_on:

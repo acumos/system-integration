@@ -69,3 +69,7 @@ spec:
       - name: nexus-data
         hostPath:
           path: /var/acumos/nexus-data
+      hostAliases:
+      - ip: "<ACUMOS_HOST>"
+        hostnames:
+        - "<ACUMOS_DOMAIN>"

@@ -26,30 +26,30 @@ services:
        image: ${COMMON_DATASERVICE_IMAGE}
        environment:
            SPRING_APPLICATION_JSON: "{
-                \"server\" : {
-                    \"port\" : ${ACUMOS_CDS_PORT}
+                \"server\": {
+                    \"port\": ${ACUMOS_CDS_PORT}
                 },
-                \"security\" : {
-                    \"user\" : {
-                        \"name\"     : \"${ACUMOS_CDS_USER}\",
-                        \"password\" : \"${ACUMOS_CDS_PASSWORD}\"
+                \"security\": {
+                    \"user\": {
+                        \"name\"    : \"${ACUMOS_CDS_USER}\",
+                        \"password\": \"${ACUMOS_CDS_PASSWORD}\"
                     }
                 },
-                \"spring\" : {
-                    \"database\" : {
-                        \"driver\" : {
-                            \"classname\" : \"org.mariadb.jdbc.Driver\"
+                \"spring\": {
+                    \"database\": {
+                        \"driver\": {
+                            \"classname\": \"org.mariadb.jdbc.Driver\"
                         }
                     },
-                    \"datasource\" : {
-                        \"url\" : \"jdbc:mysql://${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_PORT}/$ACUMOS_CDS_DB?useSSL=false\",
-                        \"username\" : \"acumos_opr\",
-                        \"password\" : \"${ACUMOS_MARIADB_USER_PASSWORD}\"
+                    \"datasource\": {
+                        \"url\": \"jdbc:mysql://${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_PORT}/$ACUMOS_CDS_DB?useSSL=false\",
+                        \"username\": \"acumos_opr\",
+                        \"password\": \"${ACUMOS_MARIADB_USER_PASSWORD}\"
                     },
-                    \"jpa\" : {
-                        \"database-platform\" : \"org.hibernate.dialect.MySQLDialect\",
-                        \"hibernate\" : {
-                            \"ddl-auto\" : \"validate\"
+                    \"jpa\": {
+                        \"database-platform\": \"org.hibernate.dialect.MySQLDialect\",
+                        \"hibernate\": {
+                            \"ddl-auto\": \"validate\"
                         }
                    }
                  }

@@ -24,35 +24,35 @@ services:
        image: ${PORTAL_FE_IMAGE}
        environment:
            SPRING_APPLICATION_JSON: "{
-               \"server\" : {
-                    \"port\" : ${ACUMOS_PORTAL_FE_PORT}
+               \"server\": {
+                    \"port\": ${ACUMOS_PORTAL_FE_PORT}
                 },
-               \"zuul\" : {
-                   \"routes\" : {
-                      \"api\" : {
+               \"zuul\": {
+                   \"routes\": {
+                      \"api\": {
                         \"url\": \"http://portal-be-service:${ACUMOS_PORTAL_BE_PORT}\"
                       },
                       \"dsce\": {
                         \"url\": \"http://dsce-service:${ACUMOS_DSCE_PORT}\"
                       },
-                      \"site\" : {
+                      \"site\": {
                         \"url\": \"http://cms-service:${ACUMOS_CMS_PORT}\"
                       },
-                      \"cmnt\" : {
-                         \"url\" : \"http://delete-me:${ACUMOS_PLATON_PORT}\"
+                      \"cmnt\": {
+                         \"url\": \"http://delete-me\"
                       },
-                      \"azure\" : {
-                          \"url\" : \"http://azure-client-service:${ACUMOS_AZURE_CLIENT_PORT}\"
+                      \"azure\": {
+                          \"url\": \"http://azure-client-service:${ACUMOS_AZURE_CLIENT_PORT}\"
                       }
                    },
-                    \"host\" : {
-                      \"connect-timeout-millis\" : 300000,
-                      \"socket-timeout-millis\" : 300000
+                    \"host\": {
+                      \"connect-timeout-millis\": 300000,
+                      \"socket-timeout-millis\": 300000
                    }
                },
-               \"spring\" : {
-                  \"http\" : {
-                     \"multipart\" : {
+               \"spring\": {
+                  \"http\": {
+                     \"multipart\": {
                         \"max-file-size\": -1,
                         \"max-request-size\": -1
                      }
