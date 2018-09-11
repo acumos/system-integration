@@ -84,3 +84,7 @@ spec:
       - name: kong-db
         hostPath:
           path: /var/acumos/kong-db
+      hostAliases:
+      - ip: "<ACUMOS_HOST>"
+        hostnames:
+        - "<ACUMOS_DOMAIN>"

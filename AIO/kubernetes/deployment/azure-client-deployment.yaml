@@ -50,7 +50,7 @@ spec:
         - name: SPRING_APPLICATION_JSON
           value: '{
                     "server": {
-                      "port": "9081"
+                      "port": 9081
                     },
                     "docker": {
                       "containerNamePrefix": "E6E-NSG",
@@ -125,3 +125,7 @@ spec:
       - name: acumos-logs
         hostPath:
           path: /var/acumos/logs
+      hostAliases:
+      - ip: "<ACUMOS_HOST>"
+        hostnames:
+        - "<ACUMOS_DOMAIN>"

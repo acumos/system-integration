@@ -47,8 +47,8 @@ spec:
         env:
         - name: SPRING_APPLICATION_JSON
           value: '{
-                    "server" : {
-                      "port" : 8083
+                    "server": {
+                      "port": 8083
                     },
                     "nexus": {
                       "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/repository/acumos_model_maven/",
@@ -57,81 +57,81 @@ spec:
                       "username": "<ACUMOS_RW_USER>",
                       "groupid": "com.artifact"
                     },
-                    "cdms" : {
-                      "client" : {
+                    "cdms": {
+                      "client": {
                         "url": "http://cds-service:8000/ccds",
                         "username": "<ACUMOS_CDS_USER>",
                         "password": "<ACUMOS_CDS_PASSWORD>"
                       }
                     },
-                    "docker" : {
-                      "host" : "docker-service",
-                      "port" : "<ACUMOS_DOCKER_API_PORT>",
-                      "registry" : {
+                    "docker": {
+                      "host": "docker-service",
+                      "port": "<ACUMOS_DOCKER_API_PORT>",
+                      "registry": {
                         "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_DOCKER_MODEL_PORT>/",
-                        "username" : "<ACUMOS_RW_USER>",
-                        "password" : "<ACUMOS_RW_USER_PASSWORD>",
+                        "username": "<ACUMOS_RW_USER>",
+                        "password": "<ACUMOS_RW_USER_PASSWORD>",
                         "email": "acumos@example.com"
                       },
-                      "imagetag" : {
+                      "imagetag": {
                         "prefix": "nexus:<ACUMOS_DOCKER_MODEL_PORT>"
                       }
                     },
-                    "qanda" : {
-                      "url" : "http://cms-service:9080"
+                    "qanda": {
+                      "url": "http://cms-service:9080"
                     },
-                    "onboarding" : {
-                      "push" : {
-                        "model" : {
-                          "url" : "http://onboarding-service:8090/onboarding-app/v2/models",
-                          "dcae_url" : "http://onboarding-service:8090/onboarding-app/v2/dcae_models"
+                    "onboarding": {
+                      "push": {
+                        "model": {
+                          "url": "http://onboarding-service:8090/onboarding-app/v2/models",
+                          "dcae_url": "http://onboarding-service:8090/onboarding-app/v2/dcae_models"
                         }
                       }
                     },
-                    "model" : {
-                      "storage" : {
-                        "folder" : {
-                          "name" : "/acumosWebOnboarding"
+                    "model": {
+                      "storage": {
+                        "folder": {
+                          "name": "/acumosWebOnboarding"
                         }
                       }
                     },
-                    "doc" : {
-                      "url" : "https://wiki.acumos.org"
+                    "doc": {
+                      "url": "https://wiki.acumos.org"
                     },
-                    "portal" : {
-                      "feature" : {
-                        "validateModel" : "false",
-                        "email_service" : "",
-                        "cas_enabled" : "false",
-                        "verifyAccount" : "false",
-                        "verifyToken" : {
-                          "exp_time" : 24  
+                    "portal": {
+                      "feature": {
+                        "validateModel": "false",
+                        "email_service": "",
+                        "cas_enabled": "false",
+                        "verifyAccount": "false",
+                        "verifyToken": {
+                          "exp_time": 24  
                         }
                       },
-                      "ui" : {
-                        "server" : {
-                          "address" : "http://notused.com"
+                      "ui": {
+                        "server": {
+                          "address": "http://notused.com"
                         }
                       },
-                      "submitValidation" : {
-                        "api" : "http://validation-client-service:9603/status/v1.0/tasks"
+                      "submitValidation": {
+                        "api": "http://validation-client-service:9603/status/v1.0/tasks"
                       },
                       "dashboard":{
-                        "url" : ""
+                        "url": ""
                       }
                     },
-                    "client" : {
-                      "ssl" : {
-                        "key-store" : "/app/certs/acumos_aio.p12",
-                        "key-store-password" : "<ACUMOS_KEYPASS>",
-                        "key-store-type" : "PKCS12",
-                        "key-password" : "<ACUMOS_KEYPASS>",
-                        "trust-store" : "/app/certs/acumosTrustStore.jks",
-                        "trust-store-password" : "<ACUMOS_KEYPASS>"
+                    "client": {
+                      "ssl": {
+                        "key-store": "/app/certs/acumos_aio.p12",
+                        "key-store-password": "<ACUMOS_KEYPASS>",
+                        "key-store-type": "PKCS12",
+                        "key-password": "<ACUMOS_KEYPASS>",
+                        "trust-store": "/app/certs/acumosTrustStore.jks",
+                        "trust-store-password": "<ACUMOS_KEYPASS>"
                       }
                     },
-                    "gateway" : {
-                      "url" : "https://federation-service:9011"
+                    "gateway": {
+                      "url": "https://federation-service:9011"
                     }
                   }'
         ports:
@@ -154,3 +154,7 @@ spec:
       - name: acumos-webonboarding
         hostPath:
           path: /var/acumos/WebOnboarding
+      hostAliases:
+      - ip: "<ACUMOS_HOST>"
+        hostnames:
+        - "<ACUMOS_DOMAIN>"

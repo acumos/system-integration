@@ -47,35 +47,35 @@ spec:
         env:
         - name: SPRING_APPLICATION_JSON
           value: '{
-                    "federation" : {
-                      "instance" : "gateway",
+                    "federation": {
+                      "instance": "gateway",
                       "instance.name": "aio",
-                      "operator" : "<ACUMOS_OPERATOR_ID>",
-                      "address" : "0.0.0.0",
-                      "server" : {
-                        "port" : "9084"
+                      "operator": "<ACUMOS_OPERATOR_ID>",
+                      "address": "0.0.0.0",
+                      "server": {
+                        "port": 9084
                       },
-                      "ssl" : {
-                        "key-store" : "/app/certs/acumos_aio.p12",
-                        "key-store-password" : "<ACUMOS_KEYPASS>",
-                        "key-store-type" : "PKCS12",
-                        "key-password" : "<ACUMOS_KEYPASS>",
-                        "trust-store" : "/app/certs/acumosTrustStore.jks",
-                        "trust-store-password" : "<ACUMOS_KEYPASS>"
+                      "ssl": {
+                        "key-store": "/app/certs/acumos_aio.p12",
+                        "key-store-password": "<ACUMOS_KEYPASS>",
+                        "key-store-type": "PKCS12",
+                        "key-password": "<ACUMOS_KEYPASS>",
+                        "trust-store": "/app/certs/acumosTrustStore.jks",
+                        "trust-store-password": "<ACUMOS_KEYPASS>"
                       }
                     },
-                    "local" : {
+                    "local": {
                       "address": "0.0.0.0",
-                      "server" : {
-                        "port" : "9011"
+                      "server": {
+                        "port": "9011"
                       },
-                      "ssl" : {
-                        "key-store" : "/app/certs/acumos_aio.p12",
-                        "key-store-password" : "<ACUMOS_KEYPASS>",
-                        "key-store-type" : "PKCS12",
-                        "key-password" : "<ACUMOS_KEYPASS>",
-                        "trust-store" : "/app/certs/acumosTrustStore.jks",
-                        "trust-store-password" : "<ACUMOS_KEYPASS>"
+                      "ssl": {
+                        "key-store": "/app/certs/acumos_aio.p12",
+                        "key-store-password": "<ACUMOS_KEYPASS>",
+                        "key-store-type": "PKCS12",
+                        "key-password": "<ACUMOS_KEYPASS>",
+                        "trust-store": "/app/certs/acumosTrustStore.jks",
+                        "trust-store-password": "<ACUMOS_KEYPASS>"
                       }
                     },
                     "nexus": {
@@ -90,8 +90,8 @@ spec:
                         "interval": 300
                       }
                     },
-                    "cdms" : {
-                      "client" : {
+                    "cdms": {
+                      "client": {
                         "url": "http://cds-service:8000/ccds",
                         "username": "<ACUMOS_CDS_USER>",
                         "password": "<ACUMOS_CDS_PASSWORD>"
@@ -114,3 +114,7 @@ spec:
       - name: acumos-certs
         hostPath:
           path: /var/acumos/certs
+      hostAliases:
+      - ip: "<ACUMOS_HOST>"
+        hostnames:
+        - "<ACUMOS_DOMAIN>"

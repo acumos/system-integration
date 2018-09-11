@@ -1,4 +1,3 @@
-version: '2'
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -17,14 +16,51 @@ version: '2'
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 
-# docker-compose for Acumos logging component filebeat
-#
-services:
-  filebeat-service:
-    image: ${FILEBEAT_IMAGE}
-    volumes:
-      - acumos-logs:/filebeat-logs
-    environment:
-      - LOGSTASH_HOST=${ACUMOS_ELK_LOGSTASH_HOST}
-      - LOGSTASH_PORT=${ACUMOS_ELK_LOGSTASH_PORT}
-
+# What this is: kubernetes template for Acumos logging component services
+# logstash, kibana, elasticsearch
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: acumos
+  name: elasticsearch-service
+  labels:
+    app: elasticsearch
+spec:
+  selector:
+    app: elasticsearch
+  type: NodePort
+  ports:
+  - nodePort: <ACUMOS_ELK_NODEPORT>
+    port: <ACUMOS_ELK_ELASTICSEARCH_PORT>
+    targetPort: 9200
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: acumos
+  name: logstash-service
+  labels:
+    app: logstash
+spec:
+  selector:
+    app: logstash
+  type: ClusterIP
+  ports:
+  - port: <ACUMOS_ELK_LOGSTASH_PORT>
+    targetPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: acumos
+  name: kibana-service
+  labels:
+    app: kibana
+spec:
+  selector:
+    app: kibana
+  type: NodePort
+  ports:
+  - nodePort: <ACUMOS_ELK_KIBANA_NODEPORT>
+    port: <ACUMOS_ELK_KIBANA_PORT>
+    targetPort: 5601

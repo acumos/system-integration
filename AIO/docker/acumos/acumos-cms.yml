@@ -25,22 +25,22 @@ services:
        image: ${PORTAL_CMS_IMAGE}
        environment:
            SPRING_APPLICATION_JSON: "{
-                \"server\" : {
-                    \"port\" : ${ACUMOS_CMS_PORT}
+                \"server\": {
+                    \"port\": ${ACUMOS_CMS_PORT}
                 },
-                \"spring\" : {
-                    \"datasource\" : {
-                        \"url\" : \"jdbc:mysql://${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_PORT}/acumos_cms?useSSL=false\",
-                        \"username\" : \"acumos_opr\",
-                        \"password\" : \"${ACUMOS_MARIADB_USER_PASSWORD}\"
+                \"spring\": {
+                    \"datasource\": {
+                        \"url\": \"jdbc:mysql://${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_PORT}/acumos_cms?useSSL=false\",
+                        \"username\": \"acumos_opr\",
+                        \"password\": \"${ACUMOS_MARIADB_USER_PASSWORD}\"
                   }
                 },
                 \"parameters\": {
-                   \"repository\" : {
-                      \"dataSource\" : {
-                        \"url\" : \"jdbc:mysql://${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_PORT}/acumos_cms?useSSL=false\",
-                        \"username\" : \"acumos_opr\",
-                        \"password\" : \"${ACUMOS_MARIADB_USER_PASSWORD}\"
+                   \"repository\": {
+                      \"dataSource\": {
+                        \"url\": \"jdbc:mysql://${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_PORT}/acumos_cms?useSSL=false\",
+                        \"username\": \"acumos_opr\",
+                        \"password\": \"${ACUMOS_MARIADB_USER_PASSWORD}\"
                       }
                    }
                 }

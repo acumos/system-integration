@@ -105,3 +105,7 @@ spec:
       - name: acumos-output
         hostPath:
           path: /var/acumos/output
+      hostAliases:
+      - ip: "<ACUMOS_HOST>"
+        hostnames:
+        - "<ACUMOS_DOMAIN>"

@@ -1,0 +1,80 @@
+version: '2'
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# docker-compose for Acumos logging components logstash, kibana, elasticsearch
+#
+services:
+
+  elasticsearch-service:
+    image: ${ELASTICSEARCH_IMAGE}
+    volumes:
+      - /var/acumos/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - acumos-esdata:/usr/share/elasticsearch/data
+    ports:
+    #Node client default listens at 9200, metricbeat and logstash index data into Elasticsearch using this port.
+     - ${ACUMOS_ELK_ELASTICSEARCH_PORT}:9200
+    #Transport client default is 9300 this port is used for nodes communication. If this port is not open, your nodes will not be able to form a cluster.
+     - ${ACUMOS_ELK_NODEPORT}:9300
+    environment:
+      ES_JAVA_OPTS: "-Xmx${ACUMOS_ELK_ES_JAVA_HEAP_MAX_SIZE} -Xms${ACUMOS_ELK_ES_JAVA_HEAP_MIN_SIZE}"
+      XPACK_SECURITY_ENABLED: "false"
+      XPACK_MONITORING_ENABLED: "false"
+    networks:
+      - elk
+
+  logstash-service:
+    image:  ${LOGSTASH_IMAGE}
+    volumes:
+      - /var/acumos/logstash/config:/usr/share/logstash/config
+      - /var/acumos/logstash/pipeline:/usr/share/logstash/pipeline
+    ports:
+    #Logstash default listens at 5000, Filebeat agent ship log to this port.
+      - ${ACUMOS_ELK_LOGSTASH_PORT}:5000
+    environment:
+      LS_JAVA_OPTS: "-Xmx${ACUMOS_ELK_LS_JAVA_HEAP_MAX_SIZE} -Xms${ACUMOS_ELK_LS_JAVA_HEAP_MIN_SIZE}"
+      ACUMOS_ELK_JDBC_DRIVER_LIBRARY: "/usr/share/logstash/vendor/bundle/mariadb-java-client-2.1.0.jar"
+      ACUMOS_ELK_JDBC_DRIVER_CLASS: "org.mariadb.jdbc.Driver"
+      ACUMOS_ELK_JDBC_CONNECTION_STRING: "jdbc:mariadb://${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_PORT}/$ACUMOS_CDS_DB"
+      ACUMOS_ELK_JDBC_USERNAME: "acumos_opr"
+      ACUMOS_ELK_JDBC_PASSWORD: "${ACUMOS_MARIADB_USER_PASSWORD}"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch-service
+
+  kibana-service:
+    image:  ${KIBANA_IMAGE}
+    volumes:
+      - /var/acumos/kibana/config:/usr/share/kibana/config
+    ports:
+    #Kibana is accessed on the web browser. Used for visualization of logs.
+      - ${ACUMOS_ELK_KIBANA_PORT}:5601
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch-service
+
+
+networks:
+  elk:
+    driver: bridge
+
+volumes:
+    acumos-esdata:
+        external: true
