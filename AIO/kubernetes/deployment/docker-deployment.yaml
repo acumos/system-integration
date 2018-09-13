@@ -39,6 +39,7 @@ spec:
       labels:
         app: docker
     spec:
+      restartPolicy: Always
       volumes:
       - name: docker-volume
         emptyDir: {}
@@ -48,7 +49,7 @@ spec:
         image: docker:dind
         securityContext:
             privileged: true
-        command: ['/bin/sh', '-c', 'while ! docker run -d -p 80:80 httpd:latest; do echo "docker-API not ready"; sleep 10; done; sleep 3600']
+        command: ['docker', 'run', '-p', '80:80', 'httpd:latest']
         env:
         - name: log_level
           value: "DEBUG"

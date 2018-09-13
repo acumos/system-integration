@@ -598,8 +598,7 @@ function setup_federation() {
     sleep 10
   done
   curl -s -o ~/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer -H "accept: */*" -H "Content-Type: application/json" -d "{ \"name\":\"$ACUMOS_DOMAIN\", \"self\": true, \"local\": false, \"contact1\": \"admin@example.com\", \"subjectName\": \"$ACUMOS_DOMAIN\", \"apiUrl\": \"https://$ACUMOS_DOMAIN:$ACUMOS_FEDERATION_PORT\",  \"statusCode\": \"AC\", \"validationStatusCode\": \"PS\" }"
-  created=$(jq -r '.created' ~/json)
-  if [[ "$created" == "null" ]]; then
+  if [[ "$(jq -r '.created' ~/json)" == "null" ]]; then
     cat ~/json
     fail "Peer entry creation failed"
   fi
