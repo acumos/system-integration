@@ -19,7 +19,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: logstash-config
-  namespace: acumos-ns01
+  namespace: ${ACUMOS_NAMESPACE}
 data:
   logstash.conf: |-
     input {
@@ -132,7 +132,7 @@ data:
        tags => ["database"]
       }
       beats {
-        port => 5044
+        port => ${ACUMOS_LOGSTASH_PORT}
         codec => plain {
                  charset => "ISO-8859-1"
                        }
@@ -162,14 +162,14 @@ data:
        stdout { codec => json_lines }
        if "database" in [tags]{
        elasticsearch {
-       hosts => ["elasticsearch.${ACUMOS_NAMESPACE}:9200"]
+       hosts => ["elasticsearch.${ACUMOS_NAMESPACE}:${ACUMOS_ELASTICSEARCH_PORT}"]
        index => "testdb"
        document_type => "%{type}"
        }
       }
       else {
      elasticsearch {
-       hosts => ["elasticsearch.${ACUMOS_NAMESPACE}:9200"]
+       hosts => ["elasticsearch.${ACUMOS_NAMESPACE}:${ACUMOS_ELASTICSEARCH_PORT}"]
        index => "logstash"
            }
       }
