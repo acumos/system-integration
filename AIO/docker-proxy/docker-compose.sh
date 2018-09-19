@@ -1,4 +1,4 @@
-version: '2'
+#!/bin/bash
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -16,16 +16,26 @@ version: '2'
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
-
-# docker-compose for Acumos logging component filebeat
 #
-services:
-  filebeat-service:
-    image: ${FILEBEAT_IMAGE}
-    volumes:
-      - acumos-logs:/filebeat-logs
-    environment:
-      - LOGSTASH_HOST=${ACUMOS_ELK_LOGSTASH_HOST}
-      - LOGSTASH_PORT=${ACUMOS_ELK_LOGSTASH_PORT}
-    restart: on-failure
+# What this is:
+# Sets environment variables needed by docker-compose for Acumos docker-proxy
+# then invokes docker-compose with the command-line arguments.
+#
+# Usage:
+# - bash docker-compose.sh [options]
+#   options: optional parameters to docker-compose. some examples:
+#   $ sudo bash docker-compose.sh build
+#     Build all services defined in the docker-compose.yaml file.
+#   $ sudo bash docker-compose.sh up
+#     Start all service containers.
+#   $ sudo bash docker-compose.sh logs -f
+#     Tail the logs of all service containers.
+#   $ sudo bash docker-compose.sh down
+#     Stop all service containers.
+#   $ sudo bash docker-compose.sh rm -v
+#     Remove all service containers.
+#
 
+source acumos-env.sh
+cd /var/acumos/docker-proxy
+docker-compose -f docker-compose.yml $*

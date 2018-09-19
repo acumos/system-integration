@@ -51,6 +51,14 @@ spec:
                       "port": 8088
                     },
                     "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
+                    "solutionResultsetSize": "2000",
+                    "cdsCheckInterval": 10000,
+                    "cdsCheckAttempt": 4,
+                    "imagedatabrokerURI": "<DATABROKER_ZIPBROKER_IMAGE>",
+                    "csvdatabrokerURI": "<DATABROKER_CSVBROKER_IMAGE>",
+                    "sqldatabrokerURI": "<DATABROKER_SQLBROKER_IMAGE>",
+                    "jsondatabrokerURI": "NA",
+                    "sqldatabrokerURI": "NA",
                     "lib":"/maven/",
                     "tosca": {
                       "outputfolder": "/temp/output/"
@@ -67,10 +75,6 @@ spec:
                       "cmndatasvcuser": "<ACUMOS_CDS_USER>",
                       "cmndatasvcpwd": "<ACUMOS_CDS_PASSWORD>"
                     },
-                    "imagedatabrokerURI": "<DATABROKER_ZIPBROKER_IMAGE>",
-                    "csvdatabrokerURI": "<DATABROKER_CSVBROKER_IMAGE>",
-                    "jsondatabrokerURI": "NA",
-                    "sqldatabrokerURI": "NA",
                     "docker": {
                       "host": "docker-service",
                       "port": "<ACUMOS_DOCKER_API_PORT>",

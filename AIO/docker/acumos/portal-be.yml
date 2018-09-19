@@ -27,6 +27,19 @@ services:
                 \"server\": {
                    \"port\": ${ACUMOS_PORTAL_BE_PORT}
                 },
+                \"docker\": {
+                   \"host\": \"${ACUMOS_DOCKER_API_HOST}\",
+                   \"port\": \"${ACUMOS_DOCKER_API_PORT}\",
+                   \"registry\": {
+                      \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/\",
+                      \"username\": \"${ACUMOS_RW_USER}\",
+                      \"password\": \"${ACUMOS_RW_USER_PASSWORD}\",
+                      \"email\": \"acumos@example.com\"
+                   },
+                   \"imagetag\": {
+                       \"prefix\": \"${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}\"
+                   }
+                },
                 \"nexus\": {
                         \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
                         \"proxy\": \"\",
@@ -41,19 +54,6 @@ services:
                      \"password\": \"${ACUMOS_CDS_PASSWORD}\"
                      }
                 },
-                \"docker\": {
-                   \"host\": \"${ACUMOS_DOCKER_API_HOST}\",
-                   \"port\": \"${ACUMOS_DOCKER_API_PORT}\",
-                   \"registry\": {
-                      \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/\",
-                      \"username\": \"${ACUMOS_RW_USER}\",
-                      \"password\": \"${ACUMOS_RW_USER_PASSWORD}\",
-                      \"email\": \"acumos@example.com\"
-                   },
-                   \"imagetag\": {
-                       \"prefix\": \"${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}\"
-                   }
-                },
                 \"qanda\": {
                    \"url\": \"http://cms-service:${ACUMOS_CMS_PORT}\"
                 },
@@ -63,7 +63,11 @@ services:
                           \"url\": \"http://onboarding-service:${ACUMOS_ONBOARDING_PORT}/onboarding-app/v2/models\",
                           \"dcae_url\": \"http://onboarding-service:${ACUMOS_ONBOARDING_PORT}/onboarding-app/v2/dcae_models\"
                        }
-                   }
+                   },
+                   \"tokenmode\": \"jwtToken\",
+                   \"cliPushUrl\": \"${ACUMOS_DOMAIN}:${ACUMOS_KONG_PROXY_SSL_PORT}/onboarding-app/v2/push\",
+                   \"cliAuthUrl\": \"${ACUMOS_DOMAIN}:${ACUMOS_KONG_PROXY_SSL_PORT}/onboarding-app/v2/auth\",
+                   \"tokenmode\": \"jwtToken\"
                 },
                 \"model\": {
                    \"storage\": {
@@ -80,10 +84,13 @@ services:
                       \"validateModel\": \"false\",
                       \"email_service\": \"\",
                       \"cas_enabled\": \"false\",
+                      \"download_bufferSize\": 8,
+                      \"signup_enabled\": \"true\",
                       \"verifyAccount\": \"false\",
                       \"verifyToken\": {
-                         \"exp_time\": 24  
-                      }
+                         \"exp_time\": 24
+                      },
+                      \"cloud_enabled\": \"[{\\\"cloudEnabled\\\" : \\\"true\\\", \\\"cloudName\\\" : \\\"azure\\\", \\\"cloudDisplayText\\\" : \\\"Microsoft Azure\\\", \\\"imageUrl\\\": \\\"/images/deploy-cloud/microsoft_azure.png\\\" },{ \\\"cloudEnabled\\\" : \\\"true\\\", \\\"cloudName\\\" : \\\"rackspace\\\", \\\"cloudDisplayText\\\" : \\\"Rackspace\\\", \\\"imageUrl\\\" : \\\"/images/deploy-cloud/rackspace.png\\\" },{ \\\"cloudEnabled\\\" : \\\"false\\\",  \\\"cloudName\\\" : \\\"gcp\\\", \\\"cloudDisplayText\\\" : \\\"Google Cloud Platform\\\", \\\"imageUrl\\\" : \\\"/images/deploy-cloud/google_cloud_platform.png\\\" },{ \\\"cloudEnabled\\\" : \\\"true\\\",  \\\"cloudName\\\" : \\\"deploylocal\\\", \\\"cloudDisplayText\\\" : \\\"Deploy To Local\\\", \\\"imageUrl\\\": \\\"/images/deploy-cloud/deploy_to_local.png\\\" },{ \\\"cloudEnabled\\\" : \\\"false\\\", \\\"cloudName\\\" : \\\"whitebox\\\", \\\"cloudDisplayText\\\" : \\\"Deploy To White Box\\\", \\\"imageUrl\\\" : \\\"/images/deploy-cloud/deploy_to_whitebox.png\\\" }]\"
                    },
                    \"ui\": {
                      \"server\": {
@@ -94,7 +101,16 @@ services:
                       \"api\": \"http://validation-client:$ACUMOS_VALIDATION_CLIENT_PORT/status/v1.0/tasks\"
                    },
                    \"dashboard\":{
-                      \"url\": \"\"
+                      \"url\": \"http://${ACUMOS_ELK_KIBANA_HOST}:${ACUMOS_ELK_KIBANA_NODEPORT}\"
+                   }
+                },
+                \"spring\": {
+                   \"mail\": {
+                      \"template\": {
+                         \"folder\": {
+                            \"path\": \"/fmtemplates/\"
+                         }
+                      } 
                    }
                 },
                 \"client\": {
@@ -109,8 +125,26 @@ services:
                 },
                 \"gateway\": {
                    \"url\": \"https://federation-service:${ACUMOS_FEDERATION_LOCAL_PORT}\"
+                },
+                \"dcae\": {
+                   \"model\": {
+                      \"name\": {
+                         \"prefix\": \"ONAP\"
+                      }
+                   }
+                },
+                \"jwt\": {
+                   \"auth\": {
+                     \"timeout\": \"80000000\"
+                   }
+                },
+                \"cas\": {
+                   \"service\": {
+                      \"validate\": {
+                         \"url\": \"https://identity.linuxfoundation.org/cas/serviceValidate\"
+                      }
+                   }
                 }
-
            }"
        expose:
            - ${ACUMOS_PORTAL_BE_PORT}
@@ -124,4 +158,6 @@ services:
            - acumosWebOnboarding:/acumosWebOnboarding
        logging:
            driver: json-file
-
+       extra_hosts:
+           - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"
+       restart: on-failure

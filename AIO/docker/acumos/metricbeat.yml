@@ -18,6 +18,8 @@ version: '2'
 # ===============LICENSE_END=========================================================
 
 # docker-compose for Acumos logging component metricbeat
+# TODO: elasticsearch-service hosts entry is a workaround for metricbeat exit
+# due to error "lookup elasticsearch-service on 8.8.4.4:53: no such host"
 #
 services:
   metricbeat-service:
@@ -39,3 +41,7 @@ services:
       - SHIPPER_NAME=acumos-aio
     extra_hosts:
       - "elasticsearch-service:${ACUMOS_HOST}"
+    extra_hosts:
+      - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"
+      - "elasticsearch-service:${ACUMOS_HOST}"
+    restart: on-failure

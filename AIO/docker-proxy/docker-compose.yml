@@ -1,5 +1,5 @@
 version: '2'
-# ===============LICENSE_START=======================================================
+# ===============LICENSE_START====================ACUMOS_DOCKER_PROXY_PORT===================================
 # Acumos Apache-2.0
 # ===================================================================================
 # Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
@@ -17,15 +17,16 @@ version: '2'
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 
-# docker-compose for Acumos logging component filebeat
-#
-services:
-  filebeat-service:
-    image: ${FILEBEAT_IMAGE}
-    volumes:
-      - acumos-logs:/filebeat-logs
-    environment:
-      - LOGSTASH_HOST=${ACUMOS_ELK_LOGSTASH_HOST}
-      - LOGSTASH_PORT=${ACUMOS_ELK_LOGSTASH_PORT}
-    restart: on-failure
+# What this is: docker-compose template for Acumos kubernetes-client
 
+services:
+  nginx:
+    image: nginx:alpine
+    restart: on-failure
+    ports:
+      - ${ACUMOS_DOCKER_PROXY_PORT}:443
+    volumes:
+      - /var/acumos/docker-proxy/auth:/etc/nginx/conf.d
+      - /var/acumos/docker-proxy/auth/nginx.conf:/etc/nginx/nginx.conf:ro
+    extra_hosts:
+      - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"

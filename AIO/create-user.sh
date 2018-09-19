@@ -34,8 +34,6 @@
 #.  role: optional role to set for the user (e.g. "admin")
 #
 
-set -x
-
 trap 'fail' ERR
 
 function fail() {
@@ -44,11 +42,9 @@ function fail() {
 }
 
 function log() {
-  set +x
   fname=$(caller 0 | awk '{print $2}')
   fline=$(caller 0 | awk '{print $1}')
   echo; echo "$fname:$fline ($(date)) $1"
-  set -x
 }
 
 function register_user() {

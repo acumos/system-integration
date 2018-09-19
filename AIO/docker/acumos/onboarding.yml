@@ -63,10 +63,10 @@ services:
                    \"cmnDataSvcPwd\": \"${ACUMOS_CDS_PASSWORD}\"
                },
                \"mktPlace\": {
-                   \"mktPlaceEndPoinURL\": \"http://portal-be-service:${ACUMOS_PORTAL_BE_PORT}\"
+                   \"mktPlaceEndPointURL\": \"http://portal-be-service:${ACUMOS_PORTAL_BE_PORT}\"
                },
                \"microService\": {
-                   \"microServiceEndPoinURL\": \"http://msg-service:${ACUMOS_MICROSERVICE_GENERATION_PORT}\"
+                   \"microServiceEndPointURL\": \"http://msg-service:${ACUMOS_MICROSERVICE_GENERATION_PORT}/microservice-generation\"
                },
                \"requirements\": {
                    \"extraIndexURL\": \"${PYTHON_EXTRAINDEX}\",
@@ -101,4 +101,6 @@ services:
            - acumos-output:/temp/
        logging:
            driver: json-file
-
+       extra_hosts:
+           - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"
+       restart: on-failure
