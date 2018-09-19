@@ -51,6 +51,7 @@ spec:
                       "port": 8088
                     },
                     "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
+                    "solutionResultsetSize": "2000",
                     "lib":"/maven/",
                     "tosca": {
                       "outputfolder": "/temp/output/"

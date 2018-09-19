@@ -39,3 +39,5 @@ services:
       - SHIPPER_NAME=acumos-aio
     extra_hosts:
       - "elasticsearch-service:${ACUMOS_HOST}"
+    extra_hosts:
+      - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"

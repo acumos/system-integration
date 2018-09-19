@@ -69,4 +69,5 @@ services:
            - acumos-logs:/maven/logs
        logging:
            driver: json-file
-
+       extra_hosts:
+           - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"

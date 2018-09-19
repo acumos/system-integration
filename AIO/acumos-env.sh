@@ -34,29 +34,30 @@ export STAGING=nexus3.acumos.org:10004
 # Should ONLY use Release version
 export RELEASE=nexus3.acumos.org:10002
 
-# Images per https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_1808171930
-# With latest patch versions of onboarding and microservice-generation
-export PORTAL_BE_IMAGE=$STAGING/acumos-portal-be:1.15.42
-export PORTAL_FE_IMAGE=$STAGING/acumos-portal-fe:1.15.42
-export AZURE_CLIENT_IMAGE=$STAGING/acumos-azure-client:1.2.15
-export DESIGNSTUDIO_IMAGE=$STAGING/ds-compositionengine:0.0.35
+# Images per https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_1809101130
+# With latest patch versions of federation and designstudio
+export PORTAL_BE_IMAGE=$STAGING/acumos-portal-be:1.15.44
+export PORTAL_FE_IMAGE=$STAGING/acumos-portal-fe:1.15.44
+export AZURE_CLIENT_IMAGE=$STAGING/acumos-azure-client:1.2.17
+export DESIGNSTUDIO_IMAGE=$STAGING/ds-compositionengine:0.0.38
 export PORTAL_CMS_IMAGE=$STAGING/acumos-cms-docker:1.3.4
-export ONBOARDING_IMAGE=$STAGING/onboarding-app:1.31.0_R1280
-export COMMON_DATASERVICE_IMAGE=$STAGING/common-dataservice:1.17.1
+export ONBOARDING_IMAGE=$STAGING/onboarding-app:1.34.0
+export COMMON_DATASERVICE_IMAGE=$STAGING/common-dataservice:1.18.1
 export OPENSTACK_CLIENT_IMAGE=$STAGING/openstack-client:1.1.11
-export BLUEPRINT_ORCHESTRATOR_IMAGE=$STAGING/blueprint-orchestrator:2.0.8
-export FEDERATION_IMAGE=$STAGING/federation-gateway:1.17.0
+export BLUEPRINT_ORCHESTRATOR_IMAGE=$STAGING/blueprint-orchestrator:2.0.9
+export FEDERATION_IMAGE=$STAGING/federation-gateway:1.18.3
+export KUBERNETES_CLIENT_IMAGE=$SNAPSHOT/kubernetes-client:0.0.5-SNAPSHOT
 #export ELASTICSEARCH_IMAGE=$STAGING/acumos-elasticsearch:1.2.0
 export ELASTICSEARCH_IMAGE=docker.elastic.co/elasticsearch/elasticsearch:5.5.1
-export LOGSTASH_IMAGE=$STAGING/acumos-logstash:1.2.0
-export KIBANA_IMAGE=$STAGING/acumos-kibana:1.2.0
-export FILEBEAT_IMAGE=$STAGING/acumos-filebeat:1.2.0
-export METRICBEAT_IMAGE=$STAGING/acumos-metricbeat:1.2.0
-export PROTO_VIEWER_IMAGE=$SNAPSHOT/acumos_proto_viewer:1.5.4
-export MICROSERVICE_GENERATION_IMAGE=$SNAPSHOT/microservice-generation:1.0.2-SNAPSHOT
+export LOGSTASH_IMAGE=$STAGING/acumos-logstash:1.18.0
+export KIBANA_IMAGE=$STAGING/acumos-kibana:1.18.0
+export FILEBEAT_IMAGE=$STAGING/acumos-filebeat:1.18.0
+export METRICBEAT_IMAGE=$STAGING/acumos-metricbeat:1.18.0
+export PROTO_VIEWER_IMAGE=$SNAPSHOT/acumos_proto_viewer:1.5.5
+export MICROSERVICE_GENERATION_IMAGE=$STAGING/microservice-generation:1.3.0
 export ONBOARDING_BASE_IMAGE=$STAGING/onboarding-base-r:1.0
 export DATABROKER_ZIPBROKER_IMAGE=$STAGING/databroker-zipbroker:0.0.1
-export DATABROKER_CSVBROKER_IMAGE=$STAGING/csvdatabroker:0.0.1
+export DATABROKER_CSVBROKER_IMAGE=$STAGING/csvdatabroker:0.0.2
 
 export ACUMOS_DOMAIN=$(hostname)
 host=$(ip route get 8.8.8.8 | awk '{print $NF; exit}')
@@ -84,7 +85,7 @@ export HTTPS_PROXY=""
 # Component options
 export ACUMOS_AZURE_CLIENT_PORT=9081
 export ACUMOS_CDS_PREVIOUS_VERSION=
-export ACUMOS_CDS_VERSION=1.17
+export ACUMOS_CDS_VERSION=1.18
 export ACUMOS_CDS_DB="acumos_cds"
 export ACUMOS_CDS_HOST=$ACUMOS_DOMAIN
 export ACUMOS_CDS_PORT=30800
@@ -107,10 +108,11 @@ export ACUMOS_ELK_ES_JAVA_HEAP_MIN_SIZE=1g
 export ACUMOS_ELK_ES_JAVA_HEAP_MAX_SIZE=2g
 export ACUMOS_ELK_LS_JAVA_HEAP_MIN_SIZE=1g
 export ACUMOS_ELK_LS_JAVA_HEAP_MAX_SIZE=2g
+export ACUMOS_KUBERNETES_CLIENT_PORT=8082
 export ACUMOS_MARIADB_HOST=$ACUMOS_HOST
 export ACUMOS_MARIADB_PORT=3306
 export ACUMOS_METRICBEAT_PORT=8098
-export ACUMOS_MICROSERVICE_GENERATION_PORT=8091
+export ACUMOS_MICROSERVICE_GENERATION_PORT=8336
 export ACUMOS_ONBOARDING_PORT=8090
 export ACUMOS_OPERATOR_ID=acumos-aio
 export ACUMOS_PORTAL_BE_PORT=8083
@@ -125,7 +127,7 @@ export PYTHON_EXTRAINDEX_HOST=
 # Acumos model deployment options
 export ACUMOS_DATA_BROKER_INTERNAL_PORT=8080
 export ACUMOS_DATA_BROKER_PORT=8556
-export ACUMOS_DEPLOYED_SOLUTION_PORT=8336
+export ACUMOS_DEPLOYED_SOLUTION_PORT=3330
 export ACUMOS_DEPLOYED_VM_PASSWORD='12NewPA$$w0rd!'
 export ACUMOS_DEPLOYED_VM_USER=dockerUser
 export ACUMOS_PROBE_PORT=5006
