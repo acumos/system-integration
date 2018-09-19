@@ -85,8 +85,10 @@ spec:
                         "model": {
                           "url": "http://onboarding-service:8090/onboarding-app/v2/models",
                           "dcae_url": "http://onboarding-service:8090/onboarding-app/v2/dcae_models"
-                        }
-                      }
+                        },
+                      "cliPushUrl" : "<ACUMOS_DOMAIN>:<ACUMOS_KONG_PROXY_SSL_PORT>/onboarding-app/v2/push",
+                      "cliAuthUrl" : "<ACUMOS_DOMAIN>:<ACUMOS_KONG_PROXY_SSL_PORT>/onboarding-app/v2/auth",
+                      "tokenmode" : "jwtToken"
                     },
                     "model": {
                       "storage": {
@@ -107,6 +109,8 @@ spec:
                         "verifyToken": {
                           "exp_time": 24  
                         }
+                      },
+                      "cloud_enabled" : "[{\"cloudEnabled\" : \"true\", \"cloudName\" : \"azure\", \"cloudDisplayText\" : \"Microsoft Azure\", \"imageUrl\": \"/images/deploy-cloud/microsoft_azure.png\" },{ \"cloudEnabled\" : \"true\", \"cloudName\" : \"rackspace\", \"cloudDisplayText\" : \"Rackspace\", \"imageUrl\": \"/images/deploy-cloud/rackspace.png\" },{ \"cloudEnabled\" : \"false\",  \"cloudName\" : \"gcp\", \"cloudDisplayText\" : \"Google Cloud Platform\", \"imageUrl\": \"/images/deploy-cloud/google_cloud_platform.png\" },{ \"cloudEnabled\" : \"true\",  \"cloudName\" : \"deploylocal\", \"cloudDisplayText\" : \"Deploy To Local\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_local.png\" },{ \"cloudEnabled\" : \"false\", \"cloudName\" : \"whitebox\", \"cloudDisplayText\" : \"Deploy To White Box\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_whitebox.png\" }]"
                       },
                       "ui": {
                         "server": {

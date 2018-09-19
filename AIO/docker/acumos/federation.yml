@@ -88,4 +88,5 @@ services:
            - /var/acumos/certs:/app/certs
        logging:
            driver: json-file
-
+       extra_hosts:
+           - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"

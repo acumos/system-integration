@@ -28,6 +28,7 @@ services:
                                 \"port\": ${ACUMOS_DSCE_PORT}
                           },
                           \"dateformat\": \"yyyy-MM-dd-HH-mm-ss-SSS\",
+                          \"solutionResultsetSize\": \"2000\",
                           \"lib\": \"/maven/\",
                           \"tosca\": {
                                 \"outputfolder\": \"/temp/output/\"
@@ -75,4 +76,5 @@ services:
            - acumos-output:/temp/
        logging:
            driver: json-file
-
+       extra_hosts:
+           - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"

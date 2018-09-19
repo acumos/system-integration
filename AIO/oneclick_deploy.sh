@@ -79,6 +79,10 @@ function setup_prereqs() {
     echo "$(/sbin/ip route get 8.8.8.8 | awk '{print $NF; exit}') $HOSTNAME" \
       | sudo tee -a /etc/hosts
   fi
+  if [[ $(grep -c $ACUMOS_DOMAIN /etc/hosts) -eq 0 ]]; then
+    log "Add $ACUMOS_DOMAIN to /etc/hosts"
+    echo "$ACUMOS_HOST $ACUMOS_DOMAIN" | sudo tee -a /etc/hosts
+  fi
   log "/etc/hosts:"
   cat /etc/hosts
 
@@ -375,6 +379,8 @@ function setup_acumos() {
   setup_elk
 
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
+    log "Stop any running Acumos docker-based components"
+    sudo bash docker-compose.sh down
     log "Deploy Acumos docker-based components"
     sudo bash docker-compose.sh build
     log "Start ELK stack first and wait for ElasticSearch to be active"
@@ -389,21 +395,28 @@ function setup_acumos() {
     sudo bash docker-compose.sh up -d \
       elasticsearch-service logstash-service kibana-service
     sudo bash docker-compose.sh up -d kong-service nexus-service 
-    sudo bash docker-compose.sh up -d \
-      cms-service azure-client-service cds-service dsce-service \
-      federation-service onboarding-service portal-be-service portal-fe-service
+    sudo bash docker-compose.sh up -d cds-service
+    sudo bash docker-compose.sh up -d cms-service azure-client-service \
+     federation-service msg-service onboarding-service \
+     kubernetes-client-service portal-be-service portal-fe-service
+    sudo bash docker-compose.sh up -d dsce-service 
     sudo bash docker-compose.sh up -d \
       metricbeat-service filebeat-service
+    bash docker-proxy/deploy.sh
   else
     if [[ $(kubectl get namespaces | grep -c 'acumos ') == 1 ]]; then
       echo "Stop any running Acumos component services under kubernetes"
-      kubectl delete service -n acumos azure-client-service cds-service cms-service\
-        filebeat-service onboarding-service portal-be-service portal-fe-service \
-        dsce-service federation-service kong-service nexus-service
+      kubectl delete service -n acumos azure-client-service cds-service \
+        cms-service portal-be-service portal-fe-service \
+        onboarding-service msg-service dsce-service kubernetes-client-service \
+        federation-service kong-service nexus-service docker-service \
+        filebeat-service metricbeat-service elasticsearch-service \
+        logstash-service kibana-service
 
       echo "Stop any running Acumos component deployments under kubernetes"
-      kubectl delete deployment -n acumos azure-client cds cms filebeat onboarding\
-        portal-be portal-fe dsce federation kong nexus
+      kubectl delete deployment -n acumos azure-client cds cms \
+        portal-be portal-fe onboarding msg dsce kubernetes-client federation \
+        kong nexus docker filebeat metricbeat elasticsearch logstash kibana
 
       echo "Delete acumos image pull secret from kubernetes"
       kubectl delete secret -n acumos acumos-registry
@@ -439,9 +452,11 @@ EOF
 
     log "Deploy Acumos kubernetes-based components"
     log "Set variable values in k8s templates"
-    depvars="ACUMOS_HOST ACUMOS_DOMAIN ACUMOS_MARIADB_HOST ACUMOS_MARIADB_PORT ACUMOS_MARIADB_USER_PASSWORD ACUMOS_NEXUS_API_PORT ACUMOS_NEXUS_HOST ACUMOS_RW_USER ACUMOS_RO_USER ACUMOS_RW_USER_PASSWORD ACUMOS_RO_USER_PASSWORD ACUMOS_DOCKER_API_HOST ACUMOS_DOCKER_API_PORT ACUMOS_DOCKER_MODEL_PORT ACUMOS_KONG_DB_PORT ACUMOS_KONG_PROXY_PORT ACUMOS_KONG_PROXY_SSL_PORT ACUMOS_KONG_ADMIN_PORT ACUMOS_KONG_ADMIN_SSL_PORT ACUMOS_DOCKER_API_PORT ACUMOS_PROJECT_NEXUS_USERNAME ACUMOS_PROJECT_NEXUS_PASSWORD ACUMOS_ELK_ELASTICSEARCH_HOST ACUMOS_ELK_ELASTICSEARCH_PORT ACUMOS_ELK_NODEPORT ACUMOS_ELK_LOGSTASH_HOST ACUMOS_ELK_LOGSTASH_PORT ACUMOS_ELK_KIBANA_PORT ACUMOS_ELK_KIBANA_NODEPORT ACUMOS_ELK_ES_JAVA_HEAP_MIN_SIZE ACUMOS_ELK_ES_JAVA_HEAP_MAX_SIZE ACUMOS_ELK_LS_JAVA_HEAP_MIN_SIZE ACUMOS_ELK_LS_JAVA_HEAP_MAX_SIZE ACUMOS_METRICBEAT_PORT"
+    # Variables for platform dependencies (not core components)
+    depvars="ACUMOS_DOCKER_API_HOST ACUMOS_DOCKER_API_PORT ACUMOS_DOCKER_API_PORT ACUMOS_DOCKER_MODEL_PORT ACUMOS_DOMAIN ACUMOS_ELK_ELASTICSEARCH_HOST ACUMOS_ELK_ELASTICSEARCH_PORT ACUMOS_ELK_ES_JAVA_HEAP_MAX_SIZE ACUMOS_ELK_ES_JAVA_HEAP_MIN_SIZE ACUMOS_ELK_KIBANA_NODEPORT ACUMOS_ELK_KIBANA_PORT ACUMOS_ELK_LOGSTASH_HOST ACUMOS_ELK_LOGSTASH_PORT ACUMOS_ELK_LS_JAVA_HEAP_MAX_SIZE ACUMOS_ELK_LS_JAVA_HEAP_MIN_SIZE ACUMOS_ELK_NODEPORT ACUMOS_FILEBEAT_PORT ACUMOS_HOST ACUMOS_KONG_ADMIN_PORT ACUMOS_KONG_ADMIN_SSL_PORT ACUMOS_KONG_DB_PORT ACUMOS_KONG_PROXY_PORT ACUMOS_KONG_PROXY_SSL_PORT ACUMOS_MARIADB_HOST ACUMOS_MARIADB_PORT ACUMOS_MARIADB_USER_PASSWORD ACUMOS_METRICBEAT_PORT ACUMOS_NEXUS_API_PORT ACUMOS_NEXUS_HOST ACUMOS_PROJECT_NEXUS_PASSWORD ACUMOS_PROJECT_NEXUS_USERNAME ACUMOS_RO_USER ACUMOS_RO_USER_PASSWORD ACUMOS_RW_USER ACUMOS_RW_USER_PASSWORD"
 
-    compvars="ACUMOS_AZURE_CLIENT_PORT ACUMOS_CDS_PORT ACUMOS_CDS_DB ACUMOS_CDS_PASSWORD ACUMOS_CDS_USER ACUMOS_CMS_PORT ACUMOS_DSCE_PORT ACUMOS_FEDERATION_PORT ACUMOS_FILEBEAT_PORT  ACUMOS_MICROSERVICE_GENERATION_PORT ACUMOS_ONBOARDING_PORT ACUMOS_PORTAL_BE_PORT ACUMOS_PORTAL_FE_PORT ACUMOS_KEYPASS ACUMOS_DATA_BROKER_INTERNAL_PORT ACUMOS_DATA_BROKER_PORT ACUMOS_DEPLOYED_SOLUTION_PORT ACUMOS_DEPLOYED_VM_PASSWORD ACUMOS_DEPLOYED_VM_USER ACUMOS_PROBE_PORT ACUMOS_OPERATOR_ID HTTP_PROXY HTTPS_PROXY"
+    # Variables for platform core components
+    compvars="ACUMOS_AZURE_CLIENT_PORT ACUMOS_CDS_DB ACUMOS_CDS_PASSWORD ACUMOS_CDS_PORT ACUMOS_CDS_USER ACUMOS_CMS_PORT ACUMOS_DATA_BROKER_INTERNAL_PORT ACUMOS_DATA_BROKER_PORT ACUMOS_DEPLOYED_SOLUTION_PORT ACUMOS_DEPLOYED_VM_PASSWORD ACUMOS_DEPLOYED_VM_USER ACUMOS_DSCE_PORT ACUMOS_FEDERATION_PORT ACUMOS_KEYPASS ACUMOS_KUBERNETES_CLIENT_PORT ACUMOS_MICROSERVICE_GENERATION_PORT ACUMOS_ONBOARDING_PORT ACUMOS_OPERATOR_ID ACUMOS_PORTAL_BE_PORT ACUMOS_PORTAL_FE_PORT ACUMOS_PROBE_PORT HTTP_PROXY HTTPS_PROXY"
     set +x
     mkdir -p ~/deploy/kubernetes
     cp -r kubernetes/* ~/deploy/kubernetes/.
@@ -457,23 +472,24 @@ EOF
     log "Set image references in k8s templates"
     sed -i -- "s~<AZURE_CLIENT_IMAGE>~$AZURE_CLIENT_IMAGE~g"  ~/deploy/kubernetes/deployment/azure-client-deployment.yaml
     sed -i -- "s~<BLUEPRINT_ORCHESTRATOR_IMAGE>~$BLUEPRINT_ORCHESTRATOR_IMAGE~g"  ~/deploy/kubernetes/deployment/azure-client-deployment.yaml
-    sed -i -- "s~<PORTAL_CMS_IMAGE>~$PORTAL_CMS_IMAGE~g"  ~/deploy/kubernetes/deployment/cms-deployment.yaml
     sed -i -- "s~<COMMON_DATASERVICE_IMAGE>~$COMMON_DATASERVICE_IMAGE~g"  ~/deploy/kubernetes/deployment/common-data-svc-deployment.yaml
-    sed -i -- "s~<DESIGNSTUDIO_IMAGE>~$DESIGNSTUDIO_IMAGE~g"  ~/deploy/kubernetes/deployment/dsce-deployment.yaml
-    sed -i -- "s~<DATABROKER_ZIPBROKER_IMAGE>~$DATABROKER_ZIPBROKER_IMAGE~g"  ~/deploy/kubernetes/deployment/dsce-deployment.yaml
     sed -i -- "s~<DATABROKER_CSVBROKER_IMAGE>~$DATABROKER_CSVBROKER_IMAGE~g"  ~/deploy/kubernetes/deployment/dsce-deployment.yaml
+    sed -i -- "s~<DATABROKER_ZIPBROKER_IMAGE>~$DATABROKER_ZIPBROKER_IMAGE~g"  ~/deploy/kubernetes/deployment/dsce-deployment.yaml
+    sed -i -- "s~<DESIGNSTUDIO_IMAGE>~$DESIGNSTUDIO_IMAGE~g"  ~/deploy/kubernetes/deployment/dsce-deployment.yaml
+    sed -i -- "s~<ELASTICSEARCH_IMAGE>~$ELASTICSEARCH_IMAGE~g"  ~/deploy/kubernetes/deployment/elk-deployment.yaml
     sed -i -- "s~<FEDERATION_IMAGE>~$FEDERATION_IMAGE~g"  ~/deploy/kubernetes/deployment/federation-deployment.yaml
     sed -i -- "s~<FILEBEAT_IMAGE>~$FILEBEAT_IMAGE~g"  ~/deploy/kubernetes/deployment/filebeat-deployment.yaml
-    sed -i -- "s~<MICROSERVICE_GENERATION_IMAGE>~$MICROSERVICE_GENERATION_IMAGE~g"  ~/deploy/kubernetes/deployment/microservice-generation-deployment.yaml
-    sed -i -- "s~<ONBOARDING_IMAGE>~$ONBOARDING_IMAGE~g"  ~/deploy/kubernetes/deployment/onboarding-deployment.yaml
-    sed -i -- "s~<ONBOARDING_BASE_IMAGE>~$ONBOARDING_BASE_IMAGE~g"  ~/deploy/kubernetes/deployment/onboarding-deployment.yaml
-    sed -i -- "s~<PORTAL_BE_IMAGE>~$PORTAL_BE_IMAGE~g"  ~/deploy/kubernetes/deployment/portal-be-deployment.yaml
-    sed -i -- "s~<PORTAL_FE_IMAGE>~$PORTAL_FE_IMAGE~g"  ~/deploy/kubernetes/deployment/portal-fe-deployment.yaml
-    sed -i -- "s~<ELASTICSEARCH_IMAGE>~$ELASTICSEARCH_IMAGE~g"  ~/deploy/kubernetes/deployment/elk-deployment.yaml
-    sed -i -- "s~<LOGSTASH_IMAGE>~$LOGSTASH_IMAGE~g"  ~/deploy/kubernetes/deployment/elk-deployment.yaml
-    sed -i -- "s~<KIBANA_IMAGE>~$KIBANA_IMAGE~g"  ~/deploy/kubernetes/deployment/elk-deployment.yaml
     sed -i -- "s~<FILEBEAT_IMAGE>~$FILEBEAT_IMAGE~g"  ~/deploy/kubernetes/deployment/filebeat-deployment.yaml
+    sed -i -- "s~<KIBANA_IMAGE>~$KIBANA_IMAGE~g"  ~/deploy/kubernetes/deployment/elk-deployment.yaml
+    sed -i -- "s~<KUBERNETES_CLIENT_IMAGE>~$KUBERNETES_CLIENT_IMAGE~g"  ~/deploy/kubernetes/deployment/kubernetes-client-deployment.yaml
+    sed -i -- "s~<LOGSTASH_IMAGE>~$LOGSTASH_IMAGE~g"  ~/deploy/kubernetes/deployment/elk-deployment.yaml
     sed -i -- "s~<METRICBEAT_IMAGE>~$METRICBEAT_IMAGE~g"  ~/deploy/kubernetes/deployment/metricbeat-deployment.yaml
+    sed -i -- "s~<MICROSERVICE_GENERATION_IMAGE>~$MICROSERVICE_GENERATION_IMAGE~g"  ~/deploy/kubernetes/deployment/microservice-generation-deployment.yaml
+    sed -i -- "s~<ONBOARDING_BASE_IMAGE>~$ONBOARDING_BASE_IMAGE~g"  ~/deploy/kubernetes/deployment/onboarding-deployment.yaml
+    sed -i -- "s~<ONBOARDING_IMAGE>~$ONBOARDING_IMAGE~g"  ~/deploy/kubernetes/deployment/onboarding-deployment.yaml
+    sed -i -- "s~<PORTAL_BE_IMAGE>~$PORTAL_BE_IMAGE~g"  ~/deploy/kubernetes/deployment/portal-be-deployment.yaml
+    sed -i -- "s~<PORTAL_CMS_IMAGE>~$PORTAL_CMS_IMAGE~g"  ~/deploy/kubernetes/deployment/cms-deployment.yaml
+    sed -i -- "s~<PORTAL_FE_IMAGE>~$PORTAL_FE_IMAGE~g"  ~/deploy/kubernetes/deployment/portal-fe-deployment.yaml
 
     log "Deploy the k8s based components"
     # Create services first... see https://github.com/kubernetes/kubernetes/issues/16448
@@ -485,7 +501,11 @@ EOF
       log "Creating deployment from $f"
       kubectl create -f $f
     done
+    bash docker-proxy/deploy.sh
   fi
+
+  log "Customize aio-cms-host.yaml"
+  sed -i -- "s~<ACUMOS_DOMAIN>~$ACUMOS_DOMAIN~g" aio-cms-host.yaml
 }
 
 # Setup server cert, key, and keystore for the Kong reverse proxy
@@ -571,6 +591,18 @@ function setup_reverse_proxy() {
   curl -i -X POST \
     --url http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis/ \
     --data "https_only=true" \
+    --data "name=solution-package" \
+    --data "upstream_url=http://kubernetes-client-service:$ACUMOS_KUBERNETES_CLIENT_PORT" \
+    --data "uris=/package" \
+    --data "strip_uri=true" \
+    --data "upstream_connect_timeout=60000" \
+    --data "upstream_read_timeout=60000" \
+    --data "upstream_send_timeout=60000" \
+    --data "retries=5"
+
+  curl -i -X POST \
+    --url http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis/ \
+    --data "https_only=true" \
     --data "name=onboarding-app" \
     --data "upstream_url=http://onboarding-service:$ACUMOS_ONBOARDING_PORT" \
     --data "uris=/onboarding-app" \
@@ -642,6 +674,13 @@ if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
   ACUMOS_KEYPASS=$(uuidgen)
   echo "ACUMOS_KEYPASS=$ACUMOS_KEYPASS" >>acumos-env.sh
   echo "export ACUMOS_KEYPASS" >>acumos-env.sh
+fi
+
+if [[ "$ACUMOS_DOCKER_PROXY_USERNAME" == "" ]]; then
+  export ACUMOS_DOCKER_PROXY_USERNAME=$(uuidgen)
+  echo "ACUMOS_DOCKER_PROXY_USERNAME=$ACUMOS_DOCKER_PROXY_USERNAME" >>acumos-env.sh
+  export ACUMOS_DOCKER_PROXY_PASSWORD=$(uuidgen)
+  echo "ACUMOS_DOCKER_PROXY_PASSWORD=$ACUMOS_DOCKER_PROXY_PASSWORD" >>acumos-env.sh
 fi
 
 source acumos-env.sh

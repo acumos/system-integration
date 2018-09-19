@@ -20,7 +20,7 @@ version: '2'
 # docker-compose for microservice-generation
 # TODO: scrub all attributes for current need
 services:
-   microservice-generation:
+   msg-service:
        image: ${MICROSERVICE_GENERATION_IMAGE}
        environment:
           SPRING_APPLICATION_JSON: "{
@@ -63,10 +63,10 @@ services:
                    \"cmnDataSvcPwd\": \"${ACUMOS_CDS_PASSWORD}\"
                },
                \"mktPlace\": {
-                   \"mktPlaceEndPoinURL\": \"http://portal-be-service:${ACUMOS_PORTAL_BE_PORT}\"
+                   \"mktPlaceEndPointURL\": \"http://portal-be-service:${ACUMOS_PORTAL_BE_PORT}\"
                },
                \"microService\": {
-                   \"microServiceEndPoinURL\": \"http://msg-service:${ACUMOS_MICROSERVICE_GENERATION_PORT}\"
+                   \"microServiceEndPointURL\": \"http://msg-service:${ACUMOS_MICROSERVICE_GENERATION_PORT}\"
                },
                \"requirements\": {
                    \"extraIndexURL\": \"${PYTHON_EXTRAINDEX}\",
@@ -97,4 +97,5 @@ services:
            - acumos-output:/temp/
        logging:
            driver: json-file
-
+       extra_hosts:
+           - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"

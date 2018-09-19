@@ -1,5 +1,5 @@
 version: '2'
-# ===============LICENSE_START=======================================================
+# ===============LICENSE_START====================ACUMOS_DOCKER_PROXY_PORT===================================
 # Acumos Apache-2.0
 # ===================================================================================
 # Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
@@ -17,27 +17,16 @@ version: '2'
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 
-# docker-compose for Acumos logging component metricbeat
-#
+# What this is: docker-compose template for Acumos kubernetes-client
+
 services:
-  metricbeat-service:
-    image: ${METRICBEAT_IMAGE}
-    network_mode: host
+  nginx:
+    image: nginx:alpine
+    restart: on-failure
+    ports:
+      - ${ACUMOS_DOCKER_PROXY_PORT}:443
     volumes:
-    #Mount the host filesystem to enable Metricbeat to monitor the host rather than the Metricbeat container.
-      - /proc:/hostfs/proc:ro
-      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
-      - /:/hostfs:ro
-      - /var/run:/var/run:rw
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: metricbeat -e -strict.perms=false -system.hostfs=/hostfs
-    environment:
-      - ELASTICSEARCH_HOST=${ACUMOS_ELK_ELASTICSEARCH_HOST}
-      - ELASTICSEARCH_PORT=${ACUMOS_ELK_ELASTICSEARCH_PORT}
-      - PROCS=.*
-      - PERIOD=10s
-      - SHIPPER_NAME=acumos-aio
-    extra_hosts:
-      - "elasticsearch-service:${ACUMOS_HOST}"
+      - /var/acumos/docker-proxy/auth:/etc/nginx/conf.d
+      - /var/acumos/docker-proxy/auth/nginx.conf:/etc/nginx/nginx.conf:ro
     extra_hosts:
       - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"

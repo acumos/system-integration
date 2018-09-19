@@ -87,10 +87,10 @@ spec:
                      "cmnDataSvcPwd": "<ACUMOS_CDS_PASSWORD>"
                    },
                    "mktPlace": {
-                     "mktPlaceEndPoinURL": "http://portal-be-service:8083"
+                     "mktPlaceEndPointURL": "http://portal-be-service:8083"
                    },
                    "microService": {
-                     "microServiceEndPoinURL": "http://msg-service:<ACUMOS_MICROSERVICE_GENERATION_PORT>"
+                     "microServiceEndPointURL": "http://msg-service:8336"
                    },
                    "requirements": {
                      "extraIndexURL": "",
