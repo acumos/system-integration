@@ -24,7 +24,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: acumos
-  name: microservice-generation
+  name: msg
   labels:
     app: msg
 spec:
@@ -44,7 +44,6 @@ spec:
       containers:
       - name: msg
         image: <MICROSERVICE_GENERATION_IMAGE>
-        env:
         env:
         - name: SPRING_APPLICATION_JSON
           value: '{
@@ -87,10 +86,10 @@ spec:
                      "cmnDataSvcPwd": "<ACUMOS_CDS_PASSWORD>"
                    },
                    "mktPlace": {
-                     "mktPlaceEndPoinURL": "http://portal-be-service:8083"
+                     "mktPlaceEndPointURL": "http://portal-be-service:8083"
                    },
                    "microService": {
-                     "microServiceEndPoinURL": "http://msg-service:<ACUMOS_MICROSERVICE_GENERATION_PORT>"
+                     "microServiceEndPointURL": "http://msg-service:8091"
                    },
                    "requirements": {
                      "extraIndexURL": "",

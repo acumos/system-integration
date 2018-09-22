@@ -41,6 +41,13 @@ services:
                        \"trust-store-password\": \"${ACUMOS_KEYPASS}\"
                     }
                 },
+                \"docker\": {
+                   \"host\": \"tcp://${ACUMOS_DOCKER_API_HOST}:${ACUMOS_DOCKER_API_PORT}\",
+                   \"registryURL\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/\",
+                   \"registryUsername\": \"${ACUMOS_RW_USER}\",
+                   \"registryPassword\": \"${ACUMOS_RW_USER_PASSWORD}\",
+                   \"registryEmail\": \"acumos@example.com\"
+                },
                 \"local\": {
                    \"address\": \"0.0.0.0\",
                    \"server\": {
@@ -56,11 +63,11 @@ services:
                    }
                 },
                 \"nexus\": {
-                   \"endpointurl\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
+                   \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
                    \"proxy\": \"\",
                    \"password\": \"${ACUMOS_RW_USER_PASSWORD}\",
                    \"username\": \"${ACUMOS_RW_USER}\",
-                   \"groupid\": \"com.artifact\"
+                   \"groupid\": \"org.acumos\"
                 },
                 \"peer\": {
                     \"jobchecker\": {
@@ -73,7 +80,7 @@ services:
                      \"username\": \"${ACUMOS_CDS_USER}\",
                      \"password\": \"${ACUMOS_CDS_PASSWORD}\"
                   }
-                }
+               }
            }"
        expose:
            - ${ACUMOS_FEDERATION_LOCAL_PORT}
@@ -88,4 +95,6 @@ services:
            - /var/acumos/certs:/app/certs
        logging:
            driver: json-file
-
+       extra_hosts:
+           - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"
+       restart: on-failure

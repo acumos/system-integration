@@ -1,0 +1,28 @@
+/AIO:
+  jcr:primaryType: hst:virtualhostgroup
+  jcr:uuid: 8a90ff1e-4028-4192-88c8-9108357a6bf0
+  hst:cmslocation: http://<ACUMOS_DOMAIN>:9080/cms
+  hst:defaultport: 9080
+  /<ACUMOS_DOMAIN>:
+    jcr:primaryType: hst:virtualhost
+    jcr:uuid: 6cec3454-8d26-4f7c-8c8f-1258e92f176b
+    hst:schemeagnostic: true
+    /hst:root:
+      jcr:primaryType: hst:mount
+      jcr:uuid: ceb79586-73dc-4c17-969e-35203c7d0513
+      hst:homepage: root
+      hst:mountpoint: /hst:hst/hst:sites/acumoscms
+      /api-manual:
+        jcr:primaryType: hst:mount
+        jcr:uuid: ecdfcf13-fd5b-4af7-b48f-ec913eff367b
+        hst:alias: api-manual
+        hst:ismapped: false
+        hst:namedpipeline: JaxrsRestPlainPipeline
+        hst:types: [rest]
+      /api:
+        jcr:primaryType: hst:mount
+        jcr:uuid: 1131125f-b5df-4315-8072-a037821ccdc2
+        hst:alias: api
+        hst:ismapped: false
+        hst:namedpipeline: RestApiPipeline
+        hst:types: [rest]

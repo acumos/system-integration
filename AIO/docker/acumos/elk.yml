@@ -37,6 +37,7 @@ services:
       XPACK_MONITORING_ENABLED: "false"
     networks:
       - elk
+    restart: on-failure
 
   logstash-service:
     image:  ${LOGSTASH_IMAGE}
@@ -57,6 +58,7 @@ services:
       - elk
     depends_on:
       - elasticsearch-service
+    restart: on-failure
 
   kibana-service:
     image:  ${KIBANA_IMAGE}
@@ -69,6 +71,7 @@ services:
       - elk
     depends_on:
       - elasticsearch-service
+    restart: on-failure
 
 
 networks:
