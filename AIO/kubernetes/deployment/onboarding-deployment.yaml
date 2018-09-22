@@ -90,7 +90,7 @@ spec:
                      "mktPlaceEndPointURL": "http://portal-be-service:8083"
                    },
                    "microService": {
-                     "microServiceEndPointURL": "http://msg-service:8336"
+                     "microServiceEndPointURL": "http://msg-service:8336/microservice-generation"
                    },
                    "requirements": {
                      "extraIndexURL": "",
