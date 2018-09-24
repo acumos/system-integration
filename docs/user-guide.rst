@@ -285,7 +285,7 @@ Step-by-Step Guide
 .. code-block:: bash	
 
    $ kubectl create namespace <namespace name>
-Example: kubectl create namespace acumos-ns01
+   Example: kubectl create namespace acumos-ns01
 
 5. Change directory to  acumosk8s-public-cloud/azure/volumeclaim to create persistent volume claim (pvc).
 
@@ -317,7 +317,7 @@ Example: kubectl create namespace acumos-ns01
 .. code-block:: bash	
 
    $ ./acumos-volumeclaim.sh <name of volumeclaim .yaml file> create
-Example: ./acumos-volumeclaim.sh acumos-volumeclaim.yaml create
+   Example: ./acumos-volumeclaim.sh acumos-volumeclaim.yaml create
 
 10. Create a secret file for acumos that contains base64 encoding to pull docker image from nexus repo.
 
@@ -342,7 +342,7 @@ Example: ./acumos-volumeclaim.sh acumos-volumeclaim.yaml create
    
    $ cd  acumosk8s-public-cloud/azure/configmap
    $ ./acumos-configmap.sh <name of config.yaml file> create
-Example: ./acumos-configmap.sh es-config.yaml create
+   Example: ./acumos-configmap.sh es-config.yaml create
          ./acumos-configmap.sh logstash-config.yaml create
 
 
@@ -375,7 +375,7 @@ Example: ./acumos-configmap.sh es-config.yaml create
 .. code-block:: bash	
 
    $ ./acumos-deployment.sh <name of deployment.yaml file> create
-Example: ./acumos-deployment.sh acumos-deployment.yaml create
+   Example: ./acumos-deployment.sh acumos-deployment.yaml create
 
 17. Change directory to  acumosk8s-public-cloud/azure/services
 
@@ -407,7 +407,7 @@ Example: ./acumos-deployment.sh acumos-deployment.yaml create
 .. code-block:: bash	
 
    $ ./acumos-service.sh <name of service.yaml file> create
-Example: ./acumos-service.sh acumos-service.yaml create
+   Example: ./acumos-service.sh acumos-service.yaml create
 
 22. Create a certs directory in kubernetes client machine and generate files acumos-k8s.cert , acumos-k8s.key , acumos-k8s.pkcs12 and acumosTrustStore.jks
 
