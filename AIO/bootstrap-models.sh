@@ -51,10 +51,11 @@ function log() {
 
 function onboard_model() {
   echo "Onboarding model $2 at $host ..."
+  proto=$(ls $1/$2/*.proto)
   curl -o ~/json -k -H "Authorization: $jwtToken"\
        -F "model=@$1/$2/model.zip;type=application/zip" \
        -F "metadata=@$1/$2/metadata.json;type=application/json"\
-       -F "schema=@$1/$2/model.proto;type=application/text" $PUSHURL
+       -F "schema=@$proto;type=application/text" $PUSHURL
   if [[ $(grep -c -e "The upstream server is timing out" -e "Service unavailable" ~/json) -gt 0 ]]; then
     log "Onboarding $2 failed at host $host"
     cat ~/json
