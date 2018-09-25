@@ -36,6 +36,10 @@ set -x
 
 source acumos-env.sh
 
+echo "Stop docker-proxy"
+sudo bash docker-proxy/docker-compose.sh -f docker-compose.yml down -v
+sudo rm -rf /var/acumos/docker-proxy
+
 if [[ "$DEPLOYED_UNDER" == "docker" || "$DEPLOYED_UNDER" == "" ]]; then
   echo "Stop Acumos docker-based components"
   sudo bash docker-compose.sh down
@@ -50,11 +54,12 @@ if [[ "$DEPLOYED_UNDER" == "k8s" || "$DEPLOYED_UNDER" == "" ]]; then
   echo "Stop the running Acumos component services under kubernetes"
   kubectl delete service -n acumos azure-client-service cds-service cms-service\
     filebeat-service onboarding-service portal-be-service portal-fe-service \
-    dsce-service federation-service kong-service nexus-service
+    dsce-service federation-service kubernetes-client-service \
+    kong-service nexus-service
 
   echo "Stop the running Acumos component deployments under kubernetes"
   kubectl delete deployment -n acumos azure-client cds cms filebeat onboarding\
-    portal-be portal-fe dsce federation kong nexus
+    portal-be portal-fe dsce federation kubernetes-client kong nexus
 
   echo "Delete image pull secrets from kubernetes"
   kubectl delete secret -n acumos acumos-registry
