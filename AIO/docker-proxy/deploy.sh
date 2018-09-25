@@ -22,9 +22,13 @@
 #
 # Prerequisites:
 # - Ubuntu Xenial or Centos 7 server
-# Usage:
-# - bash docker-proxy/deploy.sh 
 #
+# Usage:
+# - bash docker-proxy/deploy.sh
+#
+# See https://docs.acumos.org/en/latest/submodules/kubernetes-client/docs/deploy-in-private-k8s.html#operations-user-guide
+# for more information, e.g. on use of this script for manually-installed
+# Acumos platforms
 
 trap 'fail' ERR
 
@@ -76,7 +80,6 @@ setup_proxy() {
   sudo rm -rf /var/acumos/docker-proxy
   sudo cp -R docker-proxy /var/acumos/.
   sudo chown -R $USER /var/acumos/docker-proxy
-  mkdir /var/acumos/docker-proxy/data
   ACUMOS_DOCKER_PROXY_AUTH=$(echo -n "$ACUMOS_RO_USER:$ACUMOS_RO_USER_PASSWORD" | base64)
   sed -i -- "s~<ACUMOS_DOCKER_PROXY_AUTH>~$ACUMOS_DOCKER_PROXY_AUTH~g" /var/acumos/docker-proxy/auth/nginx.conf
   sed -i -- "s~<ACUMOS_NEXUS_HOST>~$ACUMOS_NEXUS_HOST~g" /var/acumos/docker-proxy/auth/nginx.conf

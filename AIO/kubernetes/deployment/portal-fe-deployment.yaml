@@ -66,6 +66,18 @@ spec:
                         },
                         "azure": {
                           "url": "http://azure-client-service:9081"
+                        },
+                        "openstack" : {
+                          "path": "/openstack/**",
+                          "url": "http://openstack-client-service:8007",
+                          "stripPrefix": "false",
+                          "sensitiveHeaders": ""
+                        },
+                        "package": {
+                          "path": "/package/**",
+                          "url": "http://kubernetes-client-service:8082",
+                          "stripPrefix": "true",
+                          "sensitiveHeaders": ""
                         }
                       },
                       "host": {

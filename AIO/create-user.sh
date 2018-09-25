@@ -120,7 +120,7 @@ function setup_user() {
   trap 'fail' ERR
   log "Create user $username"
   register_user
-  while [[ $(grep -c "An unexpected error occurred" ~/json) -gt 0 ]] ; do
+  while [[ $(grep -c -e "An unexpected error occurred" -e "The upstream server is timing out" ~/json) -gt 0 ]] ; do
     log "Portal user registration API is not yet active, waiting 10 seconds"
     sleep 10
     register_user
