@@ -464,6 +464,8 @@ EOF
     sed -i -- "s~<FILEBEAT_IMAGE>~$FILEBEAT_IMAGE~g"  ~/deploy/kubernetes/deployment/filebeat-deployment.yaml
     sed -i -- "s~<KIBANA_IMAGE>~$KIBANA_IMAGE~g"  ~/deploy/kubernetes/deployment/elk-deployment.yaml
     sed -i -- "s~<KUBERNETES_CLIENT_IMAGE>~$KUBERNETES_CLIENT_IMAGE~g"  ~/deploy/kubernetes/deployment/kubernetes-client-deployment.yaml
+    sed -i -- "s~<BLUEPRINT_ORCHESTRATOR_IMAGE>~$BLUEPRINT_ORCHESTRATOR_IMAGE~g"  ~/deploy/kubernetes/deployment/kubernetes-client-deployment.yaml
+    sed -i -- "s~<PROTO_VIEWER_IMAGE>~$PROTO_VIEWER_IMAGE~g"  ~/deploy/kubernetes/deployment/kubernetes-client-deployment.yaml
     sed -i -- "s~<LOGSTASH_IMAGE>~$LOGSTASH_IMAGE~g"  ~/deploy/kubernetes/deployment/elk-deployment.yaml
     sed -i -- "s~<METRICBEAT_IMAGE>~$METRICBEAT_IMAGE~g"  ~/deploy/kubernetes/deployment/metricbeat-deployment.yaml
     sed -i -- "s~<MICROSERVICE_GENERATION_IMAGE>~$MICROSERVICE_GENERATION_IMAGE~g"  ~/deploy/kubernetes/deployment/microservice-generation-deployment.yaml
@@ -661,8 +663,10 @@ fi
 if [[ "$ACUMOS_DOCKER_PROXY_USERNAME" == "" ]]; then
   export ACUMOS_DOCKER_PROXY_USERNAME=$(uuidgen)
   echo "ACUMOS_DOCKER_PROXY_USERNAME=$ACUMOS_DOCKER_PROXY_USERNAME" >>acumos-env.sh
+  echo "export ACUMOS_DOCKER_PROXY_USERNAME" >>acumos-env.sh
   export ACUMOS_DOCKER_PROXY_PASSWORD=$(uuidgen)
   echo "ACUMOS_DOCKER_PROXY_PASSWORD=$ACUMOS_DOCKER_PROXY_PASSWORD" >>acumos-env.sh
+  echo "export ACUMOS_DOCKER_PROXY_PASSWORD" >>acumos-env.sh
 fi
 
 source acumos-env.sh
