@@ -27,6 +27,31 @@ System Integration Release Notes
 All-in-One (OneClick Deploy)
 ............................
 
+---------------------------
+Version 0.9, 4 October 2018
+---------------------------
+
+This is the final version as of Release candidate 0 (RC0).
+
+* `ACUMOS-1784: AIO-0.8: Various bugs in testing private-kubernetes-deploy <https://jira.acumos.org/browse/ACUMOS-1784>`_
+
+  * `Various bugs and other issues needing fixes <https://gerrit.acumos.org/r/#/c/2941/>`_
+
+    * Align with Weekly+Assembly+Acumos_1809252355
+    * Update onboarding-app version to fix Tosca creation errors
+    * Update kubernetes-client to latest test version
+    * Update microservice-generation to latest test version
+    * Update probe to lates version
+    * add docker-proxy cleanup to clean.sh
+    * remove superfluous creation of /var/acumos/docker-proxy/data
+    * correct log volume mapping for kubernetes-client
+    * fix errors in portal-be templates
+    * update BLUEPRINT_ORCHESTRATOR_IMAGE variable
+    * update PROTO_VIEWER_IMAGE variable
+    * update ACUMOS_BASE_IMAGE variable
+    * add kubernetes-client to clean.sh
+    * update release notes
+
 ------------------------------
 Version 0.8, 22 September 2018
 ------------------------------

@@ -57,6 +57,9 @@ services:
                 \"qanda\": {
                    \"url\": \"http://cms-service:${ACUMOS_CMS_PORT}\"
                 },
+                \"doc\": {
+                   \"url\": \"https://wiki.acumos.org\"
+                },
                 \"onboarding\": {
                    \"push\": {
                        \"model\": {
@@ -64,7 +67,6 @@ services:
                           \"dcae_url\": \"http://onboarding-service:${ACUMOS_ONBOARDING_PORT}/onboarding-app/v2/dcae_models\"
                        }
                    },
-                   \"tokenmode\": \"jwtToken\",
                    \"cliPushUrl\": \"${ACUMOS_DOMAIN}:${ACUMOS_KONG_PROXY_SSL_PORT}/onboarding-app/v2/push\",
                    \"cliAuthUrl\": \"${ACUMOS_DOMAIN}:${ACUMOS_KONG_PROXY_SSL_PORT}/onboarding-app/v2/auth\",
                    \"tokenmode\": \"jwtToken\"
@@ -75,9 +77,6 @@ services:
                          \"name\": \"/acumosWebOnboarding\"
                       }
                    }
-                },
-                \"doc\": {
-                   \"url\": \"https://wiki.acumos.org\"
                 },
                 \"portal\": {
                    \"feature\": {
@@ -92,16 +91,27 @@ services:
                       },
                       \"cloud_enabled\": \"[{\\\"cloudEnabled\\\" : \\\"true\\\", \\\"cloudName\\\" : \\\"azure\\\", \\\"cloudDisplayText\\\" : \\\"Microsoft Azure\\\", \\\"imageUrl\\\": \\\"/images/deploy-cloud/microsoft_azure.png\\\" },{ \\\"cloudEnabled\\\" : \\\"true\\\", \\\"cloudName\\\" : \\\"rackspace\\\", \\\"cloudDisplayText\\\" : \\\"Rackspace\\\", \\\"imageUrl\\\" : \\\"/images/deploy-cloud/rackspace.png\\\" },{ \\\"cloudEnabled\\\" : \\\"false\\\",  \\\"cloudName\\\" : \\\"gcp\\\", \\\"cloudDisplayText\\\" : \\\"Google Cloud Platform\\\", \\\"imageUrl\\\" : \\\"/images/deploy-cloud/google_cloud_platform.png\\\" },{ \\\"cloudEnabled\\\" : \\\"true\\\",  \\\"cloudName\\\" : \\\"deploylocal\\\", \\\"cloudDisplayText\\\" : \\\"Deploy To Local\\\", \\\"imageUrl\\\": \\\"/images/deploy-cloud/deploy_to_local.png\\\" },{ \\\"cloudEnabled\\\" : \\\"false\\\", \\\"cloudName\\\" : \\\"whitebox\\\", \\\"cloudDisplayText\\\" : \\\"Deploy To White Box\\\", \\\"imageUrl\\\" : \\\"/images/deploy-cloud/deploy_to_whitebox.png\\\" }]\"
                    },
-                   \"ui\": {
-                     \"server\": {
-                        \"address\": \"http://notused.com\"
-                     }
-                   },
                    \"submitValidation\": {
                       \"api\": \"http://validation-client:$ACUMOS_VALIDATION_CLIENT_PORT/status/v1.0/tasks\"
                    },
                    \"dashboard\":{
                       \"url\": \"http://${ACUMOS_ELK_KIBANA_HOST}:${ACUMOS_ELK_KIBANA_NODEPORT}\"
+                   },
+                   \"mailjet\": {
+                      \"api\": {
+                         \"key\": \"replace-as-needed\"
+                      },
+                      \"secret\": {
+                         \"key\": \"replace-as-needed\" 
+                      },
+                      \"address\": {
+                         \"from\": \"admin@example.com\"
+                      }
+                   },
+                   \"ui\": {
+                     \"server\": {
+                        \"address\": \"http://notused.com\"
+                     }
                    }
                 },
                 \"spring\": {
