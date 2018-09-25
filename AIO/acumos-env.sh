@@ -35,17 +35,19 @@ export STAGING=nexus3.acumos.org:10004
 export RELEASE=nexus3.acumos.org:10002
 
 # Images per https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_1809172330
+# with new onboarding to address bugs (Tosca file generation error) and
+# microservice-generation
 export PORTAL_BE_IMAGE=$STAGING/acumos-portal-be:1.15.45
 export PORTAL_FE_IMAGE=$STAGING/acumos-portal-fe:1.15.45
 export AZURE_CLIENT_IMAGE=$STAGING/acumos-azure-client:1.2.20
 export DESIGNSTUDIO_IMAGE=$STAGING/ds-compositionengine:0.0.38
 export PORTAL_CMS_IMAGE=$STAGING/acumos-cms-docker:1.3.4
-export ONBOARDING_IMAGE=$STAGING/onboarding-app:1.35.0
+export ONBOARDING_IMAGE=$SNAPSHOT/onboarding-app:1.36.1-SNAPSHOT
 export COMMON_DATASERVICE_IMAGE=$STAGING/common-dataservice:1.18.1
 export OPENSTACK_CLIENT_IMAGE=$STAGING/openstack-client:1.1.21
 export BLUEPRINT_ORCHESTRATOR_IMAGE=$STAGING/blueprint-orchestrator:2.0.11
 export FEDERATION_IMAGE=$STAGING/federation-gateway:1.18.3
-export KUBERNETES_CLIENT_IMAGE=$STAGING/kubernetes-client:0.0.7
+export KUBERNETES_CLIENT_IMAGE=$SNAPSHOT/kubernetes-client:0.1.1-SNAPSHOT
 export DOCKER_PROXY_IMAGE=$SNAPSHOT/docker-proxy:0.0.1-SNAPSHOT
 #export ELASTICSEARCH_IMAGE=$STAGING/acumos-elasticsearch:1.2.0
 export ELASTICSEARCH_IMAGE=docker.elastic.co/elasticsearch/elasticsearch:5.5.1
@@ -53,8 +55,8 @@ export LOGSTASH_IMAGE=$STAGING/acumos-logstash:1.18.1
 export KIBANA_IMAGE=$STAGING/acumos-kibana:1.18.1
 export FILEBEAT_IMAGE=$STAGING/acumos-filebeat:1.18.1
 export METRICBEAT_IMAGE=$STAGING/acumos-metricbeat:1.18.1
-export PROTO_VIEWER_IMAGE=$SNAPSHOT/acumos_proto_viewer:1.5.5
-export MICROSERVICE_GENERATION_IMAGE=$STAGING/microservice-generation:1.4.0
+export PROTO_VIEWER_IMAGE=$SNAPSHOT/acumos-proto-viewer:1.5.5
+export MICROSERVICE_GENERATION_IMAGE=$SNAPSHOT/microservice-generation:1.5.0-SNAPSHOT
 export H2O_GENERICJAVA_MODELRUNNER_IMAGE=$STAGING/h2o-genericjava-modelrunner-2.2.3
 export ONBOARDING_BASE_IMAGE=$STAGING/onboarding-base-r:1.0
 export DATABROKER_SQLBROKER_IMAGE=$STAGING/sqldatabroker:0.0.1

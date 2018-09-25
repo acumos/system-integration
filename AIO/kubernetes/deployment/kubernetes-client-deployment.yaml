@@ -50,33 +50,50 @@ spec:
                     "kube" : {
                       "incrementPort": "8556",
                       "singleModelPort": "8556",
-                      "folderPath": "/maven/home"
+                      "incrementPort": "8557",
+                      "folderPath": "/maven/home",
+                      "singleNodePort": "30333",
+                      "singleTargetPort": "3330",
+                      "dataBrokerModelPort": "8556",
+                      "dataBrokerNodePort": "30556",
+                      "dataBrokerTargetPort": "8556",
+                      "mlTargetPort": "3330",
+                      "nginxImageName": "nginx"
+                    },
+                    "dockerproxy": {
+                    "host": "<ACUMOS_DOCKER_PROXY_HOST>",
+                    "port": "<ACUMOS_DOCKER_PROXY_PORT>"
                     },
                     "blueprint": {
-                      "port": "8555",
                       "ImageName": "<BLUEPRINT_ORCHESTRATOR_IMAGE>",
-                      "name": "blueprint-orchestrator"
-						        },
-						        "nexus": {
-						          "url": "http://${ACUMOS_NEXUS_HOST}:<ACUMOS_NEXUS_API_PORT>/repository/acumos_model_maven/",
-						          "password": "<ACUMOS_RW_USER_PASSWORD>",
-						          "username": "<ACUMOS_RW_USER>",
-						          "groupid": "com.artifact"
-						        },
-						        "cmndatasvc": {
-						          "cmndatasvcendpoinurl": "http://cds-service:8000/ccds",
-						          "cmndatasvcuser": "<ACUMOS_CDS_USER>",
-						          "cmndatasvcpwd": "<ACUMOS_CDS_PASSWORD>"
-						        },
-						        "probe": {
-						          "probeImageName": "<PROTO_VIEWER_IMAGE>",
-						          "probeImagePORT": "5006"
-						        }
+                      "name": "blueprint-orchestrator",
+                      "nodePort": "30555",
+                      "port": "8555"
+                    },
+                    "nexus": {
+                      "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/repository/acumos_model_maven/",
+                      "password": "<ACUMOS_RW_USER_PASSWORD>",
+                      "username": "<ACUMOS_RW_USER>",
+                      "groupid": "com.artifact"
+                    },
+                    "cmndatasvc": {
+                      "cmndatasvcendpointurl": "http://cds-service:8000/ccds",
+                      "cmndatasvcuser": "<ACUMOS_CDS_USER>",
+                      "cmndatasvcpwd": "<ACUMOS_CDS_PASSWORD>"
+                    },
+                    "probe": {
+                      "probeImageName": "<PROTO_VIEWER_IMAGE>",
+                      "probeImagePORT": "5006",
+                      "probeModelPort": "80",
+                      "probeNodePort": "30800",
+                      "probeTargetPort": "5006",
+                      "probeApiPort": "5006"
+                    }
                   }'
         ports:
         - containerPort: 8082
         volumeMounts:
-        - mountPath: /maven/log
+        - mountPath: /maven/logs
           name: acumos-logs
       restartPolicy: Always
       volumes:
