@@ -1,0 +1,222 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "78f282ea_56a499a2",
+        "filename": "multi-node/core/install-docker-software.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-28T18:59:08Z",
+      "side": 1,
+      "message": "remove this old word",
+      "range": {
+        "startLine": 1,
+        "startChar": 49,
+        "endLine": 1,
+        "endChar": 56
+      },
+      "revId": "705294ea31bd4c212fc97bad5f2d448b0603fc06",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "34a510b8_c5482bf8",
+        "filename": "multi-node/core/install-docker-software.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-28T18:59:08Z",
+      "side": 1,
+      "message": "Possibly should add license header",
+      "revId": "705294ea31bd4c212fc97bad5f2d448b0603fc06",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "90f3aac5_285cf225",
+        "filename": "multi-node/docker-compose/docker-compose-template.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-28T18:59:08Z",
+      "side": 1,
+      "message": "Remove don\u0027t comment out",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 36
+      },
+      "revId": "705294ea31bd4c212fc97bad5f2d448b0603fc06",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bec821aa_02a108f8",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-28T18:59:08Z",
+      "side": 1,
+      "message": "Acumos. \n\nProbably should add license",
+      "revId": "705294ea31bd4c212fc97bad5f2d448b0603fc06",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a9d9bac_1693efb9",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-28T18:59:08Z",
+      "side": 1,
+      "message": "This is a hardcoded password, it must be removed from the yml file",
+      "range": {
+        "startLine": 19,
+        "startChar": 42,
+        "endLine": 19,
+        "endChar": 74
+      },
+      "revId": "705294ea31bd4c212fc97bad5f2d448b0603fc06",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "53538343_41a48adf",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-28T18:59:08Z",
+      "side": 1,
+      "message": "See above",
+      "range": {
+        "startLine": 31,
+        "startChar": 42,
+        "endLine": 31,
+        "endChar": 74
+      },
+      "revId": "705294ea31bd4c212fc97bad5f2d448b0603fc06",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e6fb4e23_f78205cc",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-28T18:59:08Z",
+      "side": 1,
+      "message": "This hardcoded password MUST be removed",
+      "range": {
+        "startLine": 91,
+        "startChar": 42,
+        "endLine": 91,
+        "endChar": 53
+      },
+      "revId": "705294ea31bd4c212fc97bad5f2d448b0603fc06",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "edbe1831_bb1b99ff",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-28T18:59:08Z",
+      "side": 1,
+      "message": "Must factor out/remove",
+      "range": {
+        "startLine": 105,
+        "startChar": 48,
+        "endLine": 105,
+        "endChar": 55
+      },
+      "revId": "705294ea31bd4c212fc97bad5f2d448b0603fc06",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e2674433_d79686f8",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-28T18:59:08Z",
+      "side": 1,
+      "message": "Factor out / remove",
+      "range": {
+        "startLine": 180,
+        "startChar": 48,
+        "endLine": 180,
+        "endChar": 55
+      },
+      "revId": "705294ea31bd4c212fc97bad5f2d448b0603fc06",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "11a4dd69_e7363ea8",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-28T18:59:08Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 181,
+        "startChar": 39,
+        "endLine": 181,
+        "endChar": 46
+      },
+      "revId": "705294ea31bd4c212fc97bad5f2d448b0603fc06",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
