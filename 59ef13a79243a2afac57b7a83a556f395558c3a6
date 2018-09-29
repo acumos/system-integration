@@ -1,0 +1,136 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "34e00187_89973f7b",
+        "filename": "multi-node/docker-compose/docker-compose-template.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-29T10:42:28Z",
+      "side": 1,
+      "message": "proto-viewer is missing here",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 29
+      },
+      "revId": "59ef13a79243a2afac57b7a83a556f395558c3a6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a0e08fc_357cd2b8",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-29T10:42:28Z",
+      "side": 1,
+      "message": "should also be factored out",
+      "range": {
+        "startLine": 83,
+        "startChar": 33,
+        "endLine": 83,
+        "endChar": 49
+      },
+      "revId": "59ef13a79243a2afac57b7a83a556f395558c3a6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "12a52a9e_b3f76d48",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-29T10:42:28Z",
+      "side": 1,
+      "message": "Should be in a variable, this is repeated in this file, avoid hardcoded strings",
+      "range": {
+        "startLine": 108,
+        "startChar": 48,
+        "endLine": 108,
+        "endChar": 75
+      },
+      "revId": "59ef13a79243a2afac57b7a83a556f395558c3a6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "936277b1_fc0d130e",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-29T10:42:28Z",
+      "side": 1,
+      "message": "Why is the onboarding base image name and version hardcoded here?",
+      "revId": "59ef13a79243a2afac57b7a83a556f395558c3a6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31ee4562_631b63e7",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-29T10:42:28Z",
+      "side": 1,
+      "message": "This port number is used in multiple places, so ideally it will be in a variable",
+      "range": {
+        "startLine": 228,
+        "startChar": 28,
+        "endLine": 228,
+        "endChar": 32
+      },
+      "revId": "59ef13a79243a2afac57b7a83a556f395558c3a6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "03f058a5_dc516fd4",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-09-29T10:42:28Z",
+      "side": 1,
+      "message": "This is wrong, it should be org.acumos, and further it should not be hardcoded it should use a variable bcos also supplied to on-boarding",
+      "range": {
+        "startLine": 235,
+        "startChar": 36,
+        "endLine": 235,
+        "endChar": 48
+      },
+      "revId": "59ef13a79243a2afac57b7a83a556f395558c3a6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
