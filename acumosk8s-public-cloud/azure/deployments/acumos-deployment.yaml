@@ -77,20 +77,150 @@ spec:
                             "GeneratorEndPointURL": "http://acumos.acumos-ns01:8080/model_create" 
                           },
                  "mktPlace": {
-                              "mktPlaceEndPoinURL" : "http://acumos.${ACUMOS_NAMESPACE}:${ACUMOS_PORTAL_BE_PORT}"  
+                              "mktPlaceEndPointURL" : "http://acumos.${ACUMOS_NAMESPACE}:${ACUMOS_PORTAL_BE_PORT}"  
                               },
+                 "microService": {
+                     "microServiceEndPointURL": "http://acumos.${ACUMOS_NAMESPACE}:${ACUMOS_MICROSERVICE_GENERATION_PORT}/microservice-generation"
+                   },
                  "requirements": { 
                                   "extraIndexURL": "",
                                   "trustedHost": "" 
                                  }, 
                  "authenticationServiceURL": "http://acumos.${ACUMOS_NAMESPACE}:${ACUMOS_PORTAL_BE_PORT}",
+                 "spring": {
+                     "http": {
+                       "multipart": {
+                          "max-file-size": "1024MB",
+                          "max-request-size": "1024MB"
+                       }
+                     }
+                   },
                  "base_image": { "rimage": "${NEXUS3_RELEASE_REGISTRY_LF}/${ACUMOS_ONBOARDING_BASE_R}","dockerusername": "${ACUMOS_DOCKER_USERNAME}","dockerpassword": "${ACUMOS_DOCKER_PASSWORD}"}                   
                  }'
          volumeMounts:
            - mountPath: /maven/logs
              name: acumos-logs
            - mountPath: /temp
-             name: acumos-output                 
+             name: acumos-output
+       - name: microservice-generation
+         image: ${NEXUS3_RELEASE_REGISTRY_LF}/${ACUMOS_MICROSERVICE_GENERATION_IMAGE}
+         ports:
+           - containerPort: ${ACUMOS_MICROSERVICE_GENERATION_PORT}
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{
+                   "server":{
+                     "port": ${ACUMOS_MICROSERVICE_GENERATION_PORT}
+                   },
+                   "docker": {
+                     "host": "${ACUMOS_DOCKER_HOST}.${ACUMOS_NAMESPACE}",
+                     "port": "${ACUMOS_DOCKER_PORT}",
+                     "config": "/docker_host/.docker",
+                     "registry" :{"url": "http://${ACUMOS_NEXUS_SERVICE}.${ACUMOS_NAMESPACE}:${ACUMOS_NEXUS_PORT}/",
+                     "username" : "${ACUMOS_NEXUS_USERNAME}",
+                     "password" : "${ACUMOS_NEXUS_PASSWORD}", 
+                     "email": "${ACUMOS_DOCKER_REGISTRY_EMAIL}"},
+                     "tls": {
+                       "verify": "false"
+                     },
+                     "api": {
+                       "version": "1.23"
+                     },
+                     "imagetag": {
+                       "prefix": "${ACUMOS_NEXUS_SERVICE}.${ACUMOS_NAMESPACE}:${ACUMOS_NEXUS_PORT}"
+                     },
+                     "max_total_connections": "1",
+                     "max_per_route_connections": "1"
+                   },
+                   "http_proxy": "http://${ACUMOS_PROXY}.${ACUMOS_NAMESPACE}:${ACUMOS_PROXY_PORT}",
+                   "nexus": {
+                            "nexusEndPointURL": "http://${ACUMOS_NEXUS_SERVICE}.${ACUMOS_NAMESPACE}:${ACUMOS_NEXUS_ENDPOINT_PORT}/repository/acumos-k8-models-maven/",
+                            "nexusUserName": "${ACUMOS_NEXUS_USERNAME}",
+                            "nexusPassword": "${ACUMOS_NEXUS_PASSWORD}",
+                            "nexusproxy": "",
+                            "nexusGroupId": "com.artifact" 
+                           },
+                   "cmndatasvc": {
+                                "cmnDataSvcEndPoinURL": "http://acumos.${ACUMOS_NAMESPACE}:${ACUMOS_COMMON_DATA_SVC_PORT}/ccds",
+                                "cmnDataSvcUser": "${ACUMOS_CDS_USER}",
+                                "cmnDataSvcPwd": "${ACUMOS_CDS_PASSWORD}" 
+                               },
+                   "mktPlace": {
+                     "mktPlaceEndPointURL": "http://acumos.${ACUMOS_NAMESPACE}:${ACUMOS_PORTAL_BE_PORT}"
+                   },
+                   "microService": {
+                     "microServiceEndPointURL": "http://acumos.${ACUMOS_NAMESPACE}:8091"
+                   },
+                   "requirements": {
+                     "extraIndexURL": "",
+                     "trustedHost": ""
+                   },
+                   "base_image": {
+                     "rimage": "${NEXUS3_RELEASE_REGISTRY_LF}/${ACUMOS_ONBOARDING_BASE_R}",
+                     "dockerusername": "${ACUMOS_DOCKER_USERNAME}",
+                     "dockerpassword": "${ACUMOS_DOCKER_PASSWORD}"
+                   },
+                   "spring": {
+                     "http": {
+                       "multipart": {
+                          "max-file-size": "1024MB",
+                          "max-request-size": "1024MB"
+                       }
+                     }
+                   }
+                 }'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: acumos-logs
+           - mountPath: /temp
+             name: acumos-output
+       - name: kubernetes-client
+         image: ${NEXUS3_RELEASE_REGISTRY_LF}/${ACUMOS_KUBERNETES_CLIENT_IMAGE}
+         ports:
+           - containerPort: ${ACUMOS_KUBERNETES_CLIENT_PORT}
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{
+                   "kube" : {
+                      "incrementPort": "8557",
+                      "singleModelPort": "${ACUMOS_DATA_BROKER_PORT}",
+                      "folderPath": "/maven/home",
+                      "singleTargetPort": "${ACUMOS_DEPLOYED_SOLUTION_PORT}",
+                      "dataBrokerModelPort": "${ACUMOS_DATA_BROKER_PORT}",
+                      "dataBrokerTargetPort": "${ACUMOS_DATA_BROKER_PORT}",
+                      "mlTargetPort": "${ACUMOS_DEPLOYED_SOLUTION_PORT}",
+                      "nginxImageName": "nginx",
+                      "nexusEndPointURL": "http://localhost:80"
+                    },
+                   "blueprint": {
+                      "port": "${ACUMOS_BLUEPRINT_PORT}",
+                      "ImageName": "${ACUMOS_BLUE_PRINT_ORCHESTRATOR}",
+                      "name": "blueprint-orchestrator"
+				    },
+                   "nexus": {
+                            "nexusEndPointURL": "http://${ACUMOS_NEXUS_SERVICE}.${ACUMOS_NAMESPACE}:${ACUMOS_NEXUS_ENDPOINT_PORT}/repository/acumos-k8-models-maven/",
+                            "nexusUserName": "${ACUMOS_NEXUS_USERNAME}",
+                            "nexusPassword": "${ACUMOS_NEXUS_PASSWORD}",
+                            "nexusproxy": "",
+                            "nexusGroupId": "com.artifact" 
+                           },
+                   "cmndatasvc": {
+                                "cmnDataSvcEndPoinURL": "http://acumos.${ACUMOS_NAMESPACE}:${ACUMOS_COMMON_DATA_SVC_PORT}/ccds",
+                                "cmnDataSvcUser": "${ACUMOS_CDS_USER}",
+                                "cmnDataSvcPwd": "${ACUMOS_CDS_PASSWORD}" 
+                               },
+                   "probe": {
+						       "probeImageName": "${ACUMOS_PROTO_VIEWER}",
+						       "probeImagePORT": "${ACUMOS_PROBE_PORT}",
+                               "probeModelPort": "${ACUMOS_PROBE_PORT}",
+                               "probeTargetPort": "${ACUMOS_PROBE_PORT}",
+                               "probeApiPort": "${ACUMOS_PROBE_PORT}",
+                               "probeSchemaPort": "80"
+						    }
+                 }'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: acumos-logs            
        - name: acumos-portal-be
          image: ${NEXUS3_RELEASE_REGISTRY_LF}/${ACUMOS_PORTAL_BE_IMAGE}
          ports:
@@ -132,11 +262,13 @@ spec:
                 "onboarding" : {
                    "push" : {
                        "model" : {
-                          "url" : "http://acumos.${ACUMOS_NAMESPACE}:${ACUMOS_ONBOARDING_APP_PORT}/onboarding-app/v2/models",
-			  "dcae_url" : "http://acumos.${ACUMOS_NAMESPACE}:${ACUMOS_ONBOARDING_APP_PORT}/onboarding-app/v2/dcae_models"
-                       }
-                   }
-                },
+                          "url": "http://acumos.${ACUMOS_NAMESPACE}:${ACUMOS_ONBOARDING_APP_PORT}/onboarding-app/v2/models",
+			              "dcae_url": "http://acumos.${ACUMOS_NAMESPACE}:${ACUMOS_ONBOARDING_APP_PORT}/onboarding-app/v2/dcae_models"
+                       },                      
+                      "cliPushUrl": "acumos.${ACUMOS_NAMESPACE}:${ACUMOS_KONG_SSL_PORT}/onboarding-app/v2/push",
+                      "cliAuthUrl": "acumos.${ACUMOS_NAMESPACE}:${ACUMOS_KONG_SSL_PORT}/onboarding-app/v2/auth",
+                      "tokenmode": "jwtToken"
+                   },
                 "model" : {
                    "storage" : {
                       "folder" : {
@@ -162,15 +294,32 @@ spec:
                    "feature" : {
                       "validateModel" : "false",
                       "email_service" : "mailjet",
-                      "cas_enabled" : "false"
+                      "cas_enabled" : "false",
+                      "download_bufferSize": 8,
+                      "signup_enabled": "true",
+                      "verifyAccount": "false",
+                        "verifyToken": {
+                          "exp_time": 24  
+                        }
+                   },
+                   "cloud_enabled": "[{\"cloudEnabled\": \"true\", \"cloudName\": \"azure\", \"cloudDisplayText\": \"Microsoft Azure\", \"imageUrl\": \"/images/deploy-cloud/microsoft_azure.png\" },{ \"cloudEnabled\": \"true\", \"cloudName\": \"rackspace\", \"cloudDisplayText\": \"Rackspace\", \"imageUrl\": \"/images/deploy-cloud/rackspace.png\" },{ \"cloudEnabled\": \"false\",  \"cloudName\": \"gcp\", \"cloudDisplayText\": \"Google Cloud Platform\", \"imageUrl\": \"/images/deploy-cloud/google_cloud_platform.png\" },{ \"cloudEnabled\": \"true\",  \"cloudName\": \"deploylocal\", \"cloudDisplayText\": \"Deploy To Local\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_local.png\" },{ \"cloudEnabled\": \"false\", \"cloudName\": \"whitebox\", \"cloudDisplayText\": \"Deploy To White Box\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_whitebox.png\" }]"
                    },
                    "submitValidation" : {
                        "api" : "http://acumos.${ACUMOS_NAMESPACE}:${ACUMOS_VALIDATION_PORT}/status/v1.0/tasks"
                    },
                    "dashboard":{
-                       "url" : "http://acumos.${ACUMOS_NAMESPACE}:${ACUMOS_KIBANA_PORT}"
-                   }
+                       "url" : "http://kibana-service.${ACUMOS_NAMESPACE}:${ACUMOS_KIBANA_PORT}"
+                   }                
                 },
+                 "spring": {
+                      "mail": {
+                        "template": {
+                          "folder": {
+                            "path": "/fmtemplates/"
+                          }
+                        } 
+                      }
+                    },
                 "client" : {
                    "ssl" : {
                       "key-store" : "/app/certs/acumos-k8s.pkcs12",
@@ -292,6 +441,13 @@ spec:
                     "port": ${ACUMOS_PORTAL_DS_COMPOSITION_PORT} 
                     },
                     "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
+                    "solutionResultsetSize": "2000",
+                    "cdsCheckInterval": 10000,
+                    "cdsCheckAttempt": 4,
+                    "imagedatabrokerURI":"${NEXUS3_STAGING_REGISTRY_LF}/${ACUMOS_DATA_BROKER_IMAGE}",
+                    "csvdatabrokerURI":"${NEXUS3_STAGING_REGISTRY_LF}/${ACUMOS_CSV_DATA_BROKER_IMAGE}",                    
+                    "sqldatabrokerURI": "${NEXUS3_STAGING_REGISTRY_LF}/${ACUMOS_SQL_DATA_BROKER_IMAGE}",
+                    "jsondatabrokerURI": "NA",
                     "lib":"/maven/",
                     "tosca": { "outputfolder": "/temp/output/" },
                 "nexus": { 
@@ -306,10 +462,6 @@ spec:
                               "cmndatasvcuser": "${ACUMOS_CDS_USER}",
 			                  "cmndatasvcpwd": "${ACUMOS_CDS_PASSWORD}" 
                               },
-				"imagedatabrokerURI":"${NEXUS3_STAGING_REGISTRY_LF}/${ACUMOS_DATA_BROKER_IMAGE}",
-                "csvdatabrokerURI":"${NEXUS3_STAGING_REGISTRY_LF}/${ACUMOS_CSV_DATA_BROKER_IMAGE}",
-                "jsondatabrokerURI": "NA",
-                "sqldatabrokerURI": "NA",
                 "docker": {
                            "host": "${ACUMOS_DOCKER_HOST}.${ACUMOS_NAMESPACE}",
                            "port": ${ACUMOS_DOCKER_PORT},
@@ -394,6 +546,10 @@ spec:
                       "nexusRegistyPwd": "${ACUMOS_RW_USER_PASSWORD}",
                       "nexusRegistyName": "${NEXUS3_REGISTRY_NAME}",
                       "otherRegistyName": "",
+                      "nginxMapFolder": "/home/artifacts",
+                      "nginxWebFolder": "/usr/share/nginx/html",
+                      "nginxImageName": "nginx:latest",
+                      "nginxInternalPort": "80",
                       "exposeDataBrokerPort": "${ACUMOS_DATA_BROKER_PORT}",
                       "internalDataBrokerPort": "${ACUMOS_DATA_BROKER_INTERNAL_PORT}",
                       "registry": {
@@ -614,9 +770,9 @@ spec:
                },
                "ssl" : {
                  "key-store" : "/app/certs/acumos-k8s.pkcs12",
-                 "key-store-password" : "ACUMOS_KEY_STORE_PWD",
+                 "key-store-password" : "${ACUMOS_KEY_STORE_PWD}",
                  "key-store-type" : "PKCS12",
-                 "key-password" : "ACUMOS_KEY_STORE_PWD",
+                 "key-password" : "${ACUMOS_KEY_STORE_PWD}",
                  "trust-store" : "/app/certs/acumosTrustStore.jks",
                  "trust-store-password" : "${ACUMOS_TRUST_STORE_PWD}"
                }
