@@ -55,7 +55,23 @@ spec:
       name: federation-gateway
     - port: ${ACUMOS_FEDERATION_LOCAL_PORT}
       targetPort: ${ACUMOS_FEDERATION_LOCAL_PORT}
-      name: federation-local      
+      name: federation-local
+    - port: ${ACUMOS_MICROSERVICE_GENERATION_PORT}
+      targetPort: ${ACUMOS_MICROSERVICE_GENERATION_PORT}
+      protocol: TCP
+      name: microservice-generation  
+    - port: ${ACUMOS_KUBERNETES_CLIENT_PORT}
+      targetPort: ${ACUMOS_KUBERNETES_CLIENT_PORT}
+      protocol: TCP
+      name: kubernetes-client
+    - port: ${ACUMOS_OPENSTACK_CLIENT_PORT}
+      targetPort: ${ACUMOS_OPENSTACK_CLIENT_PORT}
+      protocol: TCP
+      name: acumos-openstack-client
+    - port: ${ACUMOS_AZURE_CLIENT_PORT}
+      targetPort: ${ACUMOS_AZURE_CLIENT_PORT}
+      protocol: TCP
+      name: azure-client        
   selector:
     app: acumos
     tier: frontend
