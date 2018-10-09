@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fe48b8f1_374305c2",
+        "filename": "acumosk8s-public-cloud/azure/acumos-kubectl.env",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-10-09T15:28:16Z",
+      "side": 1,
+      "message": "some specific updates below, but I generally recommend you align with Weekly+Assembly+Acumos_1809291700 with updates:\n# To address ACUMOS-1831: Portal 1.16.1, CDS 1.18.2\n# DS 1.40.1, MSG 1.7.0, kubernetes-client:0.1.3",
+      "range": {
+        "startLine": 67,
+        "startChar": 2,
+        "endLine": 67,
+        "endChar": 8
+      },
+      "revId": "8d4c8b8bfacc3d8bf592d315269fd27e9471ba78",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "41f39f75_059575d6",
+        "filename": "acumosk8s-public-cloud/azure/acumos-kubectl.env",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-10-09T15:28:16Z",
+      "side": 1,
+      "message": "use csvdatabroker:1.4.0",
+      "range": {
+        "startLine": 74,
+        "startChar": 36,
+        "endLine": 74,
+        "endChar": 55
+      },
+      "revId": "8d4c8b8bfacc3d8bf592d315269fd27e9471ba78",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6a051ae8_4a425198",
+        "filename": "acumosk8s-public-cloud/azure/acumos-kubectl.env",
+        "patchSetId": 2
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-10-09T15:28:16Z",
+      "side": 1,
+      "message": "use microservice-generation:1.7.0",
+      "range": {
+        "startLine": 90,
+        "startChar": 44,
+        "endLine": 90,
+        "endChar": 73
+      },
+      "revId": "8d4c8b8bfacc3d8bf592d315269fd27e9471ba78",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "57c4f6ea_4d1afad6",
+        "filename": "acumosk8s-public-cloud/azure/acumos-kubectl.env",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-10-09T15:28:16Z",
+      "side": 1,
+      "message": "use sqldatabroker:1.2.0",
+      "range": {
+        "startLine": 91,
+        "startChar": 36,
+        "endLine": 91,
+        "endChar": 55
+      },
+      "revId": "8d4c8b8bfacc3d8bf592d315269fd27e9471ba78",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e31c996e_b5e33075",
+        "filename": "acumosk8s-public-cloud/azure/acumos-kubectl.env",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-10-09T15:28:16Z",
+      "side": 1,
+      "message": "use kubernetes-client:0.1.3",
+      "range": {
+        "startLine": 93,
+        "startChar": 38,
+        "endLine": 93,
+        "endChar": 61
+      },
+      "revId": "8d4c8b8bfacc3d8bf592d315269fd27e9471ba78",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "459cf719_1c1e15f5",
+        "filename": "acumosk8s-public-cloud/azure/deployments/acumos-deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-10-09T15:28:16Z",
+      "side": 1,
+      "message": "add:\n                    \"dockerproxy\": {\n                    \"host\": \"${ACUMOS_DOCKER_PROXY_HOST}\",\n                    \"port\": \"${ACUMOS_DOCKER_PROXY_PORT}\"\n                    },",
+      "range": {
+        "startLine": 195,
+        "startChar": 0,
+        "endLine": 195,
+        "endChar": 1
+      },
+      "revId": "8d4c8b8bfacc3d8bf592d315269fd27e9471ba78",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a20bf59a_368ba6fe",
+        "filename": "acumosk8s-public-cloud/azure/deployments/acumos-deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-10-09T15:28:16Z",
+      "side": 1,
+      "message": "(here and elsewhere) replace tabs with spaces",
+      "range": {
+        "startLine": 199,
+        "startChar": 0,
+        "endLine": 199,
+        "endChar": 8
+      },
+      "revId": "8d4c8b8bfacc3d8bf592d315269fd27e9471ba78",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
