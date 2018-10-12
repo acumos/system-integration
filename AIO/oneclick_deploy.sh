@@ -362,7 +362,7 @@ EOF
     platform-oam/elk-stack/logstash/pipeline/logstash.conf
   sed -i -- 's/elasticsearch:9200/elasticsearch-service:9200/g' \
     platform-oam/elk-stack/kibana/config/kibana.yml
-  log "Copy ELK stack component configs to /;var/acumos"
+  log "Copy ELK stack component configs to /var/acumos"
   cp -r platform-oam/elk-stack/kibana /var/acumos/.
   cp -r platform-oam/elk-stack/logstash /var/acumos/.
 }
