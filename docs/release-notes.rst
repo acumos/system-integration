@@ -27,11 +27,19 @@ System Integration Release Notes
 All-in-One (OneClick Deploy)
 ............................
 
----------------------------
-Version 1.0.0, 5 October 2018
----------------------------
+------------------------------
+Version 1.0.1, 11 October 2018
+------------------------------
 
-This is the final version as of Release candidate 0 (RC0).
+* `ACUMOS-1894: AIO update to Acumos_1810050030 <https://jira.acumos.org/browse/ACUMOS-1894>`_
+
+  * `AIO update to Acumos_1810050030 <>`_
+
+-----------------------------
+Version 1.0.0, 5 October 2018
+-----------------------------
+
+This is the final version as of Release Candidate 0 (RC0).
 
 * `ACUMOS-1784: AIO-0.8: Various bugs in testing private-kubernetes-deploy <https://jira.acumos.org/browse/ACUMOS-1784>`_
 
