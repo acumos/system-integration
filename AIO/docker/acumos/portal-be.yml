@@ -67,7 +67,7 @@ services:
                           \"dcae_url\": \"http://onboarding-service:${ACUMOS_ONBOARDING_PORT}/onboarding-app/v2/dcae_models\"
                        }
                    },
-                   \"cliPushUrl\": \"${ACUMOS_DOMAIN}:${ACUMOS_KONG_PROXY_SSL_PORT}/onboarding-app/v2/push\",
+                   \"cliPushUrl\": \"${ACUMOS_DOMAIN}:${ACUMOS_KONG_PROXY_SSL_PORT}/onboarding-app/v2/models\",
                    \"cliAuthUrl\": \"${ACUMOS_DOMAIN}:${ACUMOS_KONG_PROXY_SSL_PORT}/onboarding-app/v2/auth\",
                    \"tokenmode\": \"jwtToken\"
                 },
