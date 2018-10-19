@@ -19,7 +19,9 @@
 #
 #.What this is: Utility to create a user via the Acumos common-dataservice API.
 #. Used by peer-test.sh to create an admin user for federation setup etc. Also
-#. useful to automate creation of test users for various test cases.
+#. useful to automate creation of test users for various test cases. To assign
+#. an additional role to a user, simply call the script with the same parameters
+#. but a different role.
 #.
 #.Prerequisites:
 #.- Acumos deployed via oneclick_deploy.sh, and acumos-env.sh as updated by it
@@ -88,11 +90,12 @@ function create_role() {
     fail "Role $1 creation failed"
   fi
   roleId=$(jq -r '.roleId' ~/json)
+  log "Role name $1 created with roleId=$roleId"
 }
 
-function assign_role() {
+function find_user() {
   trap 'fail' ERR
-  log "Assign role name $2 to user $1"
+  log "Find user $1"
   curl -s -o ~/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
     http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/user
   users=$(jq -r '.content | length' ~/json)
@@ -106,9 +109,13 @@ function assign_role() {
     ((i++))
   done
   trap 'fail' ERR
-  find_role $2
+}
+
+function assign_role() {
+  trap 'fail' ERR
+  log "Assign roleId $2 to userId $1"
   curl -s -o ~/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST \
-    http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/user/$userId/role/$roleId
+    http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/user/$1/role/$2
   status=$(jq -r '.status' ~/json)
   if [[ $status -ne 200 ]]; then
     cat ~/json
@@ -118,25 +125,31 @@ function assign_role() {
 
 function setup_user() {
   trap 'fail' ERR
-  log "Create user $username"
-  register_user
-  while [[ $(grep -c -e "An unexpected error occurred" -e "The upstream server is timing out" -e "An invalid response was received from the upstream server" ~/json) -gt 0 ]] ; do
-    log "Portal user registration API is not yet active, waiting 10 seconds"
-    sleep 10
+  find_user $username
+  if [[ "$userId" == "" ]]; then
+    log "Create user $username"
     register_user
-  done
-  if [[ "$(jq -r '.error_code' ~/json)" != "100" ]]; then
-    cat ~/json
-    fail "User account creation failed"
+    while [[ $(grep -c -e "An unexpected error occurred" -e "The upstream server is timing out" -e "An invalid response was received from the upstream server" ~/json) -gt 0 ]] ; do
+      log "Portal user registration API is not yet active, waiting 10 seconds"
+      sleep 10
+      register_user
+    done
+    if [[ "$(jq -r '.error_code' ~/json)" != "100" ]]; then
+      cat ~/json
+      fail "User account creation failed"
+    fi
+    find_user $username
+    log "Portal user $username created with userId=$userId"
+  else
+    log "Portal user $username already exists with userId=$userId"
   fi
-  echo "Portal user account $username created"
 
   if [[ "$role" != "" ]]; then
     find_role $role
     if [[ "$roleId" == "" ]]; then
       create_role $role
     fi
-    assign_role $username $role
+    assign_role $userId $roleId
   fi
   log "Resulting user account record"
   curl -s -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/user/$userId
