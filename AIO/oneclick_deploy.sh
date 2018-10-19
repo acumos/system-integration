@@ -125,35 +125,6 @@ function setup_prereqs() {
       sudo apt-get install -y docker-compose
     fi
 
-    log "Enable docker API"
-    if [[ $(grep -c "\-H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT" /lib/systemd/system/docker.service) -eq 0 ]]; then
-      sudo sed -i -- "s~ExecStart=/usr/bin/dockerd -H fd://~ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT~" /lib/systemd/system/docker.service
-    fi
-
-    log "Block host-external access to docker API"
-    if [[ $(sudo iptables -S | grep -c '172.0.0.0/8 .* 2375') -eq 0 ]]; then
-      sudo iptables -A INPUT -p tcp --dport 2375 ! -s 172.0.0.0/8 -j DROP
-    fi
-    if [[ $(sudo iptables -S | grep -c '127.0.0.1/32 .* 2375') -eq 0 ]]; then
-      sudo iptables -I INPUT -s localhost -p tcp -m tcp --dport 2375 -j ACCEPT
-    fi
-    if [[ $(sudo iptables -S | grep -c "$ACUMOS_HOST/32 .* 2375") -eq 0 ]]; then
-      sudo iptables -I INPUT -s $ACUMOS_HOST -p tcp -m tcp --dport 2375 -j ACCEPT
-    fi
-
-    log "Enable non-secure docker repositories"
-    cat << EOF | sudo tee /etc/docker/daemon.json
-{
-  "insecure-registries": [
-    "$ACUMOS_NEXUS_HOST:$ACUMOS_DOCKER_MODEL_PORT"
-  ],
-  "disable-legacy-registry": true
-}
-EOF
-
-    sudo systemctl daemon-reload
-    sudo service docker restart
-
     if [[ $(sudo docker volume ls | grep -c acumos-logs) -eq 0 ]]; then
       log "Create docker volumes for Acumos docker-based components"
       while ! curl http://$ACUMOS_DOCKER_API_HOST:$ACUMOS_DOCKER_API_PORT ; do
@@ -167,6 +138,38 @@ EOF
       sudo docker volume create nexus-data
     fi
   fi
+
+  # Workaround for docker-dind memory leak issues - use the docker-engine that
+  # resides on the AIO host
+  log "Enable docker API"
+  if [[ $(grep -c "\-H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT" /lib/systemd/system/docker.service) -eq 0 ]]; then
+    sudo sed -i -- "s~ExecStart=/usr/bin/dockerd -H fd://~ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT~" /lib/systemd/system/docker.service
+  fi
+
+  log "Block host-external access to docker API"
+  if [[ $(sudo iptables -S | grep -c '172.0.0.0/8 .* 2375') -eq 0 ]]; then
+    sudo iptables -A INPUT -p tcp --dport 2375 ! -s 172.0.0.0/8 -j DROP
+  fi
+  if [[ $(sudo iptables -S | grep -c '127.0.0.1/32 .* 2375') -eq 0 ]]; then
+    sudo iptables -I INPUT -s localhost -p tcp -m tcp --dport 2375 -j ACCEPT
+  fi
+  if [[ $(sudo iptables -S | grep -c "$ACUMOS_HOST/32 .* 2375") -eq 0 ]]; then
+    sudo iptables -I INPUT -s $ACUMOS_HOST -p tcp -m tcp --dport 2375 -j ACCEPT
+  fi
+
+  log "Enable non-secure docker repositories"
+  cat << EOF | sudo tee /etc/docker/daemon.json
+{
+  "insecure-registries": [
+    "$ACUMOS_NEXUS_HOST:$ACUMOS_DOCKER_MODEL_PORT"
+  ],
+  "disable-legacy-registry": true
+}
+EOF
+
+    sudo systemctl daemon-reload
+    sudo service docker restart
+
 
   if [[ ! -d /var/acumos ]]; then
     sudo mkdir -p /var/acumos
@@ -542,6 +545,21 @@ function setup_keystore() {
 
 function setup_reverse_proxy() {
   trap 'fail' ERR
+  log "Wait for kong-service to be running"
+  # Workaround for curl sometimes hanging for some reason
+  kong=""
+  while [[ "$kong" != "Running" ]]; do
+    if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
+      if [[ $(sudo docker ps -a | grep kong-service | grep -c " Up ") -eq 1 ]]; then
+        kong="Running"
+      fi
+    else
+      kong=$(kubectl get pods -n acumos | awk '/kong/ {print $3}')
+    fi
+    log "Kong service is not yet Running... waiting 10 seconds"
+    sleep 10
+  done
+
   log "Verify kong admin API is ready"
   while ! curl http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis; do
     log "Kong admin API is not ready... waiting 10 seconds"
