@@ -55,7 +55,7 @@ services:
                      }
                 },
                 \"qanda\": {
-                   \"url\": \"http://cms-service:${ACUMOS_CMS_PORT}\"
+                   \"url\": \"https://stackoverflow.com\"
                 },
                 \"doc\": {
                    \"url\": \"https://wiki.acumos.org\"
@@ -80,6 +80,7 @@ services:
                 },
                 \"portal\": {
                    \"feature\": {
+                      \"publishSelfRequestEnabled\": \"false\",
                       \"validateModel\": \"false\",
                       \"email_service\": \"\",
                       \"cas_enabled\": \"false\",

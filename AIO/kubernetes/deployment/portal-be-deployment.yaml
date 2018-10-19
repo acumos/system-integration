@@ -78,7 +78,7 @@ spec:
                       }
                     },
                     "qanda": {
-                      "url": "http://cms-service:9080"
+                      "url": "https://stackoverflow.com"
                     },
                     "doc": {
                       "url": "https://wiki.acumos.org"
@@ -103,6 +103,7 @@ spec:
                     },
                     "portal": {
                       "feature": {
+                        "publishSelfRequestEnabled": "false",
                         "validateModel": "false",
                         "email_service": "",
                         "cas_enabled": "false",
