@@ -1,0 +1,188 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0935688f_107a73c1",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-10-23T17:43:59Z",
+      "side": 1,
+      "message": "probably need to remove this Azure business",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 3,
+        "endChar": 64
+      },
+      "revId": "77c5f1c340c173da124fcf4d91d401d2df7da6a6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c6a8aef_f725439a",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-10-23T17:43:59Z",
+      "side": 1,
+      "message": "should not be hardcoded, it should be in a variable",
+      "range": {
+        "startLine": 14,
+        "startChar": 29,
+        "endLine": 14,
+        "endChar": 33
+      },
+      "revId": "77c5f1c340c173da124fcf4d91d401d2df7da6a6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cc515e56_c3be572d",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-10-23T17:43:59Z",
+      "side": 1,
+      "message": "Should not be hardcoded",
+      "range": {
+        "startLine": 56,
+        "startChar": 29,
+        "endLine": 56,
+        "endChar": 33
+      },
+      "revId": "77c5f1c340c173da124fcf4d91d401d2df7da6a6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "584b2d9b_da0f7ed3",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-10-23T17:43:59Z",
+      "side": 1,
+      "message": "What in the world is this?",
+      "range": {
+        "startLine": 61,
+        "startChar": 19,
+        "endLine": 61,
+        "endChar": 51
+      },
+      "revId": "77c5f1c340c173da124fcf4d91d401d2df7da6a6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31680608_c314d784",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-10-23T17:43:59Z",
+      "side": 1,
+      "message": "Should not be hardcoded",
+      "range": {
+        "startLine": 91,
+        "startChar": 71,
+        "endLine": 91,
+        "endChar": 75
+      },
+      "revId": "77c5f1c340c173da124fcf4d91d401d2df7da6a6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "368dae47_5440df16",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-10-23T17:43:59Z",
+      "side": 1,
+      "message": "Should not be hardcoded",
+      "range": {
+        "startLine": 118,
+        "startChar": 13,
+        "endLine": 118,
+        "endChar": 17
+      },
+      "revId": "77c5f1c340c173da124fcf4d91d401d2df7da6a6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "37105ac8_f6280d60",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-10-23T17:43:59Z",
+      "side": 1,
+      "message": "use variable",
+      "range": {
+        "startLine": 120,
+        "startChar": 13,
+        "endLine": 120,
+        "endChar": 17
+      },
+      "revId": "77c5f1c340c173da124fcf4d91d401d2df7da6a6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba2a15ae_b59001cb",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-10-23T17:43:59Z",
+      "side": 1,
+      "message": "don\u0027t hardcode",
+      "range": {
+        "startLine": 170,
+        "startChar": 62,
+        "endLine": 170,
+        "endChar": 66
+      },
+      "revId": "77c5f1c340c173da124fcf4d91d401d2df7da6a6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
