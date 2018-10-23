@@ -1,0 +1,234 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d07289da_f8fef7ff",
+        "filename": "multi-node/docker-compose/docker-compose-template.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-10-23T20:51:52Z",
+      "side": 1,
+      "message": "to what does this correspond? the weekly builds doesn\u0027t have a databroker_zipbroker image - sqldatabroker, csvdatabroker. The actual data-broker repo hasn\u0027t had a commit in several months - has it been deprecated?",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 34
+      },
+      "revId": "9e6b3b7052e2381c20d2dc57703d9336ea3f81a4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aafacc21_bf66680b",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-10-23T20:51:52Z",
+      "side": 1,
+      "message": "should this be org.acumos?",
+      "range": {
+        "startLine": 218,
+        "startChar": 36,
+        "endLine": 218,
+        "endChar": 48
+      },
+      "revId": "9e6b3b7052e2381c20d2dc57703d9336ea3f81a4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0adacb8f_fd52cef2",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-10-23T20:51:52Z",
+      "side": 1,
+      "message": "um.... validation was removed from daily builds in June 2018...",
+      "range": {
+        "startLine": 304,
+        "startChar": 18,
+        "endLine": 306,
+        "endChar": 21
+      },
+      "revId": "9e6b3b7052e2381c20d2dc57703d9336ea3f81a4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "af403613_ce2c7b40",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-10-23T20:51:52Z",
+      "side": 1,
+      "message": "see comment in bash file",
+      "range": {
+        "startLine": 443,
+        "startChar": 26,
+        "endLine": 443,
+        "endChar": 79
+      },
+      "revId": "9e6b3b7052e2381c20d2dc57703d9336ea3f81a4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bc8eff98_990ea6b6",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 579,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-10-23T20:51:52Z",
+      "side": 1,
+      "message": "why is this hardcoded?",
+      "range": {
+        "startLine": 579,
+        "startChar": 19,
+        "endLine": 579,
+        "endChar": 43
+      },
+      "revId": "9e6b3b7052e2381c20d2dc57703d9336ea3f81a4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cc4fb796_dfaf389c",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 692,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-10-23T20:51:52Z",
+      "side": 1,
+      "message": "why do these say \"Cognita\"??",
+      "range": {
+        "startLine": 691,
+        "startChar": 20,
+        "endLine": 692,
+        "endChar": 33
+      },
+      "revId": "9e6b3b7052e2381c20d2dc57703d9336ea3f81a4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "afabe887_5c4cc03b",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 733,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-10-23T20:51:52Z",
+      "side": 1,
+      "message": "org.acumos?",
+      "range": {
+        "startLine": 733,
+        "startChar": 20,
+        "endLine": 733,
+        "endChar": 45
+      },
+      "revId": "9e6b3b7052e2381c20d2dc57703d9336ea3f81a4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e2ba90aa_7a73232f",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 778,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-10-23T20:51:52Z",
+      "side": 1,
+      "message": "do these need to be parameterized?",
+      "range": {
+        "startLine": 771,
+        "startChar": 24,
+        "endLine": 778,
+        "endChar": 47
+      },
+      "revId": "9e6b3b7052e2381c20d2dc57703d9336ea3f81a4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d532530c_7ac20ddb",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 789,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-10-23T20:51:52Z",
+      "side": 1,
+      "message": "do these need to be parameterized?",
+      "range": {
+        "startLine": 786,
+        "startChar": 24,
+        "endLine": 789,
+        "endChar": 51
+      },
+      "revId": "9e6b3b7052e2381c20d2dc57703d9336ea3f81a4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3309c2a0_d772275b",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 798,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-10-23T20:51:52Z",
+      "side": 1,
+      "message": "org.acumos?",
+      "range": {
+        "startLine": 798,
+        "startChar": 20,
+        "endLine": 798,
+        "endChar": 45
+      },
+      "revId": "9e6b3b7052e2381c20d2dc57703d9336ea3f81a4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
