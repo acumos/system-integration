@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "4bf86b61_c9e72cfd",
+        "filename": "multi-node/docker-compose/docker-compose-template.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2018-10-24T16:27:28Z",
+      "side": 1,
+      "message": "Zipbroker has been deprecated. CSV broker is the only one in use, but is only referenced here so it can be used in the process of deployment. SQL broker is not yet developed.",
+      "parentUuid": "d07289da_f8fef7ff",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 34
+      },
+      "revId": "9e6b3b7052e2381c20d2dc57703d9336ea3f81a4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "aafacc21_bf66680b",
         "filename": "multi-node/docker-compose/docker-compose.yml",
         "patchSetId": 2
