@@ -167,9 +167,8 @@ function setup_prereqs() {
 }
 EOF
 
-    sudo systemctl daemon-reload
-    sudo service docker restart
-
+  sudo systemctl daemon-reload
+  sudo service docker restart
 
   if [[ ! -d /var/acumos ]]; then
     sudo mkdir -p /var/acumos
@@ -394,7 +393,7 @@ function setup_acumos() {
       kubectl delete service -n acumos azure-client-service cds-service \
         cms-service portal-be-service portal-fe-service \
         onboarding-service msg-service dsce-service kubernetes-client-service \
-        federation-service kong-service nexus-service docker-service \
+        federation-service kong-service nexus-service \
         filebeat-service metricbeat-service elasticsearch-service \
         logstash-service kibana-service
 

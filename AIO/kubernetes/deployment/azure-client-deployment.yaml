@@ -54,7 +54,7 @@ spec:
                     },
                     "docker": {
                       "containerNamePrefix": "E6E-NSG",
-                      "host": "docker-service",
+                      "host": "<ACUMOS_DOMAIN>",
                       "port": "<ACUMOS_DOCKER_API_PORT>",
                       "dockerVMUserName": "<ACUMOS_DEPLOYED_VM_USER>",
                       "dockerVMPassword": "<ACUMOS_DEPLOYED_VM_PASSWORD>",

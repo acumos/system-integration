@@ -51,7 +51,7 @@ spec:
                       "port": 8083
                     },
                     "docker": {
-                      "host": "docker-service",
+                      "host": "<ACUMOS_DOMAIN>",
                       "port": "<ACUMOS_DOCKER_API_PORT>",
                       "registry": {
                         "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_DOCKER_MODEL_PORT>/",

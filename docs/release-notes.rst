@@ -28,11 +28,12 @@ All-in-One (OneClick Deploy)
 ............................
 
 ------------------------------
-Version 1.0.2, 19 October 2018
+Version 1.0.2, 24 October 2018
 ------------------------------
 
 * `ACUMOS-1930: AIO update to Acumos_1810121300 <https://jira.acumos.org/browse/ACUMOS-1930>`_
 
+  * `Complete docker-engine changes <>'
   * `AIO update to Acumos_1810121300 <https://gerrit.acumos.org/r/#/c/3210/>`_
 
     * AIO update to Acumos_1810121300

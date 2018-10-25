@@ -52,7 +52,7 @@ spec:
                      "port": 8090
                    },
                    "docker": {
-                     "host": "docker-service",
+                     "host": "<ACUMOS_DOMAIN>",
                      "port": "<ACUMOS_DOCKER_API_PORT>",
                      "config": "/docker_host/.docker",
                      "registry":{
