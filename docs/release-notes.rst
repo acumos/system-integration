@@ -28,12 +28,20 @@ All-in-One (OneClick Deploy)
 ............................
 
 ------------------------------
+Version 1.0.3, 31 October 2018
+------------------------------
+
+* `ACUMOS-1984: <https://jira.acumos.org/browse/ACUMOS-1984>`_
+
+  * `AIO update to Athena 1.0 final release assembly <>`_
+
+------------------------------
 Version 1.0.2, 24 October 2018
 ------------------------------
 
 * `ACUMOS-1930: AIO update to Acumos_1810121300 <https://jira.acumos.org/browse/ACUMOS-1930>`_
 
-  * `Complete docker-engine changes <>'
+  * `Complete docker-engine changes <https://gerrit.acumos.org/r/#/c/3243/>'
   * `AIO update to Acumos_1810121300 <https://gerrit.acumos.org/r/#/c/3210/>`_
 
     * AIO update to Acumos_1810121300
