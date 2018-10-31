@@ -25,7 +25,7 @@
 #
 
 # Version of the AIO toolset
-export ACUMOS_AIO_VERSION=1.0.2
+export ACUMOS_AIO_VERSION=1.0.3
 
 # Acumos project Registries
 export ACUMOS_PROJECT_NEXUS_USERNAME=docker
@@ -37,17 +37,18 @@ export STAGING=nexus3.acumos.org:10004
 # Should ONLY use Release version
 export RELEASE=nexus3.acumos.org:10002
 
-# Images per https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_1810121300
+# Images per Athena 1.0 final release assembly
+# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_181031xxxx
 export PORTAL_BE_IMAGE=$STAGING/acumos-portal-be:1.16.2
 export PORTAL_FE_IMAGE=$STAGING/acumos-portal-fe:1.16.2
 export AZURE_CLIENT_IMAGE=$STAGING/acumos-azure-client:1.2.22
 export DESIGNSTUDIO_IMAGE=$STAGING/ds-compositionengine:1.40.2
-export PORTAL_CMS_IMAGE=$STAGING/acumos-cms-docker:1.3.4
+export PORTAL_CMS_IMAGE=$STAGING/acumos-cms-docker:1.3.5
 export ONBOARDING_IMAGE=$STAGING/onboarding-app:1.39.0
-export COMMON_DATASERVICE_IMAGE=$STAGING/common-dataservice:1.18.3
+export COMMON_DATASERVICE_IMAGE=$STAGING/common-dataservice:1.18.4
 export OPENSTACK_CLIENT_IMAGE=$STAGING/openstack-client:1.1.22
 export BLUEPRINT_ORCHESTRATOR_IMAGE=$STAGING/blueprint-orchestrator:2.0.11
-export FEDERATION_IMAGE=$STAGING/federation-gateway:1.18.6
+export FEDERATION_IMAGE=$STAGING/federation-gateway:1.18.7
 export KUBERNETES_CLIENT_IMAGE=$STAGING/kubernetes-client:1.1.0
 #export ELASTICSEARCH_IMAGE=$STAGING/acumos-elasticsearch:1.18.1
 export ELASTICSEARCH_IMAGE=docker.elastic.co/elasticsearch/elasticsearch:5.5.1
@@ -56,7 +57,7 @@ export KIBANA_IMAGE=$STAGING/acumos-kibana:1.18.2
 export FILEBEAT_IMAGE=$STAGING/acumos-filebeat:1.18.2
 export METRICBEAT_IMAGE=$STAGING/acumos-metricbeat:1.18.2
 export PROTO_VIEWER_IMAGE=$STAGING/acumos-proto-viewer:1.5.6
-export MICROSERVICE_GENERATION_IMAGE=$STAGING/microservice-generation:1.8.1
+export MICROSERVICE_GENERATION_IMAGE=$STAGING/microservice-generation:1.8.2
 export H2O_GENERICJAVA_MODELRUNNER_IMAGE=$STAGING/h2o-genericjava-modelrunner-2.2.3
 export ONBOARDING_BASE_IMAGE=$STAGING/onboarding-base-r:1.0
 export DATABROKER_SQLBROKER_IMAGE=$STAGING/sqldatabroker:1.2.0
