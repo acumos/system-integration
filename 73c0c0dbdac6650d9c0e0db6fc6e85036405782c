@@ -1,0 +1,855 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0cf85703_d2ea8eb6",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "Probably want to remove this special goofy domain name",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 3,
+        "endChar": 1
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0b6e761b_5e614f31",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "not sure these comments are true in general",
+      "range": {
+        "startLine": 4,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 1
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e3890285_13049ae8",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "This volume name probably should also be factored out into a field ${ACUMOS_LOGS} because it\u0027s used all over",
+      "range": {
+        "startLine": 46,
+        "startChar": 13,
+        "endLine": 46,
+        "endChar": 24
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5b19ab10_ef481483",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "Do you have ANY idea what this might be?  The file doesn\u0027t exist.  I don\u0027t know whom to ask.",
+      "range": {
+        "startLine": 61,
+        "startChar": 19,
+        "endLine": 61,
+        "endChar": 52
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4674b7c3_17fa10c9",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "This is also used in multiple places and should be factored out",
+      "range": {
+        "startLine": 88,
+        "startChar": 40,
+        "endLine": 88,
+        "endChar": 50
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "488e9941_b8dae9fc",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "here it is again, this BAFFLING property",
+      "range": {
+        "startLine": 141,
+        "startChar": 19,
+        "endLine": 141,
+        "endChar": 52
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d5bc7972_8c4d6be5",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "I would also LOVE to know what these might be",
+      "range": {
+        "startLine": 180,
+        "startChar": 14,
+        "endLine": 183,
+        "endChar": 17
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3b401a79_6e3c7f11",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "this is wrong but it\u0027s probably unused.  It should be org.acumos, using a field",
+      "range": {
+        "startLine": 218,
+        "startChar": 36,
+        "endLine": 218,
+        "endChar": 48
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4484e5aa_3c4d0007",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "Can this be a field instead of hardcoded??",
+      "range": {
+        "startLine": 222,
+        "startChar": 36,
+        "endLine": 222,
+        "endChar": 51
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ada515bf_ae962ca2",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "JECT or JET?",
+      "range": {
+        "startLine": 281,
+        "startChar": 40,
+        "endLine": 281,
+        "endChar": 44
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2ec52305_01858e7b",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "JECT or JET?",
+      "range": {
+        "startLine": 284,
+        "startChar": 41,
+        "endLine": 284,
+        "endChar": 45
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "294fabea_d4e51910",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "Should this be a field also?",
+      "range": {
+        "startLine": 305,
+        "startChar": 58,
+        "endLine": 305,
+        "endChar": 62
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "42cb1307_1fc2e7aa",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "FQDN or FQN?",
+      "range": {
+        "startLine": 319,
+        "startChar": 50,
+        "endLine": 319,
+        "endChar": 53
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "afacd750_ada5cde6",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "Please clean trailing whitespace",
+      "range": {
+        "startLine": 423,
+        "startChar": 50,
+        "endLine": 423,
+        "endChar": 55
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6fd4d618_15469175",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "should be a field",
+      "range": {
+        "startLine": 433,
+        "startChar": 49,
+        "endLine": 433,
+        "endChar": 59
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d60f7345_97a41ed9",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 449,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "Here it is again!",
+      "range": {
+        "startLine": 449,
+        "startChar": 32,
+        "endLine": 449,
+        "endChar": 64
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cf0662ab_790d8c3b",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "Should be a field",
+      "range": {
+        "startLine": 505,
+        "startChar": 32,
+        "endLine": 505,
+        "endChar": 42
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6157add0_76425230",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 586,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "remove this entry",
+      "range": {
+        "startLine": 586,
+        "startChar": 22,
+        "endLine": 586,
+        "endChar": 70
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7bed926d_bee51352",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 588,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "Put this password into a field, should not be hardcoded",
+      "range": {
+        "startLine": 588,
+        "startChar": 48,
+        "endLine": 588,
+        "endChar": 54
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2d9384e3_dbc05a8e",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 600,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "remove this entry",
+      "range": {
+        "startLine": 600,
+        "startChar": 22,
+        "endLine": 600,
+        "endChar": 34
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "383d08d7_29d5578e",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 602,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "Put this password into a field, should not be hardcoded",
+      "range": {
+        "startLine": 602,
+        "startChar": 47,
+        "endLine": 602,
+        "endChar": 53
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "add7368a_2713c75c",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 610,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "Put into a field",
+      "range": {
+        "startLine": 610,
+        "startChar": 31,
+        "endLine": 610,
+        "endChar": 41
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b583fbb9_63826ff5",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 622,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "Probably this whole URL should be a variable, instead of reconstructing it every time it\u0027s used from the host and port and context path :/",
+      "range": {
+        "startLine": 622,
+        "startChar": 23,
+        "endLine": 622,
+        "endChar": 83
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c93a2516_bff03a33",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 684,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "Committing this Cognita string in the template is awful.  Please factor out.",
+      "range": {
+        "startLine": 684,
+        "startChar": 30,
+        "endLine": 684,
+        "endChar": 37
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "406f6381_bc35fcaf",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 685,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "Again, cognita.",
+      "range": {
+        "startLine": 685,
+        "startChar": 15,
+        "endLine": 685,
+        "endChar": 22
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b5cb7ad1_efe4dec3",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 703,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "Please factor out, instead of hardcoding into field.",
+      "range": {
+        "startLine": 703,
+        "startChar": 41,
+        "endLine": 703,
+        "endChar": 47
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5c252ee6_ba4f42f3",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 707,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "again hardcoding a password, should be avoided",
+      "range": {
+        "startLine": 707,
+        "startChar": 41,
+        "endLine": 707,
+        "endChar": 47
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4c57da54_1f8f1654",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 710,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "I think this is an Azure constant and should be factored out",
+      "range": {
+        "startLine": 710,
+        "startChar": 45,
+        "endLine": 710,
+        "endChar": 52
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f76e641f_065783bf",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 726,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "This is wrong; it\u0027s probably not used; use a field instead",
+      "range": {
+        "startLine": 726,
+        "startChar": 32,
+        "endLine": 726,
+        "endChar": 44
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ce98ab7b_7189f918",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 759,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "This is an Azure constant?  What openstack environment do we support?",
+      "range": {
+        "startLine": 759,
+        "startChar": 40,
+        "endLine": 759,
+        "endChar": 49
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e38e94b2_207010af",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 760,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "Should be factored out to a field",
+      "range": {
+        "startLine": 760,
+        "startChar": 46,
+        "endLine": 760,
+        "endChar": 49
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6e3100be_653b14ef",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 761,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "Wot in heck is this hardcoded IP addy?  Please factor out",
+      "range": {
+        "startLine": 761,
+        "startChar": 36,
+        "endLine": 761,
+        "endChar": 54
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8e2362ae_9dce3fda",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 762,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "Oh goodness, usernames and passwords must be moved to fields",
+      "range": {
+        "startLine": 762,
+        "startChar": 37,
+        "endLine": 762,
+        "endChar": 44
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c8686115_199cb79b",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 770,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "This use of cognita, a user name, must be factored out",
+      "range": {
+        "startLine": 770,
+        "startChar": 41,
+        "endLine": 770,
+        "endChar": 51
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c3c74978_a6ccaf96",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 780,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "Lots of bad constants in this one :( please factor out",
+      "range": {
+        "startLine": 780,
+        "startChar": 35,
+        "endLine": 780,
+        "endChar": 44
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "718a30e4_797ea025",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 787,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": ":(  this is a local Azure host name, please factor out",
+      "range": {
+        "startLine": 787,
+        "startChar": 35,
+        "endLine": 787,
+        "endChar": 49
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "01b289fa_41a7ddbe",
+        "filename": "multi-node/docker-compose/docker-compose.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 791,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-11-05T21:36:12Z",
+      "side": 1,
+      "message": "This is wrong, probably not used, please factor out",
+      "range": {
+        "startLine": 791,
+        "startChar": 32,
+        "endLine": 791,
+        "endChar": 44
+      },
+      "revId": "73c0c0dbdac6650d9c0e0db6fc6e85036405782c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
