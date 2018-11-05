@@ -69,7 +69,7 @@ the Acumos platform may be:
 
 The following sections describe the approach taken for the following types of
 components of the platform, as described at
-:doc:`Acumos Platform Architecture <../../../architecture/index.html>`:
+:doc:`Acumos Platform Architecture <../../../architecture/index>`:
 
 * "core components", those that are developed by the Acumos project, and form
   the core of the Acumos platform
@@ -90,7 +90,7 @@ are exposed outside the k8s cluster at NodePorts.
 * Hippo CMS
 
   * NodePort allows manual admin setup as described in the
-    :doc:`One Click Deploy User Guide <../../../AcumosUser/oneclick-deploy/user-guide.html>`
+    :doc:`One Click Deploy User Guide <../../../AcumosUser/oneclick-deploy/user-guide>`
 
 * Onboarding
 * Microservice Generation
