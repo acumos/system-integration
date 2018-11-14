@@ -27,11 +27,27 @@ System Integration Release Notes
 All-in-One (OneClick Deploy)
 ............................
 
+-------------------------------
+Version 1.0.4, 14 November 2018
+-------------------------------
+
+* `ACUMOS-2042: AIO Release 1.0.4 <https://jira.acumos.org/browse/ACUMOS-2042>`_
+
+  * `AIO Release 1.0.4 <>`_
+
+* `ACUMOS-2018: oneclick_deploy.sh does not pass docker host API check loop <https://jira.acumos.org/browse/ACUMOS-2018>`_
+
+  * `Fix for docker host API check looping forever <https://gerrit.acumos.org/r/#/c/3344/>`_
+
+* `ACUMOS-2009: k8s-deployment.rst contains broken links <https://jira.acumos.org/browse/ACUMOS-2009>`_
+
+  * `Fix broken links <https://gerrit.acumos.org/r/#/c/3333/>`_
+
 ------------------------------
 Version 1.0.3, 31 October 2018
 ------------------------------
 
-* `ACUMOS-1984: <https://jira.acumos.org/browse/ACUMOS-1984>`_
+* `ACUMOS-1984: AIO update to Athena 1.0 final release assembly <https://jira.acumos.org/browse/ACUMOS-1984>`_
 
   * `AIO update to Athena 1.0 final release assembly <https://gerrit.acumos.org/r/#/c/3298/>`_
 
@@ -41,7 +57,7 @@ Version 1.0.2, 24 October 2018
 
 * `ACUMOS-1930: AIO update to Acumos_1810121300 <https://jira.acumos.org/browse/ACUMOS-1930>`_
 
-  * `Complete docker-engine changes <https://gerrit.acumos.org/r/#/c/3243/>'
+  * `Complete docker-engine changes <https://gerrit.acumos.org/r/#/c/3243/>`_
   * `AIO update to Acumos_1810121300 <https://gerrit.acumos.org/r/#/c/3210/>`_
 
     * AIO update to Acumos_1810121300
