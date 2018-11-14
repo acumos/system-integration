@@ -120,6 +120,37 @@ function setup_prereqs() {
       sudo apt-get install -y docker-ce
     fi
 
+    # Workaround for docker-dind memory leak issues - use the docker-engine that
+    # resides on the AIO host
+    log "Enable docker API"
+    if [[ $(grep -c "\-H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT" /lib/systemd/system/docker.service) -eq 0 ]]; then
+      sudo sed -i -- "s~ExecStart=/usr/bin/dockerd -H fd://~ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT~" /lib/systemd/system/docker.service
+    fi
+
+    log "Block host-external access to docker API"
+    if [[ $(sudo iptables -S | grep -c '172.0.0.0/8 .* 2375') -eq 0 ]]; then
+      sudo iptables -A INPUT -p tcp --dport 2375 ! -s 172.0.0.0/8 -j DROP
+    fi
+    if [[ $(sudo iptables -S | grep -c '127.0.0.1/32 .* 2375') -eq 0 ]]; then
+      sudo iptables -I INPUT -s localhost -p tcp -m tcp --dport 2375 -j ACCEPT
+    fi
+    if [[ $(sudo iptables -S | grep -c "$ACUMOS_HOST/32 .* 2375") -eq 0 ]]; then
+      sudo iptables -I INPUT -s $ACUMOS_HOST -p tcp -m tcp --dport 2375 -j ACCEPT
+    fi
+
+    log "Enable non-secure docker repositories"
+    cat << EOF | sudo tee /etc/docker/daemon.json
+{
+  "insecure-registries": [
+    "$ACUMOS_NEXUS_HOST:$ACUMOS_DOCKER_MODEL_PORT"
+  ],
+  "disable-legacy-registry": true
+}
+EOF
+
+    sudo systemctl daemon-reload
+    sudo service docker restart
+
     if [[ $(dpkg -l | grep -c docker-compose) -eq 0 ]]; then
       log "Install latest docker-compose"
       sudo apt-get install -y docker-compose
@@ -138,37 +169,6 @@ function setup_prereqs() {
       sudo docker volume create nexus-data
     fi
   fi
-
-  # Workaround for docker-dind memory leak issues - use the docker-engine that
-  # resides on the AIO host
-  log "Enable docker API"
-  if [[ $(grep -c "\-H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT" /lib/systemd/system/docker.service) -eq 0 ]]; then
-    sudo sed -i -- "s~ExecStart=/usr/bin/dockerd -H fd://~ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT~" /lib/systemd/system/docker.service
-  fi
-
-  log "Block host-external access to docker API"
-  if [[ $(sudo iptables -S | grep -c '172.0.0.0/8 .* 2375') -eq 0 ]]; then
-    sudo iptables -A INPUT -p tcp --dport 2375 ! -s 172.0.0.0/8 -j DROP
-  fi
-  if [[ $(sudo iptables -S | grep -c '127.0.0.1/32 .* 2375') -eq 0 ]]; then
-    sudo iptables -I INPUT -s localhost -p tcp -m tcp --dport 2375 -j ACCEPT
-  fi
-  if [[ $(sudo iptables -S | grep -c "$ACUMOS_HOST/32 .* 2375") -eq 0 ]]; then
-    sudo iptables -I INPUT -s $ACUMOS_HOST -p tcp -m tcp --dport 2375 -j ACCEPT
-  fi
-
-  log "Enable non-secure docker repositories"
-  cat << EOF | sudo tee /etc/docker/daemon.json
-{
-  "insecure-registries": [
-    "$ACUMOS_NEXUS_HOST:$ACUMOS_DOCKER_MODEL_PORT"
-  ],
-  "disable-legacy-registry": true
-}
-EOF
-
-  sudo systemctl daemon-reload
-  sudo service docker restart
 
   if [[ ! -d /var/acumos ]]; then
     sudo mkdir -p /var/acumos
