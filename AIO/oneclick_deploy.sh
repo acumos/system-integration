@@ -74,11 +74,12 @@ function setup_prereqs() {
   log "/etc/hosts customizations"
   # Ensure cluster hostname resolves inside the cluster
   if [[ $(grep -c $HOSTNAME /etc/hosts) -eq 0 ]]; then
-    log "Add $HOSTNAME to /etc/hosts"
+    echo; echo "prereqs.sh: ($(date)) Add $HOSTNAME to /etc/hosts"
     # have to add "/sbin" to path of IP command for centos
-    echo "$(/sbin/ip route get 8.8.8.8 | awk '{print $NF; exit}') $HOSTNAME" \
+    echo "$(/sbin/ip route get 8.8.8.8 | head -1 | sed 's/^.*src //' | awk '{print $1}') $HOSTNAME" \
       | sudo tee -a /etc/hosts
   fi
+
   if [[ $(grep -c $ACUMOS_DOMAIN /etc/hosts) -eq 0 ]]; then
     log "Add $ACUMOS_DOMAIN to /etc/hosts"
     echo "$ACUMOS_HOST $ACUMOS_DOMAIN" | sudo tee -a /etc/hosts
@@ -96,6 +97,9 @@ function setup_prereqs() {
 
   log "Basic prerequisites"
 
+  # Per https://kubernetes.io/docs/setup/independent/install-kubeadm/
+  echo; echo "prereqs.sh: ($(date)) Basic prerequisites"
+
   wait_dpkg; sudo apt-get update
 # TODO: fix need to skip upgrade as this sometimes updates the kube-system
 # services and they then stay in "pending", blocking k8s-based deployment
@@ -103,28 +107,50 @@ function setup_prereqs() {
   wait_dpkg; sudo apt-get install -y wget git jq
 
   if [[ "$DEPLOYED_UNDER" = "docker" ]]; then
-    if [[ $(dpkg -l | grep -c docker-ce) -eq 0 ]]; then
-      log "Install latest docker-ce"
-      # Per https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
-      sudo apt-get remove -y docker docker-engine docker.io docker-ce
-      sudo apt-get update
-      sudo apt-get install -y \
-        apt-transport-https \
-        ca-certificates \
-        curl \
-        software-properties-common
-      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-      sudo add-apt-repository "deb [arch=amd64] \
-        https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-      sudo apt-get update
-      sudo apt-get install -y docker-ce
-    fi
+    distver=$(grep -m 1 'VERSION_ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+    case "$distver" in
+      "16.04")
+        log "Install docker-ce if needed"
+        dce=$(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' 'docker-ce')
+        if [[ $dce != "installed" ]]; then
+          echo; echo "prereqs.sh: ($(date)) Install latest docker-ce"
+          # Per https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
+          sudo apt-get purge -y docker docker-engine docker.io
+          sudo apt-get update
+          sudo apt-get install -y \
+            apt-transport-https \
+            ca-certificates \
+            curl \
+            software-properties-common
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+          sudo add-apt-repository "deb [arch=amd64] \
+            https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+          sudo apt-get update
+          sudo apt-get install -y docker-ce
+        fi
+        ;;
+      "18.04")
+        log "Install docker.io if needed"
+        dio=$(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' 'docker.io')
+        if [[ $dio != "installed" ]]; then
+          sudo apt-get purge -y docker docker-engine docker-ce docker-ce-cli
+          sudo apt-get update
+          sudo apt-get install -y docker.io=17.12.1-0ubuntu1
+          sudo systemctl enable docker.service
+        fi
+        ;;
+      *)
+        fail "Unsupported Ubuntu version ($distver)"
+    esac
 
     # Workaround for docker-dind memory leak issues - use the docker-engine that
     # resides on the AIO host
     log "Enable docker API"
     if [[ $(grep -c "\-H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT" /lib/systemd/system/docker.service) -eq 0 ]]; then
       sudo sed -i -- "s~ExecStart=/usr/bin/dockerd -H fd://~ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT~" /lib/systemd/system/docker.service
+      # Add another variant of this config setting
+      # TODO: find a general solution
+      sudo sed -i -- "s~ExecStart=/usr/bin/dockerd -H unix://~ExecStart=/usr/bin/dockerd -H unix:// -H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT~" /lib/systemd/system/docker.service
     fi
 
     log "Block host-external access to docker API"

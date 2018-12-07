@@ -86,7 +86,7 @@ mysql --user=root --password=$MARIADB_PASSWORD -e "DROP DATABASE $ACUMOS_CDS_DB;
 fi
 
 echo "Remove mariadb-server"
-sudo apt-get remove mariadb-server-10.2 -y
+sudo apt-get purge mariadb-server-10.2 -y
 # To prevent issues later with apt-get update
 sudo rm /etc/apt/sources.list.d/mariadb.list
 sudo apt-get clean

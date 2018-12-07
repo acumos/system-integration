@@ -56,7 +56,7 @@ setup_prereqs() {
   if [[ $(dpkg -l | grep -c docker-ce) -eq 0 ]]; then
     log "Install latest docker-ce"
     # Per https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
-    sudo apt-get remove -y docker docker-engine docker.io docker-ce
+    sudo apt-get purge -y docker docker-engine docker.io docker-ce
     sudo apt-get update
     sudo apt-get install -y \
       apt-transport-https \
