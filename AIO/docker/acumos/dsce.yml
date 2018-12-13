@@ -1,4 +1,4 @@
-version: '2'
+version: '3.2'
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -41,10 +41,10 @@ services:
                                 \"outputfolder\": \"/temp/output/\"
                           },
                           \"nexus\": {
-                                \"nexusendpointurl\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
+                                \"nexusendpointurl\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/${ACUMOS_NEXUS_MAVEN_REPO_PATH}/${ACUMOS_NEXUS_MAVEN_REPO}/\",
                                 \"nexusproxy\": \"\",
-                                \"nexuspassword\": \"${ACUMOS_RW_USER_PASSWORD}\",
-                                \"nexususername\": \"${ACUMOS_RW_USER}\",
+                                \"nexuspassword\": \"${ACUMOS_NEXUS_RW_USER_PASSWORD}\",
+                                \"nexususername\": \"${ACUMOS_NEXUS_RW_USER}\",
                                 \"nexusgroupid\": \"com.artifact\"
                           },
                           \"cmndatasvc\": {
@@ -57,15 +57,15 @@ services:
                                 \"port\": \"${ACUMOS_DOCKER_API_PORT}\",
                                 \"config\": \"/docker_host/.docker\",
                                 \"registry\": {
-                                        \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/\",
-                                        \"username\": \"${ACUMOS_RW_USER}\",
-                                        \"password\": \"${ACUMOS_RW_USER_PASSWORD}\",
-                                        \"email\": \"acumos@example.com\"
+                                        \"url\": \"http://${ACUMOS_DOCKER_REGISTRY_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/\",
+                                        \"username\": \"${ACUMOS_DOCKER_REGISTRY_USER}\",
+                                        \"password\": \"${ACUMOS_DOCKER_REGISTRY_PASSWORD}\",
+                                        \"email\": \"${ACUMOS_ADMIN_EMAIL}\"
                                             },
                                 \"tls\": {\"verify\": \"false\"},
                                 \"api\": {\"version\": \"1.23\"},
                                 \"imagetag\": {
-                                        \"prefix\": \"${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}\"
+                                        \"prefix\": \"${ACUMOS_DOCKER_REGISTRY_HOST}:${ACUMOS_DOCKER_MODEL_PORT}\"
                                             },
                                 \"max_total_connections\": \"1\",
                                 \"max_per_route_connections\": \"1\"
@@ -74,8 +74,12 @@ services:
        expose:
            - ${ACUMOS_DSCE_PORT}
        volumes:
-           - acumos-logs:/maven/logs
-           - acumos-output:/temp/
+           - type: bind
+             source: /var/${ACUMOS_NAMESPACE}/logs
+             target: /maven/logs
+           - type: bind
+             source: /var/${ACUMOS_NAMESPACE}/output
+             target: /temp/
        logging:
            driver: json-file
        extra_hosts:
