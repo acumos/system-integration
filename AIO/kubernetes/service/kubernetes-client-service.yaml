@@ -23,7 +23,7 @@ apiVersion: v1
 
 kind: Service
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: kubernetes-client-service
   labels:
     app: kubernetes-client

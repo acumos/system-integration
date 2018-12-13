@@ -1,4 +1,4 @@
-version: '2'
+version: '3.2'
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -103,7 +103,7 @@ services:
                          \"key\": \"replace-as-needed\"
                       },
                       \"secret\": {
-                         \"key\": \"replace-as-needed\" 
+                         \"key\": \"replace-as-needed\"
                       },
                       \"address\": {
                          \"from\": \"admin@example.com\"
@@ -121,7 +121,7 @@ services:
                          \"folder\": {
                             \"path\": \"/fmtemplates/\"
                          }
-                      } 
+                      }
                    }
                 },
                 \"client\": {
@@ -164,9 +164,15 @@ services:
        depends_on:
            - cds-service
        volumes:
-           - acumos-logs:/maven/logs
-           - /var/acumos/certs:/app/certs
-           - acumosWebOnboarding:/acumosWebOnboarding
+           - type: bind
+             source: /var/${ACUMOS_NAMESPACE}/logs
+             target: /maven/logs
+           - type: bind
+             source: /var/$ACUMOS_NAMESPACE/certs
+             target: /app/certs
+           - type: bind
+             source: /var/${ACUMOS_NAMESPACE}/webonboarding
+             target: /acumosWebOnboarding
        logging:
            driver: json-file
        extra_hosts:
