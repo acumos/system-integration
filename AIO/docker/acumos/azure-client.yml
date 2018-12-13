@@ -1,4 +1,4 @@
-version: '2'
+version: '3.2'
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -55,19 +55,19 @@ services:
                     \"internalDataBrokerPort\": \"${ACUMOS_DATA_BROKER_INTERNAL_PORT}\",
                     \"registry\": {
                         \"bluePrint\": {
-                            \"username\": \"$ACUMOS_RW_USER\",
-                            \"password\": \"${ACUMOS_RW_USER_PASSWORD}\"
+                            \"username\": \"${ACUMOS_NEXUS_RW_USER}\",
+                            \"password\": \"${ACUMOS_NEXUS_RW_USER_PASSWORD}\"
                         },
                         \"probe\": {
-                            \"username\": \"$ACUMOS_RW_USER\",
-                            \"password\": \"${ACUMOS_RW_USER_PASSWORD}\"
+                            \"username\": \"${ACUMOS_NEXUS_RW_USER}\",
+                            \"password\": \"${ACUMOS_NEXUS_RW_USER_PASSWORD}\"
                         },
                         \"networkgroupName\": \"acumos-nsg\",
                         \"port\": \"80\",
-                        \"name\": \"${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}\",
-                        \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/\",
-                        \"username\": \"${ACUMOS_RW_USER}\",
-                        \"password\": \"${ACUMOS_RW_USER_PASSWORD}\"
+                        \"name\": \"${ACUMOS_DOCKER_REGISTRY_HOST}:${ACUMOS_DOCKER_MODEL_PORT}\",
+                        \"url\": \"http://${ACUMOS_DOCKER_REGISTRY_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/\",
+                        \"username\": \"${ACUMOS_DOCKER_REGISTRY_USER}\",
+                        \"password\": \"${ACUMOS_DOCKER_REGISTRY_PASSWORD}\"
                     }
                 },
                 \"blueprint\": {
@@ -75,10 +75,10 @@ services:
                     \"name\": \"blueprint-orchestrator\"
                 },
                 \"nexus\": {
-                    \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
+                    \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/${ACUMOS_NEXUS_MAVEN_REPO_PATH}/${ACUMOS_NEXUS_MAVEN_REPO}/\",
                     \"nexusproxy\": \"NA\",
-                    \"password\": \"${ACUMOS_RW_USER_PASSWORD}\",
-                    \"username\": \"${ACUMOS_RW_USER}\",
+                    \"password\": \"${ACUMOS_NEXUS_RW_USER_PASSWORD}\",
+                    \"username\": \"${ACUMOS_NEXUS_RW_USER}\",
                     \"groupId\": \"com.artifact\"
                 },
                 \"cmndatasvc\": {
@@ -90,13 +90,15 @@ services:
                     \"ImageName\": \"${PROTO_VIEWER_IMAGE}\",
                     \"name\": \"proto_viewer\",
                     \"internalPort\": \"${ACUMOS_PROBE_PORT}\",
-                    \"probeNexusEndPoint\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven\"
+                    \"probeNexusEndPoint\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/${ACUMOS_NEXUS_MAVEN_REPO_PATH}/${ACUMOS_NEXUS_MAVEN_REPO}\"
                 }
            }"
        expose:
            - ${ACUMOS_AZURE_CLIENT_PORT}
        volumes:
-           - acumos-logs:/maven/logs
+           - type: bind
+             source: /var/${ACUMOS_NAMESPACE}/logs
+             target: /maven/logs
        logging:
            driver: json-file
        extra_hosts:

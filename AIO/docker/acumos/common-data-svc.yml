@@ -1,4 +1,4 @@
-version: '2'
+version: '3.2'
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -42,8 +42,8 @@ services:
                         }
                     },
                     \"datasource\": {
-                        \"url\": \"jdbc:mysql://${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_PORT}/$ACUMOS_CDS_DB?useSSL=false\",
-                        \"username\": \"acumos_opr\",
+                        \"url\": \"jdbc:mysql://${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_PORT}/${ACUMOS_CDS_DB}?useSSL=false\",
+                        \"username\": \"${ACUMOS_MARIADB_USER}\",
                         \"password\": \"${ACUMOS_MARIADB_USER_PASSWORD}\"
                     },
                     \"jpa\": {
@@ -59,10 +59,11 @@ services:
        ports:
            - ${ACUMOS_CDS_PORT}:${ACUMOS_CDS_PORT}
        volumes:
-           - acumos-logs:/maven/logs
+           - type: bind
+             source: /var/${ACUMOS_NAMESPACE}/logs
+             target: /maven/logs
        logging:
            driver: json-file
        extra_hosts:
            - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"
        restart: on-failure
-

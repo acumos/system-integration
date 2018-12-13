@@ -19,11 +19,10 @@ apiVersion: v1
 
 # What this is: kubernetes template for Acumos microservice-generation service
 # How to use:
-# - Replace fields in <> with actual values (k8s does not support env variables)
 
 kind: Service
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: msg-service
   labels:
     app: msg
@@ -32,5 +31,6 @@ spec:
     app: msg
   type: ClusterIP
   ports:
-  - port: <ACUMOS_MICROSERVICE_GENERATION_PORT>
+  - name: msg-port
+    port: <ACUMOS_MICROSERVICE_GENERATION_PORT>
     targetPort: 8336

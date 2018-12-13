@@ -18,6 +18,7 @@
 # ===============LICENSE_END=========================================================
 #
 # What this is:
+# Deployment script for the Acumos core components under docker.
 # Sets environment variables needed by docker-compose in all-in-one environment
 # then invokes docker-compose with the command-line arguments.
 #
@@ -36,10 +37,10 @@
 #     Remove all service containers.
 #
 
-source acumos-env.sh
-
 set -x
 
+source acumos-env.sh
+cmd="$*"
 opts=""
 files=$(ls docker/acumos)
 for file in $files ; do
@@ -47,4 +48,4 @@ for file in $files ; do
 done
 
 cd docker
-docker-compose $opts $*
+docker-compose $opts $cmd
