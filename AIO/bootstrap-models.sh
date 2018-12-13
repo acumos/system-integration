@@ -35,32 +35,18 @@
 #   password: password for user
 #   models: optional folder with models to onboard
 
-trap 'fail' ERR
-
-function fail() {
-  log "$1"
-  cd $WORK_DIR
-  exit 1
-}
-
-function log() {
-  f=$(caller 0 | awk '{print $2}')
-  l=$(caller 0 | awk '{print $1}')
-  echo; echo "$f:$l ($(date)) $1"
-}
-
 function onboard_model() {
   echo "Onboarding model $2 at $host ..."
   proto=$(ls $1/$2/*.proto)
-  curl -o ~/json -k -H "Authorization: $jwtToken"\
+  curl -o /tmp/json -k -H "Authorization: $jwtToken"\
        -F "model=@$1/$2/model.zip;type=application/zip" \
        -F "metadata=@$1/$2/metadata.json;type=application/json"\
        -F "schema=@$proto;type=application/text" $PUSHURL
-  if [[ $(grep -c -e "The upstream server is timing out" -e "Service unavailable" ~/json) -gt 0 ]]; then
+  if [[ $(grep -c -e "The upstream server is timing out" -e "Service unavailable" /tmp/json) -gt 0 ]]; then
     log "Onboarding $2 failed at host $host"
-    cat ~/json
+    cat /tmp/json
   else
-    status=$(jq -r '.status' ~/json)
+    status=$(jq -r '.status' /tmp/json)
     if [[ "$status" != "ERROR" ]]; then
       log "Onboarding $2 succeeded at host $host"
       # log "Adding image for model $model ..."
@@ -69,7 +55,7 @@ function onboard_model() {
       # curl -H "Authorization: $jwtToken" <rest of curl command to upload description for the model from models/$model/description.txt>
     else
       log "Onboarding $2 failed at host $host"
-      cat ~/json
+      cat /tmp/json
     fi
   fi
 }
@@ -80,14 +66,14 @@ function bootstrap() {
   PUSHURL=https://$host/onboarding-app/v2/models
 
   log "Query rest service at host $host to get token"
-  curl -o ~/json -k -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' $AUTHURL -d "{\"request_body\":{\"username\":\"$user\",\"password\":\"$pass\"}}"
-  if [[ $(grep -c "doctype html" ~/json) -gt 0 ]]; then
-    cat ~/json
+  curl -o /tmp/json -k -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' $AUTHURL -d "{\"request_body\":{\"username\":\"$user\",\"password\":\"$pass\"}}"
+  if [[ $(grep -c "doctype html" /tmp/json) -gt 0 ]]; then
+    cat /tmp/json
     fail "Authentication failed at host $host"
   fi
-  jwtToken=$(jq -r '.jwtToken' ~/json)
+  jwtToken=$(jq -r '.jwtToken' /tmp/json)
   if [[ "$jwtToken" == "null" ]]; then
-    cat ~/json
+    cat /tmp/json
     fail "Authentication failed at hpst $host"
   fi
 
@@ -105,6 +91,10 @@ function bootstrap() {
     done
   fi
 }
+
+source utils.sh
+trap 'fail' ERR
+set -x
 
 host=$1
 user=$2

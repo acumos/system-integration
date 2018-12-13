@@ -1,4 +1,4 @@
-version: '2'
+version: '3.2'
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -91,8 +91,12 @@ services:
        depends_on:
            - cds-service
        volumes:
-           - acumos-logs:/maven/logs
-           - /var/acumos/certs:/app/certs
+           - type: bind
+             source: /var/${ACUMOS_NAMESPACE}/logs
+             target: /maven/logs
+           - type: bind
+             source: /var/$ACUMOS_NAMESPACE/certs
+             target: /app/certs
        logging:
            driver: json-file
        extra_hosts:
