@@ -1,4 +1,4 @@
-version: '2'
+version: '3.2'
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -74,8 +74,12 @@ services:
        expose:
            - ${ACUMOS_DSCE_PORT}
        volumes:
-           - acumos-logs:/maven/logs
-           - acumos-output:/temp/
+           - type: bind
+             source: /var/${ACUMOS_NAMESPACE}/logs
+             target: /maven/logs
+           - type: bind
+             source: /var/${ACUMOS_NAMESPACE}/output
+             target: /temp/
        logging:
            driver: json-file
        extra_hosts:
