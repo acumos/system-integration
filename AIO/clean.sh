@@ -51,25 +51,21 @@ if [[ "$DEPLOYED_UNDER" == "docker" || "$DEPLOYED_UNDER" == "" ]]; then
 fi
 
 if [[ "$DEPLOYED_UNDER" == "k8s" || "$DEPLOYED_UNDER" == "" ]]; then
-  echo "Stop the running Acumos component services under kubernetes"
-  kubectl delete service -n acumos azure-client-service cds-service cms-service\
-    filebeat-service onboarding-service portal-be-service portal-fe-service \
-    dsce-service federation-service kubernetes-client-service \
-    kong-service nexus-service
-
-  echo "Stop the running Acumos component deployments under kubernetes"
-  kubectl delete deployment -n acumos azure-client cds cms filebeat onboarding\
-    portal-be portal-fe dsce federation kubernetes-client kong nexus
-
-  echo "Delete image pull secrets from kubernetes"
-  kubectl delete secret -n acumos acumos-registry
-
-  echo "Delete namespace acumos"
-  kubectl delete namespace acumos
-  while kubectl get namespace acumos; do
-    echo "Waiting 10 seconds for namespace acumos to be deleted"
-    sleep 10
-  done
+  if [[ "$K8S_DIST" == "openshift" ]]; then
+    echo "Delete project $ACUMOS_NAMESPACE"
+    oc delete project $ACUMOS_NAMESPACE
+    while oc project $ACUMOS_NAMESPACE; do
+      echo "Waiting 10 seconds for project acumos to be deleted"
+      sleep 10
+    done
+  else
+    echo "Delete namespace $ACUMOS_NAMESPACE"
+    kubectl delete namespace $ACUMOS_NAMESPACE
+    while kubectl get namespace $ACUMOS_NAMESPACE; do
+      echo "Waiting 10 seconds for namespace $ACUMOS_NAMESPACE to be deleted"
+      sleep 10
+    done
+  fi
 fi
 
 echo "Cleanup acumos data"
@@ -85,13 +81,16 @@ mysql --user=root --password=$MARIADB_PASSWORD -e "DROP DATABASE $ACUMOS_CDS_DB;
   sudo rm -rf /var/lib/mysql
 fi
 
-echo "Remove mariadb-server"
-sudo apt-get remove mariadb-server-10.2 -y
-# To prevent issues later with apt-get update
-sudo rm /etc/apt/sources.list.d/mariadb.list
-sudo apt-get clean
-
-echo "Remove misc files"
-rm nexus-script.json
+dist=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+if [[ "$dist" == "ubuntu" ]]; then
+  echo "Remove mariadb-server"
+  sudo apt-get purge -y mariadb-server-10.2
+  # To prevent issues later with apt-get update
+  sudo rm /etc/apt/sources.list.d/mariadb.list
+  sudo apt-get clean
+else
+  echo "Remove mariadb-server"
+  sudo yum remove -y MariaDB-server MariaDB-client
+fi
 
 echo "You should now be able to repeat the install via oneclick_deploy.sh"

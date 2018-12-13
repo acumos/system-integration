@@ -26,12 +26,14 @@
 #   options: optional parameters to docker-compose. some examples:
 #   $ sudo bash docker-compose.sh build
 #     Build all services defined in the docker-compose.yaml file.
-#   $ sudo bash docker-compose.sh up
-#     Start all service containers.
+#   $ sudo bash docker-compose.sh up [ELK]
+#     default: Start all service containers.
+#     ELK: Start all ELK containers
 #   $ sudo bash docker-compose.sh logs -f
 #     Tail the logs of all service containers.
-#   $ sudo bash docker-compose.sh down
-#     Stop all service containers.
+#   $ sudo bash docker-compose.sh down [ELK]
+#     default: Stop all service containers.
+#     ELK: Stop all ELK containers
 #   $ sudo bash docker-compose.sh rm -v
 #     Remove all service containers.
 #
@@ -40,11 +42,17 @@ source acumos-env.sh
 
 set -x
 
-opts=""
-files=$(ls docker/acumos)
-for file in $files ; do
- opts="$opts -f acumos/$file"
-done
+if [[ "$2" == "ELK" ]]; then
+  cmd=$(echo $* | sed 's/ELK//')
+  opts="acumos/elk.yaml"
+else
+  cmd="$*"
+  opts=""
+  files=$(ls docker/acumos)
+  for file in $files ; do
+   opts="$opts -f acumos/$file"
+  done
+fi
 
 cd docker
-docker-compose $opts $*
+docker-compose $opts $cmd

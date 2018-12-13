@@ -37,10 +37,10 @@
 # $ bash peer-test.sh <host1> <user1> <under1> <host2> <user2> <under2> [models]
 #   host1: AIO deploy target hostname
 #   user1: user account on host1
-#   under1: docker|k8s
+#   under1: docker|k8s|openshift
 #   host2: AIO deploy target hostname
 #   user2: user account on host2
-#   under2: docker|k8s
+#   under2: docker|k8s|openshift
 #   models: optional folder with models to onboard
 #
 
@@ -69,7 +69,7 @@ function deploy() {
   ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
     $2@$1 bash clean.sh
   ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    $2@$1 bash oneclick_deploy.sh $3
+    $2@$1 bash oneclick_deploy.sh $3 $4
   ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
     $2@$1 bash create-user.sh test P@ssw0rd test user test@acumos-aio.com Admin
   ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
@@ -98,13 +98,19 @@ source acumos-env.sh
 host1=$1
 user1=$2
 under1=$3
+if [[ "$under1" == "k8s" ]]; then k8s_dist1=k8s
+else k8s_dist1=openshift
+fi
 host2=$4
 user2=$5
 under2=$6
+if [[ "$under2" == "k8s" ]]; then k8s_dist2=k8s
+else k8s_dist2=openshift
+fi
 models="$7"
 
-deploy $host1 $user1 $under1
-deploy $host2 $user2 $under2
+deploy $host1 $user1 $under1 $k8s_dist1
+deploy $host2 $user2 $under2 $k8s_dist2
 
 log "Exchange peer CA certs and server certs"
 scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \

@@ -23,7 +23,7 @@ apiVersion: apps/v1
 
 kind: Deployment
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: portal-be
   labels:
     app: portal-be
@@ -51,7 +51,7 @@ spec:
                       "port": 8083
                     },
                     "docker": {
-                      "host": "<ACUMOS_DOMAIN>",
+                      "host": "docker-service",
                       "port": "<ACUMOS_DOCKER_API_PORT>",
                       "registry": {
                         "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_DOCKER_MODEL_PORT>/",
