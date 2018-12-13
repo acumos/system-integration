@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# What this is: kubernetes template for Acumos mariadb deployment
+# How to use:
+# - Replace fields in <> with actual values (k8s does not support env variables)services:
+
+kind: Deployment
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: mariadb
+  labels:
+    app: mariadb-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mariadb-service
+  template:
+    metadata:
+      labels:
+        app: mariadb-service
+    spec:
+      containers:
+      - name: mariadb
+        image: mariadb
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "<ACUMOS_MARIADB_PASSWORD>"
+        - name: MYSQL_DATABASE
+          value: "<ACUMOS_CDS_DB>"
+        - name: MYSQL_USER
+          value: "<ACUMOS_MARIADB_USER>"
+        - name: MYSQL_PASSWORD
+          value: "<ACUMOS_MARIADB_USER_PASSWORD>"
+        - name: MYSQL_ROOT_HOST
+          value: "<ACUMOS_HOST>"
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: pv-<ACUMOS_NAMESPACE>-mariadb-data
+      - name: adminer
+        image: adminer
+        ports:
+        - containerPort: 8080
+      restartPolicy: Always
+      volumes:
+      - name: pv-<ACUMOS_NAMESPACE>-mariadb-data
+        hostPath:
+          path: /var/<ACUMOS_NAMESPACE>/mariadb-data
+# TODO: debug access issues with PVC
+#        persistentVolumeClaim:
+#         claimName: pvc-<ACUMOS_NAMESPACE>-mariadb-data
+      hostAliases:
+      - ip: "<ACUMOS_HOST>"
+        hostnames:
+        - "<ACUMOS_DOMAIN>"

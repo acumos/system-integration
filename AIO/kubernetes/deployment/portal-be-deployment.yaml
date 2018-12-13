@@ -23,7 +23,7 @@ apiVersion: apps/v1
 
 kind: Deployment
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: portal-be
   labels:
     app: portal-be
@@ -51,7 +51,7 @@ spec:
                       "port": 8083
                     },
                     "docker": {
-                      "host": "<ACUMOS_DOMAIN>",
+                      "host": "docker-service",
                       "port": "<ACUMOS_DOCKER_API_PORT>",
                       "registry": {
                         "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_DOCKER_MODEL_PORT>/",
@@ -90,8 +90,8 @@ spec:
                           "dcae_url": "http://onboarding-service:8090/onboarding-app/v2/dcae_models"
                         }
                       },
-                      "cliPushUrl": "<ACUMOS_DOMAIN>:<ACUMOS_KONG_PROXY_SSL_PORT>/onboarding-app/v2/models",
-                      "cliAuthUrl": "<ACUMOS_DOMAIN>:<ACUMOS_KONG_PROXY_SSL_PORT>/onboarding-app/v2/auth",
+                      "cliPushUrl": "https://<ACUMOS_DOMAIN>:<ACUMOS_KONG_PROXY_SSL_PORT>/onboarding-app/v2/models",
+                      "cliAuthUrl": "https://<ACUMOS_DOMAIN>:<ACUMOS_KONG_PROXY_SSL_PORT>/onboarding-app/v2/auth",
                       "tokenmode": "jwtToken"
                     },
                     "model": {
@@ -111,7 +111,7 @@ spec:
                         "signup_enabled": "true",
                         "verifyAccount": "false",
                         "verifyToken": {
-                          "exp_time": 24  
+                          "exp_time": 24
                         },
                       "cloud_enabled": "[{\"cloudEnabled\": \"true\", \"cloudName\": \"azure\", \"cloudDisplayText\": \"Microsoft Azure\", \"imageUrl\": \"/images/deploy-cloud/microsoft_azure.png\" },{ \"cloudEnabled\": \"true\", \"cloudName\": \"rackspace\", \"cloudDisplayText\": \"Rackspace\", \"imageUrl\": \"/images/deploy-cloud/rackspace.png\" },{ \"cloudEnabled\": \"false\",  \"cloudName\": \"gcp\", \"cloudDisplayText\": \"Google Cloud Platform\", \"imageUrl\": \"/images/deploy-cloud/google_cloud_platform.png\" },{ \"cloudEnabled\": \"true\",  \"cloudName\": \"deploylocal\", \"cloudDisplayText\": \"Deploy To Local\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_local.png\" },{ \"cloudEnabled\": \"false\", \"cloudName\": \"whitebox\", \"cloudDisplayText\": \"Deploy To White Box\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_whitebox.png\" }]"
                       },
@@ -126,7 +126,7 @@ spec:
                           "key": "replace-as-needed"
                         },
                         "secret": {
-                          "key": "replace-as-needed" 
+                          "key": "replace-as-needed"
                         },
                         "address": {
                           "from": "admin@example.com"
@@ -144,7 +144,7 @@ spec:
                           "folder": {
                             "path": "/fmtemplates/"
                           }
-                        } 
+                        }
                       }
                     },
                     "client": {
@@ -184,22 +184,22 @@ spec:
         - containerPort: 8083
         volumeMounts:
         - mountPath: /maven/logs
-          name: acumos-logs
+          name: pv-<ACUMOS_NAMESPACE>-logs
         - mountPath: /app/certs
-          name: acumos-certs
+          name: pv-<ACUMOS_NAMESPACE>-certs
         - mountPath: /acumosWebOnboarding
-          name: acumos-webonboarding
+          name: pv-<ACUMOS_NAMESPACE>-webonboarding
       restartPolicy: Always
       volumes:
-      - name: acumos-logs
-        hostPath:
-          path: /var/acumos/logs
-      - name: acumos-certs
-        hostPath:
-          path: /var/acumos/certs
-      - name: acumos-webonboarding
-        hostPath:
-          path: /var/acumos/WebOnboarding
+      - name: pv-<ACUMOS_NAMESPACE>-logs
+        persistentVolumeClaim:
+         claimName: pvc-<ACUMOS_NAMESPACE>-logs
+      - name: pv-<ACUMOS_NAMESPACE>-certs
+        persistentVolumeClaim:
+         claimName: pvc-<ACUMOS_NAMESPACE>-certs
+      - name: pv-<ACUMOS_NAMESPACE>-webonboarding
+        persistentVolumeClaim:
+         claimName: pvc-<ACUMOS_NAMESPACE>-webonboarding
       hostAliases:
       - ip: "<ACUMOS_HOST>"
         hostnames:

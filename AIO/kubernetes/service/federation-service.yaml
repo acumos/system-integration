@@ -23,7 +23,7 @@ apiVersion: v1
 
 kind: Service
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: federation-service
   labels:
     app: federation
@@ -32,11 +32,10 @@ spec:
     app: federation
   type: NodePort
   ports:
-  - name: federation-gateway
+  - name: federation-port
     nodePort: <ACUMOS_FEDERATION_PORT>
     port: 9084
     targetPort: 9084
   - name: federation-local
     port: 9011
     targetPort: 9011
-
