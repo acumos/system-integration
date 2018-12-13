@@ -23,7 +23,7 @@ apiVersion: apps/v1
 
 kind: Deployment
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: azure-client
   labels:
     app: azure-client
@@ -54,7 +54,7 @@ spec:
                     },
                     "docker": {
                       "containerNamePrefix": "E6E-NSG",
-                      "host": "<ACUMOS_DOMAIN>",
+                      "host": "docker-service",
                       "port": "<ACUMOS_DOCKER_API_PORT>",
                       "dockerVMUserName": "<ACUMOS_DEPLOYED_VM_USER>",
                       "dockerVMPassword": "<ACUMOS_DEPLOYED_VM_PASSWORD>",

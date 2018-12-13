@@ -23,7 +23,7 @@ apiVersion: v1
 
 kind: Service
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: kong-service
   labels:
     app: kong
@@ -33,7 +33,9 @@ spec:
   type: NodePort
   ports:
   - name: kong-db-port
-    port: <ACUMOS_KONG_DB_PORT>
+    nodePort: <ACUMOS_KONG_DB_PORT>
+    port: 5432
+    targetPort: 5432
   - name: kong-proxy-port
     nodePort: <ACUMOS_KONG_PROXY_PORT>
     port: 8000

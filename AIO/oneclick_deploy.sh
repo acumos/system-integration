@@ -26,9 +26,11 @@
 # - For deployments behind proxies, set HTTP_PROXY and HTTPS_PROXY in acumos-env.sh
 # - For kubernetes based deplpyment: Kubernetes cluster deployed
 # Usage:
-# $ bash oneclick_deploy.sh <docker|k8s>
-#   docker: install all components other than mariadb under docker-ce
-#   k8s: install all components other than mariadb under kubernetes
+# $ bash oneclick_deploy.sh <under> <k8sdist>
+#   under: docker|k8s
+#     docker: install all components other than mariadb under docker-ce
+#     k8s: install all components other than mariadb under kubernetes
+#   k8sdist: k8s distribution, generic|openshift
 #  
 # NOTE: if redeploying with an existing Acumos database, or to upgrade an
 # existing Acumos CDS database, ensure that acumos-env.sh contains the following values
@@ -74,11 +76,12 @@ function setup_prereqs() {
   log "/etc/hosts customizations"
   # Ensure cluster hostname resolves inside the cluster
   if [[ $(grep -c $HOSTNAME /etc/hosts) -eq 0 ]]; then
-    log "Add $HOSTNAME to /etc/hosts"
+    echo; echo "prereqs.sh: ($(date)) Add $HOSTNAME to /etc/hosts"
     # have to add "/sbin" to path of IP command for centos
-    echo "$(/sbin/ip route get 8.8.8.8 | awk '{print $NF; exit}') $HOSTNAME" \
+    echo "$(/sbin/ip route get 8.8.8.8 | head -1 | sed 's/^.*src //' | awk '{print $1}') $HOSTNAME" \
       | sudo tee -a /etc/hosts
   fi
+
   if [[ $(grep -c $ACUMOS_DOMAIN /etc/hosts) -eq 0 ]]; then
     log "Add $ACUMOS_DOMAIN to /etc/hosts"
     echo "$ACUMOS_HOST $ACUMOS_DOMAIN" | sudo tee -a /etc/hosts
@@ -94,82 +97,84 @@ function setup_prereqs() {
   log "/etc/resolv.conf:"
   cat /etc/resolv.conf
 
+  # Per https://kubernetes.io/docs/setup/independent/install-kubeadm/
   log "Basic prerequisites"
+  if [[ "$dist" == "ubuntu" ]]; then
+    wait_dpkg; sudo apt-get update
+  # TODO: fix need to skip upgrade as this sometimes updates the kube-system
+  # services and they then stay in "pending", blocking k8s-based deployment
+  #  wait_dpkg; sudo apt-get upgrade -y
+    wait_dpkg; sudo apt-get install -y wget git jq
 
-  wait_dpkg; sudo apt-get update
-# TODO: fix need to skip upgrade as this sometimes updates the kube-system
-# services and they then stay in "pending", blocking k8s-based deployment
-#  wait_dpkg; sudo apt-get upgrade -y
-  wait_dpkg; sudo apt-get install -y wget git jq
-
-  if [[ "$DEPLOYED_UNDER" = "docker" ]]; then
-    if [[ $(dpkg -l | grep -c docker-ce) -eq 0 ]]; then
-      log "Install latest docker-ce"
-      # Per https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
-      sudo apt-get remove -y docker docker-engine docker.io docker-ce
-      sudo apt-get update
-      sudo apt-get install -y \
-        apt-transport-https \
-        ca-certificates \
-        curl \
-        software-properties-common
-      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-      sudo add-apt-repository "deb [arch=amd64] \
-        https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-      sudo apt-get update
-      sudo apt-get install -y docker-ce
+    if [[ "$DEPLOYED_UNDER" = "docker" ]]; then
+      distver=$(grep -m 1 'VERSION_ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+      case "$distver" in
+        "16.04")
+          log "Install docker-ce if needed"
+          dce=$(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' 'docker-ce')
+          if [[ $dce != "installed" ]]; then
+            echo; echo "prereqs.sh: ($(date)) Install latest docker-ce"
+            # Per https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
+            sudo apt-get purge -y docker docker-engine docker.io
+            sudo apt-get update
+            sudo apt-get install -y \
+              apt-transport-https \
+              ca-certificates \
+              curl \
+              software-properties-common
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+            sudo add-apt-repository "deb [arch=amd64] \
+              https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+            sudo apt-get update
+            sudo apt-get install -y docker-ce
+          fi
+          ;;
+        "18.04")
+          log "Install docker.io if needed"
+          dio=$(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' 'docker.io')
+          if [[ $dio != "installed" ]]; then
+            sudo apt-get purge -y docker docker-engine docker-ce docker-ce-cli
+            sudo apt-get update
+            sudo apt-get install -y docker.io=17.12.1-0ubuntu1
+            sudo systemctl enable docker.service
+          fi
+          ;;
+        *)
+          fail "Unsupported Ubuntu version ($distver)"
+      esac
     fi
+  else
+    # For centos, only deployment under k8s is supported
+    # docker is assumed to be pre-installed as part of the k8s install process
+    sudo yum -y update
+    sudo rpm -Fvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    sudo yum install -y wget git jq
+  fi
 
-    # Workaround for docker-dind memory leak issues - use the docker-engine that
-    # resides on the AIO host
-    log "Enable docker API"
-    if [[ $(grep -c "\-H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT" /lib/systemd/system/docker.service) -eq 0 ]]; then
-      sudo sed -i -- "s~ExecStart=/usr/bin/dockerd -H fd://~ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:$ACUMOS_DOCKER_API_PORT~" /lib/systemd/system/docker.service
-    fi
-
-    log "Block host-external access to docker API"
-    if [[ $(sudo iptables -S | grep -c '172.0.0.0/8 .* 2375') -eq 0 ]]; then
-      sudo iptables -A INPUT -p tcp --dport 2375 ! -s 172.0.0.0/8 -j DROP
-    fi
-    if [[ $(sudo iptables -S | grep -c '127.0.0.1/32 .* 2375') -eq 0 ]]; then
-      sudo iptables -I INPUT -s localhost -p tcp -m tcp --dport 2375 -j ACCEPT
-    fi
-    if [[ $(sudo iptables -S | grep -c "$ACUMOS_HOST/32 .* 2375") -eq 0 ]]; then
-      sudo iptables -I INPUT -s $ACUMOS_HOST -p tcp -m tcp --dport 2375 -j ACCEPT
-    fi
-
-    log "Enable non-secure docker repositories"
-    cat << EOF | sudo tee /etc/docker/daemon.json
-{
-  "insecure-registries": [
-    "$ACUMOS_NEXUS_HOST:$ACUMOS_DOCKER_MODEL_PORT"
-  ],
-  "disable-legacy-registry": true
-}
-EOF
-
-    sudo systemctl daemon-reload
-    sudo service docker restart
-
+  if [[ "$dist" == "ubuntu" ]]; then
     if [[ $(dpkg -l | grep -c docker-compose) -eq 0 ]]; then
       log "Install latest docker-compose"
       sudo apt-get install -y docker-compose
     fi
-
-    if [[ $(sudo docker volume ls | grep -c acumos-logs) -eq 0 ]]; then
-      log "Create docker volumes for Acumos docker-based components"
-      while ! curl http://$ACUMOS_DOCKER_API_HOST:$ACUMOS_DOCKER_API_PORT ; do
-        log "waiting 30 seconds for docker daemon to be ready"
-        sleep 30
-      done
-      sudo docker volume create kong-db
-      sudo docker volume create acumos-logs
-      sudo docker volume create acumos-output
-      sudo docker volume create acumosWebOnboarding
-      sudo docker volume create nexus-data
-    fi
+  else
+    log "Install latest docker-compose"
+    sudo yum install -y docker-compose
   fi
 
+  # TODO: replace with PV's and PVC's
+  if [[ $(sudo docker volume ls | grep -c acumos-logs) -eq 0 ]]; then
+    log "Create docker volumes for Acumos docker-based components"
+    while ! sudo docker volume create kong-db ; do
+      log "waiting 10 seconds for docker daemon to be ready"
+      sleep 10
+    done
+    sudo docker volume create acumos-logs
+    sudo docker volume create acumos-output
+    sudo docker volume create acumosWebOnboarding
+    sudo docker volume create nexus-data
+  fi
+
+  # TODO: replace with PV's and PVC's for certs
   if [[ ! -d /var/acumos ]]; then
     sudo mkdir -p /var/acumos
     sudo chown $USER:$USER /var/acumos
@@ -189,41 +194,70 @@ EOF
 
 function setup_mariadb() {
   trap 'fail' ERR
-  log "Installing MariaDB 10.2"
-  # default version
-  MARIADB_VERSION='10.2'
-  # May need to update to another mirror if you encounter issues
-  # See https://downloads.mariadb.org/mariadb/repositories/#mirror=accretive&distro=Ubuntu
-  MARIADB_REPO='deb [arch=amd64,i386,ppc64el] http://sfo1.mirrors.digitalocean.com/mariadb/repo/10.2/ubuntu xenial main'
+  if [[ "$dist" == "ubuntu" ]]; then
+    log "Installing MariaDB 10.2"
+    # default version
+    MARIADB_VERSION='10.2'
+    # May need to update to another mirror if you encounter issues
+    # See https://downloads.mariadb.org/mariadb/repositories/#mirror=accretive&distro=Ubuntu
+    MARIADB_REPO='deb [arch=amd64,i386,ppc64el] http://sfo1.mirrors.digitalocean.com/mariadb/repo/10.2/ubuntu xenial main'
+    log "Import mariadb repo key"
+    sudo apt-get install software-properties-common -y
+    sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
+    sudo add-apt-repository "$MARIADB_REPO"
+    sudo apt-get update -y
 
-  log "Import mariadb repo key"
-  sudo apt-get install software-properties-common -y
-  sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
-  sudo add-apt-repository "$MARIADB_REPO"
-  sudo apt-get update -y
+    log "Install MariaDB without password prompt"
+    sudo debconf-set-selections <<< "mariadb-server-$MARIADB_VERSION mysql-server/root_password password $ACUMOS_MARIADB_PASSWORD"
+    sudo debconf-set-selections <<< "mariadb-server-$MARIADB_VERSION mysql-server/root_password_again password $ACUMOS_MARIADB_PASSWORD"
 
-  log "Install MariaDB without password prompt"
-  sudo debconf-set-selections <<< "mariadb-server-$MARIADB_VERSION mysql-server/root_password password $ACUMOS_MARIADB_PASSWORD"
-  sudo debconf-set-selections <<< "mariadb-server-$MARIADB_VERSION mysql-server/root_password_again password $ACUMOS_MARIADB_PASSWORD"
+    log "Install MariaDB"
+    sudo apt-get install -y -q mariadb-server-$MARIADB_VERSION
 
-  log "Install MariaDB"
-  sudo apt-get install -y -q mariadb-server-$MARIADB_VERSION
-  sudo systemctl daemon-reload
-
-  log "Make MariaDB connectable from outside"
-  sudo sed -i "s/bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/my.cnf
-
-  sudo sed -i 's/^\!includedir.*//' /etc/mysql/my.cnf
-  cat << EOF | sudo tee -a /etc/mysql/my.cnf
+    sudo sed -i 's/^\!includedir.*//' /etc/mysql/my.cnf
+    cat << EOF | sudo tee -a /etc/mysql/my.cnf
 # Added to use lower case for all tablenames.
 [mariadb-10.2]
 lower_case_table_names=1
 !includedir /etc/mysql/mariadb.conf.d/
 EOF
 
+    log "Make MariaDB connectable from outside"
+    sudo sed -i "s/bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/my.cnf
+  else
+  # Add MariaDB 10 external yum repo
+    cat << EOF | sudo tee -a /etc/yum.repos.d/MariaDB.repo
+[mariadb]
+name = MariaDB
+baseurl = http://yum.mariadb.org/10.2/centos7-amd64
+gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+gpgcheck=1
+EOF
+    sudo yum install -y MariaDB-server MariaDB-client
+
+    log "Configure MariaDB"
+    FILE=/etc/my.cnf.d/server.cnf
+    LINE='bind-address = 0.0.0.0'
+    sudo sed -i -e "\|$LINE|h; \${x;s|$LINE||;{g;t};a\\" -e "$LINE" -e "}" $FILE 
+    LINE='lower_case_table_names=1'
+    sudo sed -i -e "\|$LINE|h; \${x;s|$LINE||;{g;t};a\\" -e "$LINE" -e "}" $FILE 
+    LINE='skip-grant-tables'
+    sudo sed -i -e "\|$LINE|h; \${x;s|$LINE||;{g;t};a\\" -e "$LINE" -e "}" $FILE
+  fi
+
+  sudo systemctl daemon-reload
   sudo service mysql restart
+
   log "Secure mysql installation"
-  mysql --user=root --password=$ACUMOS_MARIADB_PASSWORD -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1','::1'); DELETE FROM mysql.user WHERE User=''; DELETE FROM mysql.db WHERE Db='test' OR Db='test_%'; FLUSH PRIVILEGES;"
+  if [[ "$dist" == "ubuntu" ]]; then
+    mysql --user=root --password=$ACUMOS_MARIADB_PASSWORD -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1','::1'); DELETE FROM mysql.user WHERE User=''; DELETE FROM mysql.db WHERE Db='test' OR Db='test_%'; FLUSH PRIVILEGES;"
+  else
+    mysql --user=root -e "UPDATE mysql.user SET Password=PASSWORD('$ACUMOS_MARIADB_PASSWORD') WHERE User='root'; DELETE FROM mysql.user WHERE User=''; DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1'); DROP DATABASE IF EXISTS test; DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'; FLUSH PRIVILEGES;"
+    sudo systemctl stop mysql
+    sudo sed -i "/skip-grant-tables/d" /etc/my.cnf.d/server.cnf
+    sudo systemctl daemon-reload
+    sudo service mysql restart
+  fi
 }
 
 function setup_acumosdb() {
@@ -349,6 +383,8 @@ function setup_elk() {
   else
     log "Create local shared folder for ElasticSearch persistent data"
     mkdir -p /var/acumos/esdata
+    # TODO: find out why this is needed for Centos
+    chmod 777 /var/acumos/esdata
   fi
 
   log "Prepare ELK stack component configs for AIO deploy"
@@ -375,7 +411,7 @@ function setup_acumos() {
   docker_login https://nexus3.acumos.org:10004
   docker_login https://nexus3.acumos.org:10003
   docker_login https://nexus3.acumos.org:10002
-  sudo chown -R $USER:$USER ~/.docker
+  if [[ "$dist" == "ubuntu" ]]; then sudo chown -R $USER:$USER $HOME/.docker; fi
 
   setup_elk
 
@@ -387,41 +423,45 @@ function setup_acumos() {
     sudo bash docker-compose.sh up -d
     bash docker-proxy/deploy.sh
   else
-    if [[ $(kubectl get namespaces | grep -c 'acumos ') == 1 ]]; then
-      trap '' ERR
-      echo "Stop any running Acumos component services under kubernetes"
-      kubectl delete service -n acumos azure-client-service cds-service \
-        cms-service portal-be-service portal-fe-service \
-        onboarding-service msg-service dsce-service kubernetes-client-service \
-        federation-service kong-service nexus-service \
-        filebeat-service metricbeat-service elasticsearch-service \
-        logstash-service kibana-service
-
-      echo "Stop any running Acumos component deployments under kubernetes"
-      kubectl delete deployment -n acumos azure-client cds cms \
-        portal-be portal-fe onboarding msg dsce kubernetes-client federation \
-        kong nexus docker filebeat metricbeat elasticsearch logstash kibana
-
-      echo "Delete acumos image pull secret from kubernetes"
-      kubectl delete secret -n acumos acumos-registry
-
-      echo "Delete namespace acumos from kubernetes"
-      kubectl delete namespace acumos
-      while kubectl get namespace acumos; do
-        echo "Waiting 10 seconds for namespace acumos to be deleted"
+    trap '' ERR
+    if [[ "$k8s_cmd" == "kubectl" ]]; then
+      echo "Delete namespace acumos"
+      kubectl delete namespace $ACUMOS_NAMESPACE
+      while kubectl get namespace $ACUMOS_NAMESPACE; do
+        echo "Waiting 10 seconds for namespace $ACUMOS_NAMESPACE to be deleted"
         sleep 10
       done
-      trap 'FAIL' ERR
+    else
+      echo "Delete project acumos"
+      oc delete project $ACUMOS_NAMESPACE
+      while oc project $ACUMOS_NAMESPACE; do
+        echo "Waiting 10 seconds for project $ACUMOS_NAMESPACE to be deleted"
+        sleep 10
+      done
+    fi
+    trap 'fail' ERR
+
+    if [[ "$k8s_cmd" == "kubectl" ]]; then
+      log "Create namespace acumos"
+      while ! $k8s_cmd create namespace acumos; do
+        log "k8s API is not yet ready ... waiting 10 seconds"
+        sleep 10
+      done
+    else
+      log "Create project acumos"
+      oc new-project acumos
+      while ! oc project acumos; do
+        log "OpenShift API is not yet ready ... waiting 10 seconds"
+        sleep 10
+      done
+      log "Workaround: Acumos AIO requires hostpath privilege for volumes"
+      oc adm policy add-scc-to-user privileged -z default -n $ACUMOS_NAMESPACE
     fi
 
-    log "Create namespace acumos"
-    while ! kubectl create namespace acumos; do
-      log "kubectl API is not yet ready ... waiting 10 seconds"
-      sleep 10
-    done
-
     log "Create k8s secret for image pulling from docker"
-    b64=$(cat ~/.docker/config.json | base64 -w 0)
+    if [[ "$dist" == "ubuntu" ]]; then b64=$(cat $HOME/.docker/config.json | base64 -w 0)
+    else b64=$(sudo cat /root/.docker/config.json | base64 -w 0)
+    fi
     cat <<EOF >acumos-registry.yaml
 apiVersion: v1
 kind: Secret
@@ -433,20 +473,20 @@ data:
 type: kubernetes.io/dockerconfigjson
 EOF
 
-    kubectl create -f acumos-registry.yaml
+    $k8s_cmd create -f acumos-registry.yaml
 
     log "Deploy Acumos kubernetes-based components"
     log "Set variable values in k8s templates"
     # Variables for platform dependencies (not core components)
-    depvars="ACUMOS_DOCKER_API_HOST ACUMOS_DOCKER_API_PORT ACUMOS_DOCKER_API_PORT ACUMOS_DOCKER_MODEL_PORT ACUMOS_DOCKER_PROXY_HOST ACUMOS_DOCKER_PROXY_PORT ACUMOS_DOMAIN ACUMOS_ELK_ELASTICSEARCH_HOST ACUMOS_ELK_ELASTICSEARCH_PORT ACUMOS_ELK_ES_JAVA_HEAP_MAX_SIZE ACUMOS_ELK_ES_JAVA_HEAP_MIN_SIZE ACUMOS_ELK_KIBANA_HOST ACUMOS_ELK_KIBANA_NODEPORT ACUMOS_ELK_KIBANA_PORT ACUMOS_ELK_LOGSTASH_HOST ACUMOS_ELK_LOGSTASH_PORT ACUMOS_ELK_LS_JAVA_HEAP_MAX_SIZE ACUMOS_ELK_LS_JAVA_HEAP_MIN_SIZE ACUMOS_ELK_NODEPORT ACUMOS_FILEBEAT_PORT ACUMOS_HOST ACUMOS_KONG_ADMIN_PORT ACUMOS_KONG_ADMIN_SSL_PORT ACUMOS_KONG_DB_PORT ACUMOS_KONG_PROXY_PORT ACUMOS_KONG_PROXY_SSL_PORT ACUMOS_MARIADB_HOST ACUMOS_MARIADB_PORT ACUMOS_MARIADB_USER_PASSWORD ACUMOS_METRICBEAT_PORT ACUMOS_NEXUS_API_PORT ACUMOS_NEXUS_HOST ACUMOS_PROJECT_NEXUS_PASSWORD ACUMOS_PROJECT_NEXUS_USERNAME ACUMOS_RO_USER ACUMOS_RO_USER_PASSWORD ACUMOS_RW_USER ACUMOS_RW_USER_PASSWORD"
+    depvars="ACUMOS_NAMESPACE ACUMOS_DOCKER_API_PORT ACUMOS_DOCKER_MODEL_PORT ACUMOS_DOCKER_PROXY_HOST ACUMOS_DOCKER_PROXY_PORT ACUMOS_DOMAIN ACUMOS_ELK_ELASTICSEARCH_HOST ACUMOS_ELK_ELASTICSEARCH_PORT ACUMOS_ELK_ES_JAVA_HEAP_MAX_SIZE ACUMOS_ELK_ES_JAVA_HEAP_MIN_SIZE ACUMOS_ELK_KIBANA_HOST ACUMOS_ELK_KIBANA_NODEPORT ACUMOS_ELK_KIBANA_PORT ACUMOS_ELK_LOGSTASH_HOST ACUMOS_ELK_LOGSTASH_PORT ACUMOS_ELK_LS_JAVA_HEAP_MAX_SIZE ACUMOS_ELK_LS_JAVA_HEAP_MIN_SIZE ACUMOS_ELK_NODEPORT ACUMOS_FILEBEAT_PORT ACUMOS_HOST ACUMOS_KONG_ADMIN_PORT ACUMOS_KONG_ADMIN_SSL_PORT ACUMOS_KONG_DB_PORT ACUMOS_KONG_PROXY_PORT ACUMOS_KONG_PROXY_SSL_PORT ACUMOS_MARIADB_HOST ACUMOS_MARIADB_PORT ACUMOS_MARIADB_USER_PASSWORD ACUMOS_METRICBEAT_PORT ACUMOS_NEXUS_API_PORT ACUMOS_NEXUS_HOST ACUMOS_PROJECT_NEXUS_PASSWORD ACUMOS_PROJECT_NEXUS_USERNAME ACUMOS_RO_USER ACUMOS_RO_USER_PASSWORD ACUMOS_RW_USER ACUMOS_RW_USER_PASSWORD"
 
     # Variables for platform core components
     compvars="ACUMOS_AZURE_CLIENT_PORT ACUMOS_CDS_DB ACUMOS_CDS_PASSWORD ACUMOS_CDS_PORT ACUMOS_CDS_USER ACUMOS_CMS_PORT ACUMOS_DATA_BROKER_INTERNAL_PORT ACUMOS_DATA_BROKER_PORT ACUMOS_DEPLOYED_SOLUTION_PORT ACUMOS_DEPLOYED_VM_PASSWORD ACUMOS_DEPLOYED_VM_USER ACUMOS_DSCE_PORT ACUMOS_FEDERATION_PORT ACUMOS_KEYPASS ACUMOS_KUBERNETES_CLIENT_PORT ACUMOS_MICROSERVICE_GENERATION_PORT ACUMOS_ONBOARDING_PORT ACUMOS_OPERATOR_ID ACUMOS_PORTAL_BE_PORT ACUMOS_PORTAL_FE_PORT ACUMOS_PROBE_PORT HTTP_PROXY HTTPS_PROXY"
     set +x
-    mkdir -p ~/deploy/kubernetes
-    cp -r kubernetes/* ~/deploy/kubernetes/.
+    mkdir -p $HOME/deploy/kubernetes
+    cp -r kubernetes/* $HOME/deploy/kubernetes/.
     vs="$depvars $compvars"
-    for f in  ~/deploy/kubernetes/service/*.yaml  ~/deploy/kubernetes/deployment/*.yaml; do
+    for f in  $HOME/deploy/kubernetes/service/*.yaml  $HOME/deploy/kubernetes/deployment/*.yaml; do
       for v in $vs ; do
         eval vv=\$$v
         sed -i -- "s/<$v>/$vv/g" $f
@@ -455,39 +495,39 @@ EOF
     set -x
 
     log "Set image references in k8s templates"
-    sed -i -- "s~<AZURE_CLIENT_IMAGE>~$AZURE_CLIENT_IMAGE~g"  ~/deploy/kubernetes/deployment/azure-client-deployment.yaml
-    sed -i -- "s~<BLUEPRINT_ORCHESTRATOR_IMAGE>~$BLUEPRINT_ORCHESTRATOR_IMAGE~g"  ~/deploy/kubernetes/deployment/azure-client-deployment.yaml
-    sed -i -- "s~<COMMON_DATASERVICE_IMAGE>~$COMMON_DATASERVICE_IMAGE~g"  ~/deploy/kubernetes/deployment/common-data-svc-deployment.yaml
-    sed -i -- "s~<DATABROKER_CSVBROKER_IMAGE>~$DATABROKER_CSVBROKER_IMAGE~g"  ~/deploy/kubernetes/deployment/dsce-deployment.yaml
-    sed -i -- "s~<DATABROKER_ZIPBROKER_IMAGE>~$DATABROKER_ZIPBROKER_IMAGE~g"  ~/deploy/kubernetes/deployment/dsce-deployment.yaml
-    sed -i -- "s~<DESIGNSTUDIO_IMAGE>~$DESIGNSTUDIO_IMAGE~g"  ~/deploy/kubernetes/deployment/dsce-deployment.yaml
-    sed -i -- "s~<ELASTICSEARCH_IMAGE>~$ELASTICSEARCH_IMAGE~g"  ~/deploy/kubernetes/deployment/elk-deployment.yaml
-    sed -i -- "s~<FEDERATION_IMAGE>~$FEDERATION_IMAGE~g"  ~/deploy/kubernetes/deployment/federation-deployment.yaml
-    sed -i -- "s~<FILEBEAT_IMAGE>~$FILEBEAT_IMAGE~g"  ~/deploy/kubernetes/deployment/filebeat-deployment.yaml
-    sed -i -- "s~<FILEBEAT_IMAGE>~$FILEBEAT_IMAGE~g"  ~/deploy/kubernetes/deployment/filebeat-deployment.yaml
-    sed -i -- "s~<KIBANA_IMAGE>~$KIBANA_IMAGE~g"  ~/deploy/kubernetes/deployment/elk-deployment.yaml
-    sed -i -- "s~<KUBERNETES_CLIENT_IMAGE>~$KUBERNETES_CLIENT_IMAGE~g"  ~/deploy/kubernetes/deployment/kubernetes-client-deployment.yaml
-    sed -i -- "s~<BLUEPRINT_ORCHESTRATOR_IMAGE>~$BLUEPRINT_ORCHESTRATOR_IMAGE~g"  ~/deploy/kubernetes/deployment/kubernetes-client-deployment.yaml
-    sed -i -- "s~<PROTO_VIEWER_IMAGE>~$PROTO_VIEWER_IMAGE~g"  ~/deploy/kubernetes/deployment/kubernetes-client-deployment.yaml
-    sed -i -- "s~<LOGSTASH_IMAGE>~$LOGSTASH_IMAGE~g"  ~/deploy/kubernetes/deployment/elk-deployment.yaml
-    sed -i -- "s~<METRICBEAT_IMAGE>~$METRICBEAT_IMAGE~g"  ~/deploy/kubernetes/deployment/metricbeat-deployment.yaml
-    sed -i -- "s~<MICROSERVICE_GENERATION_IMAGE>~$MICROSERVICE_GENERATION_IMAGE~g"  ~/deploy/kubernetes/deployment/microservice-generation-deployment.yaml
-    sed -i -- "s~<ONBOARDING_BASE_IMAGE>~$ONBOARDING_BASE_IMAGE~g"  ~/deploy/kubernetes/deployment/microservice-generation-deployment.yaml
-    sed -i -- "s~<ONBOARDING_BASE_IMAGE>~$ONBOARDING_BASE_IMAGE~g"  ~/deploy/kubernetes/deployment/onboarding-deployment.yaml
-    sed -i -- "s~<ONBOARDING_IMAGE>~$ONBOARDING_IMAGE~g"  ~/deploy/kubernetes/deployment/onboarding-deployment.yaml
-    sed -i -- "s~<PORTAL_BE_IMAGE>~$PORTAL_BE_IMAGE~g"  ~/deploy/kubernetes/deployment/portal-be-deployment.yaml
-    sed -i -- "s~<PORTAL_CMS_IMAGE>~$PORTAL_CMS_IMAGE~g"  ~/deploy/kubernetes/deployment/cms-deployment.yaml
-    sed -i -- "s~<PORTAL_FE_IMAGE>~$PORTAL_FE_IMAGE~g"  ~/deploy/kubernetes/deployment/portal-fe-deployment.yaml
+    sed -i -- "s~<AZURE_CLIENT_IMAGE>~$AZURE_CLIENT_IMAGE~g"  $HOME/deploy/kubernetes/deployment/azure-client-deployment.yaml
+    sed -i -- "s~<BLUEPRINT_ORCHESTRATOR_IMAGE>~$BLUEPRINT_ORCHESTRATOR_IMAGE~g"  $HOME/deploy/kubernetes/deployment/azure-client-deployment.yaml
+    sed -i -- "s~<COMMON_DATASERVICE_IMAGE>~$COMMON_DATASERVICE_IMAGE~g"  $HOME/deploy/kubernetes/deployment/common-data-svc-deployment.yaml
+    sed -i -- "s~<DATABROKER_CSVBROKER_IMAGE>~$DATABROKER_CSVBROKER_IMAGE~g"  $HOME/deploy/kubernetes/deployment/dsce-deployment.yaml
+    sed -i -- "s~<DATABROKER_ZIPBROKER_IMAGE>~$DATABROKER_ZIPBROKER_IMAGE~g"  $HOME/deploy/kubernetes/deployment/dsce-deployment.yaml
+    sed -i -- "s~<DESIGNSTUDIO_IMAGE>~$DESIGNSTUDIO_IMAGE~g"  $HOME/deploy/kubernetes/deployment/dsce-deployment.yaml
+    sed -i -- "s~<ELASTICSEARCH_IMAGE>~$ELASTICSEARCH_IMAGE~g"  $HOME/deploy/kubernetes/deployment/elk-deployment.yaml
+    sed -i -- "s~<FEDERATION_IMAGE>~$FEDERATION_IMAGE~g"  $HOME/deploy/kubernetes/deployment/federation-deployment.yaml
+    sed -i -- "s~<FILEBEAT_IMAGE>~$FILEBEAT_IMAGE~g"  $HOME/deploy/kubernetes/deployment/filebeat-deployment.yaml
+    sed -i -- "s~<FILEBEAT_IMAGE>~$FILEBEAT_IMAGE~g"  $HOME/deploy/kubernetes/deployment/filebeat-deployment.yaml
+    sed -i -- "s~<KIBANA_IMAGE>~$KIBANA_IMAGE~g"  $HOME/deploy/kubernetes/deployment/elk-deployment.yaml
+    sed -i -- "s~<KUBERNETES_CLIENT_IMAGE>~$KUBERNETES_CLIENT_IMAGE~g"  $HOME/deploy/kubernetes/deployment/kubernetes-client-deployment.yaml
+    sed -i -- "s~<BLUEPRINT_ORCHESTRATOR_IMAGE>~$BLUEPRINT_ORCHESTRATOR_IMAGE~g"  $HOME/deploy/kubernetes/deployment/kubernetes-client-deployment.yaml
+    sed -i -- "s~<PROTO_VIEWER_IMAGE>~$PROTO_VIEWER_IMAGE~g"  $HOME/deploy/kubernetes/deployment/kubernetes-client-deployment.yaml
+    sed -i -- "s~<LOGSTASH_IMAGE>~$LOGSTASH_IMAGE~g"  $HOME/deploy/kubernetes/deployment/elk-deployment.yaml
+    sed -i -- "s~<METRICBEAT_IMAGE>~$METRICBEAT_IMAGE~g"  $HOME/deploy/kubernetes/deployment/metricbeat-deployment.yaml
+    sed -i -- "s~<MICROSERVICE_GENERATION_IMAGE>~$MICROSERVICE_GENERATION_IMAGE~g"  $HOME/deploy/kubernetes/deployment/microservice-generation-deployment.yaml
+    sed -i -- "s~<ONBOARDING_BASE_IMAGE>~$ONBOARDING_BASE_IMAGE~g"  $HOME/deploy/kubernetes/deployment/microservice-generation-deployment.yaml
+    sed -i -- "s~<ONBOARDING_BASE_IMAGE>~$ONBOARDING_BASE_IMAGE~g"  $HOME/deploy/kubernetes/deployment/onboarding-deployment.yaml
+    sed -i -- "s~<ONBOARDING_IMAGE>~$ONBOARDING_IMAGE~g"  $HOME/deploy/kubernetes/deployment/onboarding-deployment.yaml
+    sed -i -- "s~<PORTAL_BE_IMAGE>~$PORTAL_BE_IMAGE~g"  $HOME/deploy/kubernetes/deployment/portal-be-deployment.yaml
+    sed -i -- "s~<PORTAL_CMS_IMAGE>~$PORTAL_CMS_IMAGE~g"  $HOME/deploy/kubernetes/deployment/cms-deployment.yaml
+    sed -i -- "s~<PORTAL_FE_IMAGE>~$PORTAL_FE_IMAGE~g"  $HOME/deploy/kubernetes/deployment/portal-fe-deployment.yaml
 
     log "Deploy the k8s based components"
     # Create services first... see https://github.com/kubernetes/kubernetes/issues/16448
-    for f in  ~/deploy/kubernetes/service/*.yaml ; do
+    for f in  $HOME/deploy/kubernetes/service/*.yaml ; do
       log "Creating service from $f"
-      kubectl create -f $f
+      $k8s_cmd create -f $f
     done
-    for f in  ~/deploy/kubernetes/deployment/*.yaml ; do
+    for f in  $HOME/deploy/kubernetes/deployment/*.yaml ; do
       log "Creating deployment from $f"
-      kubectl create -f $f
+      $k8s_cmd create -f $f
     done
     bash docker-proxy/deploy.sh
   fi
@@ -504,7 +544,13 @@ EOF
 function setup_keystore() {
   trap 'fail' ERR
   log "Install keytool"
-  sudo apt-get install -y openjdk-8-jre-headless
+  if [[ "$dist" == "ubuntu" ]]; then
+    sudo apt-get install -y openjdk-8-jre-headless
+  else
+    sudo yum install -y java-1.8.0-openjdk-headless
+  fi
+
+  rm -fr /var/acumos/certs/*
 
   log "Create self-signing CA"
   # Customize openssl.cnf as this is needed to set CN (vs command options below)
@@ -553,7 +599,7 @@ function setup_reverse_proxy() {
         kong="Running"
       fi
     else
-      kong=$(kubectl get pods -n acumos | awk '/kong/ {print $3}')
+      kong=$($k8s_cmd get pods -n $ACUMOS_NAMESPACE | awk '/kong/ {print $3}')
     fi
     log "Kong service is not yet Running... waiting 10 seconds"
     sleep 10
@@ -620,13 +666,14 @@ function setup_federation() {
     log "CDS API is not yet responding... waiting 10 seconds"
     sleep 10
   done
-  curl -s -o ~/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer -H "accept: */*" -H "Content-Type: application/json" -d "{ \"name\":\"$ACUMOS_DOMAIN\", \"self\": true, \"local\": false, \"contact1\": \"admin@example.com\", \"subjectName\": \"$ACUMOS_DOMAIN\", \"apiUrl\": \"https://$ACUMOS_DOMAIN:$ACUMOS_FEDERATION_PORT\",  \"statusCode\": \"AC\", \"validationStatusCode\": \"PS\" }"
-  if [[ "$(jq -r '.created' ~/json)" == "null" ]]; then
-    cat ~/json
+  curl -s -o $HOME/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer -H "accept: */*" -H "Content-Type: application/json" -d "{ \"name\":\"$ACUMOS_DOMAIN\", \"self\": true, \"local\": false, \"contact1\": \"admin@example.com\", \"subjectName\": \"$ACUMOS_DOMAIN\", \"apiUrl\": \"https://$ACUMOS_DOMAIN:$ACUMOS_FEDERATION_PORT\",  \"statusCode\": \"AC\", \"validationStatusCode\": \"PS\" }"
+  if [[ "$(jq -r '.created' $HOME/json)" == "null" ]]; then
+    cat $HOME/json
     fail "Peer entry creation failed"
   fi
 }
 
+dist=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
 export WORK_DIR=$(pwd)
 log "Reset acumos-env.sh"
 sed -i -- '/DEPLOYED_UNDER/d' acumos-env.sh
@@ -636,6 +683,16 @@ else DEPLOYED_UNDER=docker
 fi
 echo "DEPLOYED_UNDER=\"$DEPLOYED_UNDER\"" >>acumos-env.sh
 echo "export DEPLOYED_UNDER" >>acumos-env.sh
+if [[ "$2" == "openshift" ]]; then
+  K8S_DIST=openshift
+  k8s_cmd=oc
+else
+  K8S_DIST=generic
+  k8s_cmd=kubectl
+fi
+echo "K8S_DIST=\"$K8S_DIST\"" >>acumos-env.sh
+echo "export K8S_DIST" >>acumos-env.sh
+
 source acumos-env.sh
 
 # Create the following only if deploying with a new DB

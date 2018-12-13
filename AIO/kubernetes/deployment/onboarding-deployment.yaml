@@ -23,7 +23,7 @@ apiVersion: apps/v1
 
 kind: Deployment
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: onboarding
   labels:
     app: onboarding
@@ -52,7 +52,7 @@ spec:
                      "port": 8090
                    },
                    "docker": {
-                     "host": "<ACUMOS_DOMAIN>",
+                     "host": "docker-service",
                      "port": "<ACUMOS_DOCKER_API_PORT>",
                      "config": "/docker_host/.docker",
                      "registry":{
