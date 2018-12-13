@@ -39,92 +39,104 @@ export RELEASE=nexus3.acumos.org:10002
 
 # Images per Athena 1.0 final release assembly
 # https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_1810301700
-export PORTAL_BE_IMAGE=$STAGING/acumos-portal-be:1.16.2
-export PORTAL_FE_IMAGE=$STAGING/acumos-portal-fe:1.16.2
-export AZURE_CLIENT_IMAGE=$STAGING/acumos-azure-client:1.2.22
-export DESIGNSTUDIO_IMAGE=$STAGING/ds-compositionengine:1.40.2
-export PORTAL_CMS_IMAGE=$STAGING/acumos-cms-docker:1.3.5
-export ONBOARDING_IMAGE=$STAGING/onboarding-app:1.39.0
-export COMMON_DATASERVICE_IMAGE=$STAGING/common-dataservice:1.18.4
-export OPENSTACK_CLIENT_IMAGE=$STAGING/openstack-client:1.1.22
-export BLUEPRINT_ORCHESTRATOR_IMAGE=$STAGING/blueprint-orchestrator:2.0.11
-export FEDERATION_IMAGE=$STAGING/federation-gateway:1.18.7
-export KUBERNETES_CLIENT_IMAGE=$STAGING/kubernetes-client:1.1.0
-#export ELASTICSEARCH_IMAGE=$STAGING/acumos-elasticsearch:1.18.1
-export ELASTICSEARCH_IMAGE=docker.elastic.co/elasticsearch/elasticsearch:5.5.1
-export LOGSTASH_IMAGE=$STAGING/acumos-logstash:1.18.2
-export KIBANA_IMAGE=$STAGING/acumos-kibana:1.18.2
-export FILEBEAT_IMAGE=$STAGING/acumos-filebeat:1.18.2
-export METRICBEAT_IMAGE=$STAGING/acumos-metricbeat:1.18.2
-export PROTO_VIEWER_IMAGE=$STAGING/acumos-proto-viewer:1.5.6
-export MICROSERVICE_GENERATION_IMAGE=$STAGING/microservice-generation:1.8.2
-export H2O_GENERICJAVA_MODELRUNNER_IMAGE=$STAGING/h2o-genericjava-modelrunner-2.2.3
-export ONBOARDING_BASE_IMAGE=$STAGING/onboarding-base-r:1.0
-export DATABROKER_SQLBROKER_IMAGE=$STAGING/sqldatabroker:1.2.0
-export DATABROKER_ZIPBROKER_IMAGE=$STAGING/databroker-zipbroker:0.0.1
-export DATABROKER_CSVBROKER_IMAGE=$STAGING/csvdatabroker:1.4.0
+export PORTAL_BE_IMAGE=$RELEASE/acumos-portal-be:1.16.2
+export PORTAL_FE_IMAGE=$RELEASE/acumos-portal-fe:1.16.2
+export AZURE_CLIENT_IMAGE=$RELEASE/acumos-azure-client:1.2.22
+export DESIGNSTUDIO_IMAGE=$RELEASE/ds-compositionengine:1.40.2
+export PORTAL_CMS_IMAGE=$RELEASE/acumos-cms-docker:1.3.5
+export ONBOARDING_IMAGE=$RELEASE/onboarding-app:1.39.0
+export COMMON_DATASERVICE_IMAGE=$RELEASE/common-dataservice:1.18.4
+export OPENSTACK_CLIENT_IMAGE=$RELEASE/openstack-client:1.1.22
+export BLUEPRINT_ORCHESTRATOR_IMAGE=$RELEASE/blueprint-orchestrator:2.0.11
+export FEDERATION_IMAGE=$RELEASE/federation-gateway:1.18.7
+export KUBERNETES_CLIENT_IMAGE=$RELEASE/kubernetes-client:1.1.0
+export PROTO_VIEWER_IMAGE=$RELEASE/acumos-proto-viewer:1.5.6
+export MICROSERVICE_GENERATION_IMAGE=$RELEASE/microservice-generation:1.8.2
+export H2O_GENERICJAVA_MODELRUNNER_IMAGE=$RELEASE/h2o-genericjava-modelrunner-2.2.3
+export ONBOARDING_BASE_IMAGE=$RELEASE/onboarding-base-r:1.0.0
+export DATABROKER_SQLBROKER_IMAGE=$RELEASE/sqldatabroker:1.2.0
+export DATABROKER_ZIPBROKER_IMAGE=$RELEASE/databroker-zipbroker:0.0.1
+export DATABROKER_CSVBROKER_IMAGE=$RELEASE/csvdatabroker:1.4.0
 
 export ACUMOS_DOMAIN=$(hostname)
 # Hard-code ACUMOS_HOST below to the primary IP address (as primary route) of
 # your AIO host server, if the generated value does not work for your server
 # (there have been reports that this command does not always work)
-host=$(ip route get 8.8.8.8 | awk '{print $NF; exit}')
-export ACUMOS_HOST=$host
+hostip=$(/sbin/ip route get 8.8.8.8 | head -1 | sed 's/^.*src //' | awk '{print $1}')
+export ACUMOS_HOST=$hostip
+export ACUMOS_HOST_OS=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+export ACUMOS_HOST_OS_VER=$(grep -m 1 'VERSION_ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+export AIO_ROOT=
+export DEPLOYED_UNDER=
+export K8S_DIST=
 
 # External component options
+export ACUMOS_DEPLOY_MARIADB=true
+export ACUMOS_DEPLOY_DOCKER=true
+export ACUMOS_DEPLOY_NEXUS=true
+export ACUMOS_DEPLOY_KONG=true
+export ACUMOS_DEPLOY_ELK=true
+export ACUMOS_MARIADB_HOST=$ACUMOS_DOMAIN
+export ACUMOS_MARIADB_PORT=30306
+export ACUMOS_MARIADB_ADMINER_PORT=30380
+export ACUMOS_MARIADB_USER=acumos_opr
+export ACUMOS_MARIADB_PASSWORD=
+export ACUMOS_MARIADB_USER_PASSWORD=
 export ACUMOS_DOCKER_API_HOST=$ACUMOS_DOMAIN
 export ACUMOS_DOCKER_API_PORT=2375
 export ACUMOS_NEXUS_ADMIN_PASSWORD=admin123
 export ACUMOS_NEXUS_ADMIN_USERNAME=admin
 export ACUMOS_NEXUS_API_PORT=30881
 export ACUMOS_NEXUS_HOST=$ACUMOS_DOMAIN
-export ACUMOS_RO_USER=acumos_ro
-export ACUMOS_RW_USER=acumos_rw
+export ACUMOS_NEXUS_RO_USER=acumos_ro
+export ACUMOS_NEXUS_RO_USER_PASSWORD=
+export ACUMOS_NEXUS_RW_USER=acumos_rw
+export ACUMOS_NEXUS_RW_USER_PASSWORD=
+export ACUMOS_DOCKER_REGISTRY_USER=$ACUMOS_NEXUS_RW_USER
+export ACUMOS_DOCKER_REGISTRY_PASSWORD=
+export ACUMOS_NEXUS_MAVEN_REPO_PATH=repository
+export ACUMOS_NEXUS_MAVEN_REPO=acumos_model_maven
+export ACUMOS_NEXUS_DOCKER_REPO=docker_model_maven
+export ACUMOS_DOCKER_REGISTRY_HOST=$ACUMOS_NEXUS_HOST
 export ACUMOS_DOCKER_MODEL_PORT=30882
+export ACUMOS_DOCKER_IMAGETAG_PREFIX=nexus:$ACUMOS_DOCKER_MODEL_PORT
 export ACUMOS_KONG_ADMIN_HOST=$ACUMOS_DOMAIN
 export ACUMOS_KONG_ADMIN_PORT=30081
 export ACUMOS_KONG_ADMIN_SSL_PORT=30444
-export ACUMOS_KONG_DB_PORT=5432
+export ACUMOS_KONG_DB_PORT=30532
 export ACUMOS_KONG_PROXY_PORT=30080
 export ACUMOS_KONG_PROXY_SSL_PORT=30443
+export ACUMOS_ELK_HOST=$ACUMOS_DOMAIN
+export ACUMOS_ELK_KIBANA_PORT=30561
 export HTTP_PROXY=""
 export HTTPS_PROXY=""
 
 # Component options
+export ACUMOS_ADMIN_EMAIL='acumos@example.com'
 export ACUMOS_AZURE_CLIENT_PORT=9081
 export ACUMOS_CDS_PREVIOUS_VERSION=
 export ACUMOS_CDS_VERSION=1.18
-export ACUMOS_CDS_DB="acumos_cds"
+export ACUMOS_CDS_DB='acumos_cds'
 export ACUMOS_CDS_HOST=$ACUMOS_DOMAIN
 export ACUMOS_CDS_PORT=30800
 export ACUMOS_CDS_USER=ccds_client
+export ACUMOS_CDS_PASSWORD=
 export ACUMOS_CMS_HOST=$ACUMOS_DOMAIN
 export ACUMOS_CMS_PORT=30980
+export ACUMOS_CMS_DB='acumos_cms'
 export ACUMOS_DOCKER_PROXY_HOST=$ACUMOS_DOMAIN
 export ACUMOS_DOCKER_PROXY_PORT=30883
 export ACUMOS_DOCKER_PROXY_USERNAME=
 export ACUMOS_DOCKER_PROXY_PASSWORD=
 export ACUMOS_DSCE_PORT=8088
 export ACUMOS_FEDERATION_HOST=$ACUMOS_DOMAIN
-export ACUMOS_FEDERATION_LOCAL_PORT=9011
+export ACUMOS_FEDERATION_LOCAL_PORT=30985
 export ACUMOS_FEDERATION_PORT=30984
-export ACUMOS_FILEBEAT_PORT=8099
-export ACUMOS_ELK_ELASTICSEARCH_HOST=elasticsearch-service
-export ACUMOS_ELK_ELASTICSEARCH_PORT=9200
-export ACUMOS_ELK_NODEPORT=30930
-export ACUMOS_ELK_LOGSTASH_HOST=logstash-service
-export ACUMOS_ELK_LOGSTASH_PORT=5000
-export ACUMOS_ELK_KIBANA_HOST=$ACUMOS_DOMAIN
-export ACUMOS_ELK_KIBANA_PORT=5601
-export ACUMOS_ELK_KIBANA_NODEPORT=30561
-export ACUMOS_ELK_ES_JAVA_HEAP_MIN_SIZE=1g
-export ACUMOS_ELK_ES_JAVA_HEAP_MAX_SIZE=2g
-export ACUMOS_ELK_LS_JAVA_HEAP_MIN_SIZE=1g
-export ACUMOS_ELK_LS_JAVA_HEAP_MAX_SIZE=2g
+export ACUMOS_KEYSTORE_PATH='/app/certs/acumos_aio.p12'
+export ACUMOS_KEY_PASSWORD=
+export ACUMOS_KEYSTORE_PASSWORD=
+export ACUMOS_TRUSTSTORE_PASSWORD=
 export ACUMOS_KUBERNETES_CLIENT_PORT=8082
-export ACUMOS_MARIADB_HOST=$ACUMOS_HOST
-export ACUMOS_MARIADB_PORT=3306
-export ACUMOS_METRICBEAT_PORT=8098
 export ACUMOS_MICROSERVICE_GENERATION_PORT=8336
 export ACUMOS_ONBOARDING_PORT=8090
 export ACUMOS_OPERATOR_ID=acumos-aio
@@ -137,6 +149,10 @@ export ACUMOS_VALIDATION_MIDDLEWARE_PORT=9604
 export PYTHON_EXTRAINDEX=
 export PYTHON_EXTRAINDEX_HOST=
 
+# Options applied when kong is not deployed (ACUMOS_DEPLOY_KONG != true)
+export ACUMOS_ONBOARDING_NODEPORT=30890
+export ACUMOS_PORTAL_FE_NODEPORT=30885
+
 # Acumos model deployment options
 export ACUMOS_DATA_BROKER_INTERNAL_PORT=8080
 export ACUMOS_DATA_BROKER_PORT=8556
@@ -144,3 +160,25 @@ export ACUMOS_DEPLOYED_SOLUTION_PORT=3330
 export ACUMOS_DEPLOYED_VM_PASSWORD='12NewPA$$w0rd!'
 export ACUMOS_DEPLOYED_VM_USER=dockerUser
 export ACUMOS_PROBE_PORT=5006
+
+# Kubernetes options
+export ACUMOS_NAMESPACE=acumos
+
+# Persistent Volume options
+export ACUMOS_SETUP_PVS=true
+export ACUMOS_CERTS_PV_NAME="pv-$ACUMOS_NAMESPACE-certs"
+export ACUMOS_CERTS_PV_SIZE=10Mi
+export ACUMOS_LOGS_PV_NAME="pv-$ACUMOS_NAMESPACE-logs"
+export ACUMOS_LOGS_PV_SIZE=1Gi
+export ACUMOS_OUTPUT_PV_NAME="pv-$ACUMOS_NAMESPACE-output"
+export ACUMOS_OUTPUT_PV_SIZE=5Gi
+export ACUMOS_WEBONBOARDING_PV_NAME="pv-$ACUMOS_NAMESPACE-webonboarding"
+export ACUMOS_WEBONBOARDING_PV_SIZE=5Gi
+export DOCKER_VOLUME_PV_NAME="pv-$ACUMOS_NAMESPACE-docker-volume"
+export DOCKER_VOLUME_PV_SIZE=5Gi
+export KONG_DB_PV_NAME="pv-$ACUMOS_NAMESPACE-kong-db"
+export KONG_DB_PV_SIZE=10Mi
+export MARIADB_DATA_PV_NAME="pv-$ACUMOS_NAMESPACE-mariadb-data"
+export MARIADB_DATA_PV_SIZE=5Gi
+export NEXUS_DATA_PV_NAME="pv-$ACUMOS_NAMESPACE-nexus-data"
+export NEXUS_DATA_PV_SIZE=10Gi

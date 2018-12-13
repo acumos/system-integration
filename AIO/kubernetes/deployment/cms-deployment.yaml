@@ -19,11 +19,10 @@ apiVersion: apps/v1
 
 # What this is: kubernetes template for Acumos cms (Hippo CMS) deployment
 # How to use:
-# - Replace fields in <> with actual values (k8s does not support env variables)
 
 kind: Deployment
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: cms
   labels:
     app: cms
@@ -52,16 +51,16 @@ spec:
                     },
                     "spring": {
                       "datasource": {
-                      "url": "jdbc:mysql://<ACUMOS_MARIADB_HOST>:<ACUMOS_MARIADB_PORT>/acumos_cms?useSSL=false",
-                      "username": "acumos_opr",
+                      "url": "jdbc:mysql://<ACUMOS_MARIADB_HOST>:<ACUMOS_MARIADB_PORT>/<ACUMOS_CMS_DB>?useSSL=false",
+                      "username": "<ACUMOS_MARIADB_USER>",
                       "password": "<ACUMOS_MARIADB_USER_PASSWORD>"
                     }
                   },
                   "parameters": {
                     "repository": {
                       "dataSource": {
-                        "url": "jdbc:mysql://<ACUMOS_MARIADB_HOST>:<ACUMOS_MARIADB_PORT>/acumos_cms?useSSL=false",
-                        "username": "acumos_opr",
+                        "url": "jdbc:mysql://<ACUMOS_MARIADB_HOST>:<ACUMOS_MARIADB_PORT>/<ACUMOS_CMS_DB>?useSSL=false",
+                        "username": "<ACUMOS_MARIADB_USER>",
                         "password": "<ACUMOS_MARIADB_USER_PASSWORD>"
                         }
                       }
@@ -71,12 +70,12 @@ spec:
         - containerPort: 9080
         volumeMounts:
         - mountPath: /maven/logs
-          name: acumos-logs
+          name: pv-<ACUMOS_NAMESPACE>-logs
       restartPolicy: Always
       volumes:
-      - name: acumos-logs
-        hostPath:
-          path: /var/acumos/logs
+      - name: pv-<ACUMOS_NAMESPACE>-logs
+        persistentVolumeClaim:
+         claimName: pvc-<ACUMOS_NAMESPACE>-logs
       hostAliases:
       - ip: "<ACUMOS_HOST>"
         hostnames:
