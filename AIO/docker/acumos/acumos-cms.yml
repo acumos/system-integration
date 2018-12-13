@@ -1,4 +1,4 @@
-version: '2'
+version: '3.2'
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -50,10 +50,11 @@ services:
        ports:
            - ${ACUMOS_CMS_PORT}:${ACUMOS_CMS_PORT}
        volumes:
-           - acumos-logs:/maven/logs
+           - type: bind
+             source: /var/${ACUMOS_NAMESPACE}/logs
+             target: /maven/logs
        logging:
            driver: json-file
        extra_hosts:
            - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"
        restart: on-failure
-

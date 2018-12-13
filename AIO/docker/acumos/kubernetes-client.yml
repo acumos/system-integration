@@ -1,4 +1,4 @@
-version: '2'
+version: '3.2'
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -76,7 +76,9 @@ services:
        ports:
            - ${ACUMOS_KUBERNETES_CLIENT_PORT}:${ACUMOS_KUBERNETES_CLIENT_PORT}
        volumes:
-           - acumos-logs:/maven/logs
+           - type: bind
+             source: /var/${ACUMOS_NAMESPACE}/logs
+             target: /maven/logs
        logging:
            driver: json-file
        extra_hosts:

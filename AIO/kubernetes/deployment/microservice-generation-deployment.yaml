@@ -23,7 +23,7 @@ apiVersion: apps/v1
 
 kind: Deployment
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: msg
   labels:
     app: msg
@@ -44,6 +44,9 @@ spec:
       containers:
       - name: msg
         image: <MICROSERVICE_GENERATION_IMAGE>
+        # TODO: assess why privilege is needed in Centos to avoid errors ala '(No such file or directory)'
+        securityContext:
+          privileged: true
         env:
         - name: SPRING_APPLICATION_JSON
           value: '{
@@ -51,7 +54,7 @@ spec:
                      "port": 8336
                    },
                    "docker": {
-                     "host": "<ACUMOS_DOMAIN>",
+                     "host": "docker-service",
                      "port": "<ACUMOS_DOCKER_API_PORT>",
                      "config": "/docker_host/.docker",
                      "registry":{
@@ -113,17 +116,17 @@ spec:
         - containerPort: 8336
         volumeMounts:
         - mountPath: /maven/logs
-          name: acumos-logs
+          name: pv-<ACUMOS_NAMESPACE>-logs
         - mountPath: /temp
-          name: acumos-output
+          name: pv-<ACUMOS_NAMESPACE>-output
       restartPolicy: Always
       volumes:
-      - name: acumos-logs
-        hostPath:
-          path: /var/acumos/logs
-      - name: acumos-output
-        hostPath:
-          path: /var/acumos/output
+      - name: pv-<ACUMOS_NAMESPACE>-logs
+        persistentVolumeClaim:
+         claimName: pvc-<ACUMOS_NAMESPACE>-logs
+      - name: pv-<ACUMOS_NAMESPACE>-output
+        persistentVolumeClaim:
+         claimName: pvc-<ACUMOS_NAMESPACE>-output
       hostAliases:
       - ip: "<ACUMOS_HOST>"
         hostnames:

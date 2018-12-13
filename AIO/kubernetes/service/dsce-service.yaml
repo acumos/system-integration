@@ -23,7 +23,7 @@ apiVersion: v1
 
 kind: Service
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: dsce-service
   labels:
     app: dsce
@@ -32,5 +32,6 @@ spec:
     app: dsce
   type: ClusterIP
   ports:
-  - port: <ACUMOS_DSCE_PORT>
+  - name: dsce-port
+    port: <ACUMOS_DSCE_PORT>
     targetPort: 8088

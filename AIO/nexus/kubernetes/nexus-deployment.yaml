@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# What this is: kubernetes template for Acumos nexus deployment
+# How to use:
+# - Replace fields in <> with actual values (k8s does not support env variables)
+#
+# Notes:
+# ACUMOS_DOCKER_MODEL_PORT is parameterized since it's assumed that nexus
+# service may be deployed outside the acumos docker/k8s cluster, thus a
+# nodeport-range (30000-32767) port may be allocated. For the docker model port,
+# this external port must map to an internal port of the same value, since that
+# is how the docker client will connect to the docker repository
+
+
+kind: Deployment
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: nexus
+  labels:
+    app: nexus-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nexus-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: nexus-service
+    spec:
+      containers:
+      - name: nexus
+        image: sonatype/nexus3:3.9.0
+        env:
+        - name: log_level
+          value: "DEBUG"
+        ports:
+        - containerPort: 8081
+        - containerPort: <ACUMOS_DOCKER_MODEL_PORT>
+        volumeMounts:
+        - mountPath: /maven/logs
+          name: pv-<ACUMOS_NAMESPACE>-logs
+        - mountPath: /nexus-data
+          name: pv-<ACUMOS_NAMESPACE>-nexus-data
+      restartPolicy: Always
+      volumes:
+      - name: pv-<ACUMOS_NAMESPACE>-logs
+        persistentVolumeClaim:
+         claimName: pvc-<ACUMOS_NAMESPACE>-logs
+      - name: pv-<ACUMOS_NAMESPACE>-nexus-data
+        hostPath:
+          path: /var/<ACUMOS_NAMESPACE>/nexus-data
+# TODO: debug access issues with PVC
+#        persistentVolumeClaim:
+#         claimName: pvc-<ACUMOS_NAMESPACE>-nexus-data
+      hostAliases:
+      - ip: "<ACUMOS_HOST>"
+        hostnames:
+        - "<ACUMOS_DOMAIN>"
