@@ -23,7 +23,7 @@ apiVersion: apps/v1
 
 kind: Deployment
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: federation
   labels:
     app: federation
@@ -43,6 +43,8 @@ spec:
       - name: acumos-registry
       containers:
       - name: federation
+        securityContext:
+          privileged: true
         image: <FEDERATION_IMAGE>
         env:
         - name: SPRING_APPLICATION_JSON
@@ -65,8 +67,8 @@ spec:
                       }
                     },
                     "docker": {
-                      "host": "tcp://<ACUMOS_DOCKER_API_HOST>:<ACUMOS_DOCKER_API_PORT>",
-                      "registryURL": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_DOCKER_MODEL_PORT}/",
+                      "host": "tcp://docker-service:<ACUMOS_DOCKER_API_PORT>",
+                      "registryURL": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_DOCKER_MODEL_PORT>/",
                       "registryUsername": "<ACUMOS_RW_USER>",
                       "registryPassword": "<ACUMOS_RW_USER_PASSWORD>",
                       "registryEmail": "acumos@example.com"
@@ -110,17 +112,17 @@ spec:
         - containerPort: 9011
         volumeMounts:
         - mountPath: /maven/logs
-          name: acumos-logs
+          name: pv-<ACUMOS_NAMESPACE>-logs
         - mountPath: /app/certs
-          name: acumos-certs
+          name: pv-<ACUMOS_NAMESPACE>-certs
       restartPolicy: Always
       volumes:
-      - name: acumos-logs
-        hostPath:
-          path: /var/acumos/logs
-      - name: acumos-certs
-        hostPath:
-          path: /var/acumos/certs
+      - name: pv-<ACUMOS_NAMESPACE>-logs
+        persistentVolumeClaim:
+         claimName: pvc-<ACUMOS_NAMESPACE>-logs
+      - name: pv-<ACUMOS_NAMESPACE>-certs
+        persistentVolumeClaim:
+         claimName: pvc-<ACUMOS_NAMESPACE>-certs
       hostAliases:
       - ip: "<ACUMOS_HOST>"
         hostnames:
