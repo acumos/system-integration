@@ -17,20 +17,20 @@ apiVersion: v1
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 
-# What this is: kubernetes template for Acumos portal-fe service
+# What this is: kubernetes template for Acumos docker-engine service
 # How to use:
 # - Replace fields in <> with actual values (k8s does not support env variables)
 
 kind: Service
 metadata:
-  namespace: <ACUMOS_NAMESPACE>
-  name: portal-fe-service
+  namespace: acumos
+  name: docker-service
   labels:
-    app: portal-fe
+    app: docker
 spec:
   selector:
-    app: portal-fe
+    app: docker
   type: ClusterIP
   ports:
-  - port: <ACUMOS_PORTAL_FE_PORT>
-    targetPort: 8085
+  - name: docker-api-port
+    port: <ACUMOS_DOCKER_API_PORT>

@@ -30,7 +30,7 @@ apiVersion: v1
 
 kind: Service
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: nexus-service
   labels:
     app: nexus

@@ -21,7 +21,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: elasticsearch
   labels:
     app: elasticsearch
@@ -72,7 +72,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: logstash
   labels:
     app: logstash
@@ -129,7 +129,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: kibana
   labels:
     app: kibana

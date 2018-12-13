@@ -52,27 +52,12 @@ function wait_dpkg() {
 }
 
 setup_prereqs() {
-  wait_dpkg
-  if [[ $(dpkg -l | grep -c docker-ce) -eq 0 ]]; then
-    log "Install latest docker-ce"
-    # Per https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
-    sudo apt-get remove -y docker docker-engine docker.io docker-ce
-    sudo apt-get update
-    sudo apt-get install -y \
-      apt-transport-https \
-      ca-certificates \
-      curl \
-      software-properties-common
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    sudo add-apt-repository "deb [arch=amd64] \
-      https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    sudo apt-get update
-    sudo apt-get install -y docker-ce
-  fi
-
-  if [[ $(dpkg -l | grep -c docker-compose) -eq 0 ]]; then
-    log "Install latest docker-compose"
+  log "Install latest docker-compose"
+  if [[ "$dist" == "ubuntu" ]]; then
+    wait_dpkg
     sudo apt-get install -y docker-compose
+  else
+    sudo yum install -y docker-compose
   fi
 }
 
@@ -93,6 +78,7 @@ setup_proxy() {
 }
 
 export WORK_DIR=$(pwd)
+dist=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
 source acumos-env.sh
 setup_prereqs
 setup_proxy

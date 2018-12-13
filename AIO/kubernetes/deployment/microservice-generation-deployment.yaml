@@ -23,7 +23,7 @@ apiVersion: apps/v1
 
 kind: Deployment
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: msg
   labels:
     app: msg
@@ -51,7 +51,7 @@ spec:
                      "port": 8336
                    },
                    "docker": {
-                     "host": "<ACUMOS_DOMAIN>",
+                     "host": "docker-service",
                      "port": "<ACUMOS_DOCKER_API_PORT>",
                      "config": "/docker_host/.docker",
                      "registry":{

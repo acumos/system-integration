@@ -23,7 +23,7 @@ apiVersion: apps/v1
 
 kind: Deployment
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: dsce
   labels:
     app: dsce
@@ -76,7 +76,7 @@ spec:
                       "cmndatasvcpwd": "<ACUMOS_CDS_PASSWORD>"
                     },
                     "docker": {
-                      "host": "<ACUMOS_DOMAIN>",
+                      "host": "docker-service",
                       "port": "<ACUMOS_DOCKER_API_PORT>",
                       "config": "/docker_host/.docker",
                       "registry": {
