@@ -23,7 +23,7 @@ apiVersion: apps/v1
 
 kind: Deployment
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: cms
   labels:
     app: cms
@@ -71,12 +71,12 @@ spec:
         - containerPort: 9080
         volumeMounts:
         - mountPath: /maven/logs
-          name: acumos-logs
+          name: pv-<ACUMOS_NAMESPACE>-logs
       restartPolicy: Always
       volumes:
-      - name: acumos-logs
-        hostPath:
-          path: /var/acumos/logs
+      - name: pv-<ACUMOS_NAMESPACE>-logs
+        persistentVolumeClaim:
+         claimName: pvc-<ACUMOS_NAMESPACE>-logs
       hostAliases:
       - ip: "<ACUMOS_HOST>"
         hostnames:

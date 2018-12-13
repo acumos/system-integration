@@ -23,7 +23,7 @@ apiVersion: v1
 
 kind: Service
 metadata:
-  namespace: acumos
+  namespace: <ACUMOS_NAMESPACE>
   name: cms-service
   labels:
     app: cms
@@ -32,6 +32,7 @@ spec:
     app: cms
   type: NodePort
   ports:
-  - nodePort: <ACUMOS_CMS_PORT>
+  - name: cms-port
+    nodePort: <ACUMOS_CMS_PORT>
     port: 9080
     targetPort: 9080
