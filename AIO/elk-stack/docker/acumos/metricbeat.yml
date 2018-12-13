@@ -1,0 +1,46 @@
+version: '3.2'
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+#
+# docker-compose for Acumos logging component metricbeat
+#
+services:
+  metricbeat-service:
+    image: acumos-metricbeat
+    network_mode: host
+    volumes:
+    #Mount the host filesystem to enable Metricbeat to monitor the host rather than the Metricbeat container.
+      - /proc:/hostfs/proc:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /:/hostfs:ro
+      - /var/run:/var/run:rw
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: metricbeat -e -strict.perms=false -system.hostfs=/hostfs
+    environment:
+      - ELASTICSEARCH_HOST=${ACUMOS_ELK_DOMAIN}
+      - ELASTICSEARCH_PORT=${ACUMOS_ELK_ELASTICSEARCH_INDEX_PORT}
+      - KIBANA_HOST=${ACUMOS_ELK_DOMAIN}
+      - KIBANA_PORT=${ACUMOS_ELK_KIBANA_PORT}
+      - PROCS=.*
+      - PERIOD=10s
+      - SHIPPER_NAME=acumos-aio
+    # extra_hosts is required since using network_mode: host, which blocks
+    # docker network-internal service name resolution
+    extra_hosts:
+      - "${ACUMOS_ELK_DOMAIN}:${ACUMOS_ELK_HOST}"
+    restart: on-failure

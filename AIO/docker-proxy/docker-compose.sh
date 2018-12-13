@@ -22,20 +22,29 @@
 # then invokes docker-compose with the command-line arguments.
 #
 # Usage:
-# - bash docker-compose.sh [options]
+# - bash docker-compose.sh <AIO_ROOT> [options]
+#   AIO_ROOT: root folder of the AIO installation
 #   options: optional parameters to docker-compose. some examples:
-#   $ sudo bash docker-compose.sh build
+#   $ sudo bash docker-compose.sh $AIO_ROOT build
 #     Build all services defined in the docker-compose.yaml file.
-#   $ sudo bash docker-compose.sh up
+#   $ sudo bash docker-compose.sh $AIO_ROOT up
 #     Start all service containers.
-#   $ sudo bash docker-compose.sh logs -f
+#   $ sudo bash docker-compose.sh $AIO_ROOT logs -f
 #     Tail the logs of all service containers.
-#   $ sudo bash docker-compose.sh down
+#   $ sudo bash docker-compose.sh $AIO_ROOT down
 #     Stop all service containers.
-#   $ sudo bash docker-compose.sh rm -v
+#   $ sudo bash docker-compose.sh $AIO_ROOT rm -v
 #     Remove all service containers.
 #
 
-source acumos-env.sh
-cd /var/acumos/docker-proxy
-docker-compose -f docker-compose.yml $*
+source $1/acumos-env.sh
+set -x
+cmd="$2 $3 $4 $5"
+opts=""
+files=$(ls docker/acumos)
+for file in $files ; do
+ opts="$opts -f acumos/$file"
+done
+
+cd docker
+docker-compose $opts $cmd
