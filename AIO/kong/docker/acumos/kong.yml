@@ -1,0 +1,68 @@
+version: '3.2'
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# docker-compose for all-in-one environment
+# TODO: scrub all attributes for current need
+services:
+   kong-database:
+       restart: on-failure
+       image: postgres:9.5
+       ports:
+         - "${ACUMOS_KONG_DB_PORT}:${ACUMOS_KONG_DB_PORT}"
+       environment:
+         - POSTGRES_USER=kong
+         - POSTGRES_DB=kong
+       volumes:
+         - type: bind
+           source: /var/${ACUMOS_NAMESPACE}/kong-db
+           target: /var/lib/postgresql
+   kong-service:
+       restart: on-failure
+       image: kong:0.11
+       depends_on:
+         - kong-database
+       environment:
+         - KONG_LOG_LEVEL=debug
+         - KONG_DATABASE=postgres
+         - KONG_PG_HOST=kong-database
+         - KONG_PG_DATABASE=kong
+         - KONG_PROXY_ACCESS_LOG=/dev/stdout
+         - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+         - KONG_PROXY_ERROR_LOG=/dev/stderr
+         - KONG_ADMIN_ERROR_LOG=/dev/stderr
+         - KONG_ADMIN_LISTEN=0.0.0.0:8001
+         - KONG_ADMIN_LISTEN_SSL=0.0.0.0:8444
+       ports:
+         - "${ACUMOS_KONG_PROXY_PORT}:8000"
+         - "${ACUMOS_KONG_PROXY_SSL_PORT}:8443"
+         - "${ACUMOS_KONG_ADMIN_PORT}:8001"
+         - "${ACUMOS_KONG_ADMIN_SSL_PORT}:8444"
+       command: >
+         /bin/bash -c "
+             until [[ $$(curl -v http://kong-database:5432 2>&1 | grep -c \"Connected to \") -gt 0 ]]; do
+               echo \"kong-database is unavailable - sleeping 10 seconds\";
+               sleep 10;
+             done;
+             sed -i -- 's/\ \ \ \ proxy_max_temp_file_size 0;//' /usr/local/share/lua/5.1/kong/templates/nginx_kong.lua
+             sed -i -- '/server {/a\ \ \ \ proxy_max_temp_file_size 0;' /usr/local/share/lua/5.1/kong/templates/nginx_kong.lua
+             kong migrations up;
+             kong start -vv;
+             kong health -vv;
+             echo Connected!;
+         "

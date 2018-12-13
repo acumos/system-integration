@@ -23,75 +23,78 @@
 # - If the docker-compose console is still running, showing the logs of the
 #   containers, ctrl-c to stop it and wait will all services are stopped.
 # Usage:
-# $ bash clean.sh
+# $ bash clean.sh [prune]
+#   prune: remove unused docker images
 #
 # If clean does not stop all docker based containers, force cleanup via:
 # $ cs=$(sudo docker ps -a | awk '{print $1}'); for c in $cs; do sudo docker stop $c; sudo docker rm -v $c; done
 # To periodically clean up extra docker volumes:
 # $ vs=$(sudo ls -1 /var/lib/docker/volumes); for v in $vs; do sudo docker volume rm $v; done
 
-trap - ERR
-
 set -x
-
+trap 'exit 1' ERR
 source acumos-env.sh
+source utils.sh
+trap '' ERR
 
-echo "Stop docker-proxy"
-sudo bash docker-proxy/docker-compose.sh -f docker-compose.yml down -v
-sudo rm -rf /var/acumos/docker-proxy
+AIO_ROOT=$(pwd)
 
-if [[ "$DEPLOYED_UNDER" == "docker" || "$DEPLOYED_UNDER" == "" ]]; then
-  echo "Stop Acumos docker-based components"
-  sudo bash docker-compose.sh down
-  sudo docker volume rm kong-db
-  sudo docker volume rm acumos-logs
-  sudo docker volume rm acumos-output
-  sudo docker volume rm acumosWebOnboarding
-  sudo docker volume rm nexus-data
+if [[ $(sudo docker ps -a | grep $ACUMOS_NAMESPACE) ]]; then
+  if [[ "$DEPLOYED_UNDER" == "docker" || "$DEPLOYED_UNDER" == "" ]]; then
+    cs=$(sudo docker ps -a | awk "/$ACUMOS_NAMESPACE/{print \$1}")
+    for c in $cs; do
+      sudo docker stop $c
+      sudo docker rm -v $c
+    done
+  fi
 fi
 
-if [[ "$DEPLOYED_UNDER" == "k8s" || "$DEPLOYED_UNDER" == "" ]]; then
-  echo "Stop the running Acumos component services under kubernetes"
-  kubectl delete service -n acumos azure-client-service cds-service cms-service\
-    filebeat-service onboarding-service portal-be-service portal-fe-service \
-    dsce-service federation-service kubernetes-client-service \
-    kong-service nexus-service
-
-  echo "Stop the running Acumos component deployments under kubernetes"
-  kubectl delete deployment -n acumos azure-client cds cms filebeat onboarding\
-    portal-be portal-fe dsce federation kubernetes-client kong nexus
-
-  echo "Delete image pull secrets from kubernetes"
-  kubectl delete secret -n acumos acumos-registry
-
-  echo "Delete namespace acumos"
-  kubectl delete namespace acumos
-  while kubectl get namespace acumos; do
-    echo "Waiting 10 seconds for namespace acumos to be deleted"
-    sleep 10
-  done
+if [[ $(kubectl get namespaces) ]]; then
+  if [[ "$DEPLOYED_UNDER" == "k8s" || "$DEPLOYED_UNDER" == "" ]]; then
+    if [[ "$K8S_DIST" == "openshift" ]]; then
+      echo "Delete project $ACUMOS_NAMESPACE"
+      oc delete project $ACUMOS_NAMESPACE
+      while oc project $ACUMOS_NAMESPACE; do
+        echo "Waiting 10 seconds for project acumos to be deleted"
+        sleep 10
+      done
+    else
+      echo "Delete namespace $ACUMOS_NAMESPACE"
+      kubectl delete namespace $ACUMOS_NAMESPACE
+      while kubectl get namespace $ACUMOS_NAMESPACE; do
+        echo "Waiting 10 seconds for namespace $ACUMOS_NAMESPACE to be deleted"
+        sleep 10
+      done
+    fi
+  fi
 fi
 
-echo "Cleanup acumos data"
-sudo rm -rf /var/acumos
+echo "Cleanup any orphan docker containers"
+cs=$(sudo docker ps --format '{{.Names}}' | grep acumos)
+for c in $cs; do
+  sudo docker stop $c
+  sudo docker rm -v $c
+done
 
-echo "Reset /etc/hosts customizations"
-sudo sed -i -- '/nexus-service/d' /etc/hosts
-
-echo "Remove Acumos databases and users"
-mysql --user=root --password=$MARIADB_PASSWORD -e "DROP DATABASE $ACUMOS_CDS_DB; DROP DATABASE acumos_cms; DROP USER 'acumos_opr'@'%';"
- if [[ $? -eq 1 ]]; then
-  echo "Remove all mysql data"
-  sudo rm -rf /var/lib/mysql
+if [[ "$1" == "prune" ]]; then
+  echo "Cleanup unused docker images"
+  sudo docker image prune -a -f
 fi
 
-echo "Remove mariadb-server"
-sudo apt-get remove mariadb-server-10.2 -y
-# To prevent issues later with apt-get update
-sudo rm /etc/apt/sources.list.d/mariadb.list
-sudo apt-get clean
+echo "Delete persistent volumes"
+# k8s PVCs are deleted by namespace deletion above
+pvs="nexus-data kong-db logs output webonboarding certs docker-volume \
+  elasticsearch-data mariadb-data"
+for pv in $pvs; do
+  if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
+    kubectl delete pv pv-$ACUMOS_NAMESPACE-$pv
+    rm pv-$ACUMOS_NAMESPACE-$pv.yaml
+    rm pvc-$ACUMOS_NAMESPACE-$pv.yaml
+  fi
+done
+sudo rm -rf /var/$ACUMOS_NAMESPACE
 
-echo "Remove misc files"
-rm nexus-script.json
+echo "Delete acumos-docker-proxy image"
+sudo docker rmi acumos-docker-proxy
 
 echo "You should now be able to repeat the install via oneclick_deploy.sh"

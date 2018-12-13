@@ -1,4 +1,4 @@
-version: '2'
+version: '3.2'
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -55,19 +55,19 @@ services:
                     \"internalDataBrokerPort\": \"${ACUMOS_DATA_BROKER_INTERNAL_PORT}\",
                     \"registry\": {
                         \"bluePrint\": {
-                            \"username\": \"$ACUMOS_RW_USER\",
-                            \"password\": \"${ACUMOS_RW_USER_PASSWORD}\"
+                            \"username\": \"$ACUMOS_NEXUS_RW_USER\",
+                            \"password\": \"${ACUMOS_NEXUS_RW_USER_PASSWORD}\"
                         },
                         \"probe\": {
-                            \"username\": \"$ACUMOS_RW_USER\",
-                            \"password\": \"${ACUMOS_RW_USER_PASSWORD}\"
+                            \"username\": \"$ACUMOS_NEXUS_RW_USER\",
+                            \"password\": \"${ACUMOS_NEXUS_RW_USER_PASSWORD}\"
                         },
                         \"networkgroupName\": \"acumos-nsg\",
                         \"port\": \"80\",
                         \"name\": \"${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}\",
                         \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/\",
-                        \"username\": \"${ACUMOS_RW_USER}\",
-                        \"password\": \"${ACUMOS_RW_USER_PASSWORD}\"
+                        \"username\": \"${ACUMOS_NEXUS_RW_USER}\",
+                        \"password\": \"${ACUMOS_NEXUS_RW_USER_PASSWORD}\"
                     }
                 },
                 \"blueprint\": {
@@ -77,8 +77,8 @@ services:
                 \"nexus\": {
                     \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
                     \"nexusproxy\": \"NA\",
-                    \"password\": \"${ACUMOS_RW_USER_PASSWORD}\",
-                    \"username\": \"${ACUMOS_RW_USER}\",
+                    \"password\": \"${ACUMOS_NEXUS_RW_USER_PASSWORD}\",
+                    \"username\": \"${ACUMOS_NEXUS_RW_USER}\",
                     \"groupId\": \"com.artifact\"
                 },
                 \"cmndatasvc\": {
@@ -96,7 +96,9 @@ services:
        expose:
            - ${ACUMOS_AZURE_CLIENT_PORT}
        volumes:
-           - acumos-logs:/maven/logs
+           - type: bind
+             source: /var/${ACUMOS_NAMESPACE}/logs
+             target: /maven/logs
        logging:
            driver: json-file
        extra_hosts:

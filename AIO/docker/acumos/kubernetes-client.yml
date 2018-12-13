@@ -1,4 +1,4 @@
-version: '2'
+version: '3.2'
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -51,8 +51,8 @@ services:
               },
               \"nexus\": {
                 \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
-                \"password\": \"${ACUMOS_RW_USER_PASSWORD}\",
-                \"username\": \"${ACUMOS_RW_USER}\",
+                \"password\": \"${ACUMOS_NEXUS_RW_USER_PASSWORD}\",
+                \"username\": \"${ACUMOS_NEXUS_RW_USER}\",
                 \"groupid\": \"com.artifact\"
               },
               \"cmndatasvc\": {
@@ -76,7 +76,9 @@ services:
        ports:
            - ${ACUMOS_KUBERNETES_CLIENT_PORT}:${ACUMOS_KUBERNETES_CLIENT_PORT}
        volumes:
-           - acumos-logs:/maven/logs
+           - type: bind
+             source: /var/${ACUMOS_NAMESPACE}/logs
+             target: /maven/logs
        logging:
            driver: json-file
        extra_hosts:

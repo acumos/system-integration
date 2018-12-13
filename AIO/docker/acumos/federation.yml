@@ -1,4 +1,4 @@
-version: '2'
+version: '3.2'
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -44,9 +44,9 @@ services:
                 \"docker\": {
                    \"host\": \"tcp://${ACUMOS_DOCKER_API_HOST}:${ACUMOS_DOCKER_API_PORT}\",
                    \"registryURL\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/\",
-                   \"registryUsername\": \"${ACUMOS_RW_USER}\",
-                   \"registryPassword\": \"${ACUMOS_RW_USER_PASSWORD}\",
-                   \"registryEmail\": \"acumos@example.com\"
+                   \"registryUsername\": \"${ACUMOS_NEXUS_RW_USER}\",
+                   \"registryPassword\": \"${ACUMOS_NEXUS_RW_USER_PASSWORD}\",
+                   \"registryEmail\": \"${ACUMOS_ADMIN_EMAIL}\"
                 },
                 \"local\": {
                    \"address\": \"0.0.0.0\",
@@ -65,8 +65,8 @@ services:
                 \"nexus\": {
                    \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/repository/acumos_model_maven/\",
                    \"proxy\": \"\",
-                   \"password\": \"${ACUMOS_RW_USER_PASSWORD}\",
-                   \"username\": \"${ACUMOS_RW_USER}\",
+                   \"password\": \"${ACUMOS_NEXUS_RW_USER_PASSWORD}\",
+                   \"username\": \"${ACUMOS_NEXUS_RW_USER}\",
                    \"groupid\": \"org.acumos\"
                 },
                 \"peer\": {
@@ -91,8 +91,12 @@ services:
        depends_on:
            - cds-service
        volumes:
-           - acumos-logs:/maven/logs
-           - /var/acumos/certs:/app/certs
+           - type: bind
+             source: /var/${ACUMOS_NAMESPACE}/logs
+             target: /maven/logs
+           - type: bind
+             source: /var/$ACUMOS_NAMESPACE/certs
+             target: /app/certs
        logging:
            driver: json-file
        extra_hosts:
