@@ -1,0 +1,303 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "efe4a711_35cf356e",
+        "filename": "AIO/acumos-env.sh",
+        "patchSetId": 9
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-01-02T14:20:24Z",
+      "side": 1,
+      "message": "The Athena images should all be pulled from the RELEASE repo.   Please fix.",
+      "range": {
+        "startLine": 43,
+        "startChar": 24,
+        "endLine": 43,
+        "endChar": 31
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d0e52f5c_9213a60f",
+        "filename": "AIO/mariadb/docker-compose.sh",
+        "patchSetId": 9
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-01-02T14:20:24Z",
+      "side": 1,
+      "message": "This seems to be in the Mariadb folder but labeled Kong; which is it really?",
+      "range": {
+        "startLine": 21,
+        "startChar": 35,
+        "endLine": 21,
+        "endChar": 45
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6b90c69e_62fcaad9",
+        "filename": "AIO/mariadb/kubernetes/mariadb-deployment.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-01-02T14:20:24Z",
+      "side": 1,
+      "message": "This is hardwired in several files, is it worth factoring out into a variable?",
+      "range": {
+        "startLine": 49,
+        "startChar": 18,
+        "endLine": 49,
+        "endChar": 28
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0f5e2f6c_4c6a4ea2",
+        "filename": "AIO/mariadb/kubernetes/mariadb-service.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-01-02T14:20:24Z",
+      "side": 1,
+      "message": "I think this is the mariadb service",
+      "range": {
+        "startLine": 20,
+        "startChar": 47,
+        "endLine": 20,
+        "endChar": 56
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "244271d7_bd993018",
+        "filename": "AIO/mariadb/setup-mariadb.sh",
+        "patchSetId": 9
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-01-02T14:20:24Z",
+      "side": 1,
+      "message": "proxy? The database needs a proxy?",
+      "range": {
+        "startLine": 20,
+        "startChar": 45,
+        "endLine": 20,
+        "endChar": 50
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c61df1bc_fbeffa37",
+        "filename": "AIO/nexus/docker-compose.sh",
+        "patchSetId": 9
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-01-02T14:20:24Z",
+      "side": 1,
+      "message": "Is this kong or nexus? Is there a proxy?",
+      "range": {
+        "startLine": 21,
+        "startChar": 35,
+        "endLine": 21,
+        "endChar": 39
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "914b5f24_010a8363",
+        "filename": "AIO/nexus/kubernetes/nexus-deployment.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-01-02T14:20:24Z",
+      "side": 1,
+      "message": "Maybe remove this TODO since you have a nexus-data line above?",
+      "range": {
+        "startLine": 72,
+        "startChar": 8,
+        "endLine": 72,
+        "endChar": 13
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "886bf6bc_9739313f",
+        "filename": "AIO/nexus/kubernetes/nexus-service.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-01-02T14:20:24Z",
+      "side": 1,
+      "message": "maybe this value should also be in a variable to avoid repeats?",
+      "range": {
+        "startLine": 44,
+        "startChar": 10,
+        "endLine": 44,
+        "endChar": 14
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "26a0b26f_1de6179f",
+        "filename": "AIO/peer-test.sh",
+        "patchSetId": 9
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-01-02T14:20:24Z",
+      "side": 1,
+      "message": "Have you totally automated the Hippo CMS setup?",
+      "range": {
+        "startLine": 172,
+        "startChar": 3,
+        "endLine": 172,
+        "endChar": 8
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1abcc059_ae65fda2",
+        "filename": "AIO/setup-pv.sh",
+        "patchSetId": 9
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-01-02T14:20:24Z",
+      "side": 1,
+      "message": "what is the difference?  a line to explain might help",
+      "range": {
+        "startLine": 30,
+        "startChar": 11,
+        "endLine": 30,
+        "endChar": 17
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "80effaea_79d915b1",
+        "filename": "AIO/utils.sh",
+        "patchSetId": 9
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-01-02T14:20:24Z",
+      "side": 1,
+      "message": "Maybe make this prefix a variable in this script instead of hardcoding it repeatedly?",
+      "range": {
+        "startLine": 183,
+        "startChar": 11,
+        "endLine": 183,
+        "endChar": 22
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "246082da_11b1b696",
+        "filename": "tools/setup_openshift.sh",
+        "patchSetId": 9
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-01-02T14:20:24Z",
+      "side": 1,
+      "message": "Acumos?  Or just openshift?",
+      "range": {
+        "startLine": 20,
+        "startChar": 33,
+        "endLine": 20,
+        "endChar": 35
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f17ccfb_5645d8e0",
+        "filename": "tools/setup_openshift_client.sh",
+        "patchSetId": 9
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-01-02T14:20:24Z",
+      "side": 1,
+      "message": "This is a prereq for installing Acumos?",
+      "range": {
+        "startLine": 20,
+        "startChar": 37,
+        "endLine": 20,
+        "endChar": 53
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
