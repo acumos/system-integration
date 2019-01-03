@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "3ee9329b_7b943f03",
+        "filename": "AIO/mariadb/docker-compose.sh",
+        "patchSetId": 9
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2019-01-03T16:23:53Z",
+      "side": 1,
+      "message": "Cut/paste error. Fixed.",
+      "parentUuid": "d0e52f5c_9213a60f",
+      "range": {
+        "startLine": 21,
+        "startChar": 35,
+        "endLine": 21,
+        "endChar": 45
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6b90c69e_62fcaad9",
         "filename": "AIO/mariadb/kubernetes/mariadb-deployment.yaml",
         "patchSetId": 9
@@ -59,6 +83,30 @@
       "writtenOn": "2019-01-02T14:20:24Z",
       "side": 1,
       "message": "This is hardwired in several files, is it worth factoring out into a variable?",
+      "range": {
+        "startLine": 49,
+        "startChar": 18,
+        "endLine": 49,
+        "endChar": 28
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "74d34bc4_c19ae417",
+        "filename": "AIO/mariadb/kubernetes/mariadb-deployment.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2019-01-03T16:23:53Z",
+      "side": 1,
+      "message": "Yes, done.",
+      "parentUuid": "6b90c69e_62fcaad9",
       "range": {
         "startLine": 49,
         "startChar": 18,
@@ -94,6 +142,30 @@
     },
     {
       "key": {
+        "uuid": "9af2e68d_9c216a68",
+        "filename": "AIO/mariadb/kubernetes/mariadb-service.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2019-01-03T16:23:53Z",
+      "side": 1,
+      "message": "Yes, cut and paste",
+      "parentUuid": "0f5e2f6c_4c6a4ea2",
+      "range": {
+        "startLine": 20,
+        "startChar": 47,
+        "endLine": 20,
+        "endChar": 56
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "244271d7_bd993018",
         "filename": "AIO/mariadb/setup-mariadb.sh",
         "patchSetId": 9
@@ -105,6 +177,30 @@
       "writtenOn": "2019-01-02T14:20:24Z",
       "side": 1,
       "message": "proxy? The database needs a proxy?",
+      "range": {
+        "startLine": 20,
+        "startChar": 45,
+        "endLine": 20,
+        "endChar": 50
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "19af53dc_57de2792",
+        "filename": "AIO/mariadb/setup-mariadb.sh",
+        "patchSetId": 9
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2019-01-03T16:23:53Z",
+      "side": 1,
+      "message": "Copied from docker-proxy. Fixed it.",
+      "parentUuid": "244271d7_bd993018",
       "range": {
         "startLine": 20,
         "startChar": 45,
@@ -140,6 +236,30 @@
     },
     {
       "key": {
+        "uuid": "a0893bb2_976d0340",
+        "filename": "AIO/nexus/docker-compose.sh",
+        "patchSetId": 9
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2019-01-03T16:23:53Z",
+      "side": 1,
+      "message": "Cut and paste. Fixed.",
+      "parentUuid": "c61df1bc_fbeffa37",
+      "range": {
+        "startLine": 21,
+        "startChar": 35,
+        "endLine": 21,
+        "endChar": 39
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "914b5f24_010a8363",
         "filename": "AIO/nexus/kubernetes/nexus-deployment.yaml",
         "patchSetId": 9
@@ -151,6 +271,30 @@
       "writtenOn": "2019-01-02T14:20:24Z",
       "side": 1,
       "message": "Maybe remove this TODO since you have a nexus-data line above?",
+      "range": {
+        "startLine": 72,
+        "startChar": 8,
+        "endLine": 72,
+        "endChar": 13
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63163699_ab758de7",
+        "filename": "AIO/nexus/kubernetes/nexus-deployment.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2019-01-03T16:23:53Z",
+      "side": 1,
+      "message": "Clarified that this TODO is to investigate why the workaround above is needed.",
+      "parentUuid": "914b5f24_010a8363",
       "range": {
         "startLine": 72,
         "startChar": 8,
@@ -186,6 +330,30 @@
     },
     {
       "key": {
+        "uuid": "812aa0f5_43b0c1a7",
+        "filename": "AIO/nexus/kubernetes/nexus-service.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2019-01-03T16:23:53Z",
+      "side": 1,
+      "message": "This is the internal port. Only the external (nodePort) needs to be variable.",
+      "parentUuid": "886bf6bc_9739313f",
+      "range": {
+        "startLine": 44,
+        "startChar": 10,
+        "endLine": 44,
+        "endChar": 14
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "26a0b26f_1de6179f",
         "filename": "AIO/peer-test.sh",
         "patchSetId": 9
@@ -197,6 +365,30 @@
       "writtenOn": "2019-01-02T14:20:24Z",
       "side": 1,
       "message": "Have you totally automated the Hippo CMS setup?",
+      "range": {
+        "startLine": 172,
+        "startChar": 3,
+        "endLine": 172,
+        "endChar": 8
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2a71bce6_531ce3d9",
+        "filename": "AIO/peer-test.sh",
+        "patchSetId": 9
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2019-01-03T16:23:53Z",
+      "side": 1,
+      "message": "No but it is irrelevant to this test. Its role has been minimized to the point that I usually don\u0027t even complete the setup of it.",
+      "parentUuid": "26a0b26f_1de6179f",
       "range": {
         "startLine": 172,
         "startChar": 3,
@@ -232,6 +424,30 @@
     },
     {
       "key": {
+        "uuid": "20573ad5_969b76c4",
+        "filename": "AIO/setup-pv.sh",
+        "patchSetId": 9
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2019-01-03T16:23:53Z",
+      "side": 1,
+      "message": "I added \u0027 (setup a PV or a PVC)\u0027. Hope that\u0027s good enough.",
+      "parentUuid": "1abcc059_ae65fda2",
+      "range": {
+        "startLine": 30,
+        "startChar": 11,
+        "endLine": 30,
+        "endChar": 17
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "80effaea_79d915b1",
         "filename": "AIO/utils.sh",
         "patchSetId": 9
@@ -243,6 +459,30 @@
       "writtenOn": "2019-01-02T14:20:24Z",
       "side": 1,
       "message": "Maybe make this prefix a variable in this script instead of hardcoding it repeatedly?",
+      "range": {
+        "startLine": 183,
+        "startChar": 11,
+        "endLine": 183,
+        "endChar": 22
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6ad031da_a836ef0c",
+        "filename": "AIO/utils.sh",
+        "patchSetId": 9
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2019-01-03T16:23:53Z",
+      "side": 1,
+      "message": "since this script is sourced by the calling scripts, that would create a potential bug path. And it wouldn\u0027t save many characters.",
+      "parentUuid": "80effaea_79d915b1",
       "range": {
         "startLine": 183,
         "startChar": 11,
@@ -278,6 +518,30 @@
     },
     {
       "key": {
+        "uuid": "38d3ce69_a0cafb0c",
+        "filename": "tools/setup_openshift.sh",
+        "patchSetId": 9
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2019-01-03T16:23:53Z",
+      "side": 1,
+      "message": "Just OpenShift. This is analogous to the setup-k8s.sh script in kubernetes-client. It sets up the underlying OpenShift cluster only.",
+      "parentUuid": "246082da_11b1b696",
+      "range": {
+        "startLine": 20,
+        "startChar": 33,
+        "endLine": 20,
+        "endChar": 35
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f17ccfb_5645d8e0",
         "filename": "tools/setup_openshift_client.sh",
         "patchSetId": 9
@@ -289,6 +553,30 @@
       "writtenOn": "2019-01-02T14:20:24Z",
       "side": 1,
       "message": "This is a prereq for installing Acumos?",
+      "range": {
+        "startLine": 20,
+        "startChar": 37,
+        "endLine": 20,
+        "endChar": 53
+      },
+      "revId": "cb406780dcefc19ddc3252d1403d60fcf05922a5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "099b7782_c3702767",
+        "filename": "tools/setup_openshift_client.sh",
+        "patchSetId": 9
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2019-01-03T16:23:53Z",
+      "side": 1,
+      "message": "No, I will explain in the docs. This, like the setup-kubectl.sh script in kubernetes-client, sets up the client (workstation) side so that users can interact with the cluster without having to run commands on the cluster master node. It actually *will* be required for tenants (not cluster-admins) so I will add that note here too.",
+      "parentUuid": "3f17ccfb_5645d8e0",
       "range": {
         "startLine": 20,
         "startChar": 37,
