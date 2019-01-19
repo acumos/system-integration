@@ -95,17 +95,21 @@ function setup() {
   clean
   build_images
 
-  # Per https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
-  log "Setup the elasticsearch-data PV"
-  bash $AIO_ROOT/setup-pv.sh setup pv elasticsearch-data \
-    $PV_SIZE_ACUMOS_ELASTICSEARCH_DATA "1000:1000"
+  if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
+    # Per https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
+    log "Setup the elasticsearch-data PV"
+    bash $AIO_ROOT/setup-pv.sh setup pv elasticsearch-data \
+      $PV_SIZE_ACUMOS_ELASTICSEARCH_DATA "1000:1000"
+  fi
 
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     sudo bash docker-compose.sh $AIO_ROOT up -d --build --force-recreate
   else
+    if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
     log "Setup the elasticsearch-data PVC"
-    bash $AIO_ROOT/setup-pv.sh setup pvc \
-      elasticsearch-data $PV_SIZE_ACUMOS_ELASTICSEARCH_DATA
+      bash $AIO_ROOT/setup-pv.sh setup pvc \
+        elasticsearch-data $PV_SIZE_ACUMOS_ELASTICSEARCH_DATA
+    fi
 
     log "Deploy the k8s based components for elk-stack"
     mkdir -p deploy
