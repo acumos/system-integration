@@ -32,45 +32,33 @@
 #.  apiUrl: URL where the peer's federation gateway can be reached
 #
 
-function setup_subscription() {
-  trap 'fail' ERR
-  log "Get userId of 'test' user"
-  curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/user
-  users=$(jq -r '.content | length' /tmp/json)
-  i=0; userId=""
-  while [[ $i -lt $users && "$userId" == "" ]] ; do
-    loginName=$(jq -r ".content[$i].loginName" /tmp/json)
-    if [[ "$loginName" == "test" ]]; then
-      userId=$(jq -r ".content[$i].userId" /tmp/json)
-    fi
-    ((i++))
-  done
-
-  log "Subscribe to all solution types at $peerId"
-  curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer/sub \
-    -H "accept: */*" -H "Content-Type: application/json" \
-    -d "{ \"peerId\":\"$peerId\", \"ownerId\":\"$userId\", \"scopeType\":\"FL\", \"accessType\":\"PB\", \"options\":null, \"refreshInterval\":3600, \"maxArtifactSize\":null}"
-}
-
 function setup_peer() {
   trap 'fail' ERR
+  log "Check for existing CA cert with alias ${subjectName}CA"
+  if [[ $(keytool -list -v -keystore /var/$ACUMOS_NAMESPACE/certs/acumosTrustStore.jks -storepass $ACUMOS_KEY_PASSWORD | grep -ci ${subjectName}CA) -gt 0 ]]; then
+    log "Found existing CA cert with alias ${subjectName}CA, removing it"
+    keytool -delete -alias ${subjectName}CA \
+      -keystore /var/$ACUMOS_NAMESPACE/certs/acumosTrustStore.jks \
+      -storepass $ACUMOS_KEY_PASSWORD
+  fi
   log "Import peer CA cert into truststore"
   keytool -import -file $CAcert -alias ${subjectName}CA \
     -keystore /var/$ACUMOS_NAMESPACE/certs/acumosTrustStore.jks -storepass $ACUMOS_KEY_PASSWORD -noprompt
 
-  log "Create peer relationship for $name via CDS API"
-  curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-  -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer \
-  -H "accept: */*" -H "Content-Type: application/json" \
-  -d "{ \"name\":\"$name\", \"self\": false, \"local\": false, \"contact1\": \"$contact\", \"subjectName\": \"$subjectName\", \"apiUrl\": \"$apiUrl\",   \"statusCode\": \"AC\", \"validationStatusCode\": \"PS\" }"
-  created=$(jq -r '.created' /tmp/json)
-  if [[ "$created" == "null" ]]; then
-    cat /tmp/json
-    fail "Peer creation failed"
+  if [[ $(curl -s -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X GET http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer | grep -ci "subjectName\":\"${subjectName}") -eq 0 ]]; then
+    log "Create peer relationship for $name via CDS API"
+    curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
+    -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer \
+    -H "accept: */*" -H "Content-Type: application/json" \
+    -d "{ \"name\":\"$name\", \"self\": false, \"local\": false, \"contact1\": \"$contact\", \"subjectName\": \"$subjectName\", \"apiUrl\": \"$apiUrl\",   \"statusCode\": \"AC\", \"validationStatusCode\": \"PS\" }"
+    created=$(jq -r '.created' /tmp/json)
+    if [[ "$created" == "null" ]]; then
+      cat /tmp/json
+      fail "Peer creation failed"
+    fi
+  else
+    log "Peer relationship for $name already exists"
   fi
-  peerId=$(jq -r '.peerId' /tmp/json)
 
   if [[ $(nslookup opnfv02 | grep -c NXDOMAIN) -eq 1 ]]; then
     ip=$(grep $name /etc/hosts | cut -d ' ' -f 1)
@@ -80,16 +68,17 @@ function setup_peer() {
 
   log "Add hostalias for $subjectName at $ip and restart federation to apply new truststore entry"
   if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
-    log "Save updated federation-deployment.yaml template for use in redeployment"
-    # NOTE: hostAliases must be the last section of federation-deployment.yaml
-    # and indented as below
-    cat <<EOF >>kubernetes/deployment/federation-deployment.yaml
+    if [[ $(grep -c "\- \"$subjectName\"" kubernetes/deployment/federation-deployment.yaml) -eq 0 ]]; then
+      log "Save updated federation-deployment.yaml template for use in redeployment"
+      # NOTE: hostAliases must be the last section of federation-deployment.yaml
+      # and indented as below
+      cat <<EOF >>kubernetes/deployment/federation-deployment.yaml
       - ip: "$ip"
         hostnames:
         - "$subjectName"
 EOF
-    log "Patch the running federation service, to restart it with the changes"
-    cat <<EOF >/tmp/patch.yaml
+      log "Patch the running federation service, to restart it with the changes"
+      cat <<EOF >/tmp/patch.yaml
 spec:
   template:
     spec:
@@ -100,6 +89,12 @@ spec:
 EOF
     kubectl patch deployment -n $ACUMOS_NAMESPACE federation \
       --patch "$(cat /tmp/patch.yaml)"
+    else
+      # Just add a unique label so that kubernetes restarts federation
+      log "Patch the running federation service, to restart it with the changes"
+      kubectl patch deployment -n $ACUMOS_NAMESPACE federation  -p \
+        "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
+    fi
     log "Wait for federation deployment to be terminated and restarted as new pod"
     newpod=$pod
     while [[ $pod == $newpod ]] ; do
@@ -110,8 +105,10 @@ EOF
       sleep 5
     done
   else
-    sed -i -- "/extra_hosts:/a\ \ \ \ \ \ \ \ \ \ \ - \"$subjectName:$ip\"" \
-      docker/acumos/federation.yml
+    if [[ $(grep -c "$subjectName:" docker/acumos/federation.yml) -eq 0 ]]; then
+      sed -i -- "/extra_hosts:/a\ \ \ \ \ \ \ \ \ \ \ - \"$subjectName:$ip\"" \
+        docker/acumos/federation.yml
+    fi
     sudo bash docker-compose.sh up -d --build federation-service
   fi
 
@@ -142,5 +139,3 @@ if [[ $(grep -c -P " $name( |$)" /etc/hosts) -eq 0 ]]; then
   log "Add $name to /etc/hosts"
   echo "$ip $name" | sudo tee -a /etc/hosts
   fi
-#setup_subscription
-# (to be uncommented once subscription has been verified)

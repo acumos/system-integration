@@ -84,17 +84,21 @@ function clean() {
 
 function setup() {
   clean
-  log "Setup the nexus-data PV"
-  bash $AIO_ROOT/setup-pv.sh setup pv nexus-data \
-    $NEXUS_DATA_PV_SIZE "200:$USER"
+  if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
+    log "Setup the nexus-data PV"
+    bash $AIO_ROOT/setup-pv.sh setup pv nexus-data \
+      $NEXUS_DATA_PV_SIZE "200:$USER"
+  fi
 
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     sudo bash docker-compose.sh $AIO_ROOT up -d --build --force-recreate
   else
-    log "Setup the nexus-data PVC"
-    bash $AIO_ROOT/setup-pv.sh setup pvc nexus-data \
-      $NEXUS_DATA_PV_SIZE
-
+    if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
+      log "Setup the nexus-data PVC"
+      bash $AIO_ROOT/setup-pv.sh setup pvc nexus-data \
+        $NEXUS_DATA_PV_SIZE
+    fi
+    
     log "Deploy the k8s based components for nexus"
     mkdir -p deploy
     cp -r kubernetes/* deploy/.
@@ -106,9 +110,15 @@ function setup() {
   wait_running nexus-service
 
   # Add -m 10 since for some reason curl seems to hang waiting for a response
-  while ! curl -v -m 10 -u $ACUMOS_NEXUS_ADMIN_USERNAME:$ACUMOS_NEXUS_ADMIN_PASSWORD \
-    http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script ; do
-    log "Waiting 10 seconds for nexus server to respond"
+  cmd="curl -v -m 10 \
+    -u $ACUMOS_NEXUS_ADMIN_USERNAME:$ACUMOS_NEXUS_ADMIN_PASSWORD \
+    http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script"
+  while ! $cmd ; do
+    log "Nexus API is not responding... waiting 10 seconds"
+    sleep 10
+  done
+  until [[ $($cmd | jq -r 'length') -ge 0 ]]; do
+    log "Nexus API is not ready... waiting 10 seconds"
     sleep 10
   done
 

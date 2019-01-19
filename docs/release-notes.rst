@@ -27,6 +27,63 @@ System Integration Release Notes
 All-in-One (OneClick Deploy)
 ............................
 
+------------------------------
+Version 2.0.1, 23 January 2019
+------------------------------
+
+This is the first draft release for Acumos Boreas.
+
+* `ACUMOS-2301: Oneclick deployment of Acumos on OpenShift <https://jira.acumos.org/browse/ACUMOS-2301>`_
+
+  * `Fix reference to federation-service <https://gerrit.acumos.org/r/#/c/3629/>`_
+
+    * Fix missed bug in the last commit. Portal-BE needs to reference
+      federation-service by domain name rather than internal name, since it
+      may be deployed outside the local cluster and thus is exposed at a
+      nodePort, for which using the cluster-internal name does not work
+    * Also corrected other issues impacting platform redeployment
+    * Removed subscription creation from peer-test.sh (now a separate script)
+    * Fixed bugs in create-peer.sh and create-subscription.sh
+
+  * `Oneclick deployment of Acumos on OpenShift <https://gerrit.acumos.org/r/#/c/3504/>`_
+
+    * include changes for
+      `ACUMOS-2150: Improve docker/prereqs checks and setup <https://jira.acumos.org/browse/ACUMOS-2150>`_
+    * also address bugs
+
+      * `ACUMOS-2111: AIO uses staging instead of release registry for Athena docker images <https://jira.acumos.org/browse/ACUMOS-2111>`_
+      * `ACUMOS-2028: EOF impacts size variable <https://jira.acumos.org/browse/ACUMOS-2028>`_
+      * `ACUMOS-2029: References to email to be replaces by environment variable <https://jira.acumos.org/browse/ACUMOS-2029>`_
+      * `ACUMOS-2030: Irrelevant reference to nexus-service in /etc/hosts <https://jira.acumos.org/browse/ACUMOS-2030>`_
+
+    * add setup_openshift.sh and setup_openshift_client.sh
+    * reintroduce docker-service via docker-dind
+    * Connect kong to kong-database directly
+    * Allow user to set target namespace
+    * Simplify install reset
+    * Add Centos-specific prereqs and cleanup
+    * Remove host installation of docker for k8s/OpenShift
+    * Add option for generic k8s or OpenShift installs
+    * Add ELK option for docker-compose to start/stop
+    * use "oc" in place of "kubectl" for OpenShift
+    * Improve method of determining primary IP address
+    * add support for Ubuntu 18.04
+    * for Centos, use docker config from /root
+    * replace use of "~" with $HOME
+    * add K8S_DIST to acumos-env.sh
+    * refactor to separate core components from non-core
+    * migrate host-installed components (e.g. mariadb) to docker
+    * build local images for customization
+    * store persistent data in PV/PVC under k8s
+    * create resources (e.g. PV, PVC) using ACUMOS_NAMESPACE
+    * address OpenShift-specific constraints e.g. for security
+    * support Linux, Mac, Windows for OpenShift-CLI client
+    * update other tools to be compatible with the changes
+    * align designs where possible across docker, k8s-generic, k8s-openshift
+    * improve method of determining deployment env so user
+      does not have to specify
+    * update patched federation templates to support redeployment
+
 -------------------------------
 Version 1.0.4, 14 November 2018
 -------------------------------

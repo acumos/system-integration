@@ -20,7 +20,7 @@
 # What this is: All-in-One deployment of the Acumos platform. FOR TEST PURPOSES
 # ONLY.
 # Prerequisites:
-# - Ubuntu Xenial server (Centos 7 support is planned!)
+# - Ubuntu Xenial (16.04), Bionic (18.04), or Centos 7 hosts
 # - All hostnames specified in acumos-env.sh must be DNS-resolvable on all hosts
 #   (entries in /etc/hosts or in an actual DNS server)
 # - For deployments behind proxies, set HTTP_PROXY and HTTPS_PROXY in acumos-env.sh
@@ -138,11 +138,14 @@ function prepare_env() {
     fi
   fi
 
-  log "Create host folders for docker volumes and k8s PVs"
-  bash setup-pv.sh setup pv logs $ACUMOS_LOGS_PV_SIZE "$USER:$USER"
-  bash setup-pv.sh setup pv output $ACUMOS_OUTPUT_PV_SIZE "$USER:$USER"
-  bash setup-pv.sh setup pv webonboarding $ACUMOS_WEBONBOARDING_PV_SIZE "$USER:$USER"
-  bash setup-pv.sh setup pv certs $ACUMOS_CERTS_PV_SIZE "$USER:$USER"
+  # Can't recreate PVs if redeploying since data will still exist there
+  if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
+    log "Create host folders for docker volumes and k8s PVs"
+    bash setup-pv.sh setup pv logs $ACUMOS_LOGS_PV_SIZE "$USER:$USER"
+    bash setup-pv.sh setup pv output $ACUMOS_OUTPUT_PV_SIZE "$USER:$USER"
+    bash setup-pv.sh setup pv webonboarding $ACUMOS_WEBONBOARDING_PV_SIZE "$USER:$USER"
+    bash setup-pv.sh setup pv certs $ACUMOS_CERTS_PV_SIZE "$USER:$USER"
+  fi
 }
 
 function docker_login() {
@@ -173,13 +176,13 @@ function setup_acumos() {
     sudo bash docker-compose.sh up -d --build
     cd docker-proxy; bash setup-docker-proxy.sh; cd ..
   else
-    log "Create PVCs in namespace $ACUMOS_NAMESPACE"
-    bash setup-pv.sh setup pvc logs $ACUMOS_LOGS_PV_SIZE
-    bash setup-pv.sh setup pvc output $ACUMOS_OUTPUT_PV_SIZE
-    bash setup-pv.sh setup pvc webonboarding $ACUMOS_WEBONBOARDING_PV_SIZE
-    bash setup-pv.sh setup pvc certs $ACUMOS_CERTS_PV_SIZE
-
     if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
+      # Can't recreate PVCs if redeploying since data will still exist there
+      log "Create PVCs in namespace $ACUMOS_NAMESPACE"
+      bash setup-pv.sh setup pvc logs $ACUMOS_LOGS_PV_SIZE
+      bash setup-pv.sh setup pvc output $ACUMOS_OUTPUT_PV_SIZE
+      bash setup-pv.sh setup pvc webonboarding $ACUMOS_WEBONBOARDING_PV_SIZE
+      bash setup-pv.sh setup pvc certs $ACUMOS_CERTS_PV_SIZE
       log "Create k8s secret for image pulling from docker"
       if [[ "$ACUMOS_HOST_OS" == "ubuntu" ]]; then b64=$(cat $HOME/.docker/config.json | base64 -w 0)
       else b64=$(sudo cat /root/.docker/config.json | base64 -w 0)
