@@ -99,14 +99,14 @@ function create_subscription() {
     fail "User test not found at Acumos platform $1"
   fi
   if [[ "$modelTypeCode" == *","* ]]; then
-    modelTypeCode=$(echo '["'$modelTypeCode'"]' | sed 's/,/","/g')
+    typeCode=$(echo '[\"'$modelTypeCode'\"]' | sed 's/,/\\\",\\\"/g')
     cat <<EOF >sub.json
 {
 "accessType": "$accessType",
 "peerId": "$peerId",
 "scopeType": "$scopeType",
 "refreshInterval": $refreshInterval,
-"selector": "{ \"modelTypeCode\": $modelTypeCode }",
+"selector": "{ \"modelTypeCode\": $typeCode }",
 "userId": "$userId"
 }
 EOF
@@ -117,7 +117,7 @@ EOF
 "peerId": "$peerId",
 "scopeType": "$scopeType",
 "refreshInterval": $refreshInterval,
-"selector": "{ \"modelTypeCode\": \"$modelTypeCode\" }",
+"selector": "{ \"modelTypeCode\": \"$typeCode\" }",
 "userId": "$userId"
 }
 EOF

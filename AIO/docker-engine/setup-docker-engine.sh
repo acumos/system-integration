@@ -115,7 +115,6 @@ EOF
      # and they are not restarted - thus this kills the OpenShift stack
      sudo systemctl daemon-reload
      sudo service docker restart
-     log "Verify docker API is accessible"
      url=http://$ACUMOS_DOCKER_API_HOST:$ACUMOS_DOCKER_API_PORT
   else
     clean
@@ -140,7 +139,7 @@ EOF
   fi
 
   log "Wait for docker API to be ready at $url"
-  while ! curl $url; do
+  until [[ "$(curl $url)" == '{"message":"page not found"}' ]]; do
     log "docker API not ready ... waiting 10 seconds"
     sleep 10
   done
