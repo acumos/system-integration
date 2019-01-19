@@ -157,7 +157,7 @@ spec:
                       }
                     },
                     "gateway": {
-                      "url": "https://federation-service:9011"
+                      "url": "https://<ACUMOS_FEDERATION_HOST>:<ACUMOS_FEDERATION_LOCAL_PORT>"
                     },
                     "dcae": {
                       "model": {
