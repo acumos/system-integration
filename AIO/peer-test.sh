@@ -126,10 +126,10 @@ function create_peers() {
     $user2@$host2:/var/$ACUMOS_NAMESPACE/certs/acumosCA.crt /tmp/${host2}CA.crt
   source $host2-env.sh
   scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    /tmp/${host1}CA.crt $user2@$host2:/var/$ACUMOS_NAMESPACE/certs/peerCA.crt
+    /tmp/${host1}CA.crt $user2@$host2:/var/$ACUMOS_NAMESPACE/certs/${host1}CA.crt
   source $host1-env.sh
   scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    /tmp/${host2}CA.crt $user1@$host1:/var/$ACUMOS_NAMESPACE/certs/peerCA.crt
+    /tmp/${host2}CA.crt $user1@$host1:/var/$ACUMOS_NAMESPACE/certs/${host2}CA.crt
 
   log "Create $host2 peer at $host1"
   ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
@@ -138,7 +138,7 @@ set -x
 trap 'exit 1' ERR
 cd AIO
 source acumos-env.sh
-bash create-peer.sh /var/$ACUMOS_NAMESPACE/certs/peerCA.crt $host2 $ip2 $host2 \
+bash create-peer.sh /var/$ACUMOS_NAMESPACE/certs/${host2}CA.crt $host2 $ip2 $host2 \
   admin@example.com https://$host2:$ACUMOS_FEDERATION_PORT
 EOF
 
@@ -150,7 +150,7 @@ set -x
 trap 'exit 1' ERR
 cd AIO
 source acumos-env.sh
-bash create-peer.sh /var/$ACUMOS_NAMESPACE/certs/peerCA.crt $host1 $ip1 $host1 \
+bash create-peer.sh /var/$ACUMOS_NAMESPACE/certs/${host1}CA.crt $host1 $ip1 $host1 \
   admin@example.com https://$host1:$ACUMOS_FEDERATION_PORT
 EOF
 

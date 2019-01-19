@@ -72,7 +72,12 @@ function setup() {
   wait_running kong
 
   log "Verify kong admin API is ready"
-  while ! curl http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis; do
+  url=http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis
+  while ! curl $url ; do
+    log "Kong admin API is not responding... waiting 10 seconds"
+    sleep 10
+  done
+  until [[ $(curl $url | jq -r '.total') -ge 0 ]]; do
     log "Kong admin API is not ready... waiting 10 seconds"
     sleep 10
   done

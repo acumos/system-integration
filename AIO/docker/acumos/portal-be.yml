@@ -135,7 +135,7 @@ services:
                    }
                 },
                 \"gateway\": {
-                   \"url\": \"https://federation-service:${ACUMOS_FEDERATION_LOCAL_PORT}\"
+                   \"url\": \"https://${ACUMOS_FEDERATION_HOST}:${ACUMOS_FEDERATION_LOCAL_PORT}\"
                 },
                 \"dcae\": {
                    \"model\": {
