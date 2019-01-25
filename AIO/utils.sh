@@ -160,7 +160,7 @@ function wait_running() {
   log "Wait for $app to be running"
   t=1
   status=""
-  while [[ "$status" != "Running" && $t -le 10 ]]; do
+  while [[ "$status" != "Running" && $t -le 30 ]]; do
     ((t++))
     sleep 10
     if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
@@ -177,7 +177,7 @@ function wait_running() {
     log "$1 status is $status"
   done
   log "$1 status is $status"
-  if [[ $t -gt 10 ]]; then
+  if [[ $t -gt 30 ]]; then
     if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
       cs=$(sudo docker ps -a | awk "/$app/{print \$1}")
       for c in $cs; do

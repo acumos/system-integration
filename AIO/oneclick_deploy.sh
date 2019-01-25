@@ -262,14 +262,15 @@ function setup_federation() {
 set -x
 export WORK_DIR=$(pwd)
 AIO_ROOT=$WORK_DIR
-sed -i -- "s~AIO_ROOT=.*~AIO_ROOT=$AIO_ROOT~" acumos-env.sh
+echo "export AIO_ROOT=$AIO_ROOT" >>acumos-env.sh
 
 # This supports the option to clean and redeploy with under a different env,
 # using the same customized acumos-env.sh file.
 if [[ "$1" == "k8s" ]]; then DEPLOYED_UNDER=k8s
 else DEPLOYED_UNDER=docker
 fi
-sed -i -- "s/DEPLOYED_UNDER=.*/DEPLOYED_UNDER=$DEPLOYED_UNDER/" acumos-env.sh
+echo "export DEPLOYED_UNDER=$DEPLOYED_UNDER" >>acumos-env.sh
+
 if [[ "$2" == "openshift" ]]; then
   K8S_DIST=openshift
   k8s_cmd=oc
@@ -277,15 +278,12 @@ else
   K8S_DIST=generic
   k8s_cmd=kubectl
 fi
-sed -i -- "s/K8S_DIST=.*/K8S_DIST=$K8S_DIST/" acumos-env.sh
+echo "export K8S_DIST=$K8S_DIST" >>acumos-env.sh
 
 source acumos-env.sh
 source utils.sh
 
 update_env ACUMOS_CDS_PASSWORD "$ACUMOS_CDS_PASSWORD" $(uuidgen)
-update_env ACUMOS_KEY_PASSWORD "$ACUMOS_KEY_PASSWORD" $(uuidgen)
-update_env ACUMOS_KEYSTORE_PASSWORD "$ACUMOS_KEYSTORE_PASSWORD" "$ACUMOS_KEY_PASSWORD"
-update_env ACUMOS_TRUSTSTORE_PASSWORD "$ACUMOS_TRUSTSTORE_PASSWORD" "$ACUMOS_KEY_PASSWORD"
 update_env ACUMOS_NEXUS_RO_USER_PASSWORD "$ACUMOS_NEXUS_RO_USER_PASSWORD" \
   $(uuidgen)
 update_env ACUMOS_NEXUS_RW_USER_PASSWORD "$ACUMOS_NEXUS_RW_USER_PASSWORD" \
@@ -299,9 +297,9 @@ source $AIO_ROOT/acumos-env.sh
 
 if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
   setup_prereqs
-  bash setup-keystore.sh
 fi
 
+bash setup-keystore.sh
 prepare_env
 
 if [[ "$ACUMOS_DEPLOY_DOCKER" == "true" ]]; then
