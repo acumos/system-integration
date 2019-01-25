@@ -103,8 +103,8 @@ function verify_federation_api_access() {
   source $1-env.sh
   ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $2@$1 \
     curl -vk -o json \
-    --cert /var/$ACUMOS_NAMESPACE/certs/acumos.crt \
-    --key /var/$ACUMOS_NAMESPACE/certs/acumos.key \
+    --cert /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CERT \
+    --key /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CERT_KEY \
     https://$3:$ACUMOS_FEDERATION_PORT/solutions
   scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
     $2@$1:/home/$2/json json
@@ -120,10 +120,10 @@ function create_peers() {
   log "Exchange peer CA certs and server certs"
   source $host1-env.sh
   scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    $user1@$host1:/var/$ACUMOS_NAMESPACE/certs/acumosCA.crt /tmp/${host1}CA.crt
+    $user1@$host1:/var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CA_CERT /tmp/${host1}CA.crt
   source $host2-env.sh
   scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    $user2@$host2:/var/$ACUMOS_NAMESPACE/certs/acumosCA.crt /tmp/${host2}CA.crt
+    $user2@$host2:/var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CA_CERT /tmp/${host2}CA.crt
   source $host2-env.sh
   scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
     /tmp/${host1}CA.crt $user2@$host2:/var/$ACUMOS_NAMESPACE/certs/${host1}CA.crt

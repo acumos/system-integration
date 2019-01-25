@@ -17,7 +17,7 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-#. What this is: script to setup host-mapped PVs under kubernetes or docker
+#. What this is: script to update acumos-env.sh with user-provided cert values
 #.
 #. Prerequisites:
 #. - acumos-env.sh script prepared through oneclick_deploy.sh or manually, to
@@ -27,33 +27,16 @@
 #. Usage: intended to be called directly from oneclick_deploy.sh
 #.
 
-function setup() {
-  trap 'fail' ERR
-  if [[ ! -e /var/$ACUMOS_NAMESPACE/certs ]]; then
-    log "Create /var/$ACUMOS_NAMESPACE/certs as cert storage folder"
-    sudo mkdir -p /var/$ACUMOS_NAMESPACE/certs
-    # Have to set user and group to allow pod access to PVs
-    sudo chown $USER:$USER /var/$ACUMOS_NAMESPACE
-    sudo chown $USER:$USER /var/$ACUMOS_NAMESPACE/certs
-  fi
-
-  if [[ ! -e /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CERT ]]; then
-    if [[ -e certs/$ACUMOS_CERT ]]; then
-      log "Using existing user-prepared files in certs subfolder"
-    else
-      log "Creating new certs in certs subfolder"
-      cd certs
-      bash setup-certs.sh $ACUMOS_DOMAIN
-      bash update-cert-env.sh
-      cd ..
-    fi
-    log "Copying certs to /var/$ACUMOS_NAMESPACE/certs/"
-    cp $(ls certs/* | grep -v '\.sh') /var/$ACUMOS_NAMESPACE/certs/.
-  else
-    log "Using existing certs in /var/$ACUMOS_NAMESPACE/certs/"
-  fi
+function update_cert_env() {
+  log "Updating acumos-env.sh with \"export $1=$2\""
+  sed -i -- "s/$1=.*/$1=$2/" ../acumos-env.sh
+  export $1=$2
 }
 
-source $AIO_ROOT/acumos-env.sh
-source $AIO_ROOT/utils.sh
-setup
+trap 'fail' ERR
+source ../acumos-env.sh
+source ../utils.sh
+source cert-env.sh
+update_cert_env ACUMOS_CERT_KEY_PASSWORD $CERT_KEY_PASSWORD
+update_cert_env ACUMOS_KEYSTORE_PASSWORD $KEYSTORE_PASSWORD
+update_cert_env ACUMOS_TRUSTSTORE_PASSWORD $TRUSTSTORE_PASSWORD
