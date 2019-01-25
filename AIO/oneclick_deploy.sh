@@ -283,9 +283,6 @@ source acumos-env.sh
 source utils.sh
 
 update_env ACUMOS_CDS_PASSWORD "$ACUMOS_CDS_PASSWORD" $(uuidgen)
-update_env ACUMOS_KEY_PASSWORD "$ACUMOS_KEY_PASSWORD" $(uuidgen)
-update_env ACUMOS_KEYSTORE_PASSWORD "$ACUMOS_KEYSTORE_PASSWORD" "$ACUMOS_KEY_PASSWORD"
-update_env ACUMOS_TRUSTSTORE_PASSWORD "$ACUMOS_TRUSTSTORE_PASSWORD" "$ACUMOS_KEY_PASSWORD"
 update_env ACUMOS_NEXUS_RO_USER_PASSWORD "$ACUMOS_NEXUS_RO_USER_PASSWORD" \
   $(uuidgen)
 update_env ACUMOS_NEXUS_RW_USER_PASSWORD "$ACUMOS_NEXUS_RW_USER_PASSWORD" \
@@ -299,9 +296,9 @@ source $AIO_ROOT/acumos-env.sh
 
 if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
   setup_prereqs
-  bash setup-keystore.sh
 fi
 
+bash setup-keystore.sh
 prepare_env
 
 if [[ "$ACUMOS_DEPLOY_DOCKER" == "true" ]]; then

@@ -84,8 +84,8 @@ function setup() {
 
   log "Pass cert and key to Kong admin"
   curl -i -X POST http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/certificates \
-    -F "cert=@/var/$ACUMOS_NAMESPACE/certs/acumos.crt" \
-    -F "key=@/var/$ACUMOS_NAMESPACE/certs/acumos.key" \
+    -F "cert=@/var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CERT" \
+    -F "key=@/var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CERT_KEY" \
     -F "snis=$ACUMOS_DOMAIN"
 
   log "Add proxy entries via Kong API"
@@ -121,7 +121,7 @@ function setup() {
   # Required for docker daemon to accept the kong self-signed cert
   # Per https://docs.docker.com/registry/insecure/#use-self-signed-certificates
   sudo mkdir -p /etc/docker/certs.d/$ACUMOS_HOST
-  sudo cp /var/$ACUMOS_NAMESPACE/certs/acumosCA.crt /etc/docker/certs.d/$ACUMOS_HOST/ca.crt
+  sudo cp /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CA_CERT /etc/docker/certs.d/$ACUMOS_HOST/ca.crt
 }
 
 source $AIO_ROOT/acumos-env.sh

@@ -27,11 +27,8 @@
 #. Usage: intended to be called directly from oneclick_deploy.sh
 #.
 
-# Setup server cert, key, and keystore for the Kong reverse proxy
-# Currently the certs folder is also setup via docker-compose.yaml as a virtual
-# folder for the federation-gateway, which currently does not support http
-# access via the Kong proxy (only direct https access)
-# TODO: federation-gateway support for access via HTTP from Kong reverse proxy
+# Setup server cert, key, and keystore for Kong, Portal-BE, and Federation
+
 function setup() {
   trap 'fail' ERR
   log "Install keytool"
@@ -54,38 +51,63 @@ function setup() {
   # Customize openssl.cnf as this is needed to set CN (vs command options below)
   sed -i -- "s/<acumos-domain>/$ACUMOS_DOMAIN/" openssl.cnf
   sed -i -- "s/<acumos-host>/$ACUMOS_HOST/" openssl.cnf
-
-  openssl genrsa -des3 -out  /var/$ACUMOS_NAMESPACE/certs/acumosCA.key -passout pass:$ACUMOS_KEY_PASSWORD 4096
-
-  openssl req -x509 -new -nodes -key  /var/$ACUMOS_NAMESPACE/certs/acumosCA.key -sha256 -days 1024 \
-   -config openssl.cnf -out  /var/$ACUMOS_NAMESPACE/certs/acumosCA.crt -passin pass:$ACUMOS_KEY_PASSWORD \
+  CA_KEY_PASSWORD=$(uuidgen)
+  log "... Generate CA cert key"
+  openssl genrsa -des3 -out  /var/$ACUMOS_NAMESPACE/certs/acumosCA.key \
+    -passout pass:$CA_KEY_PASSWORD 4096
+  log "... Create self-signed cert for the CA"
+  openssl req -x509 -new -nodes -sha256 -days 1024 -config openssl.cnf \
+   -key /var/$ACUMOS_NAMESPACE/certs/acumosCA.key \
+   -passin pass:$CA_KEY_PASSWORD \
+   -out /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CA_CERT \
    -subj "/C=US/ST=Unspecified/L=Unspecified/O=Acumos/OU=Acumos/CN=$ACUMOS_DOMAIN"
 
   log "Create server certificate key"
-  openssl genrsa -out  /var/$ACUMOS_NAMESPACE/certs/acumos.key -passout pass:$ACUMOS_KEY_PASSWORD 4096
+  update_env ACUMOS_CERT_KEY_PASSWORD "$ACUMOS_CERT_KEY_PASSWORD" $(uuidgen)
+  openssl genrsa \
+    -out /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CERT_KEY \
+    -passout pass:$ACUMOS_CERT_KEY_PASSWORD 4096
 
-  log "Create a certificate signing request for the server cert"
+  log "Create a certificate signing request (CSR) for the server using the key"
   # ACUMOS_HOST is used as CN since it's assumed that the client's hostname
   # is not resolvable via DNS for this AIO deploy
-  openssl req -new -key  /var/$ACUMOS_NAMESPACE/certs/acumos.key -passin pass:$ACUMOS_KEY_PASSWORD \
+  openssl req -new \
+    -key /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CERT_KEY \
+    -passin pass:$ACUMOS_CERT_KEY_PASSWORD \
     -out  /var/$ACUMOS_NAMESPACE/certs/acumos.csr \
     -subj "/C=US/ST=Unspecified/L=Unspecified/O=Acumos/OU=Acumos/CN=$ACUMOS_DOMAIN"
 
   log "Sign the CSR with the acumos CA"
-  openssl x509 -req -in  /var/$ACUMOS_NAMESPACE/certs/acumos.csr -CA  /var/$ACUMOS_NAMESPACE/certs/acumosCA.crt \
-    -CAkey  /var/$ACUMOS_NAMESPACE/certs/acumosCA.key -CAcreateserial -passin pass:$ACUMOS_KEY_PASSWORD \
-    -extfile openssl.cnf -out  /var/$ACUMOS_NAMESPACE/certs/acumos.crt -days 500 -sha256
+  openssl x509 -req  -days 500 -sha256 \
+    -in /var/$ACUMOS_NAMESPACE/certs/acumos.csr \
+    -CA /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CA_CERT \
+    -CAkey  /var/$ACUMOS_NAMESPACE/certs/acumosCA.key \
+    -CAcreateserial -passin pass:$CA_KEY_PASSWORD \
+    -extfile openssl.cnf -out /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CERT
 
   log "Create PKCS12 format keystore with acumos server cert"
-  openssl pkcs12 -export -in  /var/$ACUMOS_NAMESPACE/certs/acumos.crt -passin pass:$ACUMOS_KEY_PASSWORD \
-    -inkey  /var/$ACUMOS_NAMESPACE/certs/acumos.key -certfile  /var/$ACUMOS_NAMESPACE/certs/acumos.crt \
-    -out  /var/$ACUMOS_NAMESPACE/certs/acumos_aio.p12 -passout pass:$ACUMOS_KEY_PASSWORD
+  update_env ACUMOS_KEYSTORE_PASSWORD "$ACUMOS_KEYSTORE_PASSWORD" $(uuidgen)
+  update_env ACUMOS_TRUSTSTORE_PASSWORD "$ACUMOS_TRUSTSTORE_PASSWORD" $(uuidgen)
+  openssl pkcs12 -export \
+    -in  /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CERT \
+    -inkey /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CERT_KEY \
+    -passin pass:$ACUMOS_CERT_KEY_PASSWORD \
+    -certfile  /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CERT \
+    -out /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_KEYSTORE \
+    -passout pass:$ACUMOS_KEYSTORE_PASSWORD
 
   log "Create JKS format truststore with acumos CA cert"
-  keytool -import -file  /var/$ACUMOS_NAMESPACE/certs/acumosCA.crt -alias acumosCA -keypass $ACUMOS_KEY_PASSWORD \
-    -keystore  /var/$ACUMOS_NAMESPACE/certs/acumosTrustStore.jks -storepass $ACUMOS_KEY_PASSWORD -noprompt
+  keytool -import \
+    -file /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CA_CERT \
+    -alias acumosCA \
+    -keypass $ACUMOS_CERT_KEY_PASSWORD \
+    -keystore  /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_TRUSTSTORE \
+    -storepass $ACUMOS_TRUSTSTORE_PASSWORD -noprompt
 }
 
 source $AIO_ROOT/acumos-env.sh
 source $AIO_ROOT/utils.sh
-setup
+if [[ "$ACUMOS_CERT_KEY_PASSWORD" == "" ]]; then
+  log "CA/cert config is not provided - setting up CA, cert, keystore, truststore"
+  setup
+fi

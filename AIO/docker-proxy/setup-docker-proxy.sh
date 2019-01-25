@@ -45,8 +45,8 @@ setup() {
     -Bbn $ACUMOS_DOCKER_PROXY_USERNAME $ACUMOS_DOCKER_PROXY_PASSWORD > auth/nginx.htpasswd
 
   log "Copy the Acumos server cert and key to auth/ for the docker image"
-  cp /var/$ACUMOS_NAMESPACE/certs/acumos.crt auth/domain.crt
-  cp /var/$ACUMOS_NAMESPACE/certs/acumos.key auth/domain.key
+  cp /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CERT auth/domain.crt
+  cp /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CERT_KEY auth/domain.key
 
   log "Build the local acumos-docker-proxy image"
   sudo docker build -t acumos-docker-proxy .
