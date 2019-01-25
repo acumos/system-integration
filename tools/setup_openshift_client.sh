@@ -79,7 +79,7 @@ setup_client() {
       brew update
       brew install openshift-cli
     elif [[ "$dist" == "windows" ]]; then
-      if [[ ! -e openshift-origin-client-tools-v3.11.0-0cbc58b-windows.zip]]; then
+      if [[ ! -e openshift-origin-client-tools-v3.11.0-0cbc58b-windows.zip ]]; then
         curl -LO https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-windows.zip
       fi
       unzip -o openshift*.zip

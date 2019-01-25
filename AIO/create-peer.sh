@@ -25,7 +25,7 @@
 #   (entries in /etc/hosts or in an actual DNS server)
 #.Usage:
 #.$ bash create-peer.sh <CAcert> <name> <subjectName> <contact> <apiUrl>
-#.  CAcert: CA certificate to add to truststore /var/$ACUMOS_NAMESPACE/certs/acumosTrustStore.jks
+#.  CAcert: CA certificate to add to truststore /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_TRUSTSTORE
 #.  name: hostname to assign to this peer
 #.  subjectName: subjectName (FQDN) from the cert
 #.  contact: admin email address
@@ -35,15 +35,15 @@
 function setup_peer() {
   trap 'fail' ERR
   log "Check for existing CA cert with alias ${subjectName}CA"
-  if [[ $(keytool -list -v -keystore /var/$ACUMOS_NAMESPACE/certs/acumosTrustStore.jks -storepass $ACUMOS_KEY_PASSWORD | grep -ci ${subjectName}CA) -gt 0 ]]; then
+  if [[ $(keytool -list -v -keystore /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_TRUSTSTORE -storepass $ACUMOS_TRUSTSTORE_PASSWORD | grep -ci ${subjectName}CA) -gt 0 ]]; then
     log "Found existing CA cert with alias ${subjectName}CA, removing it"
     keytool -delete -alias ${subjectName}CA \
-      -keystore /var/$ACUMOS_NAMESPACE/certs/acumosTrustStore.jks \
-      -storepass $ACUMOS_KEY_PASSWORD
+      -keystore /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_TRUSTSTORE \
+      -storepass $ACUMOS_CERT_KEY_PASSWORD
   fi
   log "Import peer CA cert into truststore"
   keytool -import -file $CAcert -alias ${subjectName}CA \
-    -keystore /var/$ACUMOS_NAMESPACE/certs/acumosTrustStore.jks -storepass $ACUMOS_KEY_PASSWORD -noprompt
+    -keystore /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_TRUSTSTORE -storepass $ACUMOS_TRUSTSTORE_PASSWORD -noprompt
 
   if [[ $(curl -s -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X GET http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer | grep -ci "subjectName\":\"${subjectName}") -eq 0 ]]; then
     log "Create peer relationship for $name via CDS API"
@@ -113,8 +113,8 @@ EOF
   fi
 
   log "Verify federation API is accessible"
-  while ! curl -vk --cert /var/$ACUMOS_NAMESPACE/certs/acumos.crt \
-  --key /var/$ACUMOS_NAMESPACE/certs/acumos.key \
+  while ! curl -vk --cert /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CERT \
+  --key /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CERT_KEY \
   https://$ACUMOS_FEDERATION_HOST:$ACUMOS_FEDERATION_PORT/solutions ; do
     log "federation API is not yet accessible. Waiting 10 seconds"
     sleep 10

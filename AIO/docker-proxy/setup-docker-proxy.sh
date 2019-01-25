@@ -32,6 +32,7 @@
 # Acumos platforms
 
 setup() {
+  trap 'fail' ERR
   log "Update docker-proxy config for building the docker image"
   ACUMOS_DOCKER_PROXY_AUTH=$(echo -n "$ACUMOS_NEXUS_RO_USER:$ACUMOS_NEXUS_RO_USER_PASSWORD" | base64)
   sed -i -- "s~<ACUMOS_DOCKER_PROXY_AUTH>~$ACUMOS_DOCKER_PROXY_AUTH~g" auth/nginx.conf
@@ -45,8 +46,8 @@ setup() {
     -Bbn $ACUMOS_DOCKER_PROXY_USERNAME $ACUMOS_DOCKER_PROXY_PASSWORD > auth/nginx.htpasswd
 
   log "Copy the Acumos server cert and key to auth/ for the docker image"
-  cp /var/$ACUMOS_NAMESPACE/certs/acumos.crt auth/domain.crt
-  cp /var/$ACUMOS_NAMESPACE/certs/acumos.key auth/domain.key
+  cp /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CERT auth/domain.crt
+  cp /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CERT_KEY auth/domain.key
 
   log "Build the local acumos-docker-proxy image"
   sudo docker build -t acumos-docker-proxy .

@@ -66,9 +66,6 @@ hostip=$(/sbin/ip route get 8.8.8.8 | head -1 | sed 's/^.*src //' | awk '{print 
 export ACUMOS_HOST=$hostip
 export ACUMOS_HOST_OS=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
 export ACUMOS_HOST_OS_VER=$(grep -m 1 'VERSION_ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
-export AIO_ROOT=
-export DEPLOYED_UNDER=
-export K8S_DIST=
 
 # External component options
 export ACUMOS_DEPLOY_MARIADB=true
@@ -133,9 +130,14 @@ export ACUMOS_DSCE_PORT=8088
 export ACUMOS_FEDERATION_HOST=$ACUMOS_DOMAIN
 export ACUMOS_FEDERATION_LOCAL_PORT=30985
 export ACUMOS_FEDERATION_PORT=30984
-export ACUMOS_KEYSTORE_PATH='/app/certs/acumos_aio.p12'
-export ACUMOS_KEY_PASSWORD=
+export ACUMOS_CERT_PREFIX=acumos
+export ACUMOS_CA_CERT=${ACUMOS_CERT_PREFIX}-ca.crt
+export ACUMOS_CERT=${ACUMOS_CERT_PREFIX}.crt
+export ACUMOS_CERT_KEY=${ACUMOS_CERT_PREFIX}.key
+export ACUMOS_CERT_KEY_PASSWORD=
+export ACUMOS_KEYSTORE=${ACUMOS_CERT_PREFIX}-keystore.p12
 export ACUMOS_KEYSTORE_PASSWORD=
+export ACUMOS_TRUSTSTORE=${ACUMOS_CERT_PREFIX}-truststore.jks
 export ACUMOS_TRUSTSTORE_PASSWORD=
 export ACUMOS_KUBERNETES_CLIENT_PORT=8082
 export ACUMOS_MICROSERVICE_GENERATION_PORT=8336
