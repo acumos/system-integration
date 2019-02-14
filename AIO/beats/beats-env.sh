@@ -17,25 +17,14 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# What this is:
-# Deployment script for the Acumos ELK-stack components under docker.
-# Sets environment variables needed by docker-compose in all-in-one environment
-# then invokes docker-compose with the command-line arguments.
-#
+# What this is: Environment file for ELK stack "beats" depoyment for Acumos.
+# Prerequisites:
+# - Ubuntu Xenial or Centos 7 server
 # Usage:
-# - bash docker-compose.sh [options]
-#   options: optional parameters to docker-compose.
+# - Intended to be called from setup-beats.sh
+# - Customize the values here for your needs.
 #
 
-set -x
-source ../acumos-env.sh
-source elk-env.sh
-cmd="$1 $2 $3 $4"
-opts=""
-files=$(ls docker/acumos)
-for file in $files ; do
- opts="$opts -f acumos/$file"
-done
-
-cd docker
-docker-compose $opts $cmd
+# Component options
+export ACUMOS_FILEBEAT_PORT=8099
+export ACUMOS_METRICBEAT_PORT=8098

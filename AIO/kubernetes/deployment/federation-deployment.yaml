@@ -42,9 +42,9 @@ spec:
       - name: acumos-registry
       containers:
       - name: federation
+        image: <FEDERATION_IMAGE>
         securityContext:
           privileged: true
-        image: <FEDERATION_IMAGE>
         env:
         - name: SPRING_APPLICATION_JSON
           value: '{
@@ -113,15 +113,15 @@ spec:
         - mountPath: /maven/logs
           name: pv-<ACUMOS_NAMESPACE>-logs
         - mountPath: /app/certs
-          name: pv-<ACUMOS_NAMESPACE>-certs
+          name: certs-volume
       restartPolicy: Always
       volumes:
       - name: pv-<ACUMOS_NAMESPACE>-logs
         persistentVolumeClaim:
-         claimName: pvc-<ACUMOS_NAMESPACE>-logs
-      - name: pv-<ACUMOS_NAMESPACE>-certs
-        persistentVolumeClaim:
-         claimName: pvc-<ACUMOS_NAMESPACE>-certs
+          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+      - name: certs-volume
+        configMap:
+          name: acumos-store
       hostAliases:
       - ip: "<ACUMOS_HOST>"
         hostnames:

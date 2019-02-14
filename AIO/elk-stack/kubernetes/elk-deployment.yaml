@@ -21,7 +21,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: <ACUMOS_NAMESPACE>
+  namespace: <ACUMOS_ELK_NAMESPACE>
   name: elasticsearch
   labels:
     app: elasticsearch
@@ -55,15 +55,15 @@ spec:
         - containerPort: 9200
         volumeMounts:
         - mountPath: /usr/share/elasticsearch/data
-          name: pv-<ACUMOS_NAMESPACE>-elasticsearch-data
+          name: pv-<ACUMOS_ELK_NAMESPACE>-elasticsearch-data
 # https://github.com/elastic/beats/issues/8253 (similar issue)
         securityContext:
           privileged: true
       restartPolicy: Always
       volumes:
-      - name: pv-<ACUMOS_NAMESPACE>-elasticsearch-data
+      - name: pv-<ACUMOS_ELK_NAMESPACE>-elasticsearch-data
         persistentVolumeClaim:
-          claimName: pvc-<ACUMOS_NAMESPACE>-elasticsearch-data
+          claimName: pvc-<ACUMOS_ELK_NAMESPACE>-elasticsearch-data
       hostAliases:
       - ip: "<ACUMOS_ELK_HOST>"
         hostnames:
@@ -72,7 +72,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: <ACUMOS_NAMESPACE>
+  namespace: <ACUMOS_ELK_NAMESPACE>
   name: logstash
   labels:
     app: logstash
@@ -118,7 +118,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: <ACUMOS_NAMESPACE>
+  namespace: <ACUMOS_ELK_NAMESPACE>
   name: kibana
   labels:
     app: kibana
