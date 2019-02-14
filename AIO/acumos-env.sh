@@ -58,21 +58,30 @@ export DATABROKER_SQLBROKER_IMAGE=$RELEASE/sqldatabroker:1.2.0
 export DATABROKER_ZIPBROKER_IMAGE=$RELEASE/databroker-zipbroker:0.0.1
 export DATABROKER_CSVBROKER_IMAGE=$RELEASE/csvdatabroker:1.4.0
 
-export ACUMOS_DOMAIN=$(hostname)
-# Hard-code ACUMOS_HOST below to the primary IP address (as primary route) of
-# your AIO host server, if the generated value does not work for your server
-# (there have been reports that this command does not always work)
-hostip=$(/sbin/ip route get 8.8.8.8 | head -1 | sed 's/^.*src //' | awk '{print $1}')
-export ACUMOS_HOST=$hostip
-export ACUMOS_HOST_OS=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
-export ACUMOS_HOST_OS_VER=$(grep -m 1 'VERSION_ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+# Set by oneclick_deploy.sh
+export DEPLOYED_UNDER=
+export K8S_DIST=
+export AIO_ROOT=
+export ACUMOS_DOMAIN=
+export ACUMOS_HOST=
+export ACUMOS_HOST_OS=
+export ACUMOS_HOST_OS_VER=
+export ACUMOS_ADMIN_HOST=
+export ACUMOS_ADMIN_REGISTRY_USER=
+export ACUMOS_ADMIN_REGISTRY_PASSWORD=
+export DEPLOY_RESULT=
+export FAIL_REASON=
+
+# Global options
+export SHELL_TRACE=false
 
 # External component options
 export ACUMOS_DEPLOY_MARIADB=true
 export ACUMOS_DEPLOY_DOCKER=true
 export ACUMOS_DEPLOY_NEXUS=true
 export ACUMOS_DEPLOY_KONG=true
-export ACUMOS_DEPLOY_ELK=true
+export ACUMOS_DEPLOY_ELK=false
+export ACUMOS_MARIADB_VERSION=10.2
 export ACUMOS_MARIADB_HOST=$ACUMOS_DOMAIN
 export ACUMOS_MARIADB_PORT=30306
 export ACUMOS_MARIADB_ADMINER_PORT=30380
@@ -138,7 +147,6 @@ export ACUMOS_CERT_KEY_PASSWORD=
 export ACUMOS_KEYSTORE=${ACUMOS_CERT_PREFIX}-keystore.p12
 export ACUMOS_KEYSTORE_PASSWORD=
 export ACUMOS_TRUSTSTORE=${ACUMOS_CERT_PREFIX}-truststore.jks
-export ACUMOS_TRUSTSTORE_PASSWORD=
 export ACUMOS_KUBERNETES_CLIENT_PORT=8082
 export ACUMOS_MICROSERVICE_GENERATION_PORT=8336
 export ACUMOS_ONBOARDING_PORT=8090
@@ -165,18 +173,16 @@ export ACUMOS_DEPLOYED_VM_USER=dockerUser
 export ACUMOS_PROBE_PORT=5006
 
 # Kubernetes options
+# Select "tenant" below to skip creation of hostPath PVs
+export ACUMOS_K8S_ROLE=admin
 export ACUMOS_NAMESPACE=acumos
+export ACUMOS_HOST_USER=
 
 # Persistent Volume options
-export ACUMOS_SETUP_PVS=true
 export ACUMOS_CERTS_PV_NAME="pv-$ACUMOS_NAMESPACE-certs"
 export ACUMOS_CERTS_PV_SIZE=10Mi
 export ACUMOS_LOGS_PV_NAME="pv-$ACUMOS_NAMESPACE-logs"
 export ACUMOS_LOGS_PV_SIZE=1Gi
-export ACUMOS_OUTPUT_PV_NAME="pv-$ACUMOS_NAMESPACE-output"
-export ACUMOS_OUTPUT_PV_SIZE=5Gi
-export ACUMOS_WEBONBOARDING_PV_NAME="pv-$ACUMOS_NAMESPACE-webonboarding"
-export ACUMOS_WEBONBOARDING_PV_SIZE=5Gi
 export DOCKER_VOLUME_PV_NAME="pv-$ACUMOS_NAMESPACE-docker-volume"
 export DOCKER_VOLUME_PV_SIZE=5Gi
 export KONG_DB_PV_NAME="pv-$ACUMOS_NAMESPACE-kong-db"

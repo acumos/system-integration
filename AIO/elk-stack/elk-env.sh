@@ -57,4 +57,4 @@ export ACUMOS_NAMESPACE=acumos
 
 # Persistent Volume options
 export ELASTICSEARCH_DATA_PV_NAME="pv-$ACUMOS_NAMESPACE-elasticsearch-data"
-export PV_SIZE_ACUMOS_ELASTICSEARCH_DATA=1Gi
+export ACUMOS_ELASTICSEARCH_DATA_PV_SIZE=1Gi

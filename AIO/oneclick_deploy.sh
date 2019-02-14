@@ -19,17 +19,32 @@
 #
 # What this is: All-in-One deployment of the Acumos platform. FOR TEST PURPOSES
 # ONLY.
+#
 # Prerequisites:
 # - Ubuntu Xenial (16.04), Bionic (18.04), or Centos 7 hosts
 # - All hostnames specified in acumos-env.sh must be DNS-resolvable on all hosts
 #   (entries in /etc/hosts or in an actual DNS server)
 # - For deployments behind proxies, set HTTP_PROXY and HTTPS_PROXY in acumos-env.sh
-# - For kubernetes based deplpyment: Kubernetes cluster deployed
-# Usage:
-# $ bash oneclick_deploy.sh <under> <k8sdist>
-#   under: docker|k8s
-#     docker: install all components other than mariadb under docker-ce
-#     k8s: install all components other than mariadb under kubernetes
+# - For kubernetes based deployment
+#   - Kubernetes cluster deployed
+#   - kubectl installed on user's workstation, and configured to use the kube
+#     profile for the target cluster, e.g. though setup-kubectl.sh, e.g
+#     $ wget https://raw.githubusercontent.com/acumos/kubernetes-client/master/deploy/private/setup-kubectl.sh
+#     $ bash setup-kubectl.sh myk8smaster myuser mynamespace
+# - Persistent volume pre-arranged and identified for PV-dependent components
+#   in acumos-env.sh. setup-pv.sh may be used for this, e.g.
+#   $ bash acumos-env.sh
+#   $ bash setup-pv.sh setup pv logs $ACUMOS_LOGS_PV_SIZE "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
+#
+# Usage: if deploying under docker, on the target host
+# $ bash oneclick_deploy.sh docker <host>
+#   docker: install all components other than the docker-engine using docker-compose
+#   host: domain name of target host
+#
+# If deploying under kubernetes, on the user's workstation
+# $ bash oneclick_deploy.sh k8s <host> <k8sdist>
+#   k8s: install all components under kubernetes
+#   host: domain name of k8s master node
 #   k8sdist: k8s distribution, generic|openshift
 #
 # NOTE: if redeploying with an existing Acumos database, or to upgrade an
@@ -50,31 +65,18 @@ function setup_prereqs() {
 
   log "/etc/hosts customizations"
   # Ensure cluster hostname resolves inside the cluster
-  if [[ $(grep -c -P " $HOSTNAME( |$)" /etc/hosts) -eq 0 ]]; then
-    echo; echo "prereqs.sh: ($(date)) Add $HOSTNAME to /etc/hosts"
-    # have to add "/sbin" to path of IP command for centos
-    echo "$(/sbin/ip route get 8.8.8.8 | head -1 | sed 's/^.*src //' | awk '{print $1}') $HOSTNAME" \
-      | sudo tee -a /etc/hosts
+  if [[ $(host $ACUMOS_DOMAIN | grep -c 'not found') -gt 0 ]]; then
+    if [[ $(grep -c -P " $ACUMOS_DOMAIN( |$)" /etc/hosts) -eq 0 ]]; then
+      echo; echo "prereqs.sh: ($(date)) Add $ACUMOS_DOMAIN to /etc/hosts"
+      echo "$ACUMOS_DOMAIN $ACUMOS_HOST" | sudo tee -a /etc/hosts
+    fi
   fi
 
-  if [[ $(grep -c -P " $ACUMOS_DOMAIN( |$)" /etc/hosts) -eq 0 ]]; then
-    log "Add $ACUMOS_DOMAIN to /etc/hosts"
-    echo "$ACUMOS_HOST $ACUMOS_DOMAIN" | sudo tee -a /etc/hosts
-  fi
   log "/etc/hosts:"
   cat /etc/hosts
 
-  # Add 'options ndots:5' to first resolve names using DNS search options
-  if [[ $(grep -c 'options ndots:5' /etc/resolv.conf) -eq 0 ]]; then
-    log "Add 'options ndots:5' to /etc/resolv.conf"
-    echo "options ndots:5" | sudo tee -a /etc/resolv.conf
-  fi
-  log "/etc/resolv.conf:"
-  cat /etc/resolv.conf
-
-  # Per https://kubernetes.io/docs/setup/independent/install-kubeadm/
   log "Basic prerequisites"
-  if [[ "$ACUMOS_HOST_OS" == "ubuntu" ]]; then
+  if [[ "$HOST_OS" == "ubuntu" ]]; then
     wait_dpkg; sudo apt-get update
     # TODO: fix need to skip upgrade as this sometimes updates the kube-system
     # services and they then stay in "pending", blocking k8s-based deployment
@@ -95,7 +97,7 @@ function setup_prereqs() {
     # Per https://docs.docker.com/compose/install/#install-compose
     # Current version is listed at https://github.com/docker/compose/releases
     sudo curl -L -o /usr/local/bin/docker-compose \
-      "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)"
+    "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)"
     sudo chmod +x /usr/local/bin/docker-compose
   fi
 }
@@ -105,20 +107,30 @@ function clean_env() {
     log "Stop any running Acumos core docker-based components"
     sudo bash docker-compose.sh down
   else
-    log "Stop and remove services for all core components"
-    for f in  deploy/*-service.yaml ; do
-      stop_service $f
-    done
-    log "Stop and remove deployments for all core components"
-    for f in  deploy/*-deployment.yaml ; do
-      stop_deployment $f
-    done
+    if [[ "$K8S_DIST" == "openshift" ]]; then
+      echo "Delete project $ACUMOS_NAMESPACE"
+      oc delete project $ACUMOS_NAMESPACE
+      while oc project $ACUMOS_NAMESPACE; do
+        echo "Waiting 10 seconds for project acumos to be deleted"
+        sleep 10
+      done
+    else
+      echo "Delete namespace $ACUMOS_NAMESPACE"
+      kubectl delete namespace $ACUMOS_NAMESPACE
+      while kubectl get namespace $ACUMOS_NAMESPACE; do
+        echo "Waiting 10 seconds for namespace $ACUMOS_NAMESPACE to be deleted"
+        sleep 10
+      done
+    fi
   fi
 }
 
 function prepare_env() {
   # TODO: redeploy without deleting all services first
   clean_env
+  log "Create PV for logs"
+  bash setup-pv.sh setup pv logs $ACUMOS_NAMESPACE $ACUMOS_LOGS_PV_SIZE "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
+
   if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
     log "Check if namespace/project already exists, and create if not"
     if [[ "$K8S_DIST" == "generic" ]]; then
@@ -136,15 +148,9 @@ function prepare_env() {
         oc adm policy add-scc-to-user privileged -z default -n $ACUMOS_NAMESPACE
       fi
     fi
-  fi
-
-  # Can't recreate PVs if redeploying since data will still exist there
-  if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
-    log "Create host folders for docker volumes and k8s PVs"
-    bash setup-pv.sh setup pv logs $ACUMOS_LOGS_PV_SIZE "$USER:$USER"
-    bash setup-pv.sh setup pv output $ACUMOS_OUTPUT_PV_SIZE "$USER:$USER"
-    bash setup-pv.sh setup pv webonboarding $ACUMOS_WEBONBOARDING_PV_SIZE "$USER:$USER"
-    bash setup-pv.sh setup pv certs $ACUMOS_CERTS_PV_SIZE "$USER:$USER"
+  elif [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
+    bash setup-pv.sh setup pv certs $ACUMOS_NAMESPACE $ACUMOS_CERTS_PV_SIZE \
+      "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
   fi
 }
 
@@ -155,11 +161,12 @@ function docker_login() {
 
 function setup_acumos() {
   trap 'fail' ERR
-  log "Log into LF Nexus Docker repos"
+  log "Login to LF Nexus Docker repos, for Acumos project images"
   docker_login https://nexus3.acumos.org:10004
   docker_login https://nexus3.acumos.org:10003
   docker_login https://nexus3.acumos.org:10002
-  if [[ "$ACUMOS_HOST_OS" == "ubuntu" ]]; then sudo chown -R $USER:$USER $HOME/.docker; fi
+
+  if [[ "$HOST_OS" == "ubuntu" ]]; then sudo chown -R $USER:$USER $HOME/.docker; fi
 
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     if [[ "$ACUMOS_DEPLOY_KONG" != "true" ]]; then
@@ -174,25 +181,30 @@ function setup_acumos() {
 
     log "Deploy Acumos core docker-based components"
     sudo bash docker-compose.sh up -d --build
-    cd docker-proxy; bash setup-docker-proxy.sh; cd ..
+    cd docker-proxy; source setup-docker-proxy.sh; cd ..
   else
     if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
       # Can't recreate PVCs if redeploying since data will still exist there
       log "Create PVCs in namespace $ACUMOS_NAMESPACE"
-      bash setup-pv.sh setup pvc logs $ACUMOS_LOGS_PV_SIZE
-      bash setup-pv.sh setup pvc output $ACUMOS_OUTPUT_PV_SIZE
-      bash setup-pv.sh setup pvc webonboarding $ACUMOS_WEBONBOARDING_PV_SIZE
-      bash setup-pv.sh setup pvc certs $ACUMOS_CERTS_PV_SIZE
+      source setup-pv.sh setup pvc logs $ACUMOS_NAMESPACE $ACUMOS_LOGS_PV_SIZE
+
+      if [[ $(kubectl get secret -n $ACUMOS_NAMESPACE acumos-registry) ]]; then
+        log "Deleting k8s secret acumos-registry, prior to recreating it"
+        kubectl delete secret -n $ACUMOS_NAMESPACE acumos-registry
+      fi
+
       log "Create k8s secret for image pulling from docker"
-      if [[ "$ACUMOS_HOST_OS" == "ubuntu" ]]; then b64=$(cat $HOME/.docker/config.json | base64 -w 0)
-      else b64=$(sudo cat /root/.docker/config.json | base64 -w 0)
+      if [[ "$HOST_OS" == "ubuntu" ]]; then
+        b64=$(cat $HOME/.docker/config.json | base64 -w 0)
+      else
+        b64=$(sudo cat /root/.docker/config.json | base64 -w 0)
       fi
       cat <<EOF >acumos-registry.yaml
 apiVersion: v1
 kind: Secret
 metadata:
   name: acumos-registry
-  namespace: acumos
+  namespace: $ACUMOS_NAMESPACE
 data:
   .dockerconfigjson: $b64
 type: kubernetes.io/dockerconfigjson
@@ -232,7 +244,7 @@ EOF
     done
 
     log "Deploy docker-proxy"
-    cd docker-proxy; bash setup-docker-proxy.sh; cd ..
+    cd docker-proxy; source setup-docker-proxy.sh; cd ..
 
     log "Wait for all Acumos core component pods to be Running"
     log "Wait for all elk-stack pods to be Running"
@@ -259,67 +271,106 @@ function setup_federation() {
   fi
 }
 
+function set_env() {
+  log "Updating acumos-env.sh with \"export $1=$3\""
+  sed -i -- "s/$1=.*/$1=$3/" acumos-env.sh
+  export $1=$3
+}
+
 set -x
-export WORK_DIR=$(pwd)
-AIO_ROOT=$WORK_DIR
-echo "export AIO_ROOT=$AIO_ROOT" >>acumos-env.sh
-
-# This supports the option to clean and redeploy with under a different env,
-# using the same customized acumos-env.sh file.
-if [[ "$1" == "k8s" ]]; then DEPLOYED_UNDER=k8s
-else DEPLOYED_UNDER=docker
-fi
-echo "export DEPLOYED_UNDER=$DEPLOYED_UNDER" >>acumos-env.sh
-
-if [[ "$2" == "openshift" ]]; then
-  K8S_DIST=openshift
-  k8s_cmd=oc
-else
-  K8S_DIST=generic
-  k8s_cmd=kubectl
-fi
-echo "export K8S_DIST=$K8S_DIST" >>acumos-env.sh
-
 source acumos-env.sh
 source utils.sh
+get_host_info
+export WORK_DIR=$(pwd)
+sed -i -- "s/DEPLOY_RESULT=.*/DEPLOY_RESULT=/" acumos-env.sh
+sed -i -- "s/FAIL_REASON=.*/FAIL_REASON=/" acumos-env.sh
+update_env AIO_ROOT $WORK_DIR
+update_env DEPLOYED_UNDER $1
+update_env ACUMOS_DOMAIN $2
+update_env K8S_DIST $3
 
-update_env ACUMOS_CDS_PASSWORD "$ACUMOS_CDS_PASSWORD" $(uuidgen)
-update_env ACUMOS_NEXUS_RO_USER_PASSWORD "$ACUMOS_NEXUS_RO_USER_PASSWORD" \
-  $(uuidgen)
-update_env ACUMOS_NEXUS_RW_USER_PASSWORD "$ACUMOS_NEXUS_RW_USER_PASSWORD" \
-  $(uuidgen)
-update_env ACUMOS_DOCKER_REGISTRY_PASSWORD "$ACUMOS_DOCKER_REGISTRY_PASSWORD" \
-  $ACUMOS_NEXUS_RW_USER_PASSWORD
-update_env ACUMOS_DOCKER_PROXY_USERNAME "$ACUMOS_DOCKER_PROXY_USERNAME" $(uuidgen)
-update_env ACUMOS_DOCKER_PROXY_PASSWORD "$ACUMOS_DOCKER_PROXY_PASSWORD" $(uuidgen)
+if [[ "$ACUMOS_HOST" == "" ]]; then
+  log "Determining host IP address for $ACUMOS_DOMAIN"
+  if [[ $(host $ACUMOS_DOMAIN | grep -c 'not found') -eq 0 ]]; then
+    update_env ACUMOS_HOST $(host $ACUMOS_DOMAIN | head -1 | cut -d ' ' -f 4)
+  elif [[ $(grep -c -P " $ACUMOS_DOMAIN( |$)" /etc/hosts) -gt 0 ]]; then
+    update_env ACUMOS_HOST $(grep -P "$ACUMOS_DOMAIN( |$)" /etc/hosts | cut -d ' ' -f 1)
+  else
+    log "Please ensure $ACUMOS_DOMAIN is resolvable thru DNS or hosts file"
+    fail "IP address of $ACUMOS_DOMAIN cannot be determined."
+  fi
+fi
 
-source $AIO_ROOT/acumos-env.sh
+# Local variables used here and in other sourced scripts
+export HOST_OS=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+export HOST_OS_VER=$(grep -m 1 'VERSION_ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+
+if [[ "$DEPLOYED_UNDER" == "docker" ]];then
+  # This supports the option to clean and redeploy with under a different env,
+  # using the same customized acumos-env.sh file.
+  update_env ACUMOS_HOST_OS $HOST_OS
+  update_env ACUMOS_HOST_OS_VER $HOST_OS_VER
+  update_env ACUMOS_HOST_USER $USER
+else
+  if [[ "$ACUMOS_HOST_USER" == "" ]]; then
+    log "Determining default user for target deployment host (ubuntu|centos)"
+    if [[ $(ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ubuntu@$ACUMOS_DOMAIN pwd) ]]; then
+      update_env ACUMOS_HOST_USER ubuntu
+    elif [[ $(ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no centos@$ACUMOS_DOMAIN pwd) ]]; then
+      update_env ACUMOS_HOST_USER centos
+    else
+      log "Please set the value of ACUMOS_HOST_USER in acumos-env.sh"
+      fail "Target host $ACUMOS_HOST_USER cannot be determined"
+    fi
+  fi
+  scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $ACUMOS_HOST_USER@$ACUMOS_DOMAIN:/etc/os-release .
+  ACUMOS_HOST_OS=$(cat os-release | grep --m 1 ID | awk -F '=' '{print $2}' | sed 's/"//g')
+  update_env ACUMOS_HOST_OS $ACUMOS_HOST_OS
+  ACUMOS_HOST_OS_VER=$(cat os-release | grep -m 1 'VERSION_ID=' | awk -F '=' '{print $2}' | sed 's/"//g')
+  update_env ACUMOS_HOST_OS_VER $ACUMOS_HOST_OS_VER
+fi
+
+hostip=$(/sbin/ip route get 8.8.8.8 | head -1 | sed 's/^.*src //' | awk '{print $1}')
+update_env ACUMOS_ADMIN_HOST $hostip
+
+
+if [[ "$2" == "openshift" ]]; then
+  k8s_cmd=oc
+else
+  k8s_cmd=kubectl
+fi
+
+update_env ACUMOS_CDS_PASSWORD $(uuidgen)
+update_env ACUMOS_NEXUS_RO_USER_PASSWORD $(uuidgen)
+update_env ACUMOS_NEXUS_RW_USER_PASSWORD $(uuidgen)
+update_env ACUMOS_DOCKER_REGISTRY_PASSWORD $ACUMOS_NEXUS_RW_USER_PASSWORD
+update_env ACUMOS_DOCKER_PROXY_USERNAME $(uuidgen)
+update_env ACUMOS_DOCKER_PROXY_PASSWORD $(uuidgen)
 
 if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
   setup_prereqs
 fi
 
-bash setup-keystore.sh
 prepare_env
+source setup-keystore.sh
 
 if [[ "$ACUMOS_DEPLOY_DOCKER" == "true" ]]; then
-  cd docker-engine; bash setup-docker-engine.sh; cd ..
+  cd docker-engine; source setup-docker-engine.sh; cd ..
 fi
 
 if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" && "$ACUMOS_DEPLOY_MARIADB" == "true" ]]; then
-  cd mariadb; bash setup-mariadb.sh; cd ..
+  cd mariadb; source setup-mariadb.sh; cd ..
 fi
 
-source acumos-env.sh
-bash setup-acumosdb.sh
+source setup-acumosdb.sh
 setup_acumos
 
 if [[ "$ACUMOS_DEPLOY_KONG" == "true" ]]; then
-  cd kong; bash setup-kong.sh; cd ..
+  cd kong; source setup-kong.sh; cd ..
 fi
 
 if [[ "$ACUMOS_DEPLOY_NEXUS" == "true" ]]; then
-  cd nexus; bash setup-nexus.sh; cd ..
+  cd nexus; source setup-nexus.sh; cd ..
 fi
 
 if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
@@ -327,20 +378,20 @@ if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
 fi
 
 if [[ "$ACUMOS_DEPLOY_ELK" == "true" ]]; then
-  cd elk-stack; bash setup-elk.sh; cd ..
+  cd elk-stack
+  sed -i -- "s/ACUMOS_ELK_DOMAIN=.*/ACUMOS_ELK_DOMAIN=$ACUMOS_DOMAIN/" acumos-env.sh
+  sed -i -- "s/ACUMOS_ELK_HOST=.*/ACUMOS_ELK_HOST=$ACUMOS_HOST/" acumos-env.sh
+  sed -i -- "s/ACUMOS_NAMESPACE=.*/ACUMOS_NAMESPACE=$ACUMOS_NAMESPACE/" acumos-env.sh
+  source setup-elk.sh
+  cd ..
 fi
 
 set +x
 save_logs
-log "Current PV usage, in Kbytes"
-sudo du -sbck /var/acumos/*
 
 log "Deploy is complete."
 echo "Component details and stdout logs up to this point have been saved at"
 echo "/tmp/acumos/debug, e.g. for debugging or if you are really bored."
-echo "You can monitor disk usage of the persistent volumes via the commannd:"
-echo "sudo du -h -s /var/acumos/*"
-sudo du -h -s /var/acumos/*
 echo "You can access the Acumos portal and other services at the URLs below,"
 echo "assuming hostname \"$ACUMOS_DOMAIN\" is resolvable from your workstation:"
 if [[ "$ACUMOS_DEPLOY_KONG" == "true" ]]; then
@@ -354,7 +405,7 @@ cat <<EOF >acumos.url
 Portal: $portal_base
 Onboarding API: $onboarding_base/onboarding-app
 Common Data Service: http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/swagger-ui.html
-Kibana: http://$ACUMOS_ELK_DOMAIN:$ACUMOS_ELK_KIBANA_PORT/app/kibana
+Kibana: http://$ACUMOS_ELK_HOST:$ACUMOS_ELK_KIBANA_PORT/app/kibana
 Hippo CMS: http://$ACUMOS_CMS_HOST:$ACUMOS_CMS_PORT/cms/console/?1&path=/
 Nexus: http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT
 Mariadb Admin: http://$ACUMOS_DOMAIN:$ACUMOS_MARIADB_ADMINER_PORT

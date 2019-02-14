@@ -58,10 +58,8 @@ function setup() {
       fail "No available upgrade script for CDS upgrade from $ACUMOS_CDS_VERSION to $ACUMOS_CDS_PREVIOUS_VERSION"
     fi
   else
-    log "Redeploying with existing database versikon - no action required."
+    log "Redeploying with existing database version - no action required."
   fi
 }
 
-source $AIO_ROOT/acumos-env.sh
-source $AIO_ROOT/utils.sh
 setup

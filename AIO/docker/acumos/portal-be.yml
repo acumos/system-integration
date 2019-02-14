@@ -170,9 +170,6 @@ services:
            - type: bind
              source: /var/${ACUMOS_NAMESPACE}/certs
              target: /app/certs
-           - type: bind
-             source: /var/${ACUMOS_NAMESPACE}/webonboarding
-             target: /acumosWebOnboarding
        logging:
            driver: json-file
        extra_hosts:

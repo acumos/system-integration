@@ -185,20 +185,15 @@ spec:
         - mountPath: /maven/logs
           name: pv-<ACUMOS_NAMESPACE>-logs
         - mountPath: /app/certs
-          name: pv-<ACUMOS_NAMESPACE>-certs
-        - mountPath: /acumosWebOnboarding
-          name: pv-<ACUMOS_NAMESPACE>-webonboarding
+          name: certs-volume
       restartPolicy: Always
       volumes:
       - name: pv-<ACUMOS_NAMESPACE>-logs
         persistentVolumeClaim:
-         claimName: pvc-<ACUMOS_NAMESPACE>-logs
-      - name: pv-<ACUMOS_NAMESPACE>-certs
-        persistentVolumeClaim:
-         claimName: pvc-<ACUMOS_NAMESPACE>-certs
-      - name: pv-<ACUMOS_NAMESPACE>-webonboarding
-        persistentVolumeClaim:
-         claimName: pvc-<ACUMOS_NAMESPACE>-webonboarding
+          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+      - name: certs-volume
+        configMap:
+          name: acumos-store
       hostAliases:
       - ip: "<ACUMOS_HOST>"
         hostnames:

@@ -41,7 +41,7 @@ spec:
       - name: acumos-registry
       containers:
       - name: elasticsearch
-        image: acumos-elasticsearch
+        image: <ACUMOS_ADMIN_HOST>/acumos-elasticsearch
         imagePullPolicy: IfNotPresent
         env:
         - name: ES_JAVA_OPTS
@@ -92,7 +92,7 @@ spec:
       - name: acumos-registry
       containers:
       - name: logstash
-        image: acumos-logstash
+        image: <ACUMOS_ADMIN_HOST>/acumos-logstash
         imagePullPolicy: IfNotPresent
         env:
         - name: ES_JAVA_OPTS
@@ -137,7 +137,7 @@ spec:
       imagePullSecrets:
       - name: acumos-registry
       containers:
-      - name: kibana
+      - name: <ACUMOS_ADMIN_HOST>/kibana
         image: acumos-kibana
         imagePullPolicy: IfNotPresent
         ports:

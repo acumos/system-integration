@@ -23,8 +23,7 @@
 #. - Acumos platform core components installed per oneclick_deploy.sh, with
 #.   acumos-env.sh as updated by that script for deployment options.
 #.
-#. Usage:
-#. $ bash deploy-elk.sh
+#. Usage: intended to be called directly from oneclick_deploy.sh
 #.
 
 function build_images() {
@@ -40,25 +39,29 @@ function build_images() {
   log "Building local acumos-elasticsearch image"
   cd elasticsearch
   cp -r ../platform-oam/elk-stack/elasticsearch/config .
-  sudo docker build -t acumos-elasticsearch .
+  sudo docker build -t localhost:443/acumos-elasticsearch .
+  sudo docker push localhost:443/acumos-elasticsearch
 
   log "Building local acumos-kibana image"
   # Pr https://www.elastic.co/guide/en/kibana/current/docker.html
   cd ../kibana
   cp -r ../platform-oam/elk-stack/kibana/config .
-  sudo docker build -t acumos-kibana .
+  sudo docker build -t localhost:443/acumos-kibana .
+  sudo docker push localhost:443/acumos-kibana
 
   log "Building local acumos-logstash image"
   cd ../logstash
   cp -r ../platform-oam/elk-stack/logstash/config .
   cp -r ../platform-oam/elk-stack/logstash/pipeline .
-  sudo docker build -t acumos-logstash .
+  sudo docker build -t localhost:443/acumos-logstash .
+  sudo docker push localhost:443/acumos-logstash
 
   log "Building local acumos-filebeat image"
   # Per https://www.elastic.co/guide/en/beats/filebeat/current/running-on-docker.html
   cd ../filebeat
   cp -R ../platform-oam/filebeat/config .
-  sudo docker build -t acumos-filebeat .
+  sudo docker build -t localhost:443/acumos-filebeat .
+  sudo docker push localhost:443/acumos-filebeat
 
   log "Building local acumos-metricbeat image"
   cd ../metricbeat
@@ -67,7 +70,8 @@ function build_images() {
     ../platform-oam/metricbeat/config/metricbeat.yml
   cp -R ../platform-oam/metricbeat/config .
   cp -R ../platform-oam/metricbeat/module.d .
-  sudo docker build -t acumos-metricbeat .
+  sudo docker build -t localhost:443/acumos-metricbeat .
+  sudo docker push localhost:443/acumos-metricbeat
   cd ..
 }
 
@@ -81,25 +85,23 @@ function clean() {
       stop_service deploy/$comp-service.yaml
       stop_deployment deploy/$comp-deployment.yaml
     done
+    log "Removing PVC for elk-stack"
+    source $AIO_ROOT/setup-pv.sh clean pvc elasticsearch-data $ACUMOS_NAMESPACE
   fi
 
-  # Remove any existing ELK data only if not redeploying
-  if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
-    log "Remove any existing PV data for elasticsearch-service"
-    bash $AIO_ROOT/setup-pv.sh clean pvc elasticsearch-data
-    bash $AIO_ROOT/setup-pv.sh clean pv elasticsearch-data
-  fi
+  log "Remove PV data for elk-stack"
+  source $AIO_ROOT/setup-pv.sh clean pv elasticsearch-data $ACUMOS_NAMESPACE
 }
 
 function setup() {
-  clean
   build_images
 
   if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
+    clean
     # Per https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
     log "Setup the elasticsearch-data PV"
-    bash $AIO_ROOT/setup-pv.sh setup pv elasticsearch-data \
-      $PV_SIZE_ACUMOS_ELASTICSEARCH_DATA "1000:1000"
+    source $AIO_ROOT/setup-pv.sh setup pv elasticsearch-data \
+      $ACUMOS_NAMESPACE $ACUMOS_ELASTICSEARCH_DATA_PV_SIZE "1000:1000"
   fi
 
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
@@ -107,8 +109,9 @@ function setup() {
   else
     if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
     log "Setup the elasticsearch-data PVC"
-      bash $AIO_ROOT/setup-pv.sh setup pvc \
-        elasticsearch-data $PV_SIZE_ACUMOS_ELASTICSEARCH_DATA
+      source $AIO_ROOT/setup-pv.sh setup pvc elasticsearch-data \
+        $ACUMOS_NAMESPACE $ACUMOS_ELASTICSEARCH_DATA_PV_SIZE \
+        "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
     fi
 
     log "Deploy the k8s based components for elk-stack"
@@ -133,9 +136,7 @@ function setup() {
   done
 }
 
-source $AIO_ROOT/acumos-env.sh
 source elk-env.sh
-source $AIO_ROOT/utils.sh
 if [[ "$ACUMOS_DEPLOY_METRICBEAT" == "true" ]]; then
   comps="elk filebeat metricbeat"
 else

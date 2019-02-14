@@ -26,6 +26,7 @@ services:
       - "${ACUMOS_MARIADB_PORT}:3306"
     restart: always
     environment:
+      MYSQL_ROOT_HOST: "${ACUMOS_ADMIN_HOST}"
       MYSQL_ROOT_PASSWORD: "${ACUMOS_MARIADB_PASSWORD}"
       MYSQL_DATABASE: "${ACUMOS_CDS_DB}"
       MYSQL_USER: "${ACUMOS_MARIADB_USER}"
