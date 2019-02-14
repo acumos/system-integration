@@ -28,16 +28,19 @@
 # - source $AIO_ROOT/utils.sh
 #
 
-set -x
-
 if [[ "$K8S_DIST" == "openshift" ]]; then k8s_cmd=oc
 else k8s_cmd=kubectl
 fi
 
 function fail() {
-  log "$1"
+  set +x
   save_logs
   log "Debug logs are saved at /tmp/acumos/debug"
+  if [[ -e ../acumos-env.sh ]]; then cd ..; fi
+  source acumos-env.sh
+  update_env DEPLOY_RESULT fail
+  update_env FAIL_REASON "\"$1\""
+  log "$1"
   exit 1
 }
 
@@ -97,7 +100,7 @@ function stop_service() {
     if [[ $($k8s_cmd get svc -n $ACUMOS_NAMESPACE -l app=$app) ]]; then
       log "Stop service for $app"
       $k8s_cmd delete -f $1
-      wait_until_notfound "$k8s_cmd get svc -n $ACUMOS_NAMESPACE" $app
+      wait_until_notfound "$k8s_cmd get svc -n $ACUMOS_NAMESPACE" "^$app"
     else
       log "Service not found for $app"
     fi
@@ -112,7 +115,7 @@ function stop_deployment() {
     if [[ $($k8s_cmd get deployment -n $ACUMOS_NAMESPACE -l app=$app) ]]; then
       log "Stop deployment for $app"
       $k8s_cmd delete -f $1
-      wait_until_notfound "$k8s_cmd get pods -n $ACUMOS_NAMESPACE" $app
+      wait_until_notfound "$k8s_cmd get pods -n $ACUMOS_NAMESPACE" "^$app"
     else
       log "Deployment not found for $app"
     fi
@@ -121,16 +124,17 @@ function stop_deployment() {
 
 function update_env() {
   # Reuse existing values if set
-  if [[ "$2" == "" ]]; then
-    log "Updating acumos-env.sh with \"export $1=$3\""
-    sed -i -- "s/$1=.*/$1=$3/" $AIO_ROOT/acumos-env.sh
-    export $1=$3
+  if [[ "${!1}" == "" ]]; then
+    export $1=$2
+    log "Updating acumos-env.sh with \"export $1=$2\""
+    sed -i -- "s~$1=.*~$1=$2~" $AIO_ROOT/acumos-env.sh
   fi
 }
 
 function replace_env() {
   trap 'fail' ERR
   log "Set variable values in k8s templates at $1"
+  set +x
   vars=$(grep -Rho '<[^<.]*>' $1/* | sed 's/<//' | sed 's/>//' | sort | uniq)
   for f in $1/*.yaml; do
     for v in $vars ; do
@@ -138,6 +142,7 @@ function replace_env() {
       sed -i -- "s~<$v>~$vv~g" $f
     done
   done
+  set -x
 }
 
 function start_service() {
@@ -154,29 +159,32 @@ function start_deployment() {
   $k8s_cmd create -f $1
 }
 
+function check_running() {
+  if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
+    cs=$(sudo docker ps -a | awk "/$app/{print \$1}")
+    status="Running"
+    for c in $cs; do
+      if [[ $(sudo docker ps -f id=$c | grep -c " Up ") -eq 0 ]]; then
+        status="Not yet Up"
+      fi
+    done
+  else
+    status=$($k8s_cmd get pods -n $ACUMOS_NAMESPACE -l app=$app | awk '/-/ {print $3}')
+  fi
+  log "$app status is $status"
+}
+
 function wait_running() {
   trap 'fail' ERR
   app=$1
   log "Wait for $app to be running"
   t=1
-  status=""
+  check_running
   while [[ "$status" != "Running" && $t -le 30 ]]; do
     ((t++))
     sleep 10
-    if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-      cs=$(sudo docker ps -a | awk "/$app/{print \$1}")
-      status="Running"
-      for c in $cs; do
-        if [[ $(sudo docker ps -f id=$c | grep -c " Up ") -eq 0 ]]; then
-          status="Not yet Up"
-        fi
-      done
-    else
-      status=$($k8s_cmd get pods -n $ACUMOS_NAMESPACE -l app=$app | awk '/-/ {print $3}')
-    fi
-    log "$1 status is $status"
+    check_running
   done
-  log "$1 status is $status"
   if [[ $t -gt 30 ]]; then
     if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
       cs=$(sudo docker ps -a | awk "/$app/{print \$1}")
@@ -250,4 +258,21 @@ function find_user() {
     ((i++))
   done
   trap 'fail' ERR
+}
+
+function get_host_info() {
+  if [[ $(bash --version | grep -c redhat-linux) -gt 0 ]]; then
+    HOST_OS=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+    HOST_OS_VER=$(grep -m 1 'VERSION_ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+  elif [[ $(bash --version | grep -c pc-linux) -gt 0 ]]; then
+    HOST_OS=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+    HOST_OS_VER=$(grep -m 1 'VERSION_ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+  elif [[ $(bash --version | grep -c apple) -gt 0 ]]; then
+    HOST_OS=macos
+  elif [[ $(bash --version | grep -c pc-msys) -gt 0 ]]; then
+    HOST_OS=windows
+    fail "Sorry, Windows is not supported."
+  fi
+
+  HOST_IP=$(/sbin/ip route get 8.8.8.8 | head -1 | sed 's/^.*src //' | awk '{print $1}')
 }

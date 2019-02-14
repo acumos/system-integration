@@ -23,8 +23,8 @@
 # - If the docker-compose console is still running, showing the logs of the
 #   containers, ctrl-c to stop it and wait will all services are stopped.
 # Usage:
-# $ bash clean.sh [prune]
-#   prune: remove unused docker images
+# $ bash clean.sh [namespace]
+#   namespace: value to assign to ACUMOS_NAMESPACE (default: acumos)
 #
 # If clean does not stop all docker based containers, force cleanup via:
 # $ cs=$(sudo docker ps -a | awk '{print $1}'); for c in $cs; do sudo docker stop $c; sudo docker rm -v $c; done
@@ -33,15 +33,15 @@
 
 set -x
 trap 'exit 1' ERR
-source acumos-env.sh
-source utils.sh
 trap '' ERR
 
-AIO_ROOT=$(pwd)
+if [[ "$1" == "" ]]; then ACUMOS_NAMESPACE=acumos
+else ACUMOS_NAMESPACE=$1
+fi
 
 if [[ $(which kubectl) ]]; then
-  if [[ $(kubectl get namespaces) ]]; then
-    if [[ "$K8S_DIST" == "openshift" ]]; then
+  if [[ $(kubectl get namespaces $ACUMOS_NAMESPACE) ]]; then
+    if [[ $(which oc) ]]; then
       echo "Delete project $ACUMOS_NAMESPACE"
       oc delete project $ACUMOS_NAMESPACE
       while oc project $ACUMOS_NAMESPACE; do
@@ -55,61 +55,31 @@ if [[ $(which kubectl) ]]; then
         echo "Waiting 10 seconds for namespace $ACUMOS_NAMESPACE to be deleted"
         sleep 10
       done
-      svcs=$(kubectl get svc -n $ACUMOS_NAMESPACE | awk '/-/{print $1}')
-      for svc in $svcs; do
-        log "Deleting service $svc"
-        stop_service $svc
-        while kubectl get svc -n $ACUMOS_NAMESPACE $svc ; do
-          log "Waiting 10 seconds..."
-          sleep 10
-        done
-      done
-      deps=$(kubectl get deployments -n $ACUMOS_NAMESPACE -o json >/tmp/json)
-      nd=$(jq -r '.content | length' /tmp/json)
-      i=0;
-      while [[ $i -lt $nd ]] ; do
-        dep=$(jq -r ".items[$i].metadata.name" /tmp/json)
-        log "Deleting deployment $dep"
-        kubectl delete deployment -n $ACUMOS_NAMESPACE $dep
-        while kubectl get pod -n $ACUMOS_NAMESPACE $dep ; do
-          log "Waiting 10 seconds..."
-          sleep 10
-        done
-      done
     fi
-    echo "Delete persistent volumes"
-    # k8s PVCs are deleted by namespace deletion above
-    pvs="nexus-data kong-db logs output webonboarding certs docker-volume \
-      elasticsearch-data mariadb-data"
-    for pv in $pvs; do
-      kubectl delete pv pv-$ACUMOS_NAMESPACE-$pv
-    done
   fi
+  pvs=$(kubectl get pv | awk "/$ACUMOS_NAMESPACE/{print \$1}")
+  for pv in $pvs; do
+    kubectl delete pv $pv
+  done
 fi
 
-if [[ $(sudo docker ps -a | grep $ACUMOS_NAMESPACE) ]]; then
-  if [[ "$DEPLOYED_UNDER" == "docker" || "$DEPLOYED_UNDER" == "" ]]; then
-    cs=$(sudo docker ps -a | awk "/$ACUMOS_NAMESPACE/{print \$1}")
-    for c in $cs; do
-      sudo docker stop $c
-      sudo docker rm -v $c
-    done
-  fi
+if [[ $(sudo docker ps -a | grep -c acumos) -gt 0 ]]; then
+  cs=$(sudo docker ps --format '{{.Names}}' | grep acumos)
+  for c in $cs; do
+    sudo docker stop $c
+    sudo docker rm -v $c
+  done
 fi
 
-echo "Cleanup any orphan docker containers"
-cs=$(sudo docker ps --format '{{.Names}}' | grep acumos)
-for c in $cs; do
-  sudo docker stop $c
-  sudo docker rm -v $c
-done
-
-if [[ "$1" == "prune" ]]; then
-  echo "Cleanup unused docker images"
-  sudo docker image prune -a -f
-fi
+echo "Cleanup unused docker images"
+sudo docker image prune -a -f
 
 echo "Delete persistent volume host folder"
-sudo rm -rf /var/$ACUMOS_NAMESPACE
+sudo rm -rf /var/$ACUMOS_NAMESPACE/logs
+sudo rm -rf /var/$ACUMOS_NAMESPACE/kong-db
+sudo rm -rf /var/$ACUMOS_NAMESPACE/docker-volume
+sudo rm -rf /var/$ACUMOS_NAMESPACE/nexus-data
+sudo rm -rf /var/$ACUMOS_NAMESPACE/mariadb-data
+sudo rm -rf /var/$ACUMOS_NAMESPACE/elasticsearch-data
 
 echo "You should now be able to repeat the install via oneclick_deploy.sh"

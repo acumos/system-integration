@@ -89,9 +89,9 @@ spec:
                           "dcae_url": "http://onboarding-service:8090/onboarding-app/v2/dcae_models"
                         }
                       },
-                      "cliPushUrl": "https://<ACUMOS_DOMAIN>:<ACUMOS_KONG_PROXY_SSL_PORT>/onboarding-app/v2/models",
-                      "cliAuthUrl": "https://<ACUMOS_DOMAIN>:<ACUMOS_KONG_PROXY_SSL_PORT>/onboarding-app/v2/auth",
-                      "tokenmode": "jwtToken"
+                      "cliPushUrl": "<ACUMOS_ONBOARDING_CLIPUSHURL>",
+                      "cliAuthUrl": "<ACUMOS_ONBOARDING_CLIAUTHURL>",
+                      "tokenmode": "<ACUMOS_ONBOARDING_TOKENMODE>"
                     },
                     "model": {
                       "storage": {
@@ -185,20 +185,15 @@ spec:
         - mountPath: /maven/logs
           name: pv-<ACUMOS_NAMESPACE>-logs
         - mountPath: /app/certs
-          name: pv-<ACUMOS_NAMESPACE>-certs
-        - mountPath: /acumosWebOnboarding
-          name: pv-<ACUMOS_NAMESPACE>-webonboarding
+          name: certs-volume
       restartPolicy: Always
       volumes:
       - name: pv-<ACUMOS_NAMESPACE>-logs
         persistentVolumeClaim:
-         claimName: pvc-<ACUMOS_NAMESPACE>-logs
-      - name: pv-<ACUMOS_NAMESPACE>-certs
-        persistentVolumeClaim:
-         claimName: pvc-<ACUMOS_NAMESPACE>-certs
-      - name: pv-<ACUMOS_NAMESPACE>-webonboarding
-        persistentVolumeClaim:
-         claimName: pvc-<ACUMOS_NAMESPACE>-webonboarding
+          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+      - name: certs-volume
+        configMap:
+          name: acumos-store
       hostAliases:
       - ip: "<ACUMOS_HOST>"
         hostnames:

@@ -41,10 +41,20 @@ spec:
       restartPolicy: Always
       containers:
       - name: docker-proxy
-        image: acumos-docker-proxy
+        image: nginx:stable
+        securityContext:
+            privileged: true
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8443
+        command: ['/bin/bash', '-c', 'cp /etc/nginx/conf.d/nginx.conf /etc/nginx/nginx.conf && nginx -g "daemon off;"']
+        volumeMounts:
+        - name: conf-volume
+          mountPath: /etc/nginx/conf.d
+      volumes:
+      - name: conf-volume
+        configMap:
+          name: docker-proxy
       hostAliases:
       - ip: "<ACUMOS_HOST>"
         hostnames:

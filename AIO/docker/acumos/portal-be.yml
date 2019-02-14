@@ -67,9 +67,9 @@ services:
                           \"dcae_url\": \"http://onboarding-service:${ACUMOS_ONBOARDING_PORT}/onboarding-app/v2/dcae_models\"
                        }
                    },
-                   \"cliPushUrl\": \"https://${ACUMOS_DOMAIN}:${ACUMOS_KONG_PROXY_SSL_PORT}/onboarding-app/v2/models\",
-                   \"cliAuthUrl\": \"https://${ACUMOS_DOMAIN}:${ACUMOS_KONG_PROXY_SSL_PORT}/onboarding-app/v2/auth\",
-                   \"tokenmode\": \"jwtToken\"
+                   \"cliPushUrl\": \"${ACUMOS_ONBOARDING_CLIPUSHURL}\",
+                   \"cliAuthUrl\": \"${ACUMOS_ONBOARDING_CLIAUTHURL}\",
+                   \"tokenmode\": \"${ACUMOS_ONBOARDING_TOKENMODE}\"
                 },
                 \"model\": {
                    \"storage\": {
@@ -170,9 +170,6 @@ services:
            - type: bind
              source: /var/${ACUMOS_NAMESPACE}/certs
              target: /app/certs
-           - type: bind
-             source: /var/${ACUMOS_NAMESPACE}/webonboarding
-             target: /acumosWebOnboarding
        logging:
            driver: json-file
        extra_hosts:
