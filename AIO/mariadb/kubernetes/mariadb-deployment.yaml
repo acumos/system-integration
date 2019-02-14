@@ -40,6 +40,8 @@ spec:
       - name: mariadb
         image: mariadb
         env:
+        - name: MYSQL_ROOT_HOST
+          value: "%"
         - name: MYSQL_ROOT_PASSWORD
           value: "<ACUMOS_MARIADB_PASSWORD>"
         - name: MYSQL_DATABASE
@@ -48,8 +50,6 @@ spec:
           value: "<ACUMOS_MARIADB_USER>"
         - name: MYSQL_PASSWORD
           value: "<ACUMOS_MARIADB_USER_PASSWORD>"
-        - name: MYSQL_ROOT_HOST
-          value: "<ACUMOS_HOST>"
         ports:
         - containerPort: 3306
         volumeMounts:

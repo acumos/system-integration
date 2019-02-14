@@ -24,58 +24,68 @@
 # - All FQDNs specified for peers must be DNS-resolvable on all hosts
 #   (entries in /etc/hosts or in an actual DNS server)
 #.Usage:
-#.$ bash create-peer.sh <CAcert> <name> <subjectName> <contact> <apiUrl>
+#.$ bash create-peer.sh <CAcert> <name> <name> <contact> <apiUrl>
 #.  CAcert: CA certificate to add to truststore /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_TRUSTSTORE
 #.  name: hostname to assign to this peer
-#.  subjectName: subjectName (FQDN) from the cert
+#.  name: name (FQDN) from the cert
 #.  contact: admin email address
 #.  apiUrl: URL where the peer's federation gateway can be reached
 #
 
 function setup_peer() {
   trap 'fail' ERR
-  log "Check for existing CA cert with alias ${subjectName}CA"
-  if [[ $(keytool -list -v -keystore /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_TRUSTSTORE -storepass $ACUMOS_TRUSTSTORE_PASSWORD | grep -ci ${subjectName}CA) -gt 0 ]]; then
-    log "Found existing CA cert with alias ${subjectName}CA, removing it"
-    keytool -delete -alias ${subjectName}CA \
-      -keystore /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_TRUSTSTORE \
+  log "Get /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_TRUSTSTORE from $host"
+  scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+    $user@$host:/var/$ACUMOS_NAMESPACE/certs/$ACUMOS_TRUSTSTORE .
+
+  log "Check for existing CA cert with alias ${peer}CA"
+  if [[ $(keytool -list -v -keystore $ACUMOS_TRUSTSTORE -storepass $ACUMOS_TRUSTSTORE_PASSWORD | grep -ci ${peer}CA) -gt 0 ]]; then
+    log "Found existing CA cert with alias ${peer}CA, removing it"
+    keytool -delete -alias ${peer}CA \
+      -keystore $ACUMOS_TRUSTSTORE \
       -storepass $ACUMOS_CERT_KEY_PASSWORD
   fi
-  log "Import peer CA cert into truststore"
-  keytool -import -file $CAcert -alias ${subjectName}CA \
-    -keystore /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_TRUSTSTORE -storepass $ACUMOS_TRUSTSTORE_PASSWORD -noprompt
 
-  if [[ $(curl -s -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X GET http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer | grep -ci "subjectName\":\"${subjectName}") -eq 0 ]]; then
-    log "Create peer relationship for $name via CDS API"
+  log "Import peer CA cert into truststore"
+  keytool -import -file $CAcert -alias ${peer}CA \
+    -keystore $ACUMOS_TRUSTSTORE -storepass $ACUMOS_TRUSTSTORE_PASSWORD -noprompt
+
+  log "Put updated /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_TRUSTSTORE back at $host"
+  scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $ACUMOS_TRUSTSTORE \
+    $user@$host:/var/$ACUMOS_NAMESPACE/certs/$ACUMOS_TRUSTSTORE
+
+  if [[ $(curl -s -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X GET http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer | grep -ci "name\":\"${peer}") -eq 0 ]]; then
+    log "Create peer relationship for $peer via CDS API"
+    apiURL="https://$peer:$ACUMOS_FEDERATION_PORT"
     curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer \
-    -H "accept: */*" -H "Content-Type: application/json" \
-    -d "{ \"name\":\"$name\", \"self\": false, \"local\": false, \"contact1\": \"$contact\", \"subjectName\": \"$subjectName\", \"apiUrl\": \"$apiUrl\",   \"statusCode\": \"AC\", \"validationStatusCode\": \"PS\" }"
+      -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer \
+      -H "accept: */*" -H "Content-Type: application/json" \
+      -d "{ \"name\":\"$peer\", \"self\": false, \"local\": false, \"contact1\": \"$contact\", \"name\": \"$peer\", \"apiUrl\": \"$apiUrl\",   \"statusCode\": \"AC\", \"validationStatusCode\": \"PS\" }"
     created=$(jq -r '.created' /tmp/json)
     if [[ "$created" == "null" ]]; then
       cat /tmp/json
       fail "Peer creation failed"
     fi
   else
-    log "Peer relationship for $name already exists"
+    log "Peer relationship for $peer already exists"
   fi
 
-  if [[ $(nslookup opnfv02 | grep -c NXDOMAIN) -eq 1 ]]; then
-    ip=$(grep $name /etc/hosts | cut -d ' ' -f 1)
+  if [[ $(nslookup $peer | grep -c NXDOMAIN) -eq 1 ]]; then
+    ip=$(grep $peer /etc/hosts | cut -d ' ' -f 1)
   else
-    ip=$(nslookup $name | awk '/^Address: / { print $2 }' | head -1)
+    ip=$(nslookup $peer | awk '/^Address: / { print $2 }' | head -1)
   fi
 
-  log "Add hostalias for $subjectName at $ip and restart federation to apply new truststore entry"
+  log "Add hostalias for $peer at $ip and restart federation to apply new truststore entry"
   if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
-    if [[ $(grep -c "\- \"$subjectName\"" kubernetes/deployment/federation-deployment.yaml) -eq 0 ]]; then
+    if [[ $(grep -c "\- \"$peer\"" kubernetes/deployment/federation-deployment.yaml) -eq 0 ]]; then
       log "Save updated federation-deployment.yaml template for use in redeployment"
       # NOTE: hostAliases must be the last section of federation-deployment.yaml
       # and indented as below
       cat <<EOF >>kubernetes/deployment/federation-deployment.yaml
       - ip: "$ip"
         hostnames:
-        - "$subjectName"
+        - "$peer"
 EOF
       log "Patch the running federation service, to restart it with the changes"
       cat <<EOF >/tmp/patch.yaml
@@ -85,7 +95,7 @@ spec:
       hostAliases:
       - ip: "$ip"
         hostnames:
-        - "$subjectName"
+        - "$peer"
 EOF
     kubectl patch deployment -n $ACUMOS_NAMESPACE federation \
       --patch "$(cat /tmp/patch.yaml)"
@@ -105,11 +115,16 @@ EOF
       sleep 5
     done
   else
-    if [[ $(grep -c "$subjectName:" docker/acumos/federation.yml) -eq 0 ]]; then
-      sed -i -- "/extra_hosts:/a\ \ \ \ \ \ \ \ \ \ \ - \"$subjectName:$ip\"" \
-        docker/acumos/federation.yml
-    fi
-    sudo bash docker-compose.sh up -d --build federation-service
+    ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $user@$host \
+      <<EOF
+cd AIO
+if [[ $(grep -c "$peer:" docker/acumos/federation.yml) -eq 0 ]]; then
+  sed -i -- "/extra_hosts:/a\ \ \ \ \ \ \ \ \ \ \ - \"$peer:$ip\"" \
+    docker/acumos/federation.yml
+  fi
+  sudo bash docker-compose.sh up -d --build federation-service
+fi
+EOF
   fi
 
   log "Verify federation API is accessible"
@@ -123,19 +138,17 @@ EOF
 
 set -x
 trap 'fail' ERR
-source acumos-env.sh
-source utils.sh
 
-CAcert=$1
-name=$2
-subjectName=$3
-contact=$4
-apiUrl=$5
+host=$1
+user=$2
+peer=$3
+CAcert=$4
+contact=$5
 
 setup_peer
 # TODO: This is a workaround for non-DNS-resolvable names. For tenant-based
 # deploys (no ability to modify hosts file) a different approach is needed.
-if [[ $(grep -c -P " $name( |$)" /etc/hosts) -eq 0 ]]; then
-  log "Add $name to /etc/hosts"
-  echo "$ip $name" | sudo tee -a /etc/hosts
-  fi
+if [[ $(grep -c -P " $peer( |$)" /etc/hosts) -eq 0 ]]; then
+  log "Add $peer to /etc/hosts"
+  echo "$ip $peer" | sudo tee -a /etc/hosts
+fi

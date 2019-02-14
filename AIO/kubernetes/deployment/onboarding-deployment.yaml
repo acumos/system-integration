@@ -120,16 +120,11 @@ spec:
         volumeMounts:
         - mountPath: /maven/logs
           name: pv-<ACUMOS_NAMESPACE>-logs
-        - mountPath: /temp
-          name: pv-<ACUMOS_NAMESPACE>-output
       restartPolicy: Always
       volumes:
       - name: pv-<ACUMOS_NAMESPACE>-logs
         persistentVolumeClaim:
          claimName: pvc-<ACUMOS_NAMESPACE>-logs
-      - name: pv-<ACUMOS_NAMESPACE>-output
-        persistentVolumeClaim:
-         claimName: pvc-<ACUMOS_NAMESPACE>-output
       hostAliases:
       - ip: "<ACUMOS_HOST>"
         hostnames:
