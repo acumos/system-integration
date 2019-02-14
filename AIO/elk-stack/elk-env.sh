@@ -2,7 +2,7 @@
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
-# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# Copyright (C) 2017-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
 # ===================================================================================
 # This Acumos software file is distributed by AT&T and Tech Mahindra
 # under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,7 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# What this is: Environment file for ELK stack depoyment for Acuymos.
+# What this is: Environment file for ELK stack depoyment for Acumos.
 # Prerequisites:
 # - Ubuntu Xenial or Centos 7 server
 # Usage:
@@ -25,6 +25,7 @@
 # - Customize the values here for your needs.
 #
 
+export ACUMOS_ELK_NAMESPACE=$ACUMOS_NAMESPACE
 export ACUMOS_ELK_DOMAIN=$(hostname)
 # Hard-code ACUMOS_ELK_HOST below to the primary IP address (as primary route) of
 # your ELK host server, if the generated value does not work for your server
@@ -47,14 +48,9 @@ export ACUMOS_ELK_ES_JAVA_HEAP_MIN_SIZE=1g
 export ACUMOS_ELK_ES_JAVA_HEAP_MAX_SIZE=2g
 export ACUMOS_ELK_LS_JAVA_HEAP_MIN_SIZE=1g
 export ACUMOS_ELK_LS_JAVA_HEAP_MAX_SIZE=2g
-export ACUMOS_MARIADB_HOST=$ACUMOS_ELK_DOMAIN
+export ACUMOS_MARIADB_HOST=
 export ACUMOS_MARIADB_PORT=30306
-export ACUMOS_FILEBEAT_PORT=8099
-export ACUMOS_METRICBEAT_PORT=8098
-
-# Kubernetes options
-export ACUMOS_NAMESPACE=acumos
 
 # Persistent Volume options
-export ELASTICSEARCH_DATA_PV_NAME="pv-$ACUMOS_NAMESPACE-elasticsearch-data"
-export PV_SIZE_ACUMOS_ELASTICSEARCH_DATA=1Gi
+export ELASTICSEARCH_DATA_PV_NAME="pv-$ACUMOS_ELK_NAMESPACE-elasticsearch-data"
+export ACUMOS_ELASTICSEARCH_DATA_PV_SIZE=1Gi

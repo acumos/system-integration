@@ -1,4 +1,3 @@
-#!/bin/bash
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -16,26 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
-#
-# What this is:
-# Deployment script for the Acumos ELK-stack components under docker.
-# Sets environment variables needed by docker-compose in all-in-one environment
-# then invokes docker-compose with the command-line arguments.
-#
-# Usage:
-# - bash docker-compose.sh [options]
-#   options: optional parameters to docker-compose.
-#
-
-set -x
-source ../acumos-env.sh
-source elk-env.sh
-cmd="$1 $2 $3 $4"
-opts=""
-files=$(ls docker/acumos)
-for file in $files ; do
- opts="$opts -f acumos/$file"
-done
-
-cd docker
-docker-compose $opts $cmd
+# https://github.com/elastic/beats-docker
+FROM docker.elastic.co/beats/metricbeat:6.2.4
+COPY config/metricbeat.yml /usr/share/metricbeat/metricbeat.yml

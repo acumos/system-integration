@@ -73,21 +73,20 @@ function clean() {
     log "Stop any existing k8s based components for nexus-service"
     stop_service deploy/nexus-service.yaml
     stop_deployment deploy/nexus-deployment.yaml
+    log "Remove PVC for nexus-service"
+    source $AIO_ROOT/setup-pv.sh clean pvc nexus-data $ACUMOS_NAMESPACE
   fi
 
-  if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
-    log "Remove any existing PVC and PV data for nexus-service"
-    bash $AIO_ROOT/setup-pv.sh clean pvc nexus-data
-    bash $AIO_ROOT/setup-pv.sh clean pv nexus-data
-  fi
+  log "Remove PV for nexus-service"
+  source $AIO_ROOT/setup-pv.sh clean pv nexus-data $ACUMOS_NAMESPACE
 }
 
 function setup() {
-  clean
   if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
+    clean
     log "Setup the nexus-data PV"
-    bash $AIO_ROOT/setup-pv.sh setup pv nexus-data \
-      $NEXUS_DATA_PV_SIZE "200:$USER"
+    source $AIO_ROOT/setup-pv.sh setup pv nexus-data \
+      $ACUMOS_NAMESPACE $NEXUS_DATA_PV_SIZE "200:$ACUMOS_HOST_USER"
   fi
 
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
@@ -95,10 +94,10 @@ function setup() {
   else
     if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
       log "Setup the nexus-data PVC"
-      bash $AIO_ROOT/setup-pv.sh setup pvc nexus-data \
-        $NEXUS_DATA_PV_SIZE
+      source $AIO_ROOT/setup-pv.sh setup pvc nexus-data \
+        $ACUMOS_NAMESPACE $NEXUS_DATA_PV_SIZE
     fi
-    
+
     log "Deploy the k8s based components for nexus"
     mkdir -p deploy
     cp -r kubernetes/* deploy/.
@@ -153,8 +152,6 @@ EOF
     http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script/list-users/run
 }
 
-source $AIO_ROOT/acumos-env.sh
-source $AIO_ROOT/utils.sh
 if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
   setup
 fi

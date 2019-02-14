@@ -38,28 +38,29 @@ function clean() {
     log "Stop any existing k8s based components for kong-service"
     stop_service deploy/kong-service.yaml
     stop_deployment deploy/kong-deployment.yaml
-    log "Remove any existing PVC for kong-service"
-    bash $AIO_ROOT/setup-pv.sh clean pvc kong-db
+    log "Remove PVC for kong-service"
+    source $AIO_ROOT/setup-pv.sh clean pvc kong-db $ACUMOS_NAMESPACE
   fi
 
-  log "Remove any existing PV data for kong-service"
-  bash $AIO_ROOT/setup-pv.sh clean pv kong-db
+  log "Remove PV data for kong-service"
+  source $AIO_ROOT/setup-pv.sh clean pv kong-db $ACUMOS_NAMESPACE
 }
 
 function setup() {
   trap 'fail' ERR
-  clean
+  if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then clean; fi
 
   log "Setup the kong-db PV"
-  bash $AIO_ROOT/setup-pv.sh setup pv kong-db $KONG_DB_PV_SIZE "$USER:$USER"
+  source $AIO_ROOT/setup-pv.sh setup pv kong-db \
+    $ACUMOS_NAMESPACE $KONG_DB_PV_SIZE "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
 
   log "Start kong-service components"
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     sudo bash docker-compose.sh $AIO_ROOT up -d --build --force-recreate
   else
     log "Setup the kong-db PVC"
-    bash $AIO_ROOT/setup-pv.sh setup pvc kong-db \
-      $KONG_DB_PV_SIZE "$USER:$USER"
+    source $AIO_ROOT/setup-pv.sh setup pvc kong-db \
+      $ACUMOS_NAMESPACE $KONG_DB_PV_SIZE "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
 
     log "Deploy the k8s based components for kong"
     mkdir -p deploy
@@ -84,8 +85,8 @@ function setup() {
 
   log "Pass cert and key to Kong admin"
   curl -i -X POST http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/certificates \
-    -F "cert=@/var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CERT" \
-    -F "key=@/var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CERT_KEY" \
+    -F "cert=@$AIO_ROOT/certs/$ACUMOS_CERT" \
+    -F "key=@$AIO_ROOT/certs/$ACUMOS_CERT_KEY" \
     -F "snis=$ACUMOS_DOMAIN"
 
   log "Add proxy entries via Kong API"
@@ -116,14 +117,14 @@ function setup() {
   log "Dump of API endpoints as created"
   curl http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis/
 
-  log "Add cert as CA to docker /etc/docker/certs.d"
-  # TODO: Revisit need for this workaround in docker-dind based design
-  # Required for docker daemon to accept the kong self-signed cert
-  # Per https://docs.docker.com/registry/insecure/#use-self-signed-certificates
-  sudo mkdir -p /etc/docker/certs.d/$ACUMOS_HOST
-  sudo cp /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CA_CERT /etc/docker/certs.d/$ACUMOS_HOST/ca.crt
+  if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
+    log "Add cert as CA to docker /etc/docker/certs.d"
+    # TODO: Revisit need for this workaround in docker-dind based design
+    # Required for docker daemon to accept the kong self-signed cert
+    # Per https://docs.docker.com/registry/insecure/#use-self-signed-certificates
+    sudo mkdir -p /etc/docker/certs.d/$ACUMOS_HOST
+    sudo cp $AIO_ROOT/certs/$ACUMOS_CA_CERT /etc/docker/certs.d/$ACUMOS_HOST/ca.crt
+  fi
 }
 
-source $AIO_ROOT/acumos-env.sh
-source $AIO_ROOT/utils.sh
 setup

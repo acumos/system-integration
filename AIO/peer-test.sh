@@ -117,42 +117,12 @@ function verify_federation_api_access() {
 
 function create_peers() {
   trap 'fail' ERR
-  log "Exchange peer CA certs and server certs"
-  source $host1-env.sh
-  scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    $user1@$host1:/var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CA_CERT /tmp/${host1}CA.crt
-  source $host2-env.sh
-  scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    $user2@$host2:/var/$ACUMOS_NAMESPACE/certs/$ACUMOS_CA_CERT /tmp/${host2}CA.crt
-  source $host2-env.sh
-  scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    /tmp/${host1}CA.crt $user2@$host2:/var/$ACUMOS_NAMESPACE/certs/${host1}CA.crt
-  source $host1-env.sh
-  scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    /tmp/${host2}CA.crt $user1@$host1:/var/$ACUMOS_NAMESPACE/certs/${host2}CA.crt
-
   log "Create $host2 peer at $host1"
-  ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    $user1@$host1 <<EOF
-set -x
-trap 'exit 1' ERR
-cd AIO
-source acumos-env.sh
-bash create-peer.sh /var/$ACUMOS_NAMESPACE/certs/${host2}CA.crt $host2 $ip2 $host2 \
-  admin@example.com https://$host2:$ACUMOS_FEDERATION_PORT
-EOF
-
+  source $host1-env.sh
+  source create-peer.sh $host1 $user1 ${host2}CA.crt $host2 admin@example.com
   log "Create $host1 peer at $host2"
   source $host2-env.sh
-  ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    $user2@$host2 <<EOF
-set -x
-trap 'exit 1' ERR
-cd AIO
-source acumos-env.sh
-bash create-peer.sh /var/$ACUMOS_NAMESPACE/certs/${host1}CA.crt $host1 $ip1 $host1 \
-  admin@example.com https://$host1:$ACUMOS_FEDERATION_PORT
-EOF
+  source create-peer.sh $host2 $user2 ${host1}CA.crt $host1 admin@example.com
 
   verify_federation_api_access $host1 $user1 $host2
   verify_federation_api_access $host2 $user2 $host1
