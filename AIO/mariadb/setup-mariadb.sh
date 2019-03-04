@@ -28,20 +28,15 @@
 
 function set_repo() {
   sudo apt-get install software-properties-common -y
-  case "$ACUMOS_HOST_OS_VER" in
+  case "$HOST_OS_VER" in
     "16.04")
-      log "Installing MariaDB 10.2"
-      # default version
-      MARIADB_VERSION='10.2'
-      # May need to update to another mirror if you encounter issues
-      # See https://downloads.mariadb.org/mariadb/repositories/#mirror=accretive&distro=Ubuntu
-      MARIADB_REPO='deb [arch=amd64,i386,ppc64el] http://sfo1.mirrors.digitalocean.com/mariadb/repo/10.2/ubuntu xenial main'
+      MARIADB_REPO="deb [arch=amd64,i386,ppc64el] http://sfo1.mirrors.digitalocean.com/mariadb/repo/$ACUMOS_MARIADB_VERSION/ubuntu xenial main"
       ;;
     "18.04")
-      MARIADB_REPO='deb [arch=amd64,arm64,ppc64el] http://mirror.rackspace.com/mariadb/repo/10.2/ubuntu bionic main'
+      MARIADB_REPO="deb [arch=amd64,arm64,ppc64el] http://mirror.rackspace.com/mariadb/repo/$ACUMOS_MARIADB_VERSION/ubuntu bionic main"
       ;;
     *)
-      fail "Unsupported Ubuntu version ($ACUMOS_HOST_OS_VER)"
+      fail "Unsupported Ubuntu version ($HOST_OS_VER)"
   esac
 
   log "Import mariadb repo key"
@@ -58,11 +53,12 @@ function clean() {
     log "Stop any existing k8s based components for mariadb-service"
     stop_service deploy/mariadb-service.yaml
     stop_deployment deploy/mariadb-deployment.yaml
-    bash $AIO_ROOT/setup-pv.sh clean pvc mariadb-data
+    log "Remove PVC for mariadb-service"
+    source $AIO_ROOT/setup-pv.sh clean pvc mariadb-data $ACUMOS_NAMESPACE
   fi
 
-  log "Remove any existing PV data for mariadb-service"
-  bash $AIO_ROOT/setup-pv.sh clean pv mariadb-data
+  log "Remove PV data for mariadb-service"
+  source $AIO_ROOT/setup-pv.sh clean pv mariadb-data $ACUMOS_NAMESPACE
 }
 
 function setup() {
@@ -70,8 +66,9 @@ function setup() {
   if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
     # Can only restart services etc if not redeploying with an existing DB
     clean
-    log "Install mariadb client for database setup"
-    if [[ "$ACUMOS_HOST_OS" == "ubuntu" ]]; then
+    get_host_info
+    log "Installing MariaDB client $ACUMOS_MARIADB_VERSION"
+    if [[ "$HOST_OS" == "ubuntu" ]]; then
       set_repo
       sudo apt-get install -y mariadb-client
     else
@@ -87,26 +84,16 @@ EOF
     fi
   fi
 
-# Redeploying MariaDB with an existing DB is not yet supported
-#  if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-#    sudo bash docker-compose.sh $AIO_ROOT down
-#  else
-#    stop_service deploy/mariadb-service.yaml
-#    stop_deployment deploy/mariadb-deployment.yaml
-#    log "Delete the mariadb-data PVC"
-#    bash $AIO_ROOT/setup-pv.sh clean pvc mariadb-data
-#  fi
-
   log "Setup the mariadb-data PV"
-  bash $AIO_ROOT/setup-pv.sh setup pv mariadb-data \
-    $MARIADB_DATA_PV_SIZE "$USER:$USER"
+  source $AIO_ROOT/setup-pv.sh setup pv mariadb-data \
+    $ACUMOS_NAMESPACE $MARIADB_DATA_PV_SIZE "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
 
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     sudo bash docker-compose.sh $AIO_ROOT up -d --build --force-recreate
   else
     log "Setup the mariadb-data PVC"
-    bash $AIO_ROOT/setup-pv.sh setup pvc mariadb-data \
-      $MARIADB_DATA_PV_SIZE
+    source $AIO_ROOT/setup-pv.sh setup pvc mariadb-data \
+      $ACUMOS_NAMESPACE $MARIADB_DATA_PV_SIZE
 
     if [[ "$K8S_DIST" == "openshift" ]]; then
       log "Workaround variation in OpenShift for external access to mariadb"
@@ -126,13 +113,11 @@ EOF
   log "Wait for mariadb server to accept connections"
   while ! mysql -h $ACUMOS_HOST -P $ACUMOS_MARIADB_PORT --user=root \
     --password=$ACUMOS_MARIADB_PASSWORD -e "SHOW DATABASES;" ; do
-    log "Mariadb server is not yet accepting connections from $ACUMOS_HOST"
+    log "Mariadb server is not yet accepting connections from $HOST_IP"
     sleep 10
   done
 }
 
-source $AIO_ROOT/acumos-env.sh
-source $AIO_ROOT/utils.sh
-update_env ACUMOS_MARIADB_PASSWORD "$ACUMOS_MARIADB_PASSWORD" $(uuidgen)
-update_env ACUMOS_MARIADB_USER_PASSWORD "$ACUMOS_MARIADB_USER_PASSWORD" $(uuidgen)
+update_env ACUMOS_MARIADB_PASSWORD $(uuidgen)
+update_env ACUMOS_MARIADB_USER_PASSWORD $(uuidgen)
 setup

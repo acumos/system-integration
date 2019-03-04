@@ -18,14 +18,13 @@
 # ===============LICENSE_END=========================================================
 #
 #. What this is: script to setup the ELK stack for Acumos under docker or k8s
-#.
-#. Prerequisites:
-#. - Acumos platform core components installed per oneclick_deploy.sh, with
-#.   acumos-env.sh as updated by that script for deployment options.
-#.
-#. Usage:
-#. $ bash deploy-elk.sh
-#.
+#
+# Prerequisites:
+# - Acumos platform core components installed per oneclick_deploy.sh, with
+#   acumos-env.sh as updated by that script for deployment options.
+#
+# Usage: intended to be called directly from oneclick_deploy.sh
+#
 
 function build_images() {
   log "Prepare ELK stack component configs for AIO deploy"
@@ -54,91 +53,58 @@ function build_images() {
   cp -r ../platform-oam/elk-stack/logstash/pipeline .
   sudo docker build -t acumos-logstash .
 
-  log "Building local acumos-filebeat image"
-  # Per https://www.elastic.co/guide/en/beats/filebeat/current/running-on-docker.html
-  cd ../filebeat
-  cp -R ../platform-oam/filebeat/config .
-  sudo docker build -t acumos-filebeat .
-
-  log "Building local acumos-metricbeat image"
-  cd ../metricbeat
-  # fix bug in metricbeat.yaml
-  sed -i -- 's/{ELASTICSEARCH_HOST}:5601/{KIBANA_HOST}:${KIBANA_PORT}/' \
-    ../platform-oam/metricbeat/config/metricbeat.yml
-  cp -R ../platform-oam/metricbeat/config .
-  cp -R ../platform-oam/metricbeat/module.d .
-  sudo docker build -t acumos-metricbeat .
   cd ..
 }
 
 function clean() {
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     log "Stop any existing docker based components for elk-stack"
-    sudo bash docker-compose.sh $AIO_ROOT down
+    sudo bash docker-compose.sh down
   else
     log "Stop any existing k8s based components for elk-stack"
-    for comp in $comps; do
-      stop_service deploy/$comp-service.yaml
-      stop_deployment deploy/$comp-deployment.yaml
-    done
-  fi
-
-  # Remove any existing ELK data only if not redeploying
-  if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
-    log "Remove any existing PV data for elasticsearch-service"
-    bash $AIO_ROOT/setup-pv.sh clean pvc elasticsearch-data
-    bash $AIO_ROOT/setup-pv.sh clean pv elasticsearch-data
+    stop_service deploy/\elk-service.yaml
+    stop_deployment deploy/elk-deployment.yaml
+    log "Removing PVC for elk-stack"
+    source ../setup-pv.sh clean pvc elasticsearch-data $ACUMOS_ELK_NAMESPACE
   fi
 }
 
 function setup() {
-  clean
   build_images
 
-  if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
-    # Per https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
-    log "Setup the elasticsearch-data PV"
-    bash $AIO_ROOT/setup-pv.sh setup pv elasticsearch-data \
-      $PV_SIZE_ACUMOS_ELASTICSEARCH_DATA "1000:1000"
-  fi
+  clean
+  # Per https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
+  log "Setup the elasticsearch-data PV"
+  source ../setup-pv.sh setup pv elasticsearch-data \
+    $ACUMOS_ELK_NAMESPACE $ACUMOS_ELASTICSEARCH_DATA_PV_SIZE "1000:1000"
 
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-    sudo bash docker-compose.sh $AIO_ROOT up -d --build --force-recreate
+    sudo bash docker-compose.sh up -d --build --force-recreate
   else
     if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
     log "Setup the elasticsearch-data PVC"
-      bash $AIO_ROOT/setup-pv.sh setup pvc \
-        elasticsearch-data $PV_SIZE_ACUMOS_ELASTICSEARCH_DATA
+      source ../setup-pv.sh setup pvc elasticsearch-data \
+        $ACUMOS_ELK_NAMESPACE $ACUMOS_ELASTICSEARCH_DATA_PV_SIZE \
+        "$ACUMOS_ELK_HOST_USER:$ACUMOS_ELK_HOST_USER"
     fi
 
     log "Deploy the k8s based components for elk-stack"
     mkdir -p deploy
     cp -r kubernetes/* deploy/.
     replace_env deploy
-    log "Deploy the k8s based components for docker-proxy"
-    for comp in $comps; do
-      start_service deploy/$comp-service.yaml
-      start_deployment deploy/$comp-deployment.yaml
-    done
+    log "Deploy the k8s based components for elk-stack"
+    start_service deploy/elk-service.yaml
+    start_deployment deploy/elk-deployment.yaml
   fi
 
   log "Wait for all elk-stack pods to be Running"
-  if [[ "$ACUMOS_DEPLOY_METRICBEAT" == "true" ]]; then
-    apps="elasticsearch kibana logstash filebeat metricbeat"
-  else
-    apps="elasticsearch kibana logstash filebeat"
-  fi
+  apps="elasticsearch kibana logstash"
   for app in $apps; do
     wait_running $app
   done
 }
 
-source $AIO_ROOT/acumos-env.sh
+source ../acumos-env.sh
 source elk-env.sh
-source $AIO_ROOT/utils.sh
-if [[ "$ACUMOS_DEPLOY_METRICBEAT" == "true" ]]; then
-  comps="elk filebeat metricbeat"
-else
-  comps="elk filebeat"
-fi
+source ../utils.sh
 setup
