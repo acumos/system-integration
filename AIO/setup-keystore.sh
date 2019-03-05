@@ -17,7 +17,9 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# What this is: script to setup host-mapped PVs under kubernetes or docker
+# What this is: script that enables use of pre-configured CA and server
+# certificates for an Acumos platform, or creation of new self-signed
+# certificates.
 #
 # Prerequisites:
 # - acumos-env.sh script prepared through oneclick_deploy.sh or manually, to
@@ -27,28 +29,34 @@
 # Usage: intended to be called directly from oneclick_deploy.sh
 #
 
+function update_cert_env() {
+  trap 'fail' ERR
+  log "Updating acumos-env.sh with \"export $1=$2\""
+  sedi "s/$1=.*/$1=$2/" $AIO_ROOT/acumos-env.sh
+  export $1=$2
+}
+
 function setup() {
   trap 'fail' ERR
-  if [[ -e certs/$ACUMOS_CERT ]]; then
+  cd certs
+  if [[ -e $ACUMOS_CERT ]]; then
     log "Using existing user-prepared files in certs subfolder"
   else
     log "Creating new certs in certs subfolder"
-    cd certs
-    bash setup-certs.sh $ACUMOS_CERT_PREFIX $ACUMOS_DOMAIN
-    bash update-cert-env.sh
-    cd ..
+    source setup-certs.sh $ACUMOS_CERT_PREFIX $ACUMOS_DOMAIN
   fi
 
-  if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-    if [[ ! -e /var/$ACUMOS_NAMESPACE/certs ]]; then
-      log "Create /var/$ACUMOS_NAMESPACE/certs as cert storage folder"
-      sudo mkdir -p /var/$ACUMOS_NAMESPACE/certs
-      # Have to set user and group to allow pod access to PVs
-      sudo chown $ACUMOS_HOST_USER:$ACUMOS_HOST_USER /var/$ACUMOS_NAMESPACE
-      sudo chown $ACUMOS_HOST_USER:$ACUMOS_HOST_USER /var/$ACUMOS_NAMESPACE/certs
-    fi
-    cp $(ls certs/* | grep -v '\.sh') /var/$ACUMOS_NAMESPACE/certs/.
-  else
+  if [[ ! -e cert-env.sh ]]; then
+    log "Please ensure that cert-env.sh is in the certs folder"
+    fail "cert-env.sh not found"
+  fi
+  source cert-env.sh
+  update_cert_env ACUMOS_CERT_KEY_PASSWORD $CERT_KEY_PASSWORD
+  update_cert_env ACUMOS_KEYSTORE_PASSWORD $KEYSTORE_PASSWORD
+  update_cert_env ACUMOS_TRUSTSTORE_PASSWORD $TRUSTSTORE_PASSWORD
+  cd ..
+
+  if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
     log "Create kubernetes configmap to hold the keystore and truststore"
     # See use in deployment templates for portal-be and federation
     if [[ $(kubectl get configmap -n $ACUMOS_NAMESPACE acumos-store) ]]; then

@@ -37,11 +37,7 @@
 #
 
 function register_user() {
-  if [[ "$ACUMOS_DEPLOY_KONG" == "true" ]]; then
-    portal_base=https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT
-  else
-    portal_base=http://$ACUMOS_DOMAIN:$ACUMOS_PORTAL_FE_NODEPORT
-  fi
+  portal_base=https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT
 
   curl -k -s -o /tmp/json -X POST $portal_base/api/users/register \
     -H "Content-Type: application/json" \
@@ -55,7 +51,7 @@ function find_role() {
   trap 'fail' ERR
   log "Finding role name $1"
   curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/role
+    -k https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/role
   roles=$(jq -r '.content | length' /tmp/json)
   i=0; roleId=""
   trap - ERR
@@ -73,7 +69,7 @@ function create_role() {
   trap 'fail' ERR
   log "Create role name $1"
   curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST \
-  http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/role \
+  -k https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/role \
     -H "accept: */*" -H "Content-Type: application/json" \
     -d "{\"name\": \"$1\", \"active\": true}"
   created=$(jq -r '.created' /tmp/json)
@@ -89,7 +85,7 @@ function assign_role() {
   trap 'fail' ERR
   log "Assign roleId $2 to userId $1"
   curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST \
-    http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/user/$1/role/$2
+    -k https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/user/$1/role/$2
   status=$(jq -r '.status' /tmp/json)
   if [[ $status -ne 200 ]]; then
     cat /tmp/json
@@ -127,7 +123,7 @@ function setup_user() {
   fi
   log "Resulting user account record"
   curl -s -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/user/$userId
+    -k https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/user/$userId
 }
 
 trap 'fail' ERR
@@ -144,5 +140,5 @@ if [[ $# -ge 5 ]]; then
   setup_user
   log "User creation is complete"
 else
-  grep '#. ' $0 | sed -i -- 's/#.//g'
+  grep '#. ' $0 | sedi 's/#.//g'
 fi

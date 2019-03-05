@@ -22,26 +22,26 @@ apiVersion: apps/v1
 
 kind: Deployment
 metadata:
-  namespace: <ACUMOS_NAMESPACE>
+  namespace: <ACUMOS_MARIADB_NAMESPACE>
   name: mariadb
   labels:
-    app: mariadb-service
+    app: mariadb
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mariadb-service
+      app: mariadb
   template:
     metadata:
       labels:
-        app: mariadb-service
+        app: mariadb
     spec:
       containers:
       - name: mariadb
-        image: mariadb
+        image: mariadb:10.2
         env:
         - name: MYSQL_ROOT_HOST
-          value: "%"
+          value: "<ACUMOS_MARIADB_ADMIN_HOST>"
         - name: MYSQL_ROOT_PASSWORD
           value: "<ACUMOS_MARIADB_PASSWORD>"
         - name: MYSQL_DATABASE
@@ -54,20 +54,20 @@ spec:
         - containerPort: 3306
         volumeMounts:
         - mountPath: /var/lib/mysql
-          name: pv-<ACUMOS_NAMESPACE>-mariadb-data
+          name: mariadb-data
       - name: adminer
         image: adminer
         ports:
         - containerPort: 8080
       restartPolicy: Always
       volumes:
-      - name: pv-<ACUMOS_NAMESPACE>-mariadb-data
-        hostPath:
-          path: /var/<ACUMOS_NAMESPACE>/mariadb-data
+      - name: mariadb-data
+#        hostPath:
+#          path: /var/<ACUMOS_MARIADB_NAMESPACE>/mariadb-data
 # TODO: debug access issues with PVC
-#        persistentVolumeClaim:
-#         claimName: pvc-<ACUMOS_NAMESPACE>-mariadb-data
+        persistentVolumeClaim:
+          claimName: pvc-<ACUMOS_MARIADB_NAMESPACE>-mariadb-data
       hostAliases:
-      - ip: "<ACUMOS_HOST>"
+      - ip: "<ACUMOS_HOST_IP>"
         hostnames:
-        - "<ACUMOS_DOMAIN>"
+        - "<ACUMOS_HOST>"
