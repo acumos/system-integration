@@ -50,7 +50,10 @@ spec:
         - name: SPRING_APPLICATION_JSON
           value: '{
                    "server":{
-                     "port": 8090
+                     "port": 8090,
+                     "servlet": {
+                       "context-path": "/onboarding-app"
+                     }
                    },
                    "docker": {
                      "host": "docker-service",
@@ -107,7 +110,7 @@ spec:
                      "GeneratorEndPointURL": "http://delete-me/model_create"
                    },
                    "spring": {
-                     "http": {
+                     "servlet": {
                        "multipart": {
                           "max-file-size": "1024MB",
                           "max-request-size": "1024MB"
@@ -119,13 +122,13 @@ spec:
         - containerPort: 8090
         volumeMounts:
         - mountPath: /maven/logs
-          name: pv-<ACUMOS_NAMESPACE>-logs
+          name: logs
       restartPolicy: Always
       volumes:
-      - name: pv-<ACUMOS_NAMESPACE>-logs
+      - name: logs
         persistentVolumeClaim:
          claimName: pvc-<ACUMOS_NAMESPACE>-logs
       hostAliases:
-      - ip: "<ACUMOS_HOST>"
+      - ip: "<ACUMOS_HOST_IP>"
         hostnames:
-        - "<ACUMOS_DOMAIN>"
+        - "<ACUMOS_HOST>"

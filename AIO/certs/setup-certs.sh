@@ -42,22 +42,12 @@ function log() {
 
 function setup() {
   trap 'fail' ERR
-  if [[ ! $(which keytool) ]]; then
-    log "Install keytool"
-    if [[ "$HOST_OS" == "ubuntu" ]]; then
-      sudo apt-get install -y openjdk-8-jre-headless
-    else
-      sudo yum install -y java-1.8.0-openjdk-headless
-    fi
-  fi
-
   log "Customize openssl.cnf as $name.cnf"
   if [[ "$HOST_OS" == "ubuntu" ]]; then
     cp /usr/lib/ssl/openssl.cnf ./$name.cnf
   else
     cp /etc/pki/tls/openssl.cnf ./$name.cnf
   fi
-  sudo chown $USER:$USER $name.cnf
   sed -i -- 's/^dir.*=.*/dir = ./g' $name.cnf
   sed -i -- "s/cacert.pem/$name-ca.crt/g" $name.cnf
   sed -i -- "s/cakey.pem/$name-ca.key/g" $name.cnf
@@ -113,7 +103,7 @@ authorityKeyIdentifier=keyid,issuer' $name.cnf
     -key $name.key \
     -passin pass:$CERT_KEY_PASSWORD \
     -out  $name.csr \
-    -subj "/C=US/ST=Unspecified/L=Unspecified/O=$sn/OU=$sn/CN=$sn"
+    -subj "/C=/ST=/L=/O=$sn/OU=$sn/CN=$sn"
 
   log "Sign the CSR with the CA"
   openssl x509 -req  -days 500 -sha256 -extfile $name.cnf \

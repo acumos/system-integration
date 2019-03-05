@@ -27,6 +27,55 @@ System Integration Release Notes
 All-in-One (OneClick Deploy)
 ............................
 
+----------------------------
+Version 2.1.0, 13 March 2019
+----------------------------
+
+This release is the first step in the refactoring of the AIO toolset to support
+these goals:
+
+* separation of user roles for target hosts (admin vs user)
+* Helm-based component deployment
+* discrete deployment of prerequisites, supplemental components, and core
+  components
+
+* `ACUMOS-2601: AIO upgrade to CDS 2.0 <https://jira.acumos.org/browse/ACUMOS-2601>`_
+
+  * `AIO upgrade to latest CDS <https://gerrit.acumos.org/r/#/c/3897/>`_
+
+     * Refactor into prereqs script (for admin) and deploy script for user
+       (non-sudo)
+     * Add Jupyter, Zeppelin, and NiFi baseline deploy
+
+* `ACUMOS-2587: Deploy MariaDB via Helm <https://jira.acumos.org/browse/ACUMOS-2587>`_
+
+  * included in `AIO upgrade to latest CDS <https://gerrit.acumos.org/r/#/c/3897/>`_
+
+* `ACUMOS-2049: system-integration toolset use by non-admin users <https://jira.acumos.org/browse/ACUMOS-2049>`_
+
+  * break out elk-stack components for separate deployment
+  * script host introspection (k8s tenant machine, or target host)
+  * refactor all scripts to use kubectl/oc from cluster-remote machine
+  * differentiate k8s user role (admin or tenant)
+  * expand acumos-env.sh values set in oneclick_deploy.sh
+  * use "source" vs "bash" internally to reuse env across scripts
+  * avoid building docker images (tenants can't use non-secure registries)
+  * remove unneeded OUTPUT and WEBCONBOARDING PVs
+  * make clean.sh independent of acumos-env.sh, improve reliability
+  * only create PVs if the user is an admin
+  * use configmaps where possible to avoid need for PV-staged config data
+  * add ACUMOS_MARIADB_VERSION env variable
+  * avoid re-configuration of user's workstation where possible
+  * migrate tools from kubernetes-client repo
+
+* `ACUMOS-2512: Move End User Guides Back to Component Repos so Projects have sole control <https://jira.acumos.org/browse/ACUMOS-2512>`
+
+  * `Add oneclick-deploy content <https://gerrit.acumos.org/r/#/c/3770/>`_
+
+* `ACUMOS-2424: AIO support for user-supplied CA and server certs <https://jira.acumos.org/browse/ACUMOS-2424`_
+
+  * `AIO support for user-supplied CA and server certs <https://gerrit.acumos.org/r/#/c/3679/>`_
+
 ------------------------------
 Version 2.0.1, 23 January 2019
 ------------------------------

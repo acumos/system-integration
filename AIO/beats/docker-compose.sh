@@ -28,10 +28,11 @@
 #   options: optional parameters to docker-compose.
 #
 
-set -x
-source ../acumos-env.sh
-source ../elk-stack/elk-env.sh
-source beats-env.sh
+trap - ERR
+
 cmd="$2 $3 $4 $5"
 cd docker
-docker-compose -f acumos/$1 $cmd
+docker-compose -f acumos/$1.yml $cmd
+cd ..
+
+trap 'fail' ERR
