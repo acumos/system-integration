@@ -29,9 +29,7 @@ metadata:
 spec:
   selector:
     app: cds
-  type: NodePort
   ports:
   - name: cds-port
-    nodePort: <ACUMOS_CDS_PORT>
     port: 8000
     targetPort: 8000

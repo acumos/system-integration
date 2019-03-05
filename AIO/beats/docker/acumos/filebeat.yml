@@ -21,7 +21,7 @@ version: '3.2'
 #
 services:
   filebeat-service:
-    image: acumos-filebeat
+    image: ${ACUMOS_FILEBEAT_IMAGE}
     volumes:
       - type: bind
         source: /var/${ACUMOS_NAMESPACE}/logs
@@ -30,5 +30,5 @@ services:
       - LOGSTASH_HOST=${ACUMOS_ELK_DOMAIN}
       - LOGSTASH_PORT=${ACUMOS_ELK_LOGSTASH_PORT}
     extra_hosts:
-      - "${ACUMOS_ELK_DOMAIN}:${ACUMOS_ELK_HOST}"
+      - "${ACUMOS_ELK_DOMAIN}:${ACUMOS_ELK_HOST_IP}"
     restart: on-failure

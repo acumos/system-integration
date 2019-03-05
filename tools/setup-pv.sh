@@ -59,7 +59,6 @@ if [[ ! \$(kubectl get pv $name) ]]; then
     sudo chown \$USER:users $path/$name
     chmod 777 $path/$name
   fi
-  dist=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
   cat <<EOG >$name.yaml
 kind: PersistentVolume
 apiVersion: v1

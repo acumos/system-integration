@@ -65,6 +65,7 @@ if [[ "$(rpm -qa | grep docker-1)" != "" ]]; then
   sudo yum remove -y docker docker-common
 fi
 echo; echo "prereqs.sh: ($(date)) Install latest docker-ce"
+# https://docs.okd.io/3.11/install/host_preparation.html#installing-docker
 # per https://docs.docker.com/engine/installation/linux/docker-ce/centos/#install-from-a-package
 sudo yum install -y yum-utils device-mapper-persistent-data lvm2
 sudo yum-config-manager --add-repo \

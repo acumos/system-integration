@@ -42,7 +42,7 @@ spec:
       - name: acumos-registry
       containers:
       - name: filebeat
-        image: acumos-filebeat
+        image: <ACUMOS_FILEBEAT_IMAGE>
         imagePullPolicy: IfNotPresent
         env:
         - name: log_level
@@ -55,16 +55,16 @@ spec:
         - containerPort: 8099
         volumeMounts:
         - mountPath: /filebeat-logs
-          name: pv-<ACUMOS_NAMESPACE>-logs
+          name: logs
 # Per https://github.com/elastic/beats/issues/8253
         securityContext:
           privileged: true
       restartPolicy: Always
       volumes:
-      - name: pv-<ACUMOS_NAMESPACE>-logs
+      - name: logs
         persistentVolumeClaim:
          claimName: pvc-<ACUMOS_NAMESPACE>-logs
       hostAliases:
-      - ip: "<ACUMOS_ELK_HOST>"
+      - ip: "<ACUMOS_ELK_HOST_IP>"
         hostnames:
         - "<ACUMOS_ELK_DOMAIN>"
