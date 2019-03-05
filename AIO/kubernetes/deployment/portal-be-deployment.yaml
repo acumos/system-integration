@@ -47,10 +47,11 @@ spec:
         - name: SPRING_APPLICATION_JSON
           value: '{
                     "server": {
-                      "port": 8083
+                      "port": 8083,
+                      "contextPath": "/"
                     },
                     "docker": {
-                      "host": "docker-service",
+                      "host": "docker-dind-service",
                       "port": "<ACUMOS_DOCKER_API_PORT>",
                       "registry": {
                         "url": "http://<ACUMOS_DOCKER_REGISTRY_HOST>:<ACUMOS_DOCKER_MODEL_PORT>/",
@@ -112,7 +113,7 @@ spec:
                         "verifyToken": {
                           "exp_time": 24
                         },
-                      "cloud_enabled": "[{\"cloudEnabled\": \"true\", \"cloudName\": \"azure\", \"cloudDisplayText\": \"Microsoft Azure\", \"imageUrl\": \"/images/deploy-cloud/microsoft_azure.png\" },{ \"cloudEnabled\": \"true\", \"cloudName\": \"rackspace\", \"cloudDisplayText\": \"Rackspace\", \"imageUrl\": \"/images/deploy-cloud/rackspace.png\" },{ \"cloudEnabled\": \"false\",  \"cloudName\": \"gcp\", \"cloudDisplayText\": \"Google Cloud Platform\", \"imageUrl\": \"/images/deploy-cloud/google_cloud_platform.png\" },{ \"cloudEnabled\": \"true\",  \"cloudName\": \"deploylocal\", \"cloudDisplayText\": \"Deploy To Local\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_local.png\" },{ \"cloudEnabled\": \"false\", \"cloudName\": \"whitebox\", \"cloudDisplayText\": \"Deploy To White Box\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_whitebox.png\" }]"
+                        "cloud_enabled": "[{\"cloudEnabled\": \"true\", \"cloudName\": \"azure\", \"cloudDisplayText\": \"Microsoft Azure\", \"imageUrl\": \"/images/deploy-cloud/microsoft_azure.png\" },{ \"cloudEnabled\": \"true\", \"cloudName\": \"rackspace\", \"cloudDisplayText\": \"Rackspace\", \"imageUrl\": \"/images/deploy-cloud/rackspace.png\" },{ \"cloudEnabled\": \"false\",  \"cloudName\": \"gcp\", \"cloudDisplayText\": \"Google Cloud Platform\", \"imageUrl\": \"/images/deploy-cloud/google_cloud_platform.png\" },{ \"cloudEnabled\": \"true\",  \"cloudName\": \"deploylocal\", \"cloudDisplayText\": \"Deploy To Local\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_local.png\" },{ \"cloudEnabled\": \"false\", \"cloudName\": \"whitebox\", \"cloudDisplayText\": \"Deploy To White Box\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_whitebox.png\" }]"
                       },
                       "submitValidation": {
                         "api": "http://validation-client-service:9603/status/v1.0/tasks"
@@ -138,11 +139,31 @@ spec:
                       }
                     },
                     "spring": {
-                      "mail": {
-                        "template": {
-                          "folder": {
-                            "path": "/fmtemplates/"
+                      "mail" : {
+                        "host" : "Provide the hostname",
+                        "port" : 25,
+                        "username" : "username",
+                        "password" : "password",
+                        "debug" : "true",
+                        "smtp" : {
+                          "starttls" : {
+                            "enable" : "true"
+                          },
+                          "auth" : "false"
+                        },
+                        "transport" : {
+                          "protocol" : "smtp"
+                        },
+                        "template" : {
+                          "folder" : {
+                            "path" : "/fmtemplates/"
                           }
+                        }
+                      },
+                      "servlet": {
+                        "multipart": {
+                          "max-file-size": "1024MB",
+                          "max-request-size": "1024MB"
                         }
                       }
                     },
@@ -180,27 +201,30 @@ spec:
                     },
                     "document": {
                       "size": "<ACUMOS_PORTAL_DOCUMENT_MAX_SIZE>"
-                      },
+                    },
+                    "jupyter" : {
+                      "url" : "http://<ACUMOS_DOMAIN>/"
+                    },
                     "image": {
                       "size": "<ACUMOS_PORTAL_IMAGE_MAX_SIZE>"
-                      }
+                    }
                   }'
         ports:
         - containerPort: 8083
         volumeMounts:
         - mountPath: /maven/logs
-          name: pv-<ACUMOS_NAMESPACE>-logs
+          name: logs
         - mountPath: /app/certs
           name: certs-volume
       restartPolicy: Always
       volumes:
-      - name: pv-<ACUMOS_NAMESPACE>-logs
+      - name: logs
         persistentVolumeClaim:
           claimName: pvc-<ACUMOS_NAMESPACE>-logs
       - name: certs-volume
         configMap:
           name: acumos-store
       hostAliases:
-      - ip: "<ACUMOS_HOST>"
+      - ip: "<ACUMOS_HOST_IP>"
         hostnames:
-        - "<ACUMOS_DOMAIN>"
+        - "<ACUMOS_HOST>"

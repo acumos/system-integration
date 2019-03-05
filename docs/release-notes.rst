@@ -27,6 +27,84 @@ System Integration Release Notes
 All-in-One (OneClick Deploy)
 ............................
 
+----------------------------
+Version 2.1.0, 29 March 2019
+----------------------------
+
+This release is the first step in the refactoring of the AIO toolset to support
+these goals:
+
+* separation of user roles for target hosts (admin vs user)
+* Helm-based component deployment
+* discrete deployment of prerequisites, supplemental components, and core
+  components
+
+The process for deploying the AIO platform has changed. Please review the
+`One Click Deploy User Guide <https://docs.acumos.org/en/latest/submodules/system-integration/docs/oneclick-deploy/index.html>`_
+for updated instructions.
+
+* `AIO upgrade to CDS 2.0 <https://gerrit.acumos.org/r/#/c/3897/>`_
+
+  * Delivers Jira items
+
+    * `ACUMOS-2601: AIO upgrade to CDS 2.0 <https://jira.acumos.org/browse/ACUMOS-2601>`_
+    * `ACUMOS-2587: Deploy MariaDB via Helm <https://jira.acumos.org/browse/ACUMOS-2587>`_
+    * `ACUMOS-2360: Ability to Re-Use Jupyter native capabilities <https://jira.acumos.org/browse/ACUMOS-2360>`_
+    * `ACUMOS-2365: AIO deploys new ML Workbench components <https://jira.acumos.org/browse/ACUMOS-2365>`_
+    * `ACUMOS-2571: Deploy Zeppelin <https://jira.acumos.org/browse/ACUMOS-2571>`_
+    * `ACUMOS-2572: Helm chart for Zeppelin <https://jira.acumos.org/browse/ACUMOS-2572>`_
+    * `ACUMOS-2331: Deploy JupyterHub <https://jira.acumos.org/browse/ACUMOS-2331>`_
+    * `ACUMOS-2334: Helm chart for JupyterHub <https://jira.acumos.org/browse/ACUMOS-2334>`_
+    * `ACUMOS-2126: Expanded uses for docker-proxy <https://jira.acumos.org/browse/ACUMOS-2126>`_
+    * `ACUMOS-2121: User-level authentication for docker-proxy <https://jira.acumos.org/browse/ACUMOS-2121>`_
+    * `ACUMOS-2122: Authenticate docker-proxy users as Acumos platform users <https://jira.acumos.org/browse/ACUMOS-2122>`_
+    * `ACUMOS-2639: acumos AIO sudo/non-sudo install fails <https://jira.acumos.org/browse/ACUMOS-2639>`_
+    * `ACUMOS-2145: setup_k8s.sh compatibility with Ubuntu 18.04 <https://jira.acumos.org/browse/ACUMOS-2145>`_
+
+  * Refactor into prereqs script (for admin) and deploy script for user
+    (non-sudo)
+  * Add prep/deploy wrapper scripts for admin and normal user
+  * Add Jupyter, Zeppelin, and NiFi baseline deploy
+  * Deploy MariaDB and Elk via Helm
+  * Reduce use of nodeports; route external access thru kong if possible
+  * Address public cloud use case (hostname different from domain name)
+  * Update user guide
+  * Add acumos_auth.py as 1st pass on user-level auth for docker-proxy
+  * Add docker-proxy README.md
+  * Add kong-configure job to secure kong admin setup
+  * Refocus peer-test.sh to peer relationship/subscription role
+  * Add add-host-alias.sh to update federation etc hosts aliases
+  * Add acumos_auth.py to docker-proxy service
+
+* `ACUMOS-2049: system-integration toolset use by non-admin users <https://jira.acumos.org/browse/ACUMOS-2049>`_
+
+  * Delivers Jira items
+
+    * `ACUMOS-2050: Platform deployment by k8s tenants <https://jira.acumos.org/browse/ACUMOS-2050>`_
+
+  * break out elk-stack components for separate deployment
+  * script host introspection (k8s tenant machine, or target host)
+  * refactor all scripts to use kubectl/oc from cluster-remote machine
+  * differentiate k8s user role (admin or tenant)
+  * expand acumos-env.sh values set in oneclick_deploy.sh
+  * use "source" vs "bash" internally to reuse env across scripts
+  * avoid building docker images (tenants can't use non-secure registries)
+  * remove unneeded OUTPUT and WEBCONBOARDING PVs
+  * make clean.sh independent of acumos-env.sh, improve reliability
+  * only create PVs if the user is an admin
+  * use configmaps where possible to avoid need for PV-staged config data
+  * add ACUMOS_MARIADB_VERSION env variable
+  * avoid re-configuration of user's workstation where possible
+  * migrate tools from kubernetes-client repo
+
+* `ACUMOS-2512: Move End User Guides Back to Component Repos so Projects have sole control <https://jira.acumos.org/browse/ACUMOS-2512>`
+
+  * `Add oneclick-deploy content <https://gerrit.acumos.org/r/#/c/3770/>`_
+
+* `ACUMOS-2424: AIO support for user-supplied CA and server certs <https://jira.acumos.org/browse/ACUMOS-2424`_
+
+  * `AIO support for user-supplied CA and server certs <https://gerrit.acumos.org/r/#/c/3679/>`_
+
 ------------------------------
 Version 2.0.1, 23 January 2019
 ------------------------------
@@ -55,6 +133,7 @@ This is the first draft release for Acumos Boreas.
       * `ACUMOS-2028: EOF impacts size variable <https://jira.acumos.org/browse/ACUMOS-2028>`_
       * `ACUMOS-2029: References to email to be replaces by environment variable <https://jira.acumos.org/browse/ACUMOS-2029>`_
       * `ACUMOS-2030: Irrelevant reference to nexus-service in /etc/hosts <https://jira.acumos.org/browse/ACUMOS-2030>`_
+      * `ACUMOS-2051: Support for PVCs <https://jira.acumos.org/browse/ACUMOS-2051>`_
 
     * add setup_openshift.sh and setup_openshift_client.sh
     * reintroduce docker-service via docker-dind

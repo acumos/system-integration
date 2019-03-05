@@ -1,0 +1,15 @@
+{
+  "strip_uri": false,
+  "name": "portal",
+  "http_if_terminated": false,
+  "https_only": true,
+  "upstream_url": "http://portal-fe-service:8085",
+  "uris": [
+    "/"
+  ],
+  "preserve_host": false,
+  "upstream_connect_timeout": 60000,
+  "upstream_read_timeout": 60000,
+  "upstream_send_timeout": 60000,
+  "retries": 5
+}
