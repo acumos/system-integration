@@ -100,7 +100,7 @@ spec:
                     },
                     "cdms": {
                       "client": {
-                        "url": "http://<ACUMOS_CDS_HOST>:<ACUMOS_CDS_PORT>/ccds",
+                        "url": "http://cds-service:8000/ccds",
                         "username": "<ACUMOS_CDS_USER>",
                         "password": "<ACUMOS_CDS_PASSWORD>"
                       }
@@ -123,6 +123,6 @@ spec:
         configMap:
           name: acumos-store
       hostAliases:
-      - ip: "<ACUMOS_HOST>"
+      - ip: "<ACUMOS_HOST_IP>"
         hostnames:
-        - "<ACUMOS_DOMAIN>"
+        - "<ACUMOS_HOST>"

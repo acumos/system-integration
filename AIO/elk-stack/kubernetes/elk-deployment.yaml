@@ -65,7 +65,7 @@ spec:
         persistentVolumeClaim:
           claimName: pvc-<ACUMOS_ELK_NAMESPACE>-elasticsearch-data
       hostAliases:
-      - ip: "<ACUMOS_ELK_HOST>"
+      - ip: "<ACUMOS_ELK_HOST_IP>"
         hostnames:
         - "<ACUMOS_ELK_DOMAIN>"
 ---
@@ -111,7 +111,7 @@ spec:
         - containerPort: 5000
       restartPolicy: Always
       hostAliases:
-      - ip: "<ACUMOS_ELK_HOST>"
+      - ip: "<ACUMOS_ELK_HOST_IP>"
         hostnames:
         - "<ACUMOS_ELK_DOMAIN>"
 ---
@@ -147,6 +147,6 @@ spec:
           privileged: true
       restartPolicy: Always
       hostAliases:
-      - ip: "<ACUMOS_ELK_HOST>"
+      - ip: "<ACUMOS_ELK_HOST_IP>"
         hostnames:
         - "<ACUMOS_ELK_DOMAIN>"

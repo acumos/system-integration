@@ -25,7 +25,10 @@ services:
        environment:
           SPRING_APPLICATION_JSON: "{
                \"server\":{
-                    \"port\": ${ACUMOS_ONBOARDING_PORT}
+                   \"port\": 8090,
+                   \"servlet\": {
+                      \"context-path\": \"/onboarding-app\"
+                   }
                 },
                \"docker\": {
                    \"host\": \"${ACUMOS_DOCKER_API_HOST}\",
@@ -58,15 +61,15 @@ services:
                    \"nexusGroupId\": \"com.artifact\"
                },
                \"cmndatasvc\": {
-                   \"cmnDataSvcEndPoinURL\": \"http://cds-service:${ACUMOS_CDS_PORT}/ccds\",
+                   \"cmnDataSvcEndPoinURL\": \"http://cds-service:8000/ccds\",
                    \"cmnDataSvcUser\": \"${ACUMOS_CDS_USER}\",
                    \"cmnDataSvcPwd\": \"${ACUMOS_CDS_PASSWORD}\"
                },
                \"mktPlace\": {
-                   \"mktPlaceEndPointURL\": \"http://portal-be-service:${ACUMOS_PORTAL_BE_PORT}\"
+                   \"mktPlaceEndPointURL\": \"http://portal-be-service:8083\"
                },
                \"microService\": {
-                   \"microServiceEndPointURL\": \"http://msg-service:${ACUMOS_MICROSERVICE_GENERATION_PORT}/microservice-generation\"
+                   \"microServiceEndPointURL\": \"http://msg-service:8336/microservice-generation\"
                },
                \"requirements\": {
                    \"extraIndexURL\": \"${PYTHON_EXTRAINDEX}\",
@@ -82,7 +85,7 @@ services:
                    \"GeneratorEndPointURL\": \"http://delete-me/model_create\"
                },
                \"spring\": {
-                   \"http\": {
+                   \"servlet\": {
                        \"multipart\": {
                            \"max-file-size\": \"1024MB\",
                            \"max-request-size\": \"1024MB\"
@@ -90,8 +93,8 @@ services:
                    }
                }
        }"
-       ports:
-           - ${ACUMOS_ONBOARDING_PORT}:${ACUMOS_ONBOARDING_PORT}
+       expose:
+           - 8090
        links:
            - cds-service
        depends_on:
@@ -106,5 +109,5 @@ services:
        logging:
            driver: json-file
        extra_hosts:
-           - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"
+           - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
        restart: on-failure

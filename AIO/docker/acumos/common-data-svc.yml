@@ -27,37 +27,31 @@ services:
        environment:
            SPRING_APPLICATION_JSON: "{
                 \"server\": {
-                    \"port\": ${ACUMOS_CDS_PORT}
-                },
-                \"security\": {
-                    \"user\": {
-                        \"name\"    : \"${ACUMOS_CDS_USER}\",
-                        \"password\": \"${ACUMOS_CDS_PASSWORD}\"
-                    }
+                    \"port\": 8000
                 },
                 \"spring\": {
-                    \"database\": {
-                        \"driver\": {
-                            \"classname\": \"org.mariadb.jdbc.Driver\"
-                        }
-                    },
                     \"datasource\": {
-                        \"url\": \"jdbc:mysql://${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_PORT}/${ACUMOS_CDS_DB}?useSSL=false\",
+                        \"jdbc-url\": \"jdbc:mariadb://${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_PORT}/${ACUMOS_CDS_DB}?useLegacyDatetimeCode=false&useSSL=false\",
                         \"username\": \"${ACUMOS_MARIADB_USER}\",
                         \"password\": \"${ACUMOS_MARIADB_USER_PASSWORD}\"
                     },
                     \"jpa\": {
-                        \"database-platform\": \"org.hibernate.dialect.MySQLDialect\",
+                        \"database-platform\": \"org.hibernate.dialect.MariaDB102Dialect\",
                         \"hibernate\": {
                             \"ddl-auto\": \"validate\"
+                        },
+                       \"show-sql\" : false
+                    },
+                    \"security\": {
+                        \"user\": {
+                            \"name\"    : \"${ACUMOS_CDS_USER}\",
+                            \"password\": \"${ACUMOS_CDS_PASSWORD}\"
                         }
-                   }
+                    }
                  }
            }"
        expose:
-           - ${ACUMOS_CDS_PORT}
-       ports:
-           - ${ACUMOS_CDS_PORT}:${ACUMOS_CDS_PORT}
+           - 8000
        volumes:
            - type: bind
              source: /var/${ACUMOS_NAMESPACE}/logs
@@ -65,5 +59,5 @@ services:
        logging:
            driver: json-file
        extra_hosts:
-           - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"
+           - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
        restart: on-failure

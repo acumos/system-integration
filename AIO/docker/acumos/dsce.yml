@@ -25,8 +25,9 @@ services:
        environment:
            SPRING_APPLICATION_JSON: "{
                           \"server\": {
-                                \"port\": ${ACUMOS_DSCE_PORT}
+                                \"port\": 8088
                           },
+                          \"gdmJarName\":\"gdmservice-1.2.0.jar\",
                           \"dateformat\": \"yyyy-MM-dd-HH-mm-ss-SSS\",
                           \"solutionResultsetSize\": \"2000\",
                           \"cdsCheckInterval\": 10000,
@@ -48,7 +49,7 @@ services:
                                 \"nexusgroupid\": \"com.artifact\"
                           },
                           \"cmndatasvc\": {
-                                \"cmndatasvcendpoinurl\": \"http://cds-service:${ACUMOS_CDS_PORT}/ccds\",
+                                \"cmndatasvcendpoinurl\": \"http://cds-service:8000/ccds\",
                                 \"cmndatasvcuser\": \"${ACUMOS_CDS_USER}\",
                                 \"cmndatasvcpwd\": \"${ACUMOS_CDS_PASSWORD}\"
                           },
@@ -72,7 +73,7 @@ services:
                             }
                         }"
        expose:
-           - ${ACUMOS_DSCE_PORT}
+           - 8088
        volumes:
            - type: bind
              source: /var/${ACUMOS_NAMESPACE}/logs
@@ -83,5 +84,5 @@ services:
        logging:
            driver: json-file
        extra_hosts:
-           - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"
+           - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
        restart: on-failure

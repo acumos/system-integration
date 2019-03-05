@@ -29,8 +29,8 @@ spec:
       targetPort: ${ACUMOS_PORTAL_FE_PORT}
       protocol: TCP
       name: acumos
-    - port: ${ACUMOS_CMS_PORT}
-      targetPort: ${ACUMOS_CMS_PORT}
+    - port: 9080
+      targetPort: 9080
       protocol: TCP
       name: acumos-cms-docker
     - port: ${ACUMOS_PORTAL_BE_PORT}
@@ -68,8 +68,8 @@ spec:
       targetPort: ${ACUMOS_OPENSTACK_CLIENT_PORT}
       protocol: TCP
       name: acumos-openstack-client
-    - port: ${ACUMOS_AZURE_CLIENT_PORT}
-      targetPort: ${ACUMOS_AZURE_CLIENT_PORT}
+    - port: 9081
+      targetPort: 9081
       protocol: TCP
       name: azure-client        
   selector:

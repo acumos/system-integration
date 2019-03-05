@@ -100,6 +100,6 @@ spec:
         hostPath:
           path: /var/run/docker.sock
       hostAliases:
-      - ip: "<ACUMOS_ELK_HOST>"
+      - ip: "<ACUMOS_ELK_HOST_IP>"
         hostnames:
         - "<ACUMOS_ELK_DOMAIN>"

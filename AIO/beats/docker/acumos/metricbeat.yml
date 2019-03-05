@@ -42,5 +42,5 @@ services:
     # extra_hosts is required since using network_mode: host, which blocks
     # docker network-internal service name resolution
     extra_hosts:
-      - "${ACUMOS_ELK_DOMAIN}:${ACUMOS_ELK_HOST}"
+      - "${ACUMOS_ELK_DOMAIN}:${ACUMOS_ELK_HOST_IP}"
     restart: on-failure

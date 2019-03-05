@@ -65,6 +65,6 @@ spec:
         persistentVolumeClaim:
          claimName: pvc-<ACUMOS_NAMESPACE>-logs
       hostAliases:
-      - ip: "<ACUMOS_ELK_HOST>"
+      - ip: "<ACUMOS_ELK_HOST_IP>"
         hostnames:
         - "<ACUMOS_ELK_DOMAIN>"

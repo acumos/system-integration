@@ -41,7 +41,7 @@ spec:
         image: mariadb
         env:
         - name: MYSQL_ROOT_HOST
-          value: "%"
+          value: "<ACUMOS_ADMIN_HOST>"
         - name: MYSQL_ROOT_PASSWORD
           value: "<ACUMOS_MARIADB_PASSWORD>"
         - name: MYSQL_DATABASE
@@ -68,6 +68,6 @@ spec:
 #        persistentVolumeClaim:
 #         claimName: pvc-<ACUMOS_NAMESPACE>-mariadb-data
       hostAliases:
-      - ip: "<ACUMOS_HOST>"
+      - ip: "<ACUMOS_HOST_IP>"
         hostnames:
-        - "<ACUMOS_DOMAIN>"
+        - "<ACUMOS_HOST>"

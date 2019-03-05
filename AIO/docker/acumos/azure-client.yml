@@ -28,7 +28,7 @@ services:
            log_level: "DEBUG"
            SPRING_APPLICATION_JSON: "{
                 \"server\": {
-                    \"port\": \"${ACUMOS_AZURE_CLIENT_PORT}\"
+                    \"port\": \"9081\"
                 },
                 \"docker\": {
                     \"containerNamePrefix\": \"E6E-NSG\",
@@ -51,6 +51,7 @@ services:
                     \"nginxWebFolder\": \"/usr/share/nginx/html\",
                     \"nginxImageName\": \"nginx:latest\",
                     \"nginxInternalPort\": \"80\",
+                    \"kubernetesClientUrl\":\"http://kubernetes-client-service:8082/getSolutionZip\",
                     \"exposeDataBrokerPort\": \"${ACUMOS_DATA_BROKER_PORT}\",
                     \"internalDataBrokerPort\": \"${ACUMOS_DATA_BROKER_INTERNAL_PORT}\",
                     \"registry\": {
@@ -82,7 +83,7 @@ services:
                     \"groupId\": \"com.artifact\"
                 },
                 \"cmndatasvc\": {
-                    \"cmndatasvcendpoinurl\": \"http://cds-service:${ACUMOS_CDS_PORT}/ccds\",
+                    \"cmndatasvcendpoinurl\": \"http://cds-service:8000/ccds\",
                     \"cmndatasvcuser\": \"${ACUMOS_CDS_USER}\",
                     \"cmndatasvcpwd\": \"${ACUMOS_CDS_PASSWORD}\"
                 },
@@ -94,7 +95,7 @@ services:
                 }
            }"
        expose:
-           - ${ACUMOS_AZURE_CLIENT_PORT}
+           - 9081
        volumes:
            - type: bind
              source: /var/${ACUMOS_NAMESPACE}/logs
@@ -102,5 +103,5 @@ services:
        logging:
            driver: json-file
        extra_hosts:
-           - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"
+           - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
        restart: on-failure

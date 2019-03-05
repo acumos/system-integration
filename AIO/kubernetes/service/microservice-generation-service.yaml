@@ -32,5 +32,5 @@ spec:
   type: ClusterIP
   ports:
   - name: msg-port
-    port: <ACUMOS_MICROSERVICE_GENERATION_PORT>
+    port: 8336
     targetPort: 8336

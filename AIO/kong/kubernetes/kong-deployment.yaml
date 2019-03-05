@@ -87,6 +87,6 @@ spec:
 #        persistentVolumeClaim:
 #         claimName: pvc-<ACUMOS_NAMESPACE>-kong-db
       hostAliases:
-      - ip: "<ACUMOS_HOST>"
+      - ip: "<ACUMOS_HOST_IP>"
         hostnames:
-        - "<ACUMOS_DOMAIN>"
+        - "<ACUMOS_HOST>"

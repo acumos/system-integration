@@ -29,7 +29,10 @@
 #   beat: filebeat|metricbeat
 #
 
+# First define utils that will overridden below
+
 function build_images() {
+  trap 'fail_elk' ERR
   log "Prepare $beat stack component image"
   if [[ -d platform-oam ]]; then rm -rf platform-oam; fi
   git clone https://gerrit.acumos.org/r/platform-oam
@@ -39,7 +42,7 @@ function build_images() {
     # Per https://www.elastic.co/guide/en/beats/filebeat/current/running-on-docker.html
     cd filebeat
     cp -R ../platform-oam/filebeat/config .
-    sudo docker build -t acumos-filebeat .
+    docker build -t acumos-filebeat .
   else
     log "Building local acumos-metricbeat image"
     cd metricbeat
@@ -48,28 +51,34 @@ function build_images() {
       ../platform-oam/metricbeat/config/metricbeat.yml
     cp -R ../platform-oam/metricbeat/config .
     cp -R ../platform-oam/metricbeat/module.d .
-    sudo docker build -t acumos-metricbeat .
+    docker build -t acumos-metricbeat .
   fi
   cd ..
 }
 
 clean() {
+  trap 'fail_elk' ERR
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     log "Stop any existing docker based components for $beat"
-    sudo bash docker-compose.sh $beat down
+    source docker-compose.sh $beat down
   else
     log "Stop any existing k8s based components for $beat"
+    if [[ ! -e deploy/$beat-service.yaml ]]; then
+      mkdir -p deploy
+      cp -r kubernetes/$beat-* deploy/.
+      replace_env deploy
+    fi
     stop_service deploy/$beat-service.yaml
     stop_deployment deploy/$beat-deployment.yaml
   fi
 }
 
 function setup() {
-  clean
+  trap 'fail_elk' ERR
   build_images
 
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-    sudo bash docker-compose.sh $beat up -d --build --force-recreate
+    source docker-compose.sh $beat up -d --build --force-recreate
   else
     log "Deploy the k8s based component $beat"
     mkdir -p deploy
@@ -80,12 +89,15 @@ function setup() {
   fi
 
   log "Wait for $beat pod to be Running"
-  wait_running $beat
+  wait_running $beat $ACUMOS_NAMESPACE
 }
 
-source ../acumos-env.sh
-source ../elk-stack/elk-env.sh
+if [[ "$AIO_ROOT" == "" ]]; then
+  cd ..
+  source acumos-env.sh
+  cd beats
+fi
 source beats-env.sh
-source ../utils.sh
 beat=$1
+clean
 setup

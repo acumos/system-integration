@@ -25,12 +25,14 @@
 # - for k8s, k8s cluster installed using generic k8s or OpenShift
 #
 # Usage: intended to be called from oneclick_deploy.sh
-# $ source setup-pv.sh <action> <what> <name> <size> <owner>
+# $ bash setup-pv.sh <action> <what> <namespace> <pv> <size> <owner> [oc|kubectl]
 #   action: setup|clean
 #   what: pv|pvc (setup a PV or a PVC)
-#   name: unique name, to use in naming PV/PVC as $what-$ACUMOS_NAMESPACE-$name
+#   namespace: for k8s, namespace to create the PVC under
+#   pv: name suffix (unique part) of the pv or pvc
 #   size: size in Gi or Mi (e.g. 2Gi)
 #   owner: host account to set as owner of the host folder
+#   oc|kubectl: when calling directly, specify the type of k8s control command
 #
 #   If calling directly to setup k8s PVs, use bash to run a script ala
 #   cat <<'EOF' >pv.sh
@@ -58,18 +60,6 @@ function log() {
   set -x
 }
 
-function setup_prereqs() {
-  trap 'fail' ERR
-
-  log "Basic prerequisites"
-  HOST_OS=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
-  if [[ "$HOST_OS" == "ubuntu" ]]; then
-    sudo apt-get install -y jq
-  else
-    sudo yum install -y jq
-  fi
-}
-
 function setup_pv() {
   trap 'fail' ERR
   path=/var/$namespace/$pv
@@ -82,41 +72,39 @@ function setup_pv() {
     fi
 
     if [[ ! -e $path ]]; then
-      mkdir -p $path
+      sudo mkdir -p $path
       # TODO: remove/relax this workaround
       # Required for various components to be able to write to the PVs
-      chmod 777 $path
+      sudo chmod 777 $path
       sudo chown $owner $path
     fi
   else
-    if [[ "$ACUMOS_K8S_ROLE" == "admin" ]]; then
-      log "Creating /var/$namespace as PV root folder, if needed"
-      cat <<EOF >mkpv.sh
+    log "Creating /var/$namespace as PV root folder, if needed"
+    cat <<EOF >mkpv.sh
 set -x
 if [[ ! -e /var/$namespace ]]; then
   sudo mkdir /var/$namespace
   sudo chown $ACUMOS_HOST_USER:$ACUMOS_HOST_USER /var/$namespace
 fi
 if [[ ! -e $path ]]; then
-  mkdir -p $path
-  chmod 777 $path
+  sudo mkdir -p $path
+  sudo chmod 777 $path
   sudo chown $owner $path
 fi
 EOF
-      if [[ "$(hostname)" == "$ACUMOS_DOMAIN" ]]; then
-        source mkpv.sh
-      else
-        scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-          mkpv.sh $ACUMOS_HOST_USER@$ACUMOS_DOMAIN:/home/$ACUMOS_HOST_USER/AIO/.
-        ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-          $ACUMOS_HOST_USER@$ACUMOS_DOMAIN bash AIO/mkpv.sh
-      fi
+    if [[ "$(hostname)" == "$ACUMOS_DOMAIN" ]]; then
+      source mkpv.sh
+    else
+      scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+        mkpv.sh $ACUMOS_HOST_USER@$ACUMOS_DOMAIN:/home/$ACUMOS_HOST_USER/AIO/.
+      ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+        $ACUMOS_HOST_USER@$ACUMOS_DOMAIN bash AIO/mkpv.sh
+    fi
 
     # Per https://kubernetes.io/docs/tasks/configure-pod-container/configure-persistent-volume-storage/
-    if [[ ! $(kubectl get pv $name) ]]; then
-      mkdir -p /tmp/$namespace/yaml
-      log "Creating kubernetes PV $name"
-      cat <<EOF >/tmp/$namespace/yaml/$name.yaml
+    mkdir -p /tmp/$namespace/yaml
+    log "Creating kubernetes PV $name"
+    cat <<EOF >/tmp/$namespace/yaml/$name.yaml
 kind: PersistentVolume
 apiVersion: v1
 metadata:
@@ -132,23 +120,18 @@ spec:
     path: "$path"
 EOF
 
-        kubectl create -f /tmp/$namespace/yaml/$name.yaml
-        kubectl get pv $name
-      else
-        log "PV $name exists, not recreating it"
-      fi
-    fi
+    $k8s_cmd create -f /tmp/$namespace/yaml/$name.yaml
+    $k8s_cmd get pv $name
   fi
 }
 
 function setup_pvc() {
   trap 'fail' ERR
-  if [[ ! $(kubectl get pvc -n $namespace $name) ]]; then
-    mkdir -p /tmp/$namespace/yaml
-    log "Creating PVC $name"
-    # Add volumeName: to ensure the PVC selects a specific volume as data
-    # may be pre-configured there
-    cat <<EOF >/tmp/$namespace/yaml/$name.yaml
+  mkdir -p /tmp/$namespace/yaml
+  log "Creating PVC $name"
+  # Add volumeName: to ensure the PVC selects a specific volume as data
+  # may be pre-configured there
+  cat <<EOF >/tmp/$namespace/yaml/$name.yaml
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -163,34 +146,28 @@ spec:
   volumeName: "$pv_name"
 EOF
 
-    kubectl create -n $namespace -f /tmp/$namespace/yaml/$name.yaml
-    kubectl get pvc -n $namespace $name
-  else
-    log "$name exists, not recreating it"
-  fi
+  $k8s_cmd create -n $namespace -f /tmp/$namespace/yaml/$name.yaml
+  $k8s_cmd get pvc -n $namespace $name
 }
 
 function clean() {
   trap 'fail' ERR
   if [[ "$what" == "pvc" ]]; then
-    if [[ $(kubectl get namespaces) ]]; then
-      log "Deleting $what-$namespace-$pv"
-      if [[ $(kubectl delete pvc -n $namespace $name) ]]; then
-        while $(kubectl get pvc -n $namespace $name); do
+    if [[ $($k8s_cmd get namespaces $namespace) ]]; then
+      log "Deleting $name"
+      if [[ $($k8s_cmd delete pvc -n $namespace $name) ]]; then
+        while $k8s_cmd get pvc -n $namespace $name; do
           log "Waiting 10 seconds for PVC $name to be deleted"
           sleep 10
         done
       fi
     fi
   else
-    if [[ $(kubectl get namespaces $namespace) && "$ACUMOS_K8S_ROLE" == "admin" ]]; then
-      log "Deleting $what-$namespace-$pv"
-      if [[ $(kubectl delete pv $name) ]]; then
-        while $(kubectl get pv $name); do
-          log "Waiting 10 seconds for PV $name to be deleted"
-          sleep 10
-        done
-      fi
+    if [[ $($k8s_cmd delete pv $name) ]]; then
+      while $k8s_cmd get pv $name; do
+        log "Waiting 10 seconds for PV $name to be deleted"
+        sleep 10
+      done
     fi
     if [[ -e /var/$namespace/$pv ]]; then
       log "Deleting host folder /var/$namespace/$pv"
@@ -205,6 +182,7 @@ pv=$3
 namespace=$4
 size=$5
 owner=$6
+if [[ "$7" != "" ]]; then k8s_cmd=$7; fi
 
 if [[ "$what" == "pv" ]]; then name="pv-$namespace-$pv"
 else
@@ -212,7 +190,6 @@ else
   pv_name="pv-$namespace-$pv"
 fi
 
-setup_prereqs
 if [[ "$action" == "clean" ]]; then
   clean
 else
