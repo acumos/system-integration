@@ -41,7 +41,7 @@ spec:
         image: mariadb
         env:
         - name: MYSQL_ROOT_HOST
-          value: "%"
+          value: "<ACUMOS_ADMIN_HOST>"
         - name: MYSQL_ROOT_PASSWORD
           value: "<ACUMOS_MARIADB_PASSWORD>"
         - name: MYSQL_DATABASE

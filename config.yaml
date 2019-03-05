@@ -1,5 +1,5 @@
 proxy:
-  secretToken: "dc0623160d2459e3ebb0409975af2d5d6c4902458703ab886cc9c3d7a201842a"
+  secretToken: "aaac18441c577955ac5e129a7161fffc581967e4d2f988c750871c6aaa93bdbb"
 hub:
   extraConfig: |
     c.Spawner.cmd = ['jupyter-labhub']
@@ -41,9 +41,9 @@ hub:
 #    ]
 singleuser:
   extraEnv:
-    ACUMOS_ONBOARDING_TOKENMODE: 
-    ACUMOS_ONBOARDING_CLIPUSHURL: "http://onboarding-service:/onboarding-app/v2/models"
-    ACUMOS_ONBOARDING_CLIAUTHURL: "http://onboarding-service:/onboarding-app/v2/auth"
+    ACUMOS_ONBOARDING_TOKENMODE: jwtToken
+    ACUMOS_ONBOARDING_CLIPUSHURL: "http://onboarding-service:8090/onboarding-app/v2/models"
+    ACUMOS_ONBOARDING_CLIAUTHURL: "http://onboarding-service:8090/onboarding-app/v2/auth"
   defaultUrl: "/lab"
   storage:
     type: none

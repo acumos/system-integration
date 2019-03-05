@@ -42,22 +42,12 @@ function log() {
 
 function setup() {
   trap 'fail' ERR
-  if [[ ! $(which keytool) ]]; then
-    log "Install keytool"
-    if [[ "$HOST_OS" == "ubuntu" ]]; then
-      sudo apt-get install -y openjdk-8-jre-headless
-    else
-      sudo yum install -y java-1.8.0-openjdk-headless
-    fi
-  fi
-
   log "Customize openssl.cnf as $name.cnf"
   if [[ "$HOST_OS" == "ubuntu" ]]; then
     cp /usr/lib/ssl/openssl.cnf ./$name.cnf
   else
     cp /etc/pki/tls/openssl.cnf ./$name.cnf
   fi
-  sudo chown $USER:$USER $name.cnf
   sed -i -- 's/^dir.*=.*/dir = ./g' $name.cnf
   sed -i -- "s/cacert.pem/$name-ca.crt/g" $name.cnf
   sed -i -- "s/cakey.pem/$name-ca.key/g" $name.cnf

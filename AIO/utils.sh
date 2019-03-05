@@ -35,13 +35,15 @@ fi
 function fail() {
   set +x
   trap - ERR
-  save_logs
-  log "Debug logs are saved at /tmp/acumos/debug"
+  cd $AIO_ROOT
+  reason="$1"
+  if [[ "$1" == "" ]]; then reason="unknown failure at $fname $fline"; fi
   if [[ -e ../acumos-env.sh ]]; then cd ..; fi
-  source acumos-env.sh
-  update_env DEPLOY_RESULT fail
-  update_env FAIL_REASON "\"$1\""
-  log "$1"
+  sed -i -- "s/DEPLOY_RESULT=.*/DEPLOY_RESULT=fail/" acumos-env.sh
+  sed -i -- "s/FAIL_REASON=.*/FAIL_REASON=\"$reason\"/" acumos-env.sh
+  save_logs
+  log "Debug logs are saved at $logs"
+  log "$reason"
   exit 1
 }
 
@@ -51,14 +53,6 @@ function log() {
   fline=$(caller 0 | awk '{print $1}')
   echo; echo "$fname:$fline ($(date)) $1"
   set -x
-}
-
-function wait_dpkg() {
-  # TODO: workaround for "E: Could not get lock /var/lib/dpkg/lock - open (11: Resource temporarily unavailable)"
-  echo; echo "waiting for dpkg to be unlocked"
-  while sudo fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do
-    sleep 1
-  done
 }
 
 function wait_until_notfound() {
@@ -101,7 +95,7 @@ function stop_service() {
     if [[ $($k8s_cmd get svc -n $ACUMOS_NAMESPACE -l app=$app) ]]; then
       log "Stop service for $app"
       $k8s_cmd delete -f $1
-      wait_until_notfound "$k8s_cmd get svc -n $ACUMOS_NAMESPACE" "^$app"
+      wait_until_notfound "$k8s_cmd get svc -n $ACUMOS_NAMESPACE" $app
     else
       log "Service not found for $app"
     fi
@@ -116,7 +110,7 @@ function stop_deployment() {
     if [[ $($k8s_cmd get deployment -n $ACUMOS_NAMESPACE -l app=$app) ]]; then
       log "Stop deployment for $app"
       $k8s_cmd delete -f $1
-      wait_until_notfound "$k8s_cmd get pods -n $ACUMOS_NAMESPACE" "^$app"
+      wait_until_notfound "$k8s_cmd get pods -n $ACUMOS_NAMESPACE" $app
     else
       log "Deployment not found for $app"
     fi
@@ -125,7 +119,7 @@ function stop_deployment() {
 
 function update_env() {
   # Reuse existing values if set
-  if [[ "${!1}" == "" ]]; then
+  if [[ "${!1}" == "" || "$3" == "force" ]]; then
     export $1=$2
     log "Updating acumos-env.sh with \"export $1=$2\""
     sed -i -- "s~$1=.*~$1=$2~" $AIO_ROOT/acumos-env.sh
@@ -162,10 +156,10 @@ function start_deployment() {
 
 function check_running() {
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-    cs=$(sudo docker ps -a | awk "/$app/{print \$1}")
+    cs=$(docker ps -a | awk "/$app/{print \$1}")
     status="Running"
     for c in $cs; do
-      if [[ $(sudo docker ps -f id=$c | grep -c " Up ") -eq 0 ]]; then
+      if [[ $(docker ps -f id=$c | grep -c " Up ") -eq 0 ]]; then
         status="Not yet Up"
       fi
     done
@@ -188,11 +182,11 @@ function wait_running() {
   done
   if [[ $t -gt 30 ]]; then
     if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-      cs=$(sudo docker ps -a | awk "/$app/{print \$1}")
+      cs=$(docker ps -a | awk "/$app/{print \$1}")
       for c in $cs; do
-        if [[ $(sudo docker ps -f id=$c | grep -c " Up ") -eq 0 ]]; then
-          sudo docker ps -f id=$c
-          sudo docker logs $c
+        if [[ $(docker ps -f id=$c | grep -c " Up ") -eq 0 ]]; then
+          docker ps -f id=$c
+          docker logs $c
         fi
       done
     else
@@ -205,38 +199,42 @@ function wait_running() {
 }
 
 function save_logs() {
-  if [[ -e /tmp/acumos/debug ]]; then rm -rf /tmp/acumos/debug; fi
-  mkdir -p /tmp/acumos/debug
+  set +x
+  log "Saving debug logs"
+  logs=/tmp/acumos/log/$USER
+  if [[ -e $logs ]]; then rm -rf $logs; fi
+  mkdir -p $logs
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     if [[ $(which docker) ]]; then
-      sudo docker ps -a | grep acumos | tee /tmp/acumos/debug/acumos-containers.log
-      cs=$(sudo docker ps --format '{{.Names}}' | grep acumos)
+      docker ps -a | grep acumos | tee $logs/acumos-containers.log
+      cs=$(docker ps --format '{{.Names}}' | grep acumos)
       for c in $cs; do
-        sudo bash -c "nohup docker ps -f name=$c | tee /tmp/acumos/debug/$c.log 1>/dev/null 2>&1 &" 1>/dev/null 2>&1
-        sudo bash -c "nohup docker logs $c | tee -a /tmp/acumos/debug/$c.log 1>/dev/null 2>&1 &" 1>/dev/null 2>&1
+        # running the command under bash and redirecting prevents the logs
+        # from also being output to the screen
+        bash -c "nohup docker ps -f name=$c | tee $logs/$c.log 1>/dev/null 2>&1 &" 1>/dev/null 2>&1
+        bash -c "nohup docker logs $c | tee -a $logs/$c.log 1>/dev/null 2>&1 &" 1>/dev/null 2>&1
       done
-      sudo chown $USER:$USER -R /tmp/acumos
     fi
   else
     if [[ $(which kubectl) ]]; then
-      kubectl describe pv > /tmp/acumos/debug/acumos-pv.log
-      kubectl describe pvc -n $ACUMOS_NAMESPACE > /tmp/acumos/debug/acumos-pvc.log
-      kubectl get svc -n $ACUMOS_NAMESPACE > /tmp/acumos/debug/acumos-svc.log
-      kubectl describe svc -n $ACUMOS_NAMESPACE >>  /tmp/acumos/debug/acumos-svc.log
-      kubectl get pods -n $ACUMOS_NAMESPACE > /tmp/acumos/debug/acumos-pods.log
+      kubectl describe pv > $logs/acumos-pv.log
+      kubectl describe pvc -n $ACUMOS_NAMESPACE > $logs/acumos-pvc.log
+      kubectl get svc -n $ACUMOS_NAMESPACE > $logs/acumos-svc.log
+      kubectl describe svc -n $ACUMOS_NAMESPACE >>  $logs/acumos-svc.log
+      kubectl get pods -n $ACUMOS_NAMESPACE > $logs/acumos-pods.log
       pods=$(kubectl get pods -n $ACUMOS_NAMESPACE -o json >/tmp/json)
       np=$(jq -r '.content | length' /tmp/json)
       i=0;
       while [[ $i -lt $np ]] ; do
         app=$(jq -r ".content[$i].metadata.labels.app" /tmp/json)
-        kubectl describe pods -n $ACUMOS_NAMESPACE -l app=$app > /tmp/acumos/debug/$app.log
+        kubectl describe pods -n $ACUMOS_NAMESPACE -l app=$app > $logs/$app.log
         nc=$(jq -r ".content[$i].spec.containers | length" /tmp/json)
         cs=$(jq -r ".content[$i].spec.containers" /tmp/json)
         j=0
         while [[ $j -lt $nc ]] ; do
           name=$(jq -r ".content[$i].spec.containers[$j].name" /tmp/json)
-          echo "***** $name *****" >>  /tmp/acumos/debug/$app.log
-          kubectl logs -n $ACUMOS_NAMESPACE -l app=$app -c $name >>  /tmp/acumos/debug/$app.log
+          echo "***** $name *****" >>  $logs/$app.log
+          kubectl logs -n $ACUMOS_NAMESPACE -l app=$app -c $name >>  $logs/$app.log
         done
         ((i++))
       done

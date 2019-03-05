@@ -26,40 +26,37 @@
 #.
 
 function clean() {
+  trap 'fail' ERR
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     log "Stop any existing docker based components for kong-service"
-  #    sudo bash docker-compose.sh $AIO_ROOT down
-    cs=$(sudo docker ps -a | awk '/kong/{print $1}')
+    cs=$(docker ps -a | awk '/kong/{print $1}')
     for c in $cs; do
-      sudo docker stop $c
-      sudo docker rm $c
+      docker stop $c
+      docker rm $c
     done
   else
     log "Stop any existing k8s based components for kong-service"
+    if [[ ! -e deploy/kong-service.yaml ]]; then
+      mkdir -p deploy
+      cp -r kubernetes/* deploy/.
+      replace_env deploy
+    fi
     stop_service deploy/kong-service.yaml
     stop_deployment deploy/kong-deployment.yaml
     log "Remove PVC for kong-service"
-    source $AIO_ROOT/setup-pv.sh clean pvc kong-db $ACUMOS_NAMESPACE
+    source ../setup-pv.sh clean pvc kong-db $ACUMOS_NAMESPACE
   fi
-
-  log "Remove PV data for kong-service"
-  source $AIO_ROOT/setup-pv.sh clean pv kong-db $ACUMOS_NAMESPACE
 }
 
 function setup() {
   trap 'fail' ERR
-  if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then clean; fi
-
-  log "Setup the kong-db PV"
-  source $AIO_ROOT/setup-pv.sh setup pv kong-db \
-    $ACUMOS_NAMESPACE $KONG_DB_PV_SIZE "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
 
   log "Start kong-service components"
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-    sudo bash docker-compose.sh $AIO_ROOT up -d --build --force-recreate
+    source docker-compose.sh up -d --build --force-recreate
   else
     log "Setup the kong-db PVC"
-    source $AIO_ROOT/setup-pv.sh setup pvc kong-db \
+    source ../setup-pv.sh setup pvc kong-db \
       $ACUMOS_NAMESPACE $KONG_DB_PV_SIZE "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
 
     log "Deploy the k8s based components for kong"
@@ -116,15 +113,7 @@ function setup() {
 
   log "Dump of API endpoints as created"
   curl http://$ACUMOS_KONG_ADMIN_HOST:$ACUMOS_KONG_ADMIN_PORT/apis/
-
-  if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-    log "Add cert as CA to docker /etc/docker/certs.d"
-    # TODO: Revisit need for this workaround in docker-dind based design
-    # Required for docker daemon to accept the kong self-signed cert
-    # Per https://docs.docker.com/registry/insecure/#use-self-signed-certificates
-    sudo mkdir -p /etc/docker/certs.d/$ACUMOS_HOST
-    sudo cp $AIO_ROOT/certs/$ACUMOS_CA_CERT /etc/docker/certs.d/$ACUMOS_HOST/ca.crt
-  fi
 }
 
+clean
 setup

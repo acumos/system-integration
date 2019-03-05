@@ -25,7 +25,10 @@ services:
        environment:
           SPRING_APPLICATION_JSON: "{
                \"server\":{
-                    \"port\": ${ACUMOS_MICROSERVICE_GENERATION_PORT}
+                   \"port\": ${ACUMOS_MICROSERVICE_GENERATION_PORT},
+                   \"servlet\": {
+                      \"context-path\": \"/onboarding-app\"
+                   }
                },
                \"docker\": {
                    \"host\": \"${ACUMOS_DOCKER_API_HOST}\",
@@ -78,7 +81,7 @@ services:
                    \"dockerpassword\": \"${ACUMOS_PROJECT_NEXUS_PASSWORD}\"
                },
                \"spring\": {
-                   \"http\": {
+                   \"servlet\": {
                        \"multipart\": {
                            \"max-file-size\": \"1024MB\",
                            \"max-request-size\": \"1024MB\"

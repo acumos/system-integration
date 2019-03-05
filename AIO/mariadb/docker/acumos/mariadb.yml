@@ -21,7 +21,7 @@ version: '3.2'
 services:
   mariadb-service:
     restart: on-failure
-    image: mariadb
+    image: mariadb:10.2.22
     ports:
       - "${ACUMOS_MARIADB_PORT}:3306"
     restart: always
@@ -33,7 +33,7 @@ services:
       MYSQL_PASSWORD: "${ACUMOS_MARIADB_USER_PASSWORD}"
     volumes:
       - type: bind
-        source: /var/${ACUMOS_NAMESPACE}/mariadb-data
+        source: /var/${ACUMOS_MARIADB_NAMESPACE}/mariadb-data
         target: /var/lib/mysql
 
   mariadb-adminer:

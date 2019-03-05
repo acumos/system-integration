@@ -25,7 +25,7 @@
 #
 
 # Version of the AIO toolset
-export ACUMOS_AIO_VERSION=2.0.1
+export ACUMOS_AIO_VERSION=2.1.0
 
 # Acumos project Registries
 export ACUMOS_PROJECT_NEXUS_USERNAME=docker
@@ -38,25 +38,28 @@ export STAGING=nexus3.acumos.org:10004
 export RELEASE=nexus3.acumos.org:10002
 
 # Images per Athena 1.0 final release assembly
-# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_1810301700
-export PORTAL_BE_IMAGE=$RELEASE/acumos-portal-be:1.16.2
-export PORTAL_FE_IMAGE=$RELEASE/acumos-portal-fe:1.16.2
-export AZURE_CLIENT_IMAGE=$RELEASE/acumos-azure-client:1.2.22
-export DESIGNSTUDIO_IMAGE=$RELEASE/ds-compositionengine:1.40.2
+# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_1902200900
+# Core components
+export AZURE_CLIENT_IMAGE=$STAGING/acumos-azure-client:2.0.10
 export PORTAL_CMS_IMAGE=$RELEASE/acumos-cms-docker:1.3.5
-export ONBOARDING_IMAGE=$RELEASE/onboarding-app:1.39.0
-export COMMON_DATASERVICE_IMAGE=$RELEASE/common-dataservice:1.18.4
-export OPENSTACK_CLIENT_IMAGE=$RELEASE/openstack-client:1.1.22
-export BLUEPRINT_ORCHESTRATOR_IMAGE=$RELEASE/blueprint-orchestrator:2.0.11
-export FEDERATION_IMAGE=$RELEASE/federation-gateway:1.18.7
-export KUBERNETES_CLIENT_IMAGE=$RELEASE/kubernetes-client:1.1.0
-export PROTO_VIEWER_IMAGE=$RELEASE/acumos-proto-viewer:1.5.6
-export MICROSERVICE_GENERATION_IMAGE=$RELEASE/microservice-generation:1.8.2
-export H2O_GENERICJAVA_MODELRUNNER_IMAGE=$RELEASE/h2o-genericjava-modelrunner-2.2.3
-export ONBOARDING_BASE_IMAGE=$RELEASE/onboarding-base-r:1.0.0
+export PORTAL_BE_IMAGE=$STAGING/acumos-portal-be:2.2.5
+export PORTAL_FE_IMAGE=$STAGING/acumos-portal-fe:2.2.5
+export COMMON_DATASERVICE_IMAGE=$STAGING/common-dataservice:2.2.0
+export DESIGNSTUDIO_IMAGE=$STAGING/ds-compositionengine:2.0.6
+export FEDERATION_IMAGE=$STAGING/federation-gateway:2.1.1
+export KUBERNETES_CLIENT_IMAGE=$STAGING/kubernetes-client:2.0.4
+export MICROSERVICE_GENERATION_IMAGE=$STAGING/microservice-generation:2.6.0
+export ONBOARDING_IMAGE=$STAGING/onboarding-app:2.7.0
+export OPENSTACK_CLIENT_IMAGE=$STAGING/openstack-client:2.0.8
+
+# Model-execution-components
 export DATABROKER_SQLBROKER_IMAGE=$RELEASE/sqldatabroker:1.2.0
-export DATABROKER_ZIPBROKER_IMAGE=$RELEASE/databroker-zipbroker:0.0.1
 export DATABROKER_CSVBROKER_IMAGE=$RELEASE/csvdatabroker:1.4.0
+export ONBOARDING_BASE_IMAGE=$RELEASE/onboarding-base-r:1.0.0
+export BLUEPRINT_ORCHESTRATOR_IMAGE=$STAGING/blueprint-orchestrator:2.0.11
+export H2O_GENERICJAVA_MODELRUNNER_IMAGE=$RELEASE/h2o-genericjava-modelrunner-2.2.3
+export DATABROKER_ZIPBROKER_IMAGE=$RELEASE/databroker-zipbroker:0.0.1
+export PROTO_VIEWER_IMAGE=$RELEASE/acumos-proto-viewer:1.5.6
 
 # Set by oneclick_deploy.sh
 export DEPLOYED_UNDER=
@@ -82,7 +85,8 @@ export ACUMOS_SETUP_DB=true
 export ACUMOS_DEPLOY_DOCKER=true
 export ACUMOS_DEPLOY_NEXUS=true
 export ACUMOS_DEPLOY_KONG=true
-export ACUMOS_DEPLOY_ELK=false
+export ACUMOS_DEPLOY_ELK=true
+export ACUMOS_DEPLOY_ELK_BEATS=true
 export ACUMOS_MARIADB_VERSION=10.2
 export ACUMOS_MARIADB_HOST=$ACUMOS_DOMAIN
 export ACUMOS_MARIADB_PORT=30001
@@ -124,7 +128,7 @@ export HTTPS_PROXY=""
 export ACUMOS_ADMIN_EMAIL='acumos@example.com'
 export ACUMOS_AZURE_CLIENT_PORT=9081
 export ACUMOS_CDS_PREVIOUS_VERSION=
-export ACUMOS_CDS_VERSION=1.18
+export ACUMOS_CDS_VERSION=2.2
 export ACUMOS_CDS_DB='acumos_cds'
 export ACUMOS_CDS_HOST=$ACUMOS_DOMAIN
 export ACUMOS_CDS_PORT=30800
@@ -150,6 +154,7 @@ export ACUMOS_KEYSTORE=${ACUMOS_CERT_PREFIX}-keystore.p12
 export ACUMOS_KEYSTORE_PASSWORD=
 export ACUMOS_TRUSTSTORE=${ACUMOS_CERT_PREFIX}-truststore.jks
 export ACUMOS_KUBERNETES_CLIENT_PORT=8082
+export ACUMOS_JUPYTERHUB_PORT=30010
 export ACUMOS_MICROSERVICE_GENERATION_PORT=8336
 export ACUMOS_ONBOARDING_PORT=8090
 export ACUMOS_ONBOARDING_TOKENMODE=jwtToken
@@ -180,8 +185,6 @@ export ACUMOS_DEPLOYED_VM_USER=dockerUser
 export ACUMOS_PROBE_PORT=5006
 
 # Kubernetes options
-# Select "tenant" below to skip creation of hostPath PVs
-export ACUMOS_K8S_ROLE=admin
 export ACUMOS_NAMESPACE=acumos
 export ACUMOS_HOST_USER=
 
@@ -194,7 +197,5 @@ export DOCKER_VOLUME_PV_NAME="pv-$ACUMOS_NAMESPACE-docker-volume"
 export DOCKER_VOLUME_PV_SIZE=5Gi
 export KONG_DB_PV_NAME="pv-$ACUMOS_NAMESPACE-kong-db"
 export KONG_DB_PV_SIZE=10Mi
-export MARIADB_DATA_PV_NAME="pv-$ACUMOS_NAMESPACE-mariadb-data"
-export MARIADB_DATA_PV_SIZE=5Gi
 export NEXUS_DATA_PV_NAME="pv-$ACUMOS_NAMESPACE-nexus-data"
 export NEXUS_DATA_PV_SIZE=10Gi
