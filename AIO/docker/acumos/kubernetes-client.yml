@@ -56,7 +56,7 @@ services:
                 \"groupid\": \"com.artifact\"
               },
               \"cmndatasvc\": {
-                \"cmndatasvcendpointurl\": \"http://cds-service:${ACUMOS_CDS_PORT}/ccds\",
+                \"cmndatasvcendpointurl\": \"http://cds-service:8000/ccds\",
                 \"cmndatasvcuser\": \"${ACUMOS_CDS_USER}\",
                 \"cmndatasvcpwd\": \"${ACUMOS_CDS_PASSWORD}\"
               },
@@ -72,9 +72,7 @@ services:
               }
            }"
        expose:
-           - ${ACUMOS_KUBERNETES_CLIENT_PORT}
-       ports:
-           - ${ACUMOS_KUBERNETES_CLIENT_PORT}:${ACUMOS_KUBERNETES_CLIENT_PORT}
+           - 8082
        volumes:
            - type: bind
              source: /var/${ACUMOS_NAMESPACE}/logs
@@ -82,5 +80,5 @@ services:
        logging:
            driver: json-file
        extra_hosts:
-           - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"
+           - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
        restart: on-failure

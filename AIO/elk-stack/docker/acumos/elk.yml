@@ -53,6 +53,9 @@ services:
     depends_on:
       - elasticsearch-service
     restart: on-failure
+    extra_hosts:
+      - "${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_HOST_IP}"           
+
 
   kibana-service:
     image: acumos-kibana

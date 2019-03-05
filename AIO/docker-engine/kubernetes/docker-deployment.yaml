@@ -23,29 +23,29 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: <ACUMOS_NAMESPACE>
-  name: docker
+  name: docker-dind
   labels:
-    app: docker-service
+    app: docker-dind
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: docker-service
+      app: docker-dind
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: docker-service
+        app: docker-dind
     spec:
       restartPolicy: Always
       # Docker-commands-container
       containers:
       - name: docker-cmds
-        image: docker:dind
+        image: docker:18.06.3-ce-dind
         securityContext:
             privileged: true
-        command: ['docker', 'run', '-p', '80:80', 'httpd:latest']
+        command: ['docker', 'run', '-p', '80:80', 'httpd:2.4']
         env:
         - name: log_level
           value: "DEBUG"
@@ -71,13 +71,26 @@ spec:
             value: '--insecure-registry=<ACUMOS_DOCKER_REGISTRY_HOST>:<ACUMOS_DOCKER_MODEL_PORT>'
         args: ["$(DOCKER_OPTS)"]
         volumeMounts:
-        - name: pv-<ACUMOS_NAMESPACE>-docker-volume
+        - name: docker-volume
           mountPath: /var/lib/docker
       volumes:
-      - name: pv-<ACUMOS_NAMESPACE>-docker-volume
+      - name: docker-volume
         persistentVolumeClaim:
          claimName: pvc-<ACUMOS_NAMESPACE>-docker-volume
       hostAliases:
-      - ip: "<ACUMOS_HOST>"
+      - ip: "<ACUMOS_HOST_IP>"
         hostnames:
-        - "<ACUMOS_DOMAIN>"
+        - "<ACUMOS_HOST>"
+#      dnsPolicy: None
+#      dnsConfig:
+#        nameservers:
+#          - 8.8.8.8
+#          - 8.8.4.4
+#        searches:
+#          - <ACUMOS_NAMESPACE>.svc.cluster.local
+# Address issue with DNS resolution intermittent failure from docker-engine
+# https://www.weave.works/blog/racy-conntrack-and-dns-lookup-timeouts
+#        options:
+#          - name: ndots
+#            value: "5"
+#          - name: edns0

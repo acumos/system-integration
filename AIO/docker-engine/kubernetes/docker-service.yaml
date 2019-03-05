@@ -23,12 +23,12 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: <ACUMOS_NAMESPACE>
-  name: docker-service
+  name: docker-dind-service
   labels:
-    app: docker-service
+    app: docker-dind
 spec:
   selector:
-    app: docker-service
+    app: docker-dind
   type: ClusterIP
   ports:
   - name: docker-api-port

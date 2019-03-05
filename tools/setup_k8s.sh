@@ -17,23 +17,26 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-#. What this is: script to setup a kubernetes cluster with calico as cni
-#.
-#. Prerequisites:
-#. - One or more Ubuntu Xenial (16.04) / Bionic (18.04) or Centos 7 servers
+# What this is: script to setup a kubernetes cluster with calico as cni
+#
+# Prerequisites:
+# - One or more Ubuntu Xenial (16.04) / Bionic (18.04) or Centos 7 servers
 #    (as target k8s cluster nodes)
-#. - This script downloaded to a folder on the server to be the k8s master node
-#. - key-based SSH setup between the k8s master node and other nodes
-#. - 192.168.0.0/16 should not be used on your server network interface subnets
-#.
-#. Usage: on the master node,
-#. $ git clone git clone https://gerrit.acumos.org/r/kubernetes-client
-#. $ cd kubernetes-client/deploy/private
-#. $ bash setup_k8s.sh "[nodes]"
-#.   nodes: quoted, space-separated list of k8s worker nodes. If no nodes are
-#.          specified a single all-in-one (AIO) cluster will be installed. To
-#.          ad more nodes later, just re-run the command with the node names.
-#.
+# - This script downloaded to a folder on the server to be the k8s master node
+# - key-based SSH setup between the k8s master node and other nodes
+# - 192.168.0.0/16 should not be used on your server network interface subnets
+# - If redeploying, stop any current cluster first with:
+#   sudo kubeadm reset
+#
+# Usage: on the master node,
+# $ git clone git clone https://gerrit.acumos.org/r/kubernetes-client
+# $ cd kubernetes-client/deploy/private
+# $ bash setup_k8s.sh "[nodes]"
+#   nodes: quoted, space-separated list of k8s worker nodes. If no nodes are
+#          specified a single all-in-one (AIO) cluster will be installed. To
+#          ad more nodes later, just re-run the command with the node names.
+#
+# see the config file with 'kubectl -n kube-system get cm kubeadm-config -oyaml'
 
 set -x
 
@@ -75,56 +78,28 @@ fi
 if [[ "$dist" == "ubuntu" ]]; then
   # Per https://kubernetes.io/docs/setup/independent/install-kubeadm/
   echo; echo "prereqs.sh: ($(date)) Basic prerequisites"
-
   wait_dpkg; sudo apt-get update
-  # TODO: fix need to skip upgrade as this sometimes updates the kube-system
-  # services and they then stay in "pending", blocking k8s-based deployment
-  # Also on bionic can cause a hang at 'Preparing to unpack .../00-systemd-sysv_237-3ubuntu10.11_amd64.deb ...'
-  #  wait_dpkg; sudo apt-get upgrade -y
 
-  case "$distver" in
-    "16.04")
-      echo; echo "prereqs.sh: ($(date)) Install docker-ce if needed"
-      if [[ $(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' 'docker-ce') != "installed" \
-         || $(/usr/bin/dpkg-query --show 'docker-ce' | grep -c '17\.03') -eq 0 ]]; then
-        echo; echo "prereqs.sh: ($(date)) Install latest docker-ce"
-        # Per https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
-        wait_dpkg
-        if [[ $(sudo apt-get purge -y docker-ce docker docker-engine docker.io) ]]; then
-          echo "Purged docker-ce docker docker-engine docker.io"
-        fi
-        wait_dpkg; sudo apt-get update
-        wait_dpkg; sudo apt-get install -y \
-          apt-transport-https \
-          ca-certificates \
-          curl \
-          software-properties-common
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-        wait_dpkg; sudo apt-get update
-        wait_dpkg; sudo apt-get install -y docker-ce=17.03.3~ce-0~ubuntu-xenial
-      fi
-      ;;
-    "18.04")
-      echo; echo "prereqs.sh: ($(date)) Install docker.io if needed"
-      if [[ $(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' 'docker.io') != "installed" || \
-        $(/usr/bin/dpkg-query --show 'docker.io' | grep -c '17\.12') -eq 0 ]]; then
-        wait_dpkg
-        if [[ $(sudo apt-get purge -y docker docker-engine docker-ce docker.io) ]]; then
-          echo "Purged docker-ce docker docker-engine docker.io"
-        fi
-        wait_dpkg; sudo apt-get update
-        wait_dpkg; sudo apt-get install -y docker.io=17.12.1-0ubuntu1
-        sudo systemctl enable docker.service
-      fi
-      ;;
-    *)
-      echo "Unsupported Ubuntu version ($distver)"
-      exit 1
-  esac
+  echo; echo "prereqs.sh: ($(date)) Install latest docker.ce"
+  # Per https://docs.docker.com/install/linux/docker-ce/ubuntu/
+  wait_dpkg
+  if [[ $(sudo apt-get purge -y docker-ce docker docker-engine docker.io) ]]; then
+    echo "Purged docker-ce docker docker-engine docker.io"
+  fi
+  wait_dpkg; sudo apt-get update
+  wait_dpkg; sudo apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    software-properties-common
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  wait_dpkg; sudo apt-get update
+  apt-cache madison docker-ce
+  wait_dpkg; sudo apt-get install -y docker-ce=18.06.3~ce~3-0~ubuntu
 
   echo; echo "prereqs.sh: ($(date)) Get k8s packages"
-  export KUBE_VERSION=1.10.0
+  export KUBE_VERSION=1.13.0
   # per https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
   # Install kubelet, kubeadm, kubectl per https://kubernetes.io/docs/setup/independent/install-kubeadm/
   wait_dpkg
@@ -145,8 +120,12 @@ deb http://apt.kubernetes.io/ kubernetes-xenial main
 EOF
   wait_dpkg; sudo apt-get update
   echo; echo "prereqs.sh: ($(date)) Install kubectl, kubelet, kubeadm"
-  wait_dpkg; sudo apt-get -y install --allow-downgrades kubectl=${KUBE_VERSION}-00 \
-    kubelet=${KUBE_VERSION}-00 kubeadm=${KUBE_VERSION}-00
+  # Added kubernetes-cni to fix issue https://github.com/kubernetes/kubernetes/issues/75683
+  wait_dpkg; sudo apt-get -y install --allow-downgrades kubernetes-cni=0.6.0-00 \
+    kubectl=${KUBE_VERSION}-00 kubelet=${KUBE_VERSION}-00 kubeadm=${KUBE_VERSION}-00
+  wait_dpkg; sudo apt-mark hold kubelet kubeadm kubectl
+  # end of instructions per https://kubernetes.io/docs/setup/independent/install-kubeadm/
+
   echo; echo "prereqs.sh: ($(date)) Install jq for API output parsing"
   wait_dpkg; sudo apt-get install -y jq
   if [[ "$(sudo ufw status)" == "Status: active" ]]; then
@@ -186,9 +165,6 @@ else
   sudo yum install -y docker-ce
   sudo systemctl enable docker
   sudo systemctl start docker
-#  wget https://download.docker.com/linux/centos/7/x86_64/stable/Packages/docker-ce-17.09.0.ce-1.el7.centos.x86_64.rpm
-#  sudo yum install -y docker-ce-17.09.0.ce-1.el7.centos.x86_64.rpm
-#  sudo systemctl start docker
   echo; echo "prereqs.sh: ($(date)) Install kubectl, kubelet, kubeadm"
   sudo yum remove -y kubectl kubelet kubeadm
   echo; echo "prereqs.sh: ($(date)) Workaround issue '/etc/kubernetes/manifests is not empty'"
@@ -235,11 +211,9 @@ function setup_k8s_master() {
   # If the following command fails, run "kubeadm reset" before trying again
   # --pod-network-cidr=192.168.0.0/16 is required for calico; this should not
   # conflict with your server network interface subnets
-  log "Reset kubeadm in case pre-existing cluster"
-  sudo kubeadm reset
   # Start cluster
   log "Workaround issue '/etc/kubernetes/manifests is not empty'"
-	mkdir ~/tmp
+  tmp="/home/$USER/$(uuidgen)"
   # workaround for [preflight] Some fatal errors occurred:
 	#                /etc/kubernetes/manifests is not empty
   sudo rm -rf /etc/kubernetes/manifests/*
@@ -248,10 +222,11 @@ function setup_k8s_master() {
   sudo swapoff -a
   sudo sed -i -- '/swap/d' /etc/fstab
   log "Start the cluster"
-  sudo kubeadm init --pod-network-cidr=192.168.0.0/16 >>/tmp/kubeadm.out
-  cat /tmp/kubeadm.out
-  export k8s_joincmd=$(grep "kubeadm join" /tmp/kubeadm.out)
+  sudo kubeadm init --pod-network-cidr=192.168.0.0/16 >>$tmp
+  cat $tmp
+  export k8s_joincmd=$(grep "kubeadm join" $tmp)
   echo $k8s_joincmd >~/k8s_joincmd
+  rm $tmp
   log "Cluster join command for manual use if needed: $k8s_joincmd"
   log "Also saved in file ~/k8s_joincmd"
   mkdir -p $HOME/.kube
@@ -261,46 +236,20 @@ function setup_k8s_master() {
 
   log "Allow pod scheduling on master (nodeSelector will be used to limit them)"
   kubectl taint node $HOSTNAME node-role.kubernetes.io/master:NoSchedule-
+  # Added for v1.13.0 since calico pods would not start
+  kubectl taint node $HOSTNAME node.kubernetes.io/not-ready:NoSchedule-
 
   # Deploy pod network
   log "Deploy calico as CNI"
-  # Updated to deploy Calico 2.6 per the create-cluster-kubeadm guide above
-  #  kubectl apply -f http://docs.projectcalico.org/v2.4/getting-started/kubernetes/installation/hosted/kubeadm/1.6/calico.yaml
-  kubectl apply -f https://docs.projectcalico.org/v2.6/getting-started/kubernetes/installation/hosted/kubeadm/1.6/calico.yaml
+  # Per https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
+  kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
+  kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
 
   # TODO: document process dependency
   # Failure to wait for all calico pods to be running can cause the first worker
   # to be incompletely setup. Symptom is that node_ports cannot be routed
   # via that node (no response - incoming SYN packets are dropped).
-  log "Wait for all calico pods to be Created"
-  # calico-etcd, calico-kube-controllers, calico-node
-  while [[ $(kubectl get pods --namespace kube-system | grep -c calico) -lt 3 ]]; do
-    log "all calico pods are not yet created. Waiting 10 seconds"
-    if [[ "$dist" != "ubuntu" ]]; then
-      if [[ "$(kubectl describe nodes | grep node.kubernetes.io/not-ready:NoSchedule)" != "" ]]; then
-        # Added for Centos 7 (CNI and DNS would not start otherwise)
-        kubectl taint node $HOSTNAME node.kubernetes.io/not-ready:NoSchedule-
-      fi
-    fi
-    sleep 10
-  done
-
-  log "Wait for all calico pods to be Running"
-  pods=$(kubectl get pods --namespace kube-system | awk '/calico/ {print $1}')
-  for pod in $pods; do
-    status=$(kubectl get pods --namespace kube-system | awk "/$pod/ {print \$3}")
-    while [[ "$status" != "Running" ]]; do
-      log "$pod status is $status. Waiting 10 seconds"
-      sleep 10
-      status=$(kubectl get pods --namespace kube-system | awk "/$pod/ {print \$3}")
-    done
-    log "$pod status is $status"
-  done
-
-  log "Wait for DNS to be Running"
-  if [[ "$dist" == "ubuntu" ]]; then dns='kube-dns'
-  else dns='coredns'
-  fi
+  dns='coredns'
   dnspod=$(kubectl get pods --namespace kube-system | awk "/$dns/ {print \$3}" | head -1)
   while [[ "$dnspod" != "Running" ]]; do
     log "$dns status is $dnspod. Waiting 10 seconds"
@@ -345,14 +294,8 @@ function setup_k8s_workers() {
   k8s_joincmd=$(sudo kubeadm token create --print-join-command )
   log "Installing workers at $1 with joincmd: $k8s_joincmd"
 
-# TODO: kubeadm reset below is workaround for
-# Ubuntu: "[preflight] Some fatal errors occurred: /var/lib/kubelet is not empty"
-# per https://github.com/kubernetes/kubeadm/issues/1
-# Centos: "Failed to start ContainerManager failed to initialize top
-# level QOS containers: root container /kubepods doesn't exist"
   tee start_worker.sh <<EOF
 set -x
-sudo kubeadm reset
 sudo $k8s_joincmd
 EOF
 
