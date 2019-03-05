@@ -32,5 +32,5 @@ spec:
   type: ClusterIP
   ports:
   - name: azure-client-port
-    port: <ACUMOS_AZURE_CLIENT_PORT>
+    port: 9081
     targetPort: 9081

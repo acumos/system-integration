@@ -26,31 +26,173 @@ all-in-one (AIO) target.
 What is an AIO deploy?
 ----------------------
 
-The AIO deploy tools build an all-in-one instance of Acumos, with the database,
-Nexus repositories, and docker containers all running on a single virtual
-machine or physical host machine.
+By default, the AIO deploy tools build an all-in-one instance of Acumos, with
+all Acumos data and components running under docker or kubernetes (k8s) on a
+single virtual machine or physical host machine.
+
+For k8s based deployments, both generic (standard k8s project tools) and
+OpenShift (RedHat's k8s distribution) are supported.
+
+Options also allow the user to deploy the platform on a cluster of nodes, to
+deploy a subset of the components, and to use some components that have
+previously deployed somewhere.
+
+For the Impatient (TL;DR)
+-------------------------
+
+NOTICE:
+
+* this process will remove/install software on your host, and configure
+  it e.g. firewall and security rules. Only execute this process if you understand
+  the implications or are executing the process in a VM/host that you can easily
+  re-create.
+* by default, the Acumos platform is deployed with service exposure options
+  typical for development environments. Production environments and especially
+  public environments will need additional planning and restrictions on exposed
+  services, that otherwise could expose your host to security risks. FOR TEST
+  PURPOSES ONLY; USE AT YOUR OWN RISK.
+
+Deploying as a Privileged (sudo) User
+.....................................
+
+This process is for a user that wants to execute all steps in the deployment
+process using their host account. To deploy the Acumos platform with the default
+options, as a user on a linux host with at least 16GB RAM and admin (sudo)
+permission, follow the process below.
+
+* clone the system-integration repo
+
+  .. code-block:: bash
+
+    $ git clone https://gerrit.acumos.org/r/system-integration
+  ..
+
+* using bash, check if the user is part of the docker group, and add if not
+
+  .. code-block:: bash
+
+    $ if [[ "$(id -nG "$USER" | grep docker)" == "" ]]; then sudo usermod -G docker $USER; fi
+  ..
+
+  * if you see "usermod: group 'docker' does not exist", install docker (e.g.
+    using setup-docker.sh in the system-integration/tools folder) and run the
+    command above again. Once you do not see the message above, logout and re-login.
+
+* execute the following command to install/configure prerequisites, including
+  k8s, MariaDB, and the ELK stack, using your user account, and hostname as the
+  domain name you will use to access the deployed platform.
+
+  .. code-block:: bash
+
+    $ bash system-integration/AIO/acumos_k8s_prep.sh $USER $HOSTNAME
+  ..
+
+* When you see "Prerequisites setup is complete." as the result of the
+  command above, execute the following commands to complete platform setup
+
+  .. code-block:: bash
+
+    $ cd system-integration/AIO
+    $ bash acumos_k8s_deploy.sh
+  ..
+
+* when that command completes successfully, you should see a set of URLs to
+  access the various platform services. You can also view the file "acumos.url"
+  which will be in the system-integration/AIO folder (example below)
+
+  .. code-block:: bash
+
+    $ cat system-integration/AIO/acumos.url
+    Portal: https://acumos.example.com:30443
+    Common Data Service: https://acumos.example.com:30443/ccds/swagger-ui.html
+    Kibana: http://acumos.example.com:30561/app/kibana
+    Nexus: http://acumos.example.com:30881
+    Mariadb Admin: http://acumos.example.com:30380
+    Kong Admin: http://acumos.example.com:30081
+
+  ..
+
+* By default, the platform is not configured to require email confirmation of
+  new accounts, so you can create a new account directly on the Portal home. To
+  create an account with the Admin role (needed for various platform admin
+  functions), use the create-user.sh script in the system-integration/AIO folder
+
+
+Preparation by Host Admin with Platform Deployment by Normal (non-sudo) User
+............................................................................
+
+This process is for a host Admin (sudo user) to prepare the host for a normal
+(non-sudo) user that will complete the platform deployment, under their account.
+
+* Admin clones the system-integration repo
+
+  .. code-block:: bash
+
+    $ git clone https://gerrit.acumos.org/r/system-integration
+  ..
+
+* Admin ensures the user is part of the docker group
+* Admin executes the following command to install/configure prerequisites,
+  including k8s, MariaDB, and the ELK stack, using their account. <user> in this
+  case is the username of the normal user that will complete the deployment.
+
+  .. code-block:: bash
+
+    $ bash system-integration/AIO/acumos_k8s_prep.sh <user> $HOSTNAME
+  ..
+
+* When prerequisites setup is complete, the Admin copies the resulting
+  environment files and system-integration clone to the user account, e.g.
+
+  .. code-block:: bash
+
+    sudo cp -r acumos /home/<user>/.
+    sudo chown <user>:<user> /home/<user>/acumos
+    sudo cp -r system-integration /home/<user>/.
+    sudo chown <user>:<user> /home/<user>/system-integration
+
+* The user executes the following commands to complete platform setup
+
+  .. code-block:: bash
+
+    $ cd system-integration/AIO
+    $ bash acumos_k8s_deploy.sh
+  ..
+
+
 
 What's included in the AIO tools
 --------------------------------
 
 In system-integration repo folder AIO:
 
+* acumos_k8s_prep.sh: Script to be used by a host admin (a user with privilege
+  to install applications and configure the host) to prepare a host for a normal
+  user to later deploy/manage the Acumos platform there, under a generic k8s
+  cluster.
+* setup_prereqs.sh: Prerequisite setup script for AIO deployment of the
+  Acumos platform. Intended to support users who do not have sudo permission, to
+  have a host admin (sudo user) run this script in advance for them. Used by
+  acumos_k8s_prep.sh and other target environment support scripts (WIP).
+* acumos_k8s_deploy.sh: Script used by a normal to deploy/manage the Acumos
+  platform under generic k8s, once the host has been prepared by an admin using
+  acumos_k8s_prep.sh.
 * oneclick_deploy.sh: the main script that kicks off the deployment, to setup
-  an AIO instance of Acumos under a docker or kubernetes environment.
+  an AIO instance of Acumos under a docker or kubernetes environment. Used by
+  acumos_k8s_deploy.sh, or by users to initiate Acumos platform deployment.
 * acumos-env.sh: environment setup script that is customized as new
   environment parameters get generated (e.g. passwords). Used by various
   scripts in this toolset, to set shell environment variables that they need.
-  Post-install, you can get various passwords from this e.g. mysql root and user
-  passwords if you want to do any manual database operations, e.g. see what
-  tables/rows are created as part of Acumos deployment.
+* utils.sh: utility script containing functions used by many of these scripts.
+* setup-keystore.sh: script that enables use of pre-configured CA and server
+  certificates for an Acumos platform, or creation of new self-signed
+  certificates.
 * clean.sh: script you can run as “bash clean.sh” to remove the Acumos install,
   to try it again etc.
 * docker-compose.sh: Script called by the other scripts as needed, to take
   actions on the set of Acumos docker services. Used by oneclick_deploy.sh and
   clean.sh for docker-based deployments. You can also call this directly e.g.
   to tail the service container logs. See the script for details.
-* openssl.cnf: OpenSSL configuration file used in self-signed certificate
-  generation.
 * peer-test.sh: Automated deployment of two AIO platforms, with federation and
   demo model onboarding. Used to test federation use cases.
 * create-peer.sh: Automated setup of a peer relationship between two Acumos
@@ -58,26 +200,98 @@ In system-integration repo folder AIO:
 * create-user.sh: Automated user provisioning and role assignment. Used by
   peer-test.sh to create users for model onboarding, and portal admins for
   testing federation actions on the Acumos platform.
+* create_subscription.sh: script to create a subscription for all models
+  published by a federated Acumos platform.
 * bootstrap-models.sh: Model package onboarding via curl. Optionally called by
   peer-test.sh.
 
-In system-integration repo folder AIO/docker/acumos:
+In folder AIO/docker/acumos:
 
-* docker-compose yaml files for all system components to be deployed or
-  otherwise acted upon via docker-compose.sh.
+* docker-compose yaml files and deployment script for Acumos core components.
 
-In system-integration repo folder AIO/kubernetes:
+In folder AIO/kubernetes:
 
 * under deployment, kubernetes deployment templates for all system components
 * under service, kubernetes service templates for all system components
 
+In folder AIO/beats:
+
+* deployment scripts and templates for the Filebeat and Metricbeat services
+  as ELK stack components deployed along with the Acumos platform.
+
+In folder AIO/certs:
+
+* setup-certs.sh: script to create self-signed CA and server certs.
+* This folder is also used to stage user-provided certs to be used in Acumos
+  platform deployment.
+
+In folder AIO/docker-engine:
+
+* scripts and templates to deploy docker-in-docker as the docker-engine service
+  for k8s-based Acumos platforms
+
+In folder AIO/docker-proxy:
+
+* scripts and templates for deployment of the docker-proxy core component of the
+  Acumos platform
+
+In AIO/elk-stack:
+
+* scripts and templates to deploy the ELK stack core components under docker
+
+In AIO/kong:
+
+* scripts and templates to deploy the Kong service as an ingress controller for
+  the Acumos platform
+
+In AIO/mariadb:
+
+* scripts and templates to deploy the MariaDB under docker, as the Acumos
+  platform database backend service
+
+In AIO/nexus:
+
+* scripts and templates to deploy the Nexus service for the Acumos platform
+
+In charts:
+
+* scripts and templates to deploy the following components for k8s-based
+  deployments, using Helm as deployment tool
+
+  * elk-stack: ELK stack core components
+  * jupyterhub: the JupterHub/JupyterLab services for notebook-based model
+    development
+  * mariadb: MariaDB service
+  * nifi: the NiFi service for data pipeline development
+  * zeppelin: the Zeppelin service for notebook-based model development
+
+In tools:
+
+  * setup_helm.sh: script to setup Helm as a service deployment tool
+  * setup_k8s.sh: script to setup a generic k8s cluster
+  * setup_mariadb_client.sh: script to setup the MariaDB client as used by other
+    scripts to configure the Acumos database
+  * setup_openshift_client.sh: script to setup the OpenShift client (oc) tool
+    used by other scripts and users to manage and interact with OpenShift based
+    platform deployments.
+  * setup_prometheus.sh: script to setup the Prometheus monitoring service, with
+    Grafana as a data visualization tool, for monitoring the Acumos platform's
+    resources at the k8s level. Also deploys Grafana dashboards in the dashboards
+    folder.
+  * setup-docker.sh: script to setup the docker version used for docker-based
+    platform deployment and interaction.
+  * setup-kubectl.sh: script to setup the kubectl tool used by other scripts and
+    the user to manage and interact with generic k8s based deployments.
+  * setup-pv.sh: script to setup host-based persistent volumes for use with
+    docker and k8s-based platform deployments.
+
 Release Scope
 =============
 
-Current Release (Athena)
+Current Release (Boreas)
 ------------------------
 
-The Athena release includes these capabilities that have been implemented/tested:
+The Boreas release includes these capabilities that have been implemented/tested:
 
 * single-node (AIO) deployment of the Acumos platform under docker or kubernetes
 * deployment with a new Acumos database, or redepoyment with a current database
