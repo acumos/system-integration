@@ -21,7 +21,7 @@ version: '3.2'
 #
 services:
   metricbeat-service:
-    image: acumos-metricbeat
+    image: ${ACUMOS_METRICBEAT_IMAGE}
     network_mode: host
     volumes:
     #Mount the host filesystem to enable Metricbeat to monitor the host rather than the Metricbeat container.
@@ -42,5 +42,5 @@ services:
     # extra_hosts is required since using network_mode: host, which blocks
     # docker network-internal service name resolution
     extra_hosts:
-      - "${ACUMOS_ELK_DOMAIN}:${ACUMOS_ELK_HOST}"
+      - "${ACUMOS_ELK_DOMAIN}:${ACUMOS_ELK_HOST_IP}"
     restart: on-failure

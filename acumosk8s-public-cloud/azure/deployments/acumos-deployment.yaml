@@ -381,13 +381,13 @@ spec:
                         "url": "http://acumos.${ACUMOS_NAMESPACE}:${ACUMOS_PORTAL_DS_COMPOSITION_PORT}"
                       },
                       "site" : {
-                        "url": "http://acumos.${ACUMOS_NAMESPACE}:${ACUMOS_CMS_PORT}"
+                        "url": "http://acumos.${ACUMOS_NAMESPACE}:9080"
                       },
                       "cmnt" : {
                          "url" : "http://acumos.${ACUMOS_NAMESPACE}:${ACUMOS_PLATON_PORT}"
                       },
                       "azure" : {
-                          "url" : "http://acumos.${ACUMOS_NAMESPACE}:${ACUMOS_AZURE_CLIENT_PORT}"
+                          "url" : "http://acumos.${ACUMOS_NAMESPACE}:9081"
                       },
                       "openstack" : {
                           "path": "/openstack/**",
@@ -422,11 +422,11 @@ spec:
        - name:  acumos-cms-docker
          image: ${NEXUS3_RELEASE_REGISTRY_LF}/${ACUMOS_CMS_IMAGE}
          ports:
-          - containerPort: ${ACUMOS_CMS_PORT}
+          - containerPort: 9080
          env:
            - name: SPRING_APPLICATION_JSON
              value: '{ "server" : {
-                    "port" : ${ACUMOS_CMS_PORT}
+                    "port" : 9080
                 },
                 "spring" : {
                     "datasource" : {
@@ -538,12 +538,12 @@ spec:
        - name: azure-client
          image: ${NEXUS3_RELEASE_REGISTRY_LF}/${ACUMOS_AZURE_CLIENT_IMAGE}
          ports:
-           - containerPort: ${ACUMOS_AZURE_CLIENT_PORT}
+           - containerPort: 9081
          env:
            - name: SPRING_APPLICATION_JSON
              value: '{ 
                     "server": {
-                      "port": "${ACUMOS_AZURE_CLIENT_PORT}"
+                      "port": "9081"
                     },
                     "docker": {
                       "containerNamePrefix": "${ACUMOS_AZURE_CONTAINER_NAME_PREFIX}",

@@ -48,28 +48,24 @@ spec:
           value: '{
                     "server": {
                       "port": 8000
-                      },
-                    "security": {
-                      "user": {
-                        "name": "<ACUMOS_CDS_USER>",
-                        "password": "<ACUMOS_CDS_PASSWORD>"
-                      }
                     },
                     "spring": {
-                      "database": {
-                        "driver": {
-                          "classname": "org.mariadb.jdbc.Driver"
-                        }
-                      },
                       "datasource": {
-                        "url": "jdbc:mysql://<ACUMOS_MARIADB_HOST>:<ACUMOS_MARIADB_PORT>/<ACUMOS_CDS_DB>?useSSL=false",
+                        "jdbc-url": "jdbc:mariadb://<ACUMOS_MARIADB_HOST>:<ACUMOS_MARIADB_PORT>/<ACUMOS_CDS_DB>?useLegacyDatetimeCode=false&useSSL=false",
                         "username": "<ACUMOS_MARIADB_USER>",
                         "password": "<ACUMOS_MARIADB_USER_PASSWORD>"
                       },
                       "jpa": {
-                        "database-platform": "org.hibernate.dialect.MySQLDialect",
+                        "database-platform": "org.hibernate.dialect.MariaDB102Dialect",
                         "hibernate": {
                           "ddl-auto": "validate"
+                        },
+                        "show-sql" : false
+                      },
+                      "security": {
+                        "user": {
+                          "name": "<ACUMOS_CDS_USER>",
+                          "password": "<ACUMOS_CDS_PASSWORD>"
                         }
                       }
                     }
@@ -78,13 +74,16 @@ spec:
         - containerPort: 8000
         volumeMounts:
         - mountPath: /maven/logs
-          name: pv-<ACUMOS_NAMESPACE>-logs
+          name: logs
       restartPolicy: Always
       volumes:
-      - name: pv-<ACUMOS_NAMESPACE>-logs
+      - name: logs
         persistentVolumeClaim:
          claimName: pvc-<ACUMOS_NAMESPACE>-logs
       hostAliases:
-      - ip: "<ACUMOS_HOST>"
+      - ip: "<ACUMOS_HOST_IP>"
         hostnames:
-        - "<ACUMOS_DOMAIN>"
+        - "<ACUMOS_HOST>"
+      - ip: "<ACUMOS_MARIADB_HOST_IP>"
+        hostnames:
+        - "<ACUMOS_MARIADB_HOST>"
