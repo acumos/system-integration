@@ -32,6 +32,6 @@ spec:
   type: NodePort
   ports:
   - name: cds-port
-    nodePort: <ACUMOS_CDS_PORT>
+    nodePort: <ACUMOS_CDS_NODEPORT>
     port: 8000
     targetPort: 8000

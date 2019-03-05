@@ -18,7 +18,6 @@ version: '3.2'
 # ===============LICENSE_END=========================================================
 
 # docker-compose for federation-gateway
-# TODO: scrub all attributes for current need
 services:
    federation-service:
        image: ${FEDERATION_IMAGE}
@@ -76,7 +75,7 @@ services:
                 },
                 \"cdms\": {
                   \"client\": {
-                     \"url\": \"http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds\",
+                     \"url\": \"http://cds-service:8000/ccds\",
                      \"username\": \"${ACUMOS_CDS_USER}\",
                      \"password\": \"${ACUMOS_CDS_PASSWORD}\"
                   }
@@ -99,5 +98,5 @@ services:
        logging:
            driver: json-file
        extra_hosts:
-           - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"
+           - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
        restart: on-failure
