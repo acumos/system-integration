@@ -90,20 +90,21 @@ setup_client() {
   log "Setup kube config"
   token=$(ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
     $username@$master \
-    /usr/local/sbin/kubectl config view --raw -o jsonpath='{.users[].user.token}')
+    kubectl config view --raw -o jsonpath='{.users[].user.token}')
 
   oc config set-cluster $master --server=https://$master:8443 --insecure-skip-tls-verify=true
-  oc config set-context $master --cluster=$master --user=admin-$master $namespace
-  oc config set-credentials admin-$master --token=$token
-  oc config use-context $master
+  oc config set-context $master-$namespace --cluster=$master --user=admin $ns
+  oc config set-credentials admin --token=$token
+  oc config use-context $master-$namespace
 }
 
 master=$1
 username=$2
-if [[ "$3" != "" ]]; then namespace="--namespace=$3"; fi
+namespace=$3
+if [[ "$3" != "" ]]; then ns="--namespace=$3"; fi
 setup_client
 
 log "All done!"
 echo "You are setup to use account 'admin' at cluster $master"
 echo "Log in using 'oc login -u admin -p any'"
-echo "Then issue a command e.g.'oc get pods --all-namespaces'"
+echo "Then issue a command e.g. 'oc get pods --all-namespaces'"

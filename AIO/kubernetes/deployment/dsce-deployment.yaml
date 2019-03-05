@@ -49,10 +49,11 @@ spec:
                     "server": {
                       "port": 8088
                     },
+                    "gdmJarName":"gdmservice-1.2.0-SNAPSHOT.jar",
                     "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
                     "solutionResultsetSize": "2000",
-                    "cdsCheckInterval": 10000,
-                    "cdsCheckAttempt": 4,
+                    "cdsCheckInterval": 20000,
+                    "cdsCheckAttempt": 10,
                     "imagedatabrokerURI": "<DATABROKER_ZIPBROKER_IMAGE>",
                     "csvdatabrokerURI": "<DATABROKER_CSVBROKER_IMAGE>",
                     "sqldatabrokerURI": "<DATABROKER_SQLBROKER_IMAGE>",
@@ -60,7 +61,7 @@ spec:
                     "sqldatabrokerURI": "NA",
                     "lib":"/maven/",
                     "tosca": {
-                      "outputfolder": "/temp/output/"
+                      "outputfolder": "/tmp/output/"
                     },
                     "nexus": {
                       "nexusendpointurl": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/<ACUMOS_NEXUS_MAVEN_REPO_PATH>/<ACUMOS_NEXUS_MAVEN_REPO>/",
@@ -75,7 +76,7 @@ spec:
                       "cmndatasvcpwd": "<ACUMOS_CDS_PASSWORD>"
                     },
                     "docker": {
-                      "host": "docker-service",
+                      "host": "docker-dind-service",
                       "port": "<ACUMOS_DOCKER_API_PORT>",
                       "config": "/docker_host/.docker",
                       "registry": {
@@ -97,13 +98,13 @@ spec:
         - containerPort: 8088
         volumeMounts:
         - mountPath: /maven/logs
-          name: pv-<ACUMOS_NAMESPACE>-logs
+          name: logs
       restartPolicy: Always
       volumes:
-      - name: pv-<ACUMOS_NAMESPACE>-logs
+      - name: logs
         persistentVolumeClaim:
          claimName: pvc-<ACUMOS_NAMESPACE>-logs
       hostAliases:
-      - ip: "<ACUMOS_HOST>"
+      - ip: "<ACUMOS_HOST_IP>"
         hostnames:
-        - "<ACUMOS_DOMAIN>"
+        - "<ACUMOS_HOST>"

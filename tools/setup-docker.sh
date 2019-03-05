@@ -21,7 +21,6 @@
 #
 # Prerequisites:
 # - Ubuntu Xenial or Centos 7 server
-# - acumos-env.sh customized for this platform, as by oneclick_deploy.sh
 #
 # Usage:
 # - bash setup-docker.sh
@@ -44,43 +43,35 @@ function log() {
   set -x
 }
 
+function wait_dpkg() {
+  # TODO: workaround for "E: Could not get lock /var/lib/dpkg/lock - open (11: Resource temporarily unavailable)"
+  echo; echo "waiting for dpkg to be unlocked"
+  while sudo fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do
+    sleep 1
+  done
+}
+
 setup() {
-  if [[ "$ACUMOS_HOST_OS" == "ubuntu" ]]; then
-    case "$ACUMOS_HOST_OS_VER" in
-      "16.04")
-        log "Install latest docker-ce in Ubuntu Xenial if needed"
-          dce=$(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' 'docker-ce')
-        if [[ $dce != "installed" ]]; then
-          log "Install latest docker-ce"
-          # Per https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
-          sudo apt-get purge -y docker-ce docker docker-engine docker.io
-          sudo apt-get update
-          sudo apt-get install -y \
-            apt-transport-https \
-            ca-certificates \
-            curl \
-            software-properties-common
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-          sudo add-apt-repository "deb [arch=amd64] \
-            https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-          sudo apt-get update
-          sudo apt-get install -y docker-ce=17.03.3~ce-0~ubuntu-xenial
-        fi
-        ;;
-      "18.04")
-        log "Install latest docker-io in Ubuntu Bionic if needed"
-        dio=$(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' 'docker.io')
-        if [[ $dio != "installed" ]]; then
-          sudo apt-get purge -y docker docker-engine docker-ce docker-ce-cli
-          sudo apt-get update
-          sudo apt-get install -y docker.io=17.12.1-0ubuntu1
-          sudo systemctl enable docker.service
-        fi
-        ;;
-      *)
-        fail "Unsupported Ubuntu version ($ACUMOS_HOST_OS_VER)"
-    esac
-  elif [[ "$ACUMOS_HOST_OS" == "centos" ]]; then
+  if [[ "$HOST_OS" == "ubuntu" ]]; then
+    # Per https://kubernetes.io/docs/setup/independent/install-kubeadm/
+    log "Install latest docker.ce"
+    # Per https://docs.docker.com/install/linux/docker-ce/ubuntu/
+    wait_dpkg
+    if [[ $(sudo apt-get purge -y docker-ce docker docker-engine docker.io) ]]; then
+      echo "Purged docker-ce docker docker-engine docker.io"
+    fi
+    wait_dpkg; sudo apt-get update
+    wait_dpkg; sudo apt-get install -y \
+      apt-transport-https \
+      ca-certificates \
+      curl \
+      software-properties-common
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    wait_dpkg; sudo apt-get update
+    apt-cache madison docker-ce
+    wait_dpkg; sudo apt-get install -y docker-ce=18.06.3~ce~3-0~ubuntu
+  elif [[ "$HOST_OS" == "centos" ]]; then
     log "Install latest docker-ce in Centos"
     # per https://docs.docker.com/engine/installation/linux/docker-ce/centos/#install-from-a-package
     sudo yum install -y yum-utils device-mapper-persistent-data lvm2
@@ -90,7 +81,7 @@ setup() {
     sudo systemctl enable docker
     sudo systemctl start docker
   else
-    fail "Unsupported host OS: $ACUMOS_HOST_OS"
+    fail "Unsupported host OS: $HOST_OS"
   fi
 
   log "Install latest docker-compose v3.2"
@@ -102,6 +93,6 @@ setup() {
   sudo chmod +x /usr/local/bin/docker-compose
 }
 
-export ACUMOS_HOST_OS=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
-export ACUMOS_HOST_OS_VER=$(grep -m 1 'VERSION_ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+export HOST_OS=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+export HOST_OS_VER=$(grep -m 1 'VERSION_ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
 setup
