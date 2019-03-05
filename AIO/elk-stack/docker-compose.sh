@@ -27,10 +27,9 @@
 #   options: optional parameters to docker-compose.
 #
 
-set -x
-source ../acumos-env.sh
-source elk-env.sh
-cmd="$1 $2 $3 $4"
+trap - ERR
+
+cmd="$*"
 opts=""
 files=$(ls docker/acumos)
 for file in $files ; do
@@ -39,3 +38,6 @@ done
 
 cd docker
 docker-compose $opts $cmd
+cd ..
+
+trap 'fail' ERR
