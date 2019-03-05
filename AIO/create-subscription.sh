@@ -56,7 +56,7 @@ function find_user() {
   log "Finding user name $1"
   curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
     --header 'Accept: application/json' \
-    http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/user
+    -k https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/user
   users=$(jq -r '.content | length' /tmp/json)
   i=0; userId=""
   while [[ $i -lt $users && "$userId" == "" ]] ; do
@@ -71,7 +71,7 @@ function find_user() {
 function find_peer() {
   curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X GET \
     --header 'Accept: application/json' \
-    http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer
+    -k https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/peer
   peers=$(jq -r '.content | length' /tmp/json)
   i=0; peerId=""
   while [[ $i -lt $peers && "$peerId" == "" ]] ; do
@@ -124,7 +124,7 @@ EOF
   fi
   cat sub.json
   curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST \
-  http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer/sub \
+  -k https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/peer/sub \
     -H "accept: */*" -H "Content-Type: application/json" -d @sub.json
   created=$(jq -r '.created' /tmp/json)
   if [[ "$created" == "null" ]]; then
@@ -136,7 +136,7 @@ EOF
   log "Current subscriptions at $1 for peer $3 with ID $peerId"
   curl -X GET -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
     --header 'Accept: application/json' \
-    http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer/$peerId/sub
+    -k https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/peer/$peerId/sub
 }
 
 set -x

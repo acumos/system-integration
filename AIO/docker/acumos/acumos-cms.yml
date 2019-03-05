@@ -19,14 +19,13 @@ version: '3.2'
 
 # docker-compose for cms
 # uses localhost for database (running on same server)
-# TODO: remove ports: when post-deploy/manual CMS admin operations are not needed
 services:
    cms-service:
        image: ${PORTAL_CMS_IMAGE}
        environment:
            SPRING_APPLICATION_JSON: "{
                 \"server\": {
-                    \"port\": ${ACUMOS_CMS_PORT}
+                    \"port\": 9080
                 },
                 \"spring\": {
                     \"datasource\": {
@@ -46,9 +45,7 @@ services:
                 }
            }"
        expose:
-           - ${ACUMOS_CMS_PORT}
-       ports:
-           - ${ACUMOS_CMS_PORT}:${ACUMOS_CMS_PORT}
+           - 9080
        volumes:
            - type: bind
              source: /var/${ACUMOS_NAMESPACE}/logs
@@ -56,5 +53,5 @@ services:
        logging:
            driver: json-file
        extra_hosts:
-           - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"
+           - "${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_HOST_IP}"
        restart: on-failure

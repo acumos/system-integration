@@ -32,5 +32,5 @@ spec:
   type: ClusterIP
   ports:
   - name: kubernetes-client-port
-    port: <ACUMOS_KUBERNETES_CLIENT_PORT>
+    port: 8082
     targetPort: 8082
