@@ -18,153 +18,176 @@ version: '3.2'
 # ===============LICENSE_END=========================================================
 
 # docker-compose for portal-be
-# TODO: scrub all attributes for current need
 services:
    portal-be-service:
        image: ${PORTAL_BE_IMAGE}
        environment:
            SPRING_APPLICATION_JSON: "{
-                \"server\": {
-                   \"port\": ${ACUMOS_PORTAL_BE_PORT}
-                },
-                \"docker\": {
-                   \"host\": \"${ACUMOS_DOCKER_API_HOST}\",
-                   \"port\": \"${ACUMOS_DOCKER_API_PORT}\",
-                   \"registry\": {
-                      \"url\": \"http://${ACUMOS_DOCKER_REGISTRY_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/\",
-                      \"username\": \"${ACUMOS_DOCKER_REGISTRY_USER}\",
-                      \"password\": \"${ACUMOS_DOCKER_REGISTRY_PASSWORD}\",
-                      \"email\": \"${ACUMOS_ADMIN_EMAIL}\"
-                   },
-                   \"imagetag\": {
-                       \"prefix\": \"${ACUMOS_DOCKER_IMAGETAG_PREFIX}\"
-                   }
-                },
-                \"nexus\": {
-                        \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/${ACUMOS_NEXUS_MAVEN_REPO_PATH}/${ACUMOS_NEXUS_MAVEN_REPO}/\",
-                        \"proxy\": \"\",
-                        \"password\": \"${ACUMOS_NEXUS_RW_USER_PASSWORD}\",
-                        \"username\": \"${ACUMOS_NEXUS_RW_USER}\",
-                        \"groupid\": \"com.artifact\"
-                },
-                \"cdms\": {
-                  \"client\": {
-                     \"url\": \"http://cds-service:${ACUMOS_CDS_PORT}/ccds\",
-                     \"username\": \"${ACUMOS_CDS_USER}\",
-                     \"password\": \"${ACUMOS_CDS_PASSWORD}\"
-                     }
-                },
-                \"qanda\": {
-                   \"url\": \"https://stackoverflow.com\"
-                },
-                \"doc\": {
-                   \"url\": \"https://wiki.acumos.org\"
-                },
-                \"onboarding\": {
-                   \"push\": {
-                       \"model\": {
-                          \"url\": \"http://onboarding-service:${ACUMOS_ONBOARDING_PORT}/onboarding-app/v2/models\",
-                          \"dcae_url\": \"http://onboarding-service:${ACUMOS_ONBOARDING_PORT}/onboarding-app/v2/dcae_models\"
-                       }
-                   },
-                   \"cliPushUrl\": \"${ACUMOS_ONBOARDING_CLIPUSHURL}\",
-                   \"cliAuthUrl\": \"${ACUMOS_ONBOARDING_CLIAUTHURL}\",
-                   \"tokenmode\": \"${ACUMOS_ONBOARDING_TOKENMODE}\"
-                },
-                \"model\": {
-                   \"storage\": {
-                      \"folder\": {
-                         \"name\": \"/acumosWebOnboarding\"
-                      }
-                   }
-                },
-                \"portal\": {
-                   \"feature\": {
-                      \"publishSelfRequestEnabled\": \"false\",
-                      \"validateModel\": \"false\",
-                      \"email_service\": \"\",
-                      \"cas_enabled\": \"false\",
-                      \"download_bufferSize\": 8,
-                      \"signup_enabled\": \"true\",
-                      \"verifyAccount\": \"false\",
-                      \"verifyToken\": {
-                         \"exp_time\": 24
+                    \"server\": {
+                      \"port\": 8083,
+                      \"contextPath\": \"/\"
+                    },
+                    \"docker\": {
+                      \"host\": \"docker-service\",
+                      \"port\": \"${ACUMOS_DOCKER_API_PORT}\",
+                      \"registry\": {
+                        \"url\": \"http://${ACUMOS_DOCKER_REGISTRY_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/\",
+                        \"username\": \"${ACUMOS_DOCKER_REGISTRY_USER}\",
+                        \"password\": \"${ACUMOS_DOCKER_REGISTRY_PASSWORD}\",
+                        \"email\": \"${ACUMOS_ADMIN_EMAIL}\"
                       },
+                      \"imagetag\": {
+                        \"prefix\": \"${ACUMOS_DOCKER_IMAGETAG_PREFIX}\"
+                      }
+                    },
+                    \"nexus\": {
+                      \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/${ACUMOS_NEXUS_MAVEN_REPO_PATH}/${ACUMOS_NEXUS_MAVEN_REPO}/\",
+                      \"proxy\": \"\",
+                      \"password\": \"${ACUMOS_NEXUS_RW_USER_PASSWORD}\",
+                      \"username\": \"${ACUMOS_NEXUS_RW_USER}\",
+                      \"groupid\": \"com.artifact\"
+                    },
+                    \"cdms\": {
+                      \"client\": {
+                        \"url\": \"http://cds-service:8000/ccds\",
+                        \"username\": \"${ACUMOS_CDS_USER}\",
+                        \"password\": \"${ACUMOS_CDS_PASSWORD}\"
+                      }
+                    },
+                    \"qanda\": {
+                      \"url\": \"https://stackoverflow.com\"
+                    },
+                    \"doc\": {
+                      \"url\": \"https://wiki.acumos.org\"
+                    },
+                    \"onboarding\": {
+                      \"push\": {
+                        \"model\": {
+                          \"url\": \"http://onboarding-service:8090/onboarding-app/v2/models\",
+                          \"dcae_url\": \"http://onboarding-service:8090/onboarding-app/v2/dcae_models\"
+                        }
+                      },
+                      \"cliPushUrl\": \"${ACUMOS_ONBOARDING_CLIPUSHURL}\",
+                      \"cliAuthUrl\": \"${ACUMOS_ONBOARDING_CLIAUTHURL}\",
+                      \"tokenmode\": \"${ACUMOS_ONBOARDING_TOKENMODE}\"
+                    },
+                    \"model\": {
+                      \"storage\": {
+                        \"folder\": {
+                          \"name\": \"/acumosWebOnboarding\"
+                        }
+                      }
+                    },
+                    \"portal\": {
+                      \"feature\": {
+                        \"publishSelfRequestEnabled\": \"false\",
+                        \"validateModel\": \"false\",
+                        \"email_service\": \"\",
+                        \"cas_enabled\": \"false\",
+                        \"download_bufferSize\": 8,
+                        \"signup_enabled\": \"true\",
+                        \"verifyAccount\": \"false\",
+                        \"verifyToken\": {
+                          \"exp_time\": 24
+                        },
                       \"cloud_enabled\": \"[{\\\"cloudEnabled\\\" : \\\"true\\\", \\\"cloudName\\\" : \\\"azure\\\", \\\"cloudDisplayText\\\" : \\\"Microsoft Azure\\\", \\\"imageUrl\\\": \\\"/images/deploy-cloud/microsoft_azure.png\\\" },{ \\\"cloudEnabled\\\" : \\\"true\\\", \\\"cloudName\\\" : \\\"rackspace\\\", \\\"cloudDisplayText\\\" : \\\"Rackspace\\\", \\\"imageUrl\\\" : \\\"/images/deploy-cloud/rackspace.png\\\" },{ \\\"cloudEnabled\\\" : \\\"false\\\",  \\\"cloudName\\\" : \\\"gcp\\\", \\\"cloudDisplayText\\\" : \\\"Google Cloud Platform\\\", \\\"imageUrl\\\" : \\\"/images/deploy-cloud/google_cloud_platform.png\\\" },{ \\\"cloudEnabled\\\" : \\\"true\\\",  \\\"cloudName\\\" : \\\"deploylocal\\\", \\\"cloudDisplayText\\\" : \\\"Deploy To Local\\\", \\\"imageUrl\\\": \\\"/images/deploy-cloud/deploy_to_local.png\\\" },{ \\\"cloudEnabled\\\" : \\\"false\\\", \\\"cloudName\\\" : \\\"whitebox\\\", \\\"cloudDisplayText\\\" : \\\"Deploy To White Box\\\", \\\"imageUrl\\\" : \\\"/images/deploy-cloud/deploy_to_whitebox.png\\\" }]\"
-                   },
-                   \"submitValidation\": {
-                      \"api\": \"http://validation-client:${ACUMOS_VALIDATION_CLIENT_PORT}/status/v1.0/tasks\"
-                   },
-                   \"dashboard\":{
-                      \"url\": \"http://${ACUMOS_ELK_DOMAIN}:${ACUMOS_ELK_KIBANA_PORT}\"
-                   },
-                   \"mailjet\": {
-                      \"api\": {
-                         \"key\": \"replace-as-needed\"
                       },
-                      \"secret\": {
-                         \"key\": \"replace-as-needed\"
+                      \"submitValidation\": {
+                        \"api\": \"http://validation-client-service:9603/status/v1.0/tasks\"
                       },
-                      \"address\": {
-                         \"from\": \"${ACUMOS_ADMIN_EMAIL}\"
+                      \"dashboard\": {
+                        \"url\": \"http://${ACUMOS_ELK_DOMAIN}:${ACUMOS_ELK_KIBANA_PORT}\"
+                      },
+                      \"mailjet\": {
+                        \"api\": {
+                          \"key\": \"replace-as-needed\"
+                        },
+                        \"secret\": {
+                          \"key\": \"replace-as-needed\"
+                        },
+                        \"address\": {
+                          \"from\": \"${ACUMOS_ADMIN_EMAIL}\"
+                        }
+                      },
+                      \"ui\": {
+                        \"server\": {
+                          \"address\": \"http://notused.com\"
+                        }
                       }
-                   },
-                   \"ui\": {
-                     \"server\": {
-                        \"address\": \"http://notused.com\"
-                     }
-                   }
-                },
-                \"spring\": {
-                   \"mail\": {
-                      \"template\": {
-                         \"folder\": {
-                            \"path\": \"/fmtemplates/\"
-                         }
+                    },
+                    \"spring\": {
+                      \"mail\" : {
+                        \"host\" : \"Provide the hostname\",
+                        \"port\" : 25,
+                        \"username\" : \"username\",
+                        \"password\" : \"password\",
+                        \"debug\" : \"true\",
+                        \"smtp\" : {
+                          \"starttls\" : {
+                            \"enable\" : \"true\"
+                          },
+                          \"auth\" : \"false\"
+                        },
+                        \"transport\" : {
+                          \"protocol\" : \"smtp\"
+                        },
+                        \"template\" : {
+                          \"folder\" : {
+                            \"path\" : \"/fmtemplates/\"
+                          }
+                        }
+                      },
+                      \"servlet\": {
+                        \"multipart\": {
+                          \"max-file-size\": \"1024MB\",
+                          \"max-request-size\": \"1024MB\"
+                        }
                       }
-                   }
-                },
-                \"client\": {
-                   \"ssl\": {
-                      \"key-store\": \"/app/certs/${ACUMOS_KEYSTORE}\",
-                      \"key-store-password\": \"${ACUMOS_KEYSTORE_PASSWORD}\",
-                      \"key-store-type\": \"PKCS12\",
-                      \"key-password\": \"${ACUMOS_CERT_KEY_PASSWORD}\",
-                      \"trust-store\": \"/app/certs/${ACUMOS_TRUSTSTORE}\",
-                      \"trust-store-password\": \"${ACUMOS_TRUSTSTORE_PASSWORD}\"
-                   }
-                },
-                \"gateway\": {
-                   \"url\": \"https://${ACUMOS_FEDERATION_HOST}:${ACUMOS_FEDERATION_LOCAL_PORT}\"
-                },
-                \"dcae\": {
-                   \"model\": {
-                      \"name\": {
-                         \"prefix\": \"ONAP\"
+                    },
+                    \"client\": {
+                      \"ssl\": {
+                        \"key-store\": \"/app/certs/${ACUMOS_KEYSTORE}\",
+                        \"key-store-password\": \"${ACUMOS_KEYSTORE_PASSWORD}\",
+                        \"key-store-type\": \"PKCS12\",
+                        \"key-password\": \"${ACUMOS_CERT_KEY_PASSWORD}\",
+                        \"trust-store\": \"/app/certs/${ACUMOS_TRUSTSTORE}\",
+                        \"trust-store-password\": \"${ACUMOS_TRUSTSTORE_PASSWORD}\"
                       }
-                   }
-                },
-                \"jwt\": {
-                   \"auth\": {
-                     \"timeout\": \"80000000\"
-                   }
-                },
-                \"cas\": {
-                   \"service\": {
-                      \"validate\": {
-                         \"url\": \"https://identity.linuxfoundation.org/cas/serviceValidate\"
+                    },
+                    \"gateway\": {
+                      \"url\": \"https://${ACUMOS_FEDERATION_HOST}:${ACUMOS_FEDERATION_LOCAL_PORT}\"
+                    },
+                    \"dcae\": {
+                      \"model\": {
+                        \"name\": {
+                          \"prefix\": \"ONAP\"
+                        }
                       }
-                   }
-                },
-                \"document\": {
-                   \"size\": \"${ACUMOS_PORTAL_DOCUMENT_MAX_SIZE}\"
-                },
-                \"image\": {
-                   \"size\": \"${ACUMOS_PORTAL_IMAGE_MAX_SIZE}\"
-                }                
+                    },
+                    \"jwt\": {
+                      \"auth\": {
+                        \"timeout\": \"80000000\"
+                      }
+                    },
+                    \"cas\": {
+                      \"service\": {
+                        \"validate\": {
+                          \"url\": \"https://identity.linuxfoundation.org/cas/serviceValidate\"
+                        }
+                      }
+                    },
+                    \"document\": {
+                      \"size\": \"${ACUMOS_PORTAL_DOCUMENT_MAX_SIZE}\"
+                    },
+                    \"jupyter\" : {
+                      \"url\" : \"http://${ACUMOS_DOMAIN}/\"
+                    },
+                    \"image\": {
+                      \"size\": \"${ACUMOS_PORTAL_IMAGE_MAX_SIZE}\"
+                    }
            }"
        expose:
-           - ${ACUMOS_PORTAL_BE_PORT}
+           - 8083
        links:
            - cds-service
        depends_on:
@@ -179,5 +202,5 @@ services:
        logging:
            driver: json-file
        extra_hosts:
-           - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"
+           - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
        restart: on-failure

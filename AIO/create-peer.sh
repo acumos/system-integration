@@ -17,19 +17,20 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-#.What this is: Utility to create an Acumos portal peer relationship via the
-#.  Acumos common-dataservice API.
-#.Prerequisites:
+# What this is: Utility to create an Acumos portal peer relationship via the
+#   Acumos common-dataservice API.
+# Prerequisites:
 # - Acumos deployed via oneclick_deploy.sh, and acumos-env.sh as updated by it
 # - All FQDNs specified for peers must be DNS-resolvable on all hosts
 #   (entries in /etc/hosts or in an actual DNS server)
-#.Usage:
-#.$ bash create-peer.sh <CAcert> <name> <name> <contact> <apiUrl>
-#.  CAcert: CA certificate to add to truststore /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_TRUSTSTORE
-#.  name: hostname to assign to this peer
-#.  name: name (FQDN) from the cert
-#.  contact: admin email address
-#.  apiUrl: URL where the peer's federation gateway can be reached
+#
+# Usage:
+# $ bash create-peer.sh <CAcert> <name> <name> <contact> <apiUrl>
+#   CAcert: CA certificate to add to truststore /var/$ACUMOS_NAMESPACE/certs/$ACUMOS_TRUSTSTORE
+#   name: hostname to assign to this peer
+#   name: name (FQDN) from the cert
+#   contact: admin email address
+#   apiUrl: URL where the peer's federation gateway can be reached
 #
 
 function setup_peer() {
@@ -54,11 +55,11 @@ function setup_peer() {
   scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $ACUMOS_TRUSTSTORE \
     $user@$host:/var/$ACUMOS_NAMESPACE/certs/$ACUMOS_TRUSTSTORE
 
-  if [[ $(curl -s -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X GET http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer | grep -ci "name\":\"${peer}") -eq 0 ]]; then
+  if [[ $(curl -s -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X GET -k https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/peer | grep -ci "name\":\"${peer}") -eq 0 ]]; then
     log "Create peer relationship for $peer via CDS API"
     apiURL="https://$peer:$ACUMOS_FEDERATION_PORT"
     curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-      -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer \
+      -X POST -k https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/peer \
       -H "accept: */*" -H "Content-Type: application/json" \
       -d "{ \"name\":\"$peer\", \"self\": false, \"local\": false, \"contact1\": \"$contact\", \"name\": \"$peer\", \"apiUrl\": \"$apiUrl\",   \"statusCode\": \"AC\", \"validationStatusCode\": \"PS\" }"
     created=$(jq -r '.created' /tmp/json)
@@ -122,7 +123,7 @@ if [[ $(grep -c "$peer:" docker/acumos/federation.yml) -eq 0 ]]; then
   sed -i -- "/extra_hosts:/a\ \ \ \ \ \ \ \ \ \ \ - \"$peer:$ip\"" \
     docker/acumos/federation.yml
   fi
-  sudo bash docker-compose.sh up -d --build federation-service
+  source docker-compose.sh up -d --build federation-service
 fi
 EOF
   fi
@@ -146,9 +147,3 @@ CAcert=$4
 contact=$5
 
 setup_peer
-# TODO: This is a workaround for non-DNS-resolvable names. For tenant-based
-# deploys (no ability to modify hosts file) a different approach is needed.
-if [[ $(grep -c -P " $peer( |$)" /etc/hosts) -eq 0 ]]; then
-  log "Add $peer to /etc/hosts"
-  echo "$ip $peer" | sudo tee -a /etc/hosts
-fi

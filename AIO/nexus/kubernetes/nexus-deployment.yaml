@@ -33,18 +33,18 @@ metadata:
   namespace: <ACUMOS_NAMESPACE>
   name: nexus
   labels:
-    app: nexus-service
+    app: nexus
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nexus-service
+      app: nexus
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: nexus-service
+        app: nexus
     spec:
       containers:
       - name: nexus
@@ -57,21 +57,21 @@ spec:
         - containerPort: <ACUMOS_DOCKER_MODEL_PORT>
         volumeMounts:
         - mountPath: /maven/logs
-          name: pv-<ACUMOS_NAMESPACE>-logs
+          name: logs
         - mountPath: /nexus-data
-          name: pv-<ACUMOS_NAMESPACE>-nexus-data
+          name: nexus-data
       restartPolicy: Always
       volumes:
-      - name: pv-<ACUMOS_NAMESPACE>-logs
+      - name: logs
         persistentVolumeClaim:
          claimName: pvc-<ACUMOS_NAMESPACE>-logs
-      - name: pv-<ACUMOS_NAMESPACE>-nexus-data
+      - name: nexus-data
         hostPath:
           path: /var/<ACUMOS_NAMESPACE>/nexus-data
 # TODO: debug access issues with PVC, necessitating the hostPath entry above
 #        persistentVolumeClaim:
 #         claimName: pvc-<ACUMOS_NAMESPACE>-nexus-data
       hostAliases:
-      - ip: "<ACUMOS_HOST>"
+      - ip: "<ACUMOS_HOST_IP>"
         hostnames:
-        - "<ACUMOS_DOMAIN>"
+        - "<ACUMOS_HOST>"

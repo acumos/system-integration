@@ -25,10 +25,10 @@ metadata:
   namespace: <ACUMOS_NAMESPACE>
   name: docker-service
   labels:
-    app: docker-service
+    app: docker
 spec:
   selector:
-    app: docker-service
+    app: docker
   type: ClusterIP
   ports:
   - name: docker-api-port
