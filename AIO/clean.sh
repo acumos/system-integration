@@ -61,18 +61,18 @@ if [[ $(which kubectl) ]]; then
   for pv in $pvs; do
     kubectl delete pv $pv
   done
-fi
+else
+  if [[ $(sudo docker ps -a | grep -c ' acumos_') -gt 0 ]]; then
+    cs=$(sudo docker ps --format '{{.Names}}' | grep ' acumos_')
+    for c in $cs; do
+      sudo docker stop $c
+      sudo docker rm -v $c
+    done
+  fi
 
-if [[ $(sudo docker ps -a | grep -c ' acumos_') -gt 0 ]]; then
-  cs=$(sudo docker ps --format '{{.Names}}' | grep ' acumos_')
-  for c in $cs; do
-    sudo docker stop $c
-    sudo docker rm -v $c
-  done
+  echo "Cleanup unused docker images"
+  sudo docker image prune -a -f
 fi
-
-echo "Cleanup unused docker images"
-sudo docker image prune -a -f
 
 echo "Delete persistent volume host folder"
 sudo rm -rf /var/$ACUMOS_NAMESPACE/logs
@@ -81,5 +81,8 @@ sudo rm -rf /var/$ACUMOS_NAMESPACE/docker-volume
 sudo rm -rf /var/$ACUMOS_NAMESPACE/nexus-data
 sudo rm -rf /var/$ACUMOS_NAMESPACE/mariadb-data
 sudo rm -rf /var/$ACUMOS_NAMESPACE/elasticsearch-data
+
+echo "Clean up logs etc"
+sudo rm -rf /tmp/acumos
 
 echo "You should now be able to repeat the install via oneclick_deploy.sh"

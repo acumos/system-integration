@@ -51,6 +51,7 @@ services:
                     \"nginxWebFolder\": \"/usr/share/nginx/html\",
                     \"nginxImageName\": \"nginx:latest\",
                     \"nginxInternalPort\": \"80\",
+                    \"kubernetesClientUrl\":\"http://kubernetes-client-service:${ACUMOS_KUBERNETES_CLIENT_PORT}/getSolutionZip\",
                     \"exposeDataBrokerPort\": \"${ACUMOS_DATA_BROKER_PORT}\",
                     \"internalDataBrokerPort\": \"${ACUMOS_DATA_BROKER_INTERNAL_PORT}\",
                     \"registry\": {

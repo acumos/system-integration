@@ -43,7 +43,7 @@ setup() {
   log "Generate auth/nginx.htpasswd for the docker image"
   # Don't use Bcrypt (-B) since not supported by nginx (debian/upstream issue)
   # https://github.com/kubernetes/ingress-nginx/issues/3150
-  sudo docker run --rm --entrypoint htpasswd registry:2 \
+  docker run --rm --entrypoint htpasswd registry:2 \
     -bn $ACUMOS_DOCKER_PROXY_USERNAME $ACUMOS_DOCKER_PROXY_PASSWORD > auth/nginx.htpasswd
 
   log "Copy the Acumos server cert and key to auth/ for the docker image"
@@ -52,10 +52,10 @@ setup() {
 
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     log "Build the local acumos-docker-proxy image"
-    sudo docker build -t acumos-docker-proxy .
+    docker build -t acumos-docker-proxy .
 
     # --build will restart any existing container with any new configuration
-    sudo bash docker-compose.sh $AIO_ROOT up -d --build --force-recreate
+    source docker-compose.sh up -d --build --force-recreate
   else
     log "Stop any existing k8s based components for docker-proxy"
     stop_service deploy/docker-proxy-service.yaml

@@ -35,13 +35,15 @@ fi
 function fail() {
   set +x
   trap - ERR
-  save_logs
-  log "Debug logs are saved at /tmp/acumos/debug"
+  reason="$1"
+  if [[ "$1" == "" ]]; then reason="unknown"; fi
   if [[ -e ../acumos-env.sh ]]; then cd ..; fi
   source acumos-env.sh
   update_env DEPLOY_RESULT fail
-  update_env FAIL_REASON "\"$1\""
-  log "$1"
+  update_env FAIL_REASON "$reason"
+  save_logs
+  log "Debug logs are saved at /tmp/acumos/debug"
+  log "$reason"
   exit 1
 }
 
@@ -51,14 +53,6 @@ function log() {
   fline=$(caller 0 | awk '{print $1}')
   echo; echo "$fname:$fline ($(date)) $1"
   set -x
-}
-
-function wait_dpkg() {
-  # TODO: workaround for "E: Could not get lock /var/lib/dpkg/lock - open (11: Resource temporarily unavailable)"
-  echo; echo "waiting for dpkg to be unlocked"
-  while sudo fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do
-    sleep 1
-  done
 }
 
 function wait_until_notfound() {
@@ -162,10 +156,10 @@ function start_deployment() {
 
 function check_running() {
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-    cs=$(sudo docker ps -a | awk "/$app/{print \$1}")
+    cs=$(docker ps -a | awk "/$app/{print \$1}")
     status="Running"
     for c in $cs; do
-      if [[ $(sudo docker ps -f id=$c | grep -c " Up ") -eq 0 ]]; then
+      if [[ $(docker ps -f id=$c | grep -c " Up ") -eq 0 ]]; then
         status="Not yet Up"
       fi
     done
@@ -188,11 +182,11 @@ function wait_running() {
   done
   if [[ $t -gt 30 ]]; then
     if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-      cs=$(sudo docker ps -a | awk "/$app/{print \$1}")
+      cs=$(docker ps -a | awk "/$app/{print \$1}")
       for c in $cs; do
-        if [[ $(sudo docker ps -f id=$c | grep -c " Up ") -eq 0 ]]; then
-          sudo docker ps -f id=$c
-          sudo docker logs $c
+        if [[ $(docker ps -f id=$c | grep -c " Up ") -eq 0 ]]; then
+          docker ps -f id=$c
+          docker logs $c
         fi
       done
     else
@@ -205,17 +199,17 @@ function wait_running() {
 }
 
 function save_logs() {
+  log "Saving debug logs"
   if [[ -e /tmp/acumos/debug ]]; then rm -rf /tmp/acumos/debug; fi
   mkdir -p /tmp/acumos/debug
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     if [[ $(which docker) ]]; then
-      sudo docker ps -a | grep acumos | tee /tmp/acumos/debug/acumos-containers.log
-      cs=$(sudo docker ps --format '{{.Names}}' | grep acumos)
+      docker ps -a | grep acumos | tee /tmp/acumos/debug/acumos-containers.log
+      cs=$(docker ps --format '{{.Names}}' | grep acumos)
       for c in $cs; do
-        sudo bash -c "nohup docker ps -f name=$c | tee /tmp/acumos/debug/$c.log 1>/dev/null 2>&1 &" 1>/dev/null 2>&1
-        sudo bash -c "nohup docker logs $c | tee -a /tmp/acumos/debug/$c.log 1>/dev/null 2>&1 &" 1>/dev/null 2>&1
+        bash -c "nohup docker ps -f name=$c | tee /tmp/acumos/debug/$c.log 1>/dev/null 2>&1 &" 1>/dev/null 2>&1
+        bash -c "nohup docker logs $c | tee -a /tmp/acumos/debug/$c.log 1>/dev/null 2>&1 &" 1>/dev/null 2>&1
       done
-      sudo chown $USER:$USER -R /tmp/acumos
     fi
   else
     if [[ $(which kubectl) ]]; then

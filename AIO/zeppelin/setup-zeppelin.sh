@@ -1,0 +1,120 @@
+#!/bin/bash
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2019 AT&T Intellectual Property. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+#
+# What this is: script to setup Zeppelin as a service of the Acumos platform.
+# NOTE: experimental use only; does not yet include Acumos user authentication.
+#
+# Prerequisites:
+# - kubernetes cluster installed
+# - helm installed under the k8s cluster
+# - kubectl and helm installed on the user's workstation
+# - user workstation setup to use a k8s profile for the target k8s cluster
+#   e.g. using the Acumos kubernetes-client repo tools
+#   $ bash kubernetes-client/deploy/private/setup-kubectl.sh k8smaster ubuntu acumos
+#
+# Usage: on the user's workstation
+# $ bash setup-zeppelin.sh <namespace>
+#   namespace: namespace to deploy under
+#
+
+function fail() {
+  log "$1"
+  cd $WORK_DIR
+  exit 1
+}
+
+function log() {
+  set +x
+  fname=$(caller 0 | awk '{print $2}')
+  fline=$(caller 0 | awk '{print $1}')
+  echo; echo "$fname:$fline ($(date)) $1"
+  set -x
+}
+
+function prereqs() {
+ log "Setup prerequisites"
+ # Per https://z2jh.jupyter.org/en/latest/setup-jupyterhub.html
+ if [[ ! $(which helm) ]]; then
+   # Install a helm client per https://github.com/helm/helm/releases"
+   wget https://storage.googleapis.com/kubernetes-helm/helm-v2.12.3-linux-amd64.tar.gz
+   gzip -d helm-v2.12.3-linux-amd64.tar.gz
+   tar -xvf helm-v2.12.3-linux-amd64.tar
+   sudo cp linux-amd64/helm /usr/local/sbin/.
+ fi
+
+ log "Initialize helm"
+ helm init
+}
+
+function setup() {
+
+  if [[ "$(helm list zeppelin)" != "" ]]; then
+    log "Delete/purge current zeppelin service"
+    helm delete --purge zeppelin
+  fi
+
+  log "Clone helm charts repo"
+  if [[ ! -e charts ]]; then
+    git clone https://github.com/helm/charts.git
+  fi
+
+  log "Update zepellin chart to reference image apache/zeppelin"
+  cd charts/stable/zeppelin
+  # update chart to use apache/zeppelin image as the default image is debian:8
+  # based which is incompatible with Acumos
+  sed -i 's~dylanmei/zeppelin:0.7.2~apache/zeppelin:0.8.1~' values.yaml
+
+  log "Update zepellin chart to use nodePort for the zeppelin service"
+  sed -i 's/ClusterIP/NodePort/' templates/svc.yaml
+
+  log "Install the zepellin helm chart"
+  helm upgrade --install zeppelin --namespace $namespace .
+
+  log "Wait for zeppelin to be running"
+  i=0
+  status=$(kubectl get pods -n $namespace | awk '/zeppelin/ {print $3}')
+  while [[ "$status" != "Running" ]]; do
+    helm list zeppelin
+    kubectl get svc -n $namespace | grep zeppelin
+    kubectl get pods -n $namespace | grep zeppelin
+    ((++i))
+    if [[ $i -eq 30 ]]; then
+      fail "Zeppelin not running after 5 minutes"
+    fi
+    echo "Waiting..."
+    sleep 10
+    status=$(kubectl get pods -n $namespace | awk '/zeppelin/ {print $3}')
+  done
+
+  log "Deploy is complete!"
+  cluster=$(kubectl config get-contexts \
+    $(kubectl config view | awk '/current-context/{print $2}') \
+    | awk '/\*/{print $3}')
+  server=$(kubectl config view \
+    -o jsonpath="{.clusters[?(@.name == \"$cluster\")].cluster.server}" \
+    | cut -d '/' -f 3 | cut -d ':' -f 1)
+  nodePort=$(kubectl get svc -n $namespace -o json zeppelin-zeppelin | jq '.spec.ports[0].nodePort')
+  echo "Access Zeppelin at http://$server:$nodePort"
+}
+
+WORK_DIR=$(pwd)
+namespace=$1
+prereqs
+setup
+cd $WORK_DIR

@@ -28,10 +28,7 @@
 #   options: optional parameters to docker-compose.
 #
 
-set -x
-source ../acumos-env.sh
-source ../elk-stack/elk-env.sh
-source beats-env.sh
 cmd="$2 $3 $4 $5"
 cd docker
 docker-compose -f acumos/$1 $cmd
+cd ..

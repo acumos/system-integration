@@ -31,10 +31,14 @@
 #     profile for the target cluster, e.g. though setup-kubectl.sh, e.g
 #     $ wget https://raw.githubusercontent.com/acumos/kubernetes-client/master/deploy/private/setup-kubectl.sh
 #     $ bash setup-kubectl.sh myk8smaster myuser mynamespace
-# - Persistent volume pre-arranged and identified for PV-dependent components
-#   in acumos-env.sh. setup-pv.sh may be used for this, e.g.
-#   $ bash acumos-env.sh
-#   $ bash setup-pv.sh setup pv logs $ACUMOS_LOGS_PV_SIZE "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
+# - Host preparation steps by an admin (or sudo user)
+#   - Persistent volume pre-arranged and identified for PV-dependent components
+#     in acumos-env.sh. setup-pv.sh may be used for this, e.g.
+#     $ bash acumos-env.sh
+#     $ bash setup-pv.sh setup pv logs $ACUMOS_LOGS_PV_SIZE "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
+#   - the User running this script must have been added to the "docker" group
+#     $ sudo usermod <user> -G docker
+#   - AIO prerequisites setup by sudo user via setup_AIO_prereqs.sh
 #
 # Usage: if deploying under docker, on the target host
 # $ bash oneclick_deploy.sh docker <host>
@@ -60,52 +64,10 @@
 #   ACUMOS_CDS_DB to the same as the previous installed database
 #
 
-function setup_prereqs() {
-  trap 'fail' ERR
-
-  log "/etc/hosts customizations"
-  # Ensure cluster hostname resolves inside the cluster
-  if [[ $(host $ACUMOS_DOMAIN | grep -c 'not found') -gt 0 ]]; then
-    if [[ $(grep -c -P " $ACUMOS_DOMAIN( |$)" /etc/hosts) -eq 0 ]]; then
-      echo; echo "prereqs.sh: ($(date)) Add $ACUMOS_DOMAIN to /etc/hosts"
-      echo "$ACUMOS_DOMAIN $ACUMOS_HOST" | sudo tee -a /etc/hosts
-    fi
-  fi
-
-  log "/etc/hosts:"
-  cat /etc/hosts
-
-  log "Basic prerequisites"
-  if [[ "$HOST_OS" == "ubuntu" ]]; then
-    wait_dpkg; sudo apt-get update
-    # TODO: fix need to skip upgrade as this sometimes updates the kube-system
-    # services and they then stay in "pending", blocking k8s-based deployment
-    # Also on bionic can cause a hang at 'Preparing to unpack .../00-systemd-sysv_237-3ubuntu10.11_amd64.deb ...'
-    #  wait_dpkg; sudo apt-get upgrade -y
-    wait_dpkg; sudo apt-get install -y wget git jq
-  else
-    # For centos, only deployment under k8s is supported
-    # docker is assumed to be pre-installed as part of the k8s install process
-    sudo yum -y update
-    sudo rpm -Fvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-    sudo yum install -y wget git jq bind-utils
-  fi
-
-  if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-    log "Install latest docker-compose"
-    # Required, to use docker compose version 3.2 templates
-    # Per https://docs.docker.com/compose/install/#install-compose
-    # Current version is listed at https://github.com/docker/compose/releases
-    sudo curl -L -o /usr/local/bin/docker-compose \
-    "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)"
-    sudo chmod +x /usr/local/bin/docker-compose
-  fi
-}
-
 function clean_env() {
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     log "Stop any running Acumos core docker-based components"
-    sudo bash docker-compose.sh down
+    source docker-compose.sh down
   else
     if [[ "$K8S_DIST" == "openshift" ]]; then
       echo "Delete project $ACUMOS_NAMESPACE"
@@ -128,8 +90,6 @@ function clean_env() {
 function prepare_env() {
   # TODO: redeploy without deleting all services first
   clean_env
-  log "Create PV for logs"
-  bash setup-pv.sh setup pv logs $ACUMOS_NAMESPACE $ACUMOS_LOGS_PV_SIZE "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
 
   if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
     log "Check if namespace/project already exists, and create if not"
@@ -148,15 +108,12 @@ function prepare_env() {
         oc adm policy add-scc-to-user privileged -z default -n $ACUMOS_NAMESPACE
       fi
     fi
-  elif [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
-    bash setup-pv.sh setup pv certs $ACUMOS_NAMESPACE $ACUMOS_CERTS_PV_SIZE \
-      "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
   fi
 }
 
 function docker_login() {
   wait_until_success \
-    "sudo docker login $1 -u $ACUMOS_PROJECT_NEXUS_USERNAME -p $ACUMOS_PROJECT_NEXUS_PASSWORD"
+    "docker login $1 -u $ACUMOS_PROJECT_NEXUS_USERNAME -p $ACUMOS_PROJECT_NEXUS_PASSWORD"
 }
 
 function setup_acumos() {
@@ -165,8 +122,6 @@ function setup_acumos() {
   docker_login https://nexus3.acumos.org:10004
   docker_login https://nexus3.acumos.org:10003
   docker_login https://nexus3.acumos.org:10002
-
-  if [[ "$HOST_OS" == "ubuntu" ]]; then sudo chown -R $USER:$USER $HOME/.docker; fi
 
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     if [[ "$ACUMOS_DEPLOY_KONG" != "true" ]]; then
@@ -180,7 +135,7 @@ function setup_acumos() {
     fi
 
     log "Deploy Acumos core docker-based components"
-    sudo bash docker-compose.sh up -d --build
+    source docker-compose.sh up -d --build
     cd docker-proxy; source setup-docker-proxy.sh; cd ..
   else
     if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
@@ -194,11 +149,7 @@ function setup_acumos() {
       fi
 
       log "Create k8s secret for image pulling from docker"
-      if [[ "$HOST_OS" == "ubuntu" ]]; then
-        b64=$(cat $HOME/.docker/config.json | base64 -w 0)
-      else
-        b64=$(sudo cat /root/.docker/config.json | base64 -w 0)
-      fi
+      b64=$(cat $HOME/.docker/config.json | base64 -w 0)
       cat <<EOF >acumos-registry.yaml
 apiVersion: v1
 kind: Secret
@@ -264,7 +215,10 @@ function setup_federation() {
   log "Create 'self' peer entry (required) via CDS API"
   wait_until_success \
     "curl -s -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer"
-  curl -s -o $HOME/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer -H "accept: */*" -H "Content-Type: application/json" -d "{ \"name\":\"$ACUMOS_DOMAIN\", \"self\": true, \"local\": false, \"contact1\": \"$ACUMOS_ADMIN_EMAIL\", \"subjectName\": \"$ACUMOS_DOMAIN\", \"apiUrl\": \"https://$ACUMOS_DOMAIN:$ACUMOS_FEDERATION_PORT\",  \"statusCode\": \"AC\", \"validationStatusCode\": \"PS\" }"
+  curl -s -o $HOME/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST \
+    http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/peer -H "accept: */*" \
+    -H "Content-Type: application/json" \
+    -d "{ \"name\":\"$ACUMOS_DOMAIN\", \"self\": true, \"local\": false, \"contact1\": \"$ACUMOS_ADMIN_EMAIL\", \"subjectName\": \"$ACUMOS_DOMAIN\", \"apiUrl\": \"https://$ACUMOS_DOMAIN:$ACUMOS_FEDERATION_PORT\",  \"statusCode\": \"AC\", \"validationStatusCode\": \"PS\" }"
   if [[ "$(jq -r '.created' $HOME/json)" == "null" ]]; then
     cat $HOME/json
     fail "Peer entry creation failed"
@@ -357,16 +311,10 @@ if [[ -e mariadb-env.sh ]]; then
   sed -i -- "s/ACUMOS_SETUP_DB=.*/ACUMOS_SETUP_DB=$ACUMOS_SETUP_DB/" acumos-env.sh
 fi
 
-if [[ "$ACUMOS_SETUP_PREREQS" == "true" ]]; then
-  setup_prereqs
-  export ACUMOS_SETUP_PREREQS=false
-  sed -i -- "s/ACUMOS_SETUP_PREREQS=.*/ACUMOS_SETUP_PREREQS=$ACUMOS_SETUP_PREREQS/" acumos-env.sh
-fi
-
 prepare_env
 source setup-keystore.sh
 
-if [[ "$ACUMOS_DEPLOY_DOCKER" == "true" ]]; then
+if [[ "$DEPLOYED_UNDER" == "k8s" && "$ACUMOS_DEPLOY_DOCKER" == "true" ]]; then
   cd docker-engine; source setup-docker-engine.sh; cd ..
 fi
 
@@ -394,9 +342,6 @@ fi
 
 if [[ "$ACUMOS_DEPLOY_ELK" == "true" ]]; then
   cd elk-stack
-  sed -i -- "s/ACUMOS_ELK_DOMAIN=.*/ACUMOS_ELK_DOMAIN=$ACUMOS_DOMAIN/" acumos-env.sh
-  sed -i -- "s/ACUMOS_ELK_HOST=.*/ACUMOS_ELK_HOST=$ACUMOS_HOST/" acumos-env.sh
-  sed -i -- "s/ACUMOS_NAMESPACE=.*/ACUMOS_NAMESPACE=$ACUMOS_NAMESPACE/" acumos-env.sh
   source setup-elk.sh
   cd ..
 fi
@@ -409,6 +354,9 @@ echo "Component details and stdout logs up to this point have been saved at"
 echo "/tmp/acumos/debug, e.g. for debugging or if you are really bored."
 echo "You can access the Acumos portal and other services at the URLs below,"
 echo "assuming hostname \"$ACUMOS_DOMAIN\" is resolvable from your workstation:"
+echo "One optional/manual step remains: if needed, complete the Hippo CMS"
+echo "config as described in https://docs.acumos.org/en/latest/submodules/system-integration/docs/oneclick-deploy/user-guide.html#install-process"
+
 if [[ "$ACUMOS_DEPLOY_KONG" == "true" ]]; then
   portal_base=https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT
   onboarding_base=$portal_base

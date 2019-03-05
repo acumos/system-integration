@@ -37,6 +37,10 @@ export ACUMOS_ELK_HOST=$host
 export HTTP_PROXY=""
 export HTTPS_PROXY=""
 
+# Set by setup-elk.sh
+export DEPLOY_RESULT=
+export FAIL_REASON=
+
 # Component options
 export ACUMOS_DEPLOY_METRICBEAT=true
 export ACUMOS_CDS_DB="acumos_cds"

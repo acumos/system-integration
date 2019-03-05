@@ -58,18 +58,6 @@ function log() {
   set -x
 }
 
-function setup_prereqs() {
-  trap 'fail' ERR
-
-  log "Basic prerequisites"
-  HOST_OS=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
-  if [[ "$HOST_OS" == "ubuntu" ]]; then
-    sudo apt-get install -y jq
-  else
-    sudo yum install -y jq
-  fi
-}
-
 function setup_pv() {
   trap 'fail' ERR
   path=/var/$namespace/$pv
@@ -82,14 +70,14 @@ function setup_pv() {
     fi
 
     if [[ ! -e $path ]]; then
-      mkdir -p $path
+      sudo mkdir -p $path
       # TODO: remove/relax this workaround
       # Required for various components to be able to write to the PVs
-      chmod 777 $path
+      sudo chmod 777 $path
       sudo chown $owner $path
     fi
   else
-    if [[ "$ACUMOS_K8S_ROLE" == "admin" ]]; then
+    if [[ "$ACUMOS_USER_ROLE" == "admin" ]]; then
       log "Creating /var/$namespace as PV root folder, if needed"
       cat <<EOF >mkpv.sh
 set -x
@@ -98,8 +86,8 @@ if [[ ! -e /var/$namespace ]]; then
   sudo chown $ACUMOS_HOST_USER:$ACUMOS_HOST_USER /var/$namespace
 fi
 if [[ ! -e $path ]]; then
-  mkdir -p $path
-  chmod 777 $path
+  sudo mkdir -p $path
+  sudo chmod 777 $path
   sudo chown $owner $path
 fi
 EOF
@@ -183,7 +171,7 @@ function clean() {
       fi
     fi
   else
-    if [[ $(kubectl get namespaces $namespace) && "$ACUMOS_K8S_ROLE" == "admin" ]]; then
+    if [[ $(kubectl get namespaces $namespace) && "$ACUMOS_USER_ROLE" == "admin" ]]; then
       log "Deleting $what-$namespace-$pv"
       if [[ $(kubectl delete pv $name) ]]; then
         while $(kubectl get pv $name); do
@@ -212,7 +200,6 @@ else
   pv_name="pv-$namespace-$pv"
 fi
 
-setup_prereqs
 if [[ "$action" == "clean" ]]; then
   clean
 else

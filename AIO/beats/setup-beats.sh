@@ -25,9 +25,24 @@
 #    elk-env.sh as updated by those scripts, for deployment options.
 #
 # Usage: on the AIO host where Acumos is being deployed
-# $ bash setup-beats.sh <beat>
+# $ bash setup-beats.sh <beat> <namespace>
 #   beat: filebeat|metricbeat
+#   namespace: ACUMOS_NAMESPACE (needed for logs PV name)
 #
+
+# First define utils that will overridden below
+source ../utils.sh
+
+function fail() {
+  set +x
+  trap - ERR
+  reason="$1"
+  if [[ "$1" == "" ]]; then reason="unknown"; fi
+  sed -i -- 's/DEPLOY_RESULT=.*/DEPLOY_RESULT=fail/' elk-env.sh
+  sed -i -- "s/FAIL_REASON=.*~FAIL_REASON=$reason~" elk-env.sh
+  log "$reason"
+  exit 1
+}
 
 function build_images() {
   log "Prepare $beat stack component image"
@@ -39,7 +54,7 @@ function build_images() {
     # Per https://www.elastic.co/guide/en/beats/filebeat/current/running-on-docker.html
     cd filebeat
     cp -R ../platform-oam/filebeat/config .
-    sudo docker build -t acumos-filebeat .
+    docker build -t acumos-filebeat .
   else
     log "Building local acumos-metricbeat image"
     cd metricbeat
@@ -48,7 +63,7 @@ function build_images() {
       ../platform-oam/metricbeat/config/metricbeat.yml
     cp -R ../platform-oam/metricbeat/config .
     cp -R ../platform-oam/metricbeat/module.d .
-    sudo docker build -t acumos-metricbeat .
+    docker build -t acumos-metricbeat .
   fi
   cd ..
 }
@@ -56,9 +71,14 @@ function build_images() {
 clean() {
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     log "Stop any existing docker based components for $beat"
-    sudo bash docker-compose.sh $beat down
+    source docker-compose.sh $beat down
   else
     log "Stop any existing k8s based components for $beat"
+    if [[ ! -e deploy/$beat-service.yaml ]]; then
+      mkdir -p deploy
+      cp -r kubernetes/$beat-* deploy/.
+      replace_env deploy
+    fi
     stop_service deploy/$beat-service.yaml
     stop_deployment deploy/$beat-deployment.yaml
   fi
@@ -69,7 +89,7 @@ function setup() {
   build_images
 
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-    sudo bash docker-compose.sh $beat up -d --build --force-recreate
+    source docker-compose.sh $beat up -d --build --force-recreate
   else
     log "Deploy the k8s based component $beat"
     mkdir -p deploy
@@ -83,9 +103,8 @@ function setup() {
   wait_running $beat
 }
 
-source ../acumos-env.sh
 source ../elk-stack/elk-env.sh
 source beats-env.sh
-source ../utils.sh
 beat=$1
+ACUMOS_NAMESPACE=$2
 setup

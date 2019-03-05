@@ -68,35 +68,22 @@ EOF
 function clean() {
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     log "Stop any existing docker based components for nexus-service"
-    sudo bash docker-compose.sh $AIO_ROOT down
+    source docker-compose.sh down
   else
     log "Stop any existing k8s based components for nexus-service"
     stop_service deploy/nexus-service.yaml
     stop_deployment deploy/nexus-deployment.yaml
     log "Remove PVC for nexus-service"
-    source $AIO_ROOT/setup-pv.sh clean pvc nexus-data $ACUMOS_NAMESPACE
+    source ../setup-pv.sh clean pvc nexus-data $ACUMOS_NAMESPACE
   fi
-
-  log "Remove PV for nexus-service"
-  source $AIO_ROOT/setup-pv.sh clean pv nexus-data $ACUMOS_NAMESPACE
 }
 
 function setup() {
-  if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
-    clean
-    log "Setup the nexus-data PV"
-    source $AIO_ROOT/setup-pv.sh setup pv nexus-data \
-      $ACUMOS_NAMESPACE $NEXUS_DATA_PV_SIZE "200:$ACUMOS_HOST_USER"
-  fi
-
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-    sudo bash docker-compose.sh $AIO_ROOT up -d --build --force-recreate
+    source docker-compose.sh up -d --build --force-recreate
   else
-    if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
-      log "Setup the nexus-data PVC"
-      source $AIO_ROOT/setup-pv.sh setup pvc nexus-data \
-        $ACUMOS_NAMESPACE $NEXUS_DATA_PV_SIZE
-    fi
+    log "Setup the nexus-data PVC"
+    source setup-pv.sh setup pvc nexus-data $ACUMOS_NAMESPACE $NEXUS_DATA_PV_SIZE
 
     log "Deploy the k8s based components for nexus"
     mkdir -p deploy
@@ -104,7 +91,7 @@ function setup() {
     replace_env deploy
     start_service deploy/nexus-service.yaml
     start_deployment deploy/nexus-deployment.yaml
-    fi
+  fi
 
   wait_running nexus-service
 
@@ -112,13 +99,14 @@ function setup() {
   cmd="curl -v -m 10 \
     -u $ACUMOS_NEXUS_ADMIN_USERNAME:$ACUMOS_NEXUS_ADMIN_PASSWORD \
     http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script"
-  while ! $cmd ; do
-    log "Nexus API is not responding... waiting 10 seconds"
-    sleep 10
-  done
-  until [[ $($cmd | jq -r 'length') -ge 0 ]]; do
+  local i=0
+  until [[ "$($cmd)" == "[ ]" ]]; do
     log "Nexus API is not ready... waiting 10 seconds"
     sleep 10
+    ((++i))
+    if [[  $i -eq 60 ]]; then
+      fail "Nexus API failed to respond"
+    fi
   done
 
   setup_nexus_repo $ACUMOS_NEXUS_MAVEN_REPO 'Maven'

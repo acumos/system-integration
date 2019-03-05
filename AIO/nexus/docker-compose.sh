@@ -25,21 +25,19 @@
 # Usage:
 # - bash docker-compose.sh [options]
 #   options: optional parameters to docker-compose. some examples:
-#   $ sudo bash docker-compose.sh $AIO_ROOT build
+#   $ bash docker-compose.sh build
 #     Build all services defined in the docker-compose.yaml file.
-#   $ sudo bash docker-compose.sh $AIO_ROOT up
+#   $ bash docker-compose.sh up
 #     Starts all service containers.
-#   $ sudo bash docker-compose.sh $AIO_ROOT logs -f
+#   $ bash docker-compose.sh logs -f
 #     Tail the logs of all service containers.
-#   $ sudo bash docker-compose.sh $AIO_ROOT down
+#   $ bash docker-compose.sh down
 #     Stop all service containers.
-#   $ sudo bash docker-compose.sh $AIO_ROOT rm -v
+#   $ bash docker-compose.sh rm -v
 #     Remove all service containers.
 #
 
-source $1/acumos-env.sh
-set -x
-cmd="$2 $3 $4 $5"
+cmd="$*"
 opts=""
 files=$(ls docker/acumos)
 for file in $files ; do
@@ -48,3 +46,4 @@ done
 
 cd docker
 docker-compose $opts $cmd
+cd ..
