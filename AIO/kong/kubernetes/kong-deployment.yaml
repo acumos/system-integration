@@ -36,6 +36,8 @@ spec:
       labels:
         app: kong
     spec:
+      hostname: kong
+      restartPolicy: Always
       containers:
       - name: kong-database
         image: postgres:9.5
@@ -48,7 +50,7 @@ spec:
         - containerPort: 5432
         volumeMounts:
         - mountPath: /var/lib/postgresql
-          name: pv-<ACUMOS_NAMESPACE>-kong-db
+          name: kong-db
       - name: kong
         image: kong:0.11
         env:
@@ -69,24 +71,34 @@ spec:
         - name: KONG_LOG_LEVEL
           value: debug
         - name: KONG_ADMIN_LISTEN
-          value: 0.0.0.0:81
+          value: 0.0.0.0:8001
         - name: KONG_ADMIN_LISTEN_SSL
-          value: 0.0.0.0:444
+          value: 0.0.0.0:8444
         ports:
         - containerPort: 8000
         - containerPort: 8443
-        - containerPort: 81
-        - containerPort: 444
-        command: ['/bin/bash', '-c', 'until [[ $$(curl -v http://localhost:5432 2>&1 | grep -c "Connected to ") -gt 0 ]]; do echo "kong-database is unavailable - sleeping 10 seconds"; sleep 10; done; sed -i -- "s/\ \ \ \ proxy_max_temp_file_size 0;//" /usr/local/share/lua/5.1/kong/templates/nginx_kong.lua; sed -i -- "/server {/a\ \ \ \ proxy_max_temp_file_size 0;" /usr/local/share/lua/5.1/kong/templates/nginx_kong.lua; kong migrations up; kong start -vv; kong health -vv; echo Connected!; sleep 3600']
-      restartPolicy: Always
+        - containerPort: 8001
+        - containerPort: 8444
+        command: ['/bin/bash', '-c']
+        args:
+        - until [[ $(curl -v http://localhost:5432 2>&1 | grep -c "Connected to ") -gt 0 ]]; do
+            echo "kong-database is not yet available";
+            sleep 10;
+          done;
+          sed -i -- "s/\ \ \ \ proxy_max_temp_file_size 0;//" /usr/local/share/lua/5.1/kong/templates/nginx_kong.lua;
+          sed -i -- "/server {/a\ \ \ \ proxy_max_temp_file_size 0;" /usr/local/share/lua/5.1/kong/templates/nginx_kong.lua;
+          kong migrations up;
+          kong start -vv;
+          while true; do
+            if [[ $(kong health -vv) ]]; then
+              echo 'Kong is ready';
+            fi;
+            sleep 3600;
+          done;
       volumes:
-      - name: pv-<ACUMOS_NAMESPACE>-kong-db
+      - name: kong-db
         hostPath:
           path: /var/<ACUMOS_NAMESPACE>/kong-db
 # TODO: debug access issues with PVC
 #        persistentVolumeClaim:
 #         claimName: pvc-<ACUMOS_NAMESPACE>-kong-db
-      hostAliases:
-      - ip: "<ACUMOS_HOST>"
-        hostnames:
-        - "<ACUMOS_DOMAIN>"
