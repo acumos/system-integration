@@ -29,9 +29,7 @@ metadata:
 spec:
   selector:
     app: cms
-  type: NodePort
   ports:
   - name: cms-port
-    nodePort: <ACUMOS_CMS_PORT>
     port: 9080
     targetPort: 9080

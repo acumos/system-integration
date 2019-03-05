@@ -1,4 +1,4 @@
-#!/bin/bash
+$tmp#!/bin/bash
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -77,17 +77,17 @@ function setup_prometheus() {
     --set server.service.type=NodePort \
     --set server.persistentVolume.enabled=false
 
-  while ! curl -o /tmp/up http://$host_ip:30990/api/v1/query?query=up ; do
+  while ! curl -o $tmp -m 10 http://$host_ip:30990/api/v1/query?query=up ; do
     log "Prometheus API is not yet responding... waiting 10 seconds"
     sleep 10
   done
 
-  exp=$(jq '.data.result|length' /tmp/up)
+  exp=$(jq '.data.result|length' $tmp)
   log "$exp exporters are up"
   while [[ $exp -gt 0 ]]; do
     ((exp--))
-    eip=$(jq -r ".data.result[$exp].metric.instance" /tmp/up)
-    job=$(jq -r ".data.result[$exp].metric.job" /tmp/up)
+    eip=$(jq -r ".data.result[$exp].metric.instance" $tmp)
+    job=$(jq -r ".data.result[$exp].metric.job" $tmp)
     log "$job at $eip"
   done
 }
@@ -108,7 +108,7 @@ function setup_grafana() {
   grafana=$host_ip:30330
 
   log "Setup Grafana datasources and dashboards"
-  while ! curl -u admin:admin http://$grafana/api/org ; do
+  while ! curl -m 10 -u admin:admin http://$grafana/api/org ; do
     log "Grafana API is not yet responding... waiting 10 seconds"
     sleep 10
   done
@@ -119,11 +119,11 @@ function setup_grafana() {
 "url":"http://$host_ip:30990/", "basicAuth":false,"isDefault":true, \
 "user":"", "password":"" }
 EOF
-  curl -X POST -o /tmp/json -u admin:admin -H "Accept: application/json" \
+  curl -X POST -o $tmp -u admin:admin -H "Accept: application/json" \
     -H "Content-type: application/json" \
     -d @datasources.json http://$grafana/api/datasources
 
-  if [[ "$(jq -r '.message' /tmp/json)" != "Datasource added" ]]; then
+  if [[ "$(jq -r '.message' $tmp)" != "Datasource added" ]]; then
     fail "Datasource creation failed"
   fi
   log "Prometheus datasource for Grafana added"
@@ -135,12 +135,14 @@ EOF
   # Select the home icon (upper left), Dashboards / Import, enter the id, select load, and select the Prometheus datasource
 
   cd dashboards
-  boards=$(ls)
-  for board in $boards; do
-    curl -X POST -u admin:admin \
-      -H "Accept: application/json" -H "Content-type: application/json" \
-      -d @${board} http://$grafana/api/dashboards/db
-  done
+  if [[ $(ls *.json) ]]; then
+    boards=$(ls *.json)
+    for board in $boards; do
+      curl -X POST -u admin:admin \
+        -H "Accept: application/json" -H "Content-type: application/json" \
+        -d @${board} http://$grafana/api/dashboards/db
+    done
+  fi
 }
 
 function wait_until_notfound() {
@@ -175,8 +177,10 @@ if [[ "$1" == "clean" ]]; then
   log "Cleanup is complete. You can now redeploy Prometheus+Grafana."
 else
   setup_prereqs
+  tmp=/home/$USER/$(uuidgen)
   setup_prometheus
   setup_grafana
+  rm $tmp
   log "Prometheus dashboard is available at http://$host_ip:30990"
   log "Grafana dashboards are available at http://$host_ip:30330 (login as admin/admin)"
   log "Grafana API is available at http://admin:admin@$host_ip:30330/api/v1/query?query=<string>"
