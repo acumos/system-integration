@@ -25,6 +25,10 @@
 # - Customize the values here for your needs.
 #
 
+# images
+export ACUMOS_FILEBEAT_IMAGE=$ACUMOS_STAGING/acumos-filebeat:2.0.7
+export ACUMOS_METRICBEAT_IMAGE=$ACUMOS_STAGING/acumos-metricbeat:2.0.7
+
 # Component options
 export ACUMOS_FILEBEAT_PORT=8099
 export ACUMOS_METRICBEAT_PORT=8098

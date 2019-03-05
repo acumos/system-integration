@@ -49,17 +49,28 @@ function log() {
   echo; echo "$fname:$fline ($(date)) $1"
 }
 
+function run_tmp() {
+  trap 'fail' ERR
+  if [[ "$master" != "$HOSTNAME"* ]]; then
+    ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+      $username@$master 'bash -s' < $tmp
+  else
+    bash $tmp
+  fi
+  rm $tmp
+}
+
 function setup() {
+  trap 'fail' ERR
   # Per https://kubernetes.io/docs/tasks/configure-pod-container/configure-persistent-volume-storage/
-  ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    $username@$master <<EOF
+  tmp=/tmp/$(uuidgen)
+  cat <<EOF >$tmp
 if [[ ! \$(kubectl get pv $name) ]]; then
   if [[ ! -e $path/$name ]]; then
     sudo mkdir -p $path/$name
     sudo chown \$USER:users $path/$name
     chmod 777 $path/$name
   fi
-  dist=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
   cat <<EOG >$name.yaml
 kind: PersistentVolume
 apiVersion: v1
@@ -84,14 +95,17 @@ else
   exit 1
 fi
 EOF
+  run_tmp
 }
 
 function clean() {
-  ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    $username@$master <<EOF
+  trap 'fail' ERR
+  tmp=/tmp/$(uuidgen)
+  cat <<EOF >$tmp
 kubectl delete pv $name
 sudo rm -rf /$path/$name
 EOF
+  run_tmp
 }
 
 export WORK_DIR=$(pwd)
