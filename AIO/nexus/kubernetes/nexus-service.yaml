@@ -32,10 +32,10 @@ metadata:
   namespace: <ACUMOS_NAMESPACE>
   name: nexus-service
   labels:
-    app: nexus-service
+    app: nexus
 spec:
   selector:
-    app: nexus-service
+    app: nexus
   type: NodePort
   ports:
   - name: nexus-api

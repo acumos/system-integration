@@ -18,31 +18,30 @@ version: '3.2'
 # ===============LICENSE_END=========================================================
 
 # docker-compose for portal-fe
-# TODO: scrub all attributes for current need
 services:
    portal-fe-service:
        image: ${PORTAL_FE_IMAGE}
        environment:
            SPRING_APPLICATION_JSON: "{
                \"server\": {
-                    \"port\": ${ACUMOS_PORTAL_FE_PORT}
+                    \"port\": 8085
                 },
                \"zuul\": {
                    \"routes\": {
                       \"api\": {
-                        \"url\": \"http://portal-be-service:${ACUMOS_PORTAL_BE_PORT}\"
+                        \"url\": \"http://portal-be-service:8083\"
                       },
                       \"dsce\": {
-                        \"url\": \"http://dsce-service:${ACUMOS_DSCE_PORT}\"
+                        \"url\": \"http://dsce-service:8088\"
                       },
                       \"site\": {
-                        \"url\": \"http://cms-service:${ACUMOS_CMS_PORT}\"
+                        \"url\": \"http://cms-service:9080\"
                       },
                       \"cmnt\": {
                         \"url\": \"http://delete-me\"
                       },
                       \"azure\": {
-                        \"url\": \"http://azure-client-service:${ACUMOS_AZURE_CLIENT_PORT}\"
+                        \"url\": \"http://azure-client-service:9081\"
                       },
                       \"openstack\" : {
                         \"path\": \"/openstack/**\",
@@ -63,7 +62,7 @@ services:
                    }
                },
                \"spring\": {
-                  \"http\": {
+                  \"servlet\": {
                      \"multipart\": {
                         \"max-file-size\": -1,
                         \"max-request-size\": -1
@@ -71,8 +70,8 @@ services:
                   }
                }
            }"
-       ports:
-           - ${ACUMOS_PORTAL_FE_PORT}:${ACUMOS_PORTAL_FE_PORT}
+       expose:
+           - 8085
        links:
            - portal-be-service
        depends_on:
@@ -84,5 +83,5 @@ services:
        logging:
            driver: json-file
        extra_hosts:
-           - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"
+           - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
        restart: on-failure

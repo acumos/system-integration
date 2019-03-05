@@ -1,5 +1,5 @@
 version: '3.2'
-# ===============LICENSE_START====================ACUMOS_DOCKER_PROXY_PORT===================================
+# ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
 # Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
@@ -22,8 +22,18 @@ version: '3.2'
 services:
   nginx:
     image: acumos-docker-proxy
+    environment:
+      ACUMOS_DOCKER_PROXY_AUTH_API_PORT: 8000
+      ACUMOS_DOCKER_PROXY_AUTH_API_PATH: "/auth"
+      ACUMOS_AUTH_URL: "http://onboarding-service:8090/onboarding-app/v2/auth/"
+      ACUMOS_DOCKER_PROXY_LOG_FILE: "/var/log/acumos/docker-proxy.log"
+      ACUMOS_DOCKER_PROXY_LOG_LEVEL: 1
     restart: on-failure
     ports:
-      - ${ACUMOS_DOCKER_PROXY_PORT}:443
+      - ${ACUMOS_DOCKER_PROXY_PORT}:8443
     extra_hosts:
-      - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"
+      - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
+    volumes:
+      - type: bind
+        source: /var/${ACUMOS_NAMESPACE}/logs
+        target: /var/log/acumos

@@ -95,13 +95,13 @@ spec:
         - containerPort: 8082
         volumeMounts:
         - mountPath: /maven/logs
-          name: pv-<ACUMOS_NAMESPACE>-logs
+          name: logs
       restartPolicy: Always
       volumes:
-      - name: pv-<ACUMOS_NAMESPACE>-logs
+      - name: logs
         persistentVolumeClaim:
          claimName: pvc-<ACUMOS_NAMESPACE>-logs
       hostAliases:
-      - ip: "<ACUMOS_HOST>"
+      - ip: "<ACUMOS_HOST_IP>"
         hostnames:
-        - "<ACUMOS_DOMAIN>"
+        - "<ACUMOS_HOST>"
