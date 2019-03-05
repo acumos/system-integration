@@ -44,6 +44,6 @@ services:
        logging:
            driver: json-file
        extra_hosts:
-           - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"
+           - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
        restart: on-failure
 
