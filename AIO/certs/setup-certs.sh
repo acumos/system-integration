@@ -40,43 +40,37 @@ function log() {
   set -x
 }
 
+function sedi () {
+    sed --version >/dev/null 2>&1 && sed -i -- "$@" || sed -i "" "$@"
+}
+
 function setup() {
   trap 'fail' ERR
-  if [[ ! $(which keytool) ]]; then
-    log "Install keytool"
-    if [[ "$HOST_OS" == "ubuntu" ]]; then
-      sudo apt-get install -y openjdk-8-jre-headless
-    else
-      sudo yum install -y java-1.8.0-openjdk-headless
-    fi
-  fi
-
   log "Customize openssl.cnf as $name.cnf"
   if [[ "$HOST_OS" == "ubuntu" ]]; then
     cp /usr/lib/ssl/openssl.cnf ./$name.cnf
   else
     cp /etc/pki/tls/openssl.cnf ./$name.cnf
   fi
-  sudo chown $USER:$USER $name.cnf
-  sed -i -- 's/^dir.*=.*/dir = ./g' $name.cnf
-  sed -i -- "s/cacert.pem/$name-ca.crt/g" $name.cnf
-  sed -i -- "s/cakey.pem/$name-ca.key/g" $name.cnf
-  sed -i -- "s/# copy_extensions = copy/copy_extensions = copy/" $name.cnf
-  sed -i -- 's/# extensions.*=.*/extensions = v3_req/' $name.cnf
-  sed -i -- 's/countryName_default.*/countryName_default = US/' $name.cnf
-  sed -i -- '/\[ v3_req \]/a \
+  sedi 's/^dir.*=.*/dir = ./g' $name.cnf
+  sedi "s/cacert.pem/$name-ca.crt/g" $name.cnf
+  sedi "s/cakey.pem/$name-ca.key/g" $name.cnf
+  sedi "s/# copy_extensions = copy/copy_extensions = copy/" $name.cnf
+  sedi 's/# extensions.*=.*/extensions = v3_req/' $name.cnf
+  sedi 's/countryName_default.*/countryName_default = US/' $name.cnf
+  sedi '/\[ v3_req \]/a \
 subjectAltName = @alt_names\n\
 # Included these for openssl x509 -req -extfile\n\
 subjectKeyIdentifier=hash\n\
 authorityKeyIdentifier=keyid,issuer' $name.cnf
 
-  sed -i -- 's/\[ v3_ca \]/\[ alt_names \]\n\n[ v3_ca \]/' $name.cnf
-  sed -i -- "/\[ alt_names \]/aDNS.1 = $sn" $name.cnf
+  sedi 's/\[ v3_ca \]/\[ alt_names \]\n\n[ v3_ca \]/' $name.cnf
+  sedi "/\[ alt_names \]/aDNS.1 = $sn" $name.cnf
 
   if [[ "$san" != "" ]]; then
     i=2
     for n in $san; do
-      sed -i -- "/\[ alt_names \]/aDNS.$i = $n" $name.cnf
+      sedi "/\[ alt_names \]/aDNS.$i = $n" $name.cnf
       ((i++))
     done
   fi
@@ -84,7 +78,7 @@ authorityKeyIdentifier=keyid,issuer' $name.cnf
   if [[ "$saip" != "" ]]; then
     i=1
     for n in $saip; do
-      sed -i -- "/\[ alt_names \]/aIP.$i = $n" $name.cnf
+      sedi "/\[ alt_names \]/aIP.$i = $n" $name.cnf
       ((i++))
     done
   fi

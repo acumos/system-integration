@@ -31,24 +31,7 @@ spec:
     app: kong
   type: NodePort
   ports:
-  - name: kong-db-port
-    nodePort: <ACUMOS_KONG_DB_PORT>
-    port: 5432
-    targetPort: 5432
-  - name: kong-proxy-port
-    nodePort: <ACUMOS_KONG_PROXY_PORT>
-    port: 8000
-    targetPort: 8000
   - name: kong-proxy-ssl-port
     nodePort: <ACUMOS_KONG_PROXY_SSL_PORT>
     port: 8443
     targetPort: 8443
-  - name: kong-admin-port
-    nodePort: <ACUMOS_KONG_ADMIN_PORT>
-    port: 81
-    targetPort: 81
-  - name: kong-admin-ssl-port
-    nodePort: <ACUMOS_KONG_ADMIN_SSL_PORT>
-    port: 444
-    targetPort: 444
-
