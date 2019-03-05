@@ -1,5 +1,5 @@
 version: '3.2'
-# ===============LICENSE_START====================ACUMOS_DOCKER_PROXY_PORT===================================
+# ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
 # Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
@@ -24,6 +24,6 @@ services:
     image: acumos-docker-proxy
     restart: on-failure
     ports:
-      - ${ACUMOS_DOCKER_PROXY_PORT}:443
+      - ${ACUMOS_DOCKER_PROXY_PORT}:8443
     extra_hosts:
-      - "${ACUMOS_DOMAIN}:${ACUMOS_HOST}"
+      - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"

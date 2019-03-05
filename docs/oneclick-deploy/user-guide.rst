@@ -26,9 +26,13 @@ all-in-one (AIO) target.
 What is an AIO deploy?
 ----------------------
 
-The AIO deploy tools build an all-in-one instance of Acumos, with the database,
-Nexus repositories, and docker containers all running on a single virtual
-machine or physical host machine.
+By default, the AIO deploy tools build an all-in-one instance of Acumos, with
+all Acumos data and components running under docker or kubernetes (k8s) on a
+single virtual machine or physical host machine.
+
+Options also allow the user to deploy the platform on a cluster of nodes, to
+deploy a subset of the components, and to use some components that have
+previously deployed somewhere.
 
 What's included in the AIO tools
 --------------------------------

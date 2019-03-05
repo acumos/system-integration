@@ -42,7 +42,7 @@ spec:
       - name: acumos-registry
       containers:
       - name: metricbeat
-        image: acumos-metricbeat
+        image: <ACUMOS_METRICBEAT_IMAGE>
         imagePullPolicy: IfNotPresent
         env:
         - name: log_level
@@ -79,6 +79,8 @@ spec:
           readOnly: false
         - mountPath: /var/run/docker.sock
           name: sock
+        - name: conf-volume
+          mountPath: /usr/share/metricbeat
 # Per https://github.com/elastic/beats/issues/8253
         securityContext:
           privileged: true
@@ -99,7 +101,10 @@ spec:
       - name: sock
         hostPath:
           path: /var/run/docker.sock
+      - name: conf-volume
+        configMap:
+          name: metricbeat
       hostAliases:
-      - ip: "<ACUMOS_ELK_HOST>"
+      - ip: "<ACUMOS_ELK_HOST_IP>"
         hostnames:
         - "<ACUMOS_ELK_DOMAIN>"
