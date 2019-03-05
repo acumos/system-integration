@@ -50,7 +50,10 @@ spec:
         - name: SPRING_APPLICATION_JSON
           value: '{
                    "server":{
-                     "port": 8336
+                     "port": 8336,
+                     "servlet": {
+                       "context-path": "/onboarding-app"
+                     }
                    },
                    "docker": {
                      "host": "docker-service",
@@ -103,7 +106,7 @@ spec:
                      "dockerpassword": "<ACUMOS_PROJECT_NEXUS_PASSWORD>"
                    },
                    "spring": {
-                     "http": {
+                     "servlet": {
                        "multipart": {
                           "max-file-size": "1024MB",
                           "max-request-size": "1024MB"

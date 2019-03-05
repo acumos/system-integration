@@ -27,6 +27,7 @@ services:
                           \"server\": {
                                 \"port\": ${ACUMOS_DSCE_PORT}
                           },
+                          \"gdmJarName\":\"gdmservice-1.2.0.jar\",
                           \"dateformat\": \"yyyy-MM-dd-HH-mm-ss-SSS\",
                           \"solutionResultsetSize\": \"2000\",
                           \"cdsCheckInterval\": 10000,

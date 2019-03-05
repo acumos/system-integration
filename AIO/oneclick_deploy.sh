@@ -394,9 +394,6 @@ fi
 
 if [[ "$ACUMOS_DEPLOY_ELK" == "true" ]]; then
   cd elk-stack
-  sed -i -- "s/ACUMOS_ELK_DOMAIN=.*/ACUMOS_ELK_DOMAIN=$ACUMOS_DOMAIN/" acumos-env.sh
-  sed -i -- "s/ACUMOS_ELK_HOST=.*/ACUMOS_ELK_HOST=$ACUMOS_HOST/" acumos-env.sh
-  sed -i -- "s/ACUMOS_NAMESPACE=.*/ACUMOS_NAMESPACE=$ACUMOS_NAMESPACE/" acumos-env.sh
   source setup-elk.sh
   cd ..
 fi

@@ -25,7 +25,10 @@ services:
        environment:
           SPRING_APPLICATION_JSON: "{
                \"server\":{
-                    \"port\": ${ACUMOS_ONBOARDING_PORT}
+                   \"port\": ${ACUMOS_ONBOARDING_PORT},
+                   \"servlet\": {
+                      \"context-path\": \"/onboarding-app\"
+                   }
                 },
                \"docker\": {
                    \"host\": \"${ACUMOS_DOCKER_API_HOST}\",
@@ -82,7 +85,7 @@ services:
                    \"GeneratorEndPointURL\": \"http://delete-me/model_create\"
                },
                \"spring\": {
-                   \"http\": {
+                   \"servlet\": {
                        \"multipart\": {
                            \"max-file-size\": \"1024MB\",
                            \"max-request-size\": \"1024MB\"
