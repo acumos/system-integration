@@ -58,7 +58,7 @@ spec:
         - name: ES_JAVA_OPTS
           value: "-Djava.net.preferIPv4Stack=true -Xms4g -Xmx4g"
         ports:
-        - containerPort: 9200
+        - containerPort: {{ .Values.elasticsearch.image.port }}
         volumeMounts:
         - name: elasticsearch
           mountPath: /usr/share/elasticsearch/config/elasticsearch.yml

@@ -15,44 +15,51 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
-apiVersion: extensions/v1beta1
-kind: Deployment
+apiVersion: v1
+kind: Service
 metadata:
-  name: kibana
+  name: acumos-postgres
   namespace: "{{ .Values.namespace }}"
-  labels:
-    app: kibana
+spec:
+  ports:
+  - name: pgql
+    port: {{ .Values.acumosKongPostgresPort }}
+    targetPort: {{ .Values.acumosKongPostgresPort }}
+    protocol: TCP
+  selector:
+    app: acumos-postgres
+
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: acumos-postgres
+  namespace: "{{ .Values.namespace }}"
 spec:
   replicas: 1
-  revisionHistoryLimit: 3
-  strategy:
-    type: Recreate
   template:
     metadata:
-      annotations:
-        releasetime: {{ $.Release.Time }}
       labels:
-        app: kibana
+        app: acumos-postgres
     spec:
       containers:
-      - name: kibana
-        image: "{{ .Values.kibana.image.repository}}:{{ .Values.kibana.image.tag}}"
-        imagePullPolicy: {{ .Values.elasticsearch.image.pullPolicy | quote }}
-        ports:
-        - containerPort: {{ .Values.kibana.image.port}}
-        volumeMounts:
-          - name: kibana
-            mountPath: /usr/share/kibana/config/kibana.yml
-            subPath: kibana.yml
-        env:
-        - name: ELASTICSEARCH_URL
-          value: http://elasticsearch.{{ .Values.namespace }}:{{ .Values.elasticsearch.image.port }}
+        - name: acumos-postgres
+          image: postgres:9.6
+          env:
+            - name: POSTGRES_USER
+              value: {{ .Values.acumosKongPostgresUser }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.acumosKongPostgresPassword }}
+            - name: POSTGRES_DB
+              value: {{ .Values.acumosKongPostgresDB }}
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          ports:
+            - containerPort: {{ .Values.acumosKongPostgresPort }}
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: pg-data
       volumes:
-        - name: kibana
-          configMap:
-            name: kibana
-            items:
-            - key: kibana.yml
-              path: kibana.yml
-      imagePullSecrets:
-        - name: acumossecret		  
+        - name: pg-data
+          emptyDir: {}
+

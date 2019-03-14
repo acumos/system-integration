@@ -21,60 +21,50 @@
 appVersion: "1.0.0"
 
 namespace: "acumos-ns01"
-clusterName: "k8-cluster-elk"
-databaseName: "dbname"
-databasePortNo: "3306"
-databaseUserName: "username"
-databasePassword: "password"
-databaseUrl: "acumos-mysql"
+clusterName: "k8-cluster-noncore-components"
 
-elasticsearch:
+docker:
   image:
-    repository: "nexus3.acumos.org:10004/acumos-elasticsearch"
-    tag: "2.0.7"
-    pullPolicy: "IfNotPresent"
-    port: "9200"
+    repository: "docker"
+    tag: "17.06.0-dind"
 
-  persistence:
-    enabled: true
-    pvcName: "elasticsearch-data"
-    size: "10Gi"
+# Ports
+acumosMariaDbPort: "3306"
+acumosOnboardingAppPort: "8090"
+acumosFederationGatewayPort: "9084"
+acumosFederationLocalPort: "9884"
+acumosKongPostgresPort: "5432"
+acumosKongAdminPort: "8001"
+acumosKongProxyPort: "8000"
+acumosKongSslPort: "8443"
+acumosKongAdmSslPort: "8444"
+acumosNexusPort: "8001"
+acumosNexusEndpointPort: "8081"
+acumosProxyPort: "3128"
+acumosDockerPort: "2375"
+acumosDockerPlatformPort: "8002"
 
-  resources:
-    limits:
-      cpu: "750m"
-      memory: "6Gi"
-    requests:
-      cpu: "750m"
-      memory: "4Gi"
+#Nexus
+acumosDockerHost: "acumos-docker-service"
+acumosNexusService: "acumos-nexus-service"
+acumosNexusUsername: "acumos-k8-user-rw"
+acumosNexusPassword: "XXXXXXXXX"
+acumosProxy: "acumos-proxy"
+acumosDockerUsername: "XXXX"
+acumosDockerPassword: "XXXXXx"
+acumosDockerProxyHost: "acumos-docker-proxy-service"
+acumosDockerProxyPort: "8883"
 
-  nodeAffinity: {}
-  nodeSelector: {}
-  tolerations: []
+#Kong
+acumosKongPostgresUser: "kong"
+acumosKongPostgresPassword: "XXXXXX"
+acumosKongPostgresDB: "kong"
+acumosKongPGPassword: "XXXXXXX"
+acumosMariaDbRootPassword: "XXXX"
 
-logstash:
-  image:
-    repository: "nexus3.acumos.org:10004/acumos-logstash"
-    tag: "2.0.7"
-    pullPolicy: "IfNotPresent"
-    port: "5044"
+#PVC
+acumosMariaDbPvcStorage: "1Gi"
+acumosPVCStorage: "2Gi"
+acumosNexusPVCStorage: "50Gi"
 
-kibana:
-  image:
-    repository: "nexus3.acumos.org:10004/acumos-kibana"
-    tag: "2.0.7"
-    pullPolicy: "IfNotPresent"
-    port: "5601"
 
-  tls:
-    crt: 
-    key: 
-  
-  ingress:
-    enabled: false
-    host: ""
-    whitelist:
-      enabled: false
-      ranges: ""
-    letsencrypt:
-      enabled: false

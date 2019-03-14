@@ -1,0 +1,778 @@
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+ name: acumos
+ namespace: "{{ .Values.namespace }}"
+ labels:
+   app: acumos
+spec:
+ selector:
+   matchLabels:
+     app: acumos    
+     tier: frontend
+ replicas: 1
+ template:
+   metadata:
+     labels:
+       app: acumos
+       tier: frontend
+   spec:
+     containers:
+       - name: onboarding-app
+         image: {{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosOnboardingImage }}
+         ports:
+           - containerPort: {{ .Values.acumosOnboardingAppPort }}
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{ "server" :{ 
+                   "port" : {{ .Values.acumosOnboardingAppPort }},
+                   "servlet": {
+                            "context-path": "/onboarding-app"
+                               }
+                      },
+                 "docker" : { 
+                            "host" : "{{ .Values.acumosDockerHost }}.{{ .Values.namespace }}",
+                            "port": {{ .Values.acumosDockerPort }} ,
+                            "config": "/docker_host/.docker",
+                            "registry" :{"url": "http://{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusPort }}/",
+                            "username" : "{{ .Values.acumosNexusUsername }}",
+                            "password" : "{{ .Values.acumosNexusPassword }}", 
+                            "email": "{{ .Values.acumosDockerRegistryEmail }}"},
+                            "tls": { "verify": "false" }, 
+                            "api": { "version": "1.23" },
+                            "imagetag":{
+                                "prefix": "{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusPort }}" 
+                                    },
+                            "max_total_connections":  "1", "max_per_route_connections": "1" 
+                            },
+                 "http_proxy": "http://{{ .Values.acumosProxy }}.{{ .Values.namespace }}:{{ .Values.acumosProxyPort }}",
+                 "nexus": {
+                            "nexusEndPointURL": "http://{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusEndpointPort }}/repository/acumos-k8-models-maven/",
+                            "nexusUserName": "{{ .Values.acumosNexusUsername }}",
+                            "nexusPassword": "{{ .Values.acumosNexusPassword }}",
+                            "nexusproxy": "",
+                            "nexusGroupId": "com.artifact" 
+                           },
+                 "cmndatasvc": {
+                                "cmnDataSvcEndPoinURL": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosCommonDataSvcPort }}/ccds",
+                                "cmnDataSvcUser": "{{ .Values.acumosCdsUser }}",
+                                "cmnDataSvcPwd": "{{ .Values.acumosCdsPassword }}" 
+                               },
+                 "tosca": {
+                            "OutputFolder" : "/temp/",
+                            "GeneratorEndPointURL": "http://acumos.{{ .Values.namespace }}:8080/model_create" 
+                          },
+                 "mktPlace": {
+                              "mktPlaceEndPointURL" : "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosPortalBePort }}"  
+                              },
+                 "microService": {
+                     "microServiceEndPointURL": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosMicroServiceGenerationPort }}/microservice-generation"
+                   },
+                 "requirements": { 
+                                  "extraIndexURL": "",
+                                  "trustedHost": "" 
+                                 }, 
+                 "authenticationServiceURL": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosPortalBePort }}",
+                 "spring": {
+                     "servlet": {
+                       "multipart": {
+                          "max-file-size": "-1",
+                          "max-request-size": "-1"
+                       }
+                     }
+                   },
+                 "base_image": { "rimage": "{{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosOnboardingBaseRImage }}","dockerusername": "{{ .Values.acumosDockerUsername }}","dockerpassword": "{{ .Values.acumosDockerPassword }}"}                   
+                 }'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: acumos-logs
+           - mountPath: /temp
+             name: acumos-output
+       - name: microservice-generation
+         image: {{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosMicroServiceGenerationImage }}
+         ports:
+           - containerPort: {{ .Values.acumosMicroServiceGenerationPort }}
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{
+                   "server":{
+                     "port": {{ .Values.acumosMicroServiceGenerationPort }},
+                     "servlet": {
+                         "context-path": "/microservice-generation"
+                               }
+                   },
+                   "docker": {
+                     "host": "{{ .Values.acumosDockerHost }}.{{ .Values.namespace }}",
+                     "port": "{{ .Values.acumosDockerPort }}",
+                     "config": "/docker_host/.docker",
+                     "registry" :{"url": "http://{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusPort }}/",
+                     "username" : "{{ .Values.acumosNexusUsername }}",
+                     "password" : "{{ .Values.acumosNexusPassword }}", 
+                     "email": "{{ .Values.acumosDockerRegistryEmail }}"},
+                     "tls": {
+                       "verify": "false"
+                     },
+                     "api": {
+                       "version": "1.23"
+                     },
+                     "imagetag": {
+                       "prefix": "{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusPort }}"
+                     },
+                     "max_total_connections": "1",
+                     "max_per_route_connections": "1"
+                   },
+                   "http_proxy": "http://{{ .Values.acumosProxy }}.{{ .Values.namespace }}:{{ .Values.acumosProxyPort }}",
+                   "nexus": {
+                            "nexusEndPointURL": "http://{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusEndpointPort }}/repository/acumos-k8-models-maven/",
+                            "nexusUserName": "{{ .Values.acumosNexusUsername }}",
+                            "nexusPassword": "{{ .Values.acumosNexusPassword }}",
+                            "nexusproxy": "",
+                            "nexusGroupId": "com.artifact" 
+                           },
+                   "cmndatasvc": {
+                                "cmnDataSvcEndPoinURL": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosCommonDataSvcPort }}/ccds",
+                                "cmnDataSvcUser": "{{ .Values.acumosCdsUser }}",
+                                "cmnDataSvcPwd": "{{ .Values.acumosCdsPassword }}" 
+                               },
+                   "mktPlace": {
+                     "mktPlaceEndPointURL": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosPortalBePort }}"
+                   },
+                   "microService": {
+                     "microServiceEndPointURL": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosMicroServiceGenerationPort }}/microservice-generation"
+                   },
+                   "requirements": {
+                     "extraIndexURL": "",
+                     "trustedHost": ""
+                   },
+                   "base_image": {
+                     "rimage": "{{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosOnboardingBaseRImage }}",
+                     "dockerusername": "{{ .Values.acumosDockerUsername }}",
+                     "dockerpassword": "{{ .Values.acumosDockerPassword }}"
+                   },
+                   "spring": {
+                     "servlet": {
+                       "multipart": {
+                          "max-file-size": "-1",
+                          "max-request-size": "-1"
+                       }
+                     }
+                   }
+                 }'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: acumos-logs
+           - mountPath: /temp
+             name: acumos-output
+       - name: kubernetes-client
+         image: {{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosKubernetesClientImage }}
+         ports:
+           - containerPort: {{ .Values.acumosKubernetesClientPort }}
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{
+                   "kube" : {
+                      "incrementPort": "8557",
+                      "singleModelPort": "{{ .Values.acumosDataBrokerPort }}",
+                      "folderPath": "/maven/home",
+                      "singleTargetPort": "{{ .Values.acumosDeployedSolutionPort }}",
+                      "dataBrokerModelPort": "{{ .Values.acumosDataBrokerPort }}",
+                      "dataBrokerTargetPort": "{{ .Values.acumosDataBrokerPort }}",
+                      "mlTargetPort": "{{ .Values.acumosDeployedSolutionPort }}",
+                      "nginxImageName": "nginx",
+                      "nexusEndPointURL": "http://{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusEndpointPort }}/repository/acumos-k8-models-maven/"
+                    },
+                   "dockerproxy": {
+                    "host": "{{ .Values.acumosDockerProxyHost }}",
+                    "port": "{{ .Values.acumosDockerProxyPort }}"
+                    },
+                   "blueprint": {
+                      "port": "{{ .Values.acumosBluePrintPort }}",
+                      "ImageName": "{{ .Values.acumosBluePrintOrchestratorImage }}",
+                      "name": "blueprint-orchestrator"
+                     },
+                   "nexus": {
+                            "nexusEndPointURL": "http://{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusEndpointPort }}/repository/acumos-k8-models-maven/",
+                            "nexusUserName": "{{ .Values.acumosNexusUsername }}",
+                            "nexusPassword": "{{ .Values.acumosNexusPassword }}",
+                            "nexusproxy": "",
+                            "nexusGroupId": "com.artifact" 
+                           },
+                   "cmndatasvc": {
+                                "cmnDataSvcEndPoinURL": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosCommonDataSvcPort }}/ccds",
+                                "cmnDataSvcUser": "{{ .Values.acumosCdsUser }}",
+                                "cmnDataSvcPwd": "{{ .Values.acumosCdsPassword }}" 
+                               },
+                   "probe": {
+                               "probeImageName": "{{ .Values.acumosProtoViewerImage }}",
+                               "probeImagePORT": "{{ .Values.acumosProbePort }}",
+                               "probeModelPort": "{{ .Values.acumosProbePort }}",
+                               "probeTargetPort": "{{ .Values.acumosProbePort }}",
+                               "probeApiPort": "{{ .Values.acumosProbePort }}",
+                               "probeSchemaPort": "80"
+                             }
+                 }'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: acumos-logs            
+       - name: acumos-portal-be
+         image: {{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosPortalBeImage }}
+         ports:
+           - containerPort: {{ .Values.acumosPortalBePort }}
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{ "server" : {
+                   "port" : {{ .Values.acumosPortalBePort }}
+                },
+                "nexus": {
+                        "url": "http://{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusEndpointPort }}/repository/acumos-k8-models-maven",
+                        "proxy": "",
+                        "password": "{{ .Values.acumosNexusPassword }}",
+                        "username": "{{ .Values.acumosNexusUsername }}",
+                        "groupid": "com.artifact"
+                },
+                "cdms" : {
+                  "client" : {
+                     "url": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosCommonDataSvcPort }}/ccds",
+                     "username": "{{ .Values.acumosCdsUser }}",
+                     "password": "{{ .Values.acumosCdsPassword }}"
+                     }
+                },
+                "docker" : {
+                   "host" : "{{ .Values.acumosDockerHost }}.{{ .Values.namespace }}",
+                   "resgistry" : {
+                      "url": "http://{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusPort }}/",
+                      "username" : "{{ .Values.acumosNexusUsername }}",
+                      "password" : "{{ .Values.acumosNexusPassword }}",
+                      "email": "admin@acumos.com"
+                   },
+                   "imagetag" : {
+                       "prefix": "{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusPort }}"
+                   }
+                },
+                "qanda" : {
+                   "url" : "https://{{ .Values.acumosQandAUrl }}"
+                },
+                "image" : {
+                   "size" : "800KB"
+                },
+                "onboarding" : {
+                   "push" : {
+                       "model" : {
+                          "url": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosOnboardingAppPort }}/onboarding-app/v2/models",
+                          "dcae_url": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosMicroServiceGenerationPort }}/microservice-generation/v2/generateMicroservice"
+                          }
+                       },                      
+                      "cliPushUrl": "http://{{ .Values.cliPushService }}:{{ .Values.acumosOnboardingAppPort }}/onboarding-app/v2/models",
+                      "cliAuthUrl": "http://{{ .Values.cliPushService }}:{{ .Values.acumosOnboardingAppPort }}/onboarding-app/v2/auth",
+                      "tokenmode": "apiToken"
+                   },
+                "model" : {
+                   "storage" : {
+                      "folder" : {
+                         "name" : "/acumosWebOnboarding"
+                      }
+                   }
+                },
+                "doc" : {
+                   "url" : "https://wiki.acumos.org"
+                },
+                "document" : {
+                   "size" : 10000000
+                },
+                "jupyter" : {
+                   "url" : "https://acumos.{{ .Values.namespace }}:{{ .Values.acumosJupyterPort }}"
+                },
+                "kubernetes" : {
+                   "doc" : {
+                      "url" : "http://{{ .Values.docUrl }}/"
+                   }
+                },
+                "portal" : {
+                   "mailjet" : {
+                      "api" : {
+                         "key" : "{{ .Values.acumosMailJetApiKey }}"
+                      },
+                      "secret" : {
+                         "key" : "{{ .Values.acumosMailJetSecretKey }}"
+                      },
+                      "address" : {
+                         "from" : "{{ .Values.acumosMailJetId }}"
+                      }
+                   },
+                   "feature" : {
+                      "publishSelfRequestEnabled" : "true",
+                      "validateModel" : "false",
+                      "email_service" : "mailjet",
+                      "cas_enabled" : "false",
+                      "verifyAccount": "false",
+                        "verifyToken": {
+                          "exp_time": 24  
+                        }
+                   },
+                   "cloud_enabled" : "[{\"cloudEnabled\" : \"true\", \"cloudName\" : \"azure\", \"cloudDisplayText\" : \"Microsoft Azure\", \"imageUrl\": \"/images/deploy-cloud/microsoft_azure.png\" },{ \"cloudEnabled\" : \"false\", \"cloudName\" : \"rackspace\", \"cloudDisplayText\" : \"Rackspace\", \"imageUrl\": \"/images/deploy-cloud/rackspace.png\" },{ \"cloudEnabled\" : \"false\",  \"cloudName\" : \"gcp\", \"cloudDisplayText\" : \"Google Cloud Platform\", \"imageUrl\": \"/images/deploy-cloud/google_cloud_platform.png\" },{ \"cloudEnabled\" : \"true\",  \"cloudName\" : \"deploylocal\", \"cloudDisplayText\" : \"Deploy To Local\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_local.png\" },{ \"cloudEnabled\" : \"false\",  \"cloudName\" : \"whitebox\", \"cloudDisplayText\" : \"Deploy To White Box\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_whitebox.png\" }]"
+                   },
+                   "ui" : {
+                      "server" : {
+                           "address" : "https://{{ .Values.acumosHostname }}"
+                      }
+                   },                   
+                   "dashboard":{
+                       "url" : "http://{{ .Values.acumosELKHost }}:{{ .Values.acumosKibanaPort }}"
+                   },                 
+                "client" : {
+                   "ssl" : {
+                      "key-store" : "/app/certs/acumos-k8s.pkcs12",
+                      "key-store-password" : "{{ .Values.acumosKeyStorePwd }}",
+                      "key-store-type" : "PKCS12",
+                      "key-password" : "{{ .Values.acumosKeyStorePwd }}",
+                      "trust-store" : "/app/certs/acumosTrustStore.jks",
+                      "trust-store-password" : "{{ .Values.acumosTrustStorePwd }}"
+                   }
+                 },
+                 "gateway" : {
+                    "url" : "https://acumos.acumos-ns01:{{ .Values.acumosFederationLocalPort }}"
+                 },
+                 "dcae" : {
+                    "model" : {
+                       "name" : {
+                          "prefix" : "ONAP"
+                       }
+                    }
+                },
+                "jwt" : {
+                   "auth" : {
+                      "timeout" : "80000000"
+                   }
+                },
+                 "cas"  : {
+                    "service" : {
+                       "validate" : {
+                            "url"  : "https://identity.linuxfoundation.org/cas/serviceValidate"
+                       }
+                    }
+                } }'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: acumos-logs
+           - mountPath: /app/certs
+             name: acumos-certs
+           - mountPath: /acumosWebOnboarding
+             name: acumos-webonboarding                
+       - name: acumos
+         image: {{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosPortalFeImage }}
+         ports:
+          - containerPort: {{ .Values.acumosPortalFePort }}
+            name: acumos
+         env:
+           - name: ACUMOS_DB_HOST
+             value: acumos-mysql.{{ .Values.namespace }}
+           - name: ACUMOS_DB_PASSWORD
+             value: {{ .Values.acumosMariaDbRootPassword }}
+           - name: SPRING_APPLICATION_JSON
+             value: '{ "server" : {
+                    "port" : {{ .Values.acumosPortalFePort }}
+                },
+               "qanda" : {
+                        "url" : "https://stackoverflow.com/questions/tagged/acumos"
+                    },
+               "zuul" : {
+                   "routes" : {
+                      "api" : {
+                        "url": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosPortalBePort }}"
+                      },
+                      "dsce": {
+                        "url": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosPortalDsCompositionPort }}"
+                      },
+                      "site" : {
+                        "url": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosCmsPort }}"
+                      },
+                      "cmnt" : {
+                         "url" : "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosPlatOnPort }}"
+                      },
+                      "azure" : {
+                          "url" : "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosAzureClientPort }}"
+                      },
+                      "openstack" : {
+                          "path": "/openstack/**",
+                          "url": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosOpenStackClientPort }}",
+                          "stripPrefix": "false",
+                          "sensitiveHeaders": ""
+                        },
+                      "package": {
+                          "path": "/package/**",
+                          "url": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosKubernetesClientPort }}",
+                          "stripPrefix": "true",
+                          "sensitiveHeaders": ""
+                        }
+                   },
+                   "host" : {
+                      "connect-timeout-millis" : 300000,
+                      "socket-timeout-millis" : 300000
+                   }
+               },
+               "spring" : {
+                  "http" : {
+                     "multipart" : {
+                        "max-file-size": -1,
+                        "max-request-size": -1
+                     }
+                  }
+               }
+               }'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: acumos-logs               
+       - name:  acumos-cms-docker
+         image: {{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosCmsImage }}
+         ports:
+          - containerPort: {{ .Values.acumosCmsPort }}
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{ "server" : {
+                    "port" : {{ .Values.acumosCmsPort }}
+                },
+                "spring" : {
+                    "datasource" : {
+                        "url" : "jdbc:mysql://acumos-mysql.{{ .Values.namespace }}:{{ .Values.acumosMariaDbPort }}/{{ .Values.acumosCMSDb }}?useSSL=false",
+                        "username" : "{{ .Values.acumosCmsUser }}",
+                        "password" : "{{ .Values.acumosCmsPassword }}"
+                  }
+                },
+                "parameters": {
+                   "repository" : {
+                      "dataSource" : {
+                         "url" : "jdbc:mysql://acumos-mysql.{{ .Values.namespace }}:{{ .Values.acumosMariaDbPort }}/{{ .Values.acumosCMSDb }}?useSSL=false",
+                         "username" : "{{ .Values.acumosCmsUser }}",
+                         "password" : "{{ .Values.acumosCmsPassword }}"
+                      }
+                   }
+                } }'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: acumos-logs                
+       - name:  ds-compositionengine
+         image: {{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosDesignStudioImage }}
+         ports:
+           - containerPort: {{ .Values.acumosPortalDsCompositionPort }}
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{ "server": {
+                    "port": {{ .Values.acumosPortalDsCompositionPort }} 
+                    },
+                    "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
+                    "solutionResultsetSize": "2000",
+                    "gdmJarName":"gdmservice-1.2.0.jar",
+                    "cdsCheckInterval": 20000,
+                    "cdsCheckAttempt": 7,
+                    "imagedatabrokerURI":"{{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosDataBrokerImage }}",
+                    "csvdatabrokerURI":"{{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosCsvDataBrokerImage }}",                    
+                    "sqldatabrokerURI": "{{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosSqlDataBrokerImage }}",
+                    "jsondatabrokerURI": "NA",
+                    "lib":"/maven/",
+                    "tosca": { "outputfolder": "/temp/output/" },
+                "nexus": { 
+                         "nexusendpointurl": "http://{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusEndpointPort }}/repository/acumos-k8-models-maven/",
+                         "nexusproxy": "",
+                         "nexuspassword": "{{ .Values.acumosNexusPassword }}",
+                         "nexususername": "{{ .Values.acumosNexusUsername }}",
+                         "nexusgroupid": "com.artifact" 
+                         },
+                "cmndatasvc": { 
+                              "cmndatasvcendpoinurl": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosCommonDataSvcPort }}/ccds",
+                              "cmndatasvcuser": "{{ .Values.acumosCdsUser }}",
+                              "cmndatasvcpwd": "{{ .Values.acumosCdsPassword }}" 
+                              },
+                "docker": {
+                           "host": "{{ .Values.acumosDockerHost }}.{{ .Values.namespace }}",
+                           "port": {{ .Values.acumosDockerPort }},
+                           "config": "/docker_host/.docker",
+                           "registry": {
+                                        "url": "http://{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusPort }}/",
+                                        "username": "{{ .Values.acumosNexusUsername }}",
+                                        "password": "{{ .Values.acumosNexusPassword }}",
+                                        "email": "{{ .Values.acumosDockerRegistryEmail }}"
+                                            },
+                            "tls": {"verify": "false"},
+                            "api": {"version": "1.23"},
+                            "imagetag": {
+                                        "prefix": "{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusPort }}"
+                                            },
+                            "max_total_connections": "1",
+                            "max_per_route_connections": "1"
+                            } }'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: acumos-logs
+           - mountPath: /temp
+             name: acumos-output                            
+       - name:  common-data-svc
+         image: {{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosCdsImage }}
+         ports:
+           - containerPort: {{ .Values.acumosCommonDataSvcPort }}
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{ "server" : { 
+                 "port" : {{ .Values.acumosCommonDataSvcPort }} },
+                "spring" : { 
+                            "datasource" : {
+                                        "jdbc-url" : "jdbc:mariadb://{{ .Values.acumosMariaDbUrl }}.{{ .Values.namespace }}:{{ .Values.acumosMariaDbPort }}/{{ .Values.acumosCdsDb }}?useLegacyDatetimeCode=false&useSSL=false",
+                                        "username" : "{{ .Values.acumosMariaDbUser }}",
+                                        "password" : "{{ .Values.acumosMariaDbPassword }}"
+                                        },
+                            "jpa" : {
+                                    "database-platform" : "org.hibernate.dialect.MariaDB102Dialect",
+                                     "hibernate" : { 
+                                            "ddl-auto" : "validate" 
+                                             },
+                                          "show-sql" : false
+                                     },
+                             "security" : {
+                             "user" : {
+                                      "name": "{{ .Values.acumosCdsUser }}",
+                                      "password": "{{ .Values.acumosCdsPassword }}"
+                                      }
+                             }
+ 
+                             }
+                     }'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: acumos-logs                     
+       - name: azure-client
+         image: {{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosAzureClientImage }}
+         ports:
+           - containerPort: {{ .Values.acumosAzureClientPort }}
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{ 
+                    "server": {
+                      "port": "{{ .Values.acumosAzureClientPort }}"
+                    },
+                    "docker": {
+                      "containerNamePrefix": "{{ .Values.acumosAzureContainerNamePrefix }}",
+                      "host": "{{ .Values.acumosDockerHost }}.{{ .Values.namespace }}",
+                      "port": "{{ .Values.acumosDockerPort }}",
+                      "dockerVMUserName": "{{ .Values.acumosDeployedVMUser }}",
+                      "dockerVMPassword": "{{ .Values.acumosDeployedVMPassword }}",
+                      "replaceChar": "^",
+                      "ignordoller": "TRUE",
+                      "solutionPort": "{{ .Values.acumosDeployedSolutionPort }}",
+                      "subnet": "{{ .Values.acumosAzureSubnet }}",
+                      "vnet": "{{ .Values.acumosAzureVnet }}",
+                      "sleepTimeFirst": "30000",
+                      "sleepTimeSecond": "50000",
+                      "nexusRegistyUserName": "{{ .Values.acumosRWUserName }}",
+                      "nexusRegistyPwd": "{{ .Values.acumosRWUserPassword }}",
+                      "nexusRegistyName": "{{ .Values.nexus3RegistryName }}",
+                      "otherRegistyName": "",
+                      "nginxMapFolder": "/home/artifacts",
+                      "nginxWebFolder": "/usr/share/nginx/html",
+                      "nginxImageName": "nginx:latest",
+                      "nginxInternalPort": "80",
+                      "exposeDataBrokerPort": "{{ .Values.acumosDataBrokerPort }}",
+                      "internalDataBrokerPort": "{{ .Values.acumosDataBrokerInternalPort }}",
+                      "registry": {
+                        "bluePrint": {
+                          "username": "{{ .Values.acumosRWUserName }}",
+                          "password": "{{ .Values.acumosRWUserPassword }}"
+                        },
+                        "probe": {
+                          "username": "{{ .Values.acumosRWUserName }}",
+                          "password": "{{ .Values.acumosRWUserPassword }}"
+                        },
+                        "networkgroupName": "{{ .Values.acumosAzureNetworkGroupName }}",
+                        "port": "80",
+                        "name": "{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusPort }}",
+                        "url": "http://{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusPort }}/",
+                        "username": "{{ .Values.acumosNexusUsername }}",
+                        "password": "{{ .Values.acumosNexusPassword }}"
+                      }
+                    },
+                    "blueprint": {
+                      "ImageName": "{{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosBluePrintOrchestratorImage }}",
+                      "name": "blueprint-orchestrator"
+                    },
+                    "nexus": {
+                      "url": "http://{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusEndpointPort }}/repository/acumos-k8-models-maven/",
+                      "nexusproxy": "NA",
+                      "password": "{{ .Values.acumosNexusPassword }}",
+                      "username": "{{ .Values.acumosNexusUsername }}",
+                      "groupId": "com.artifact"
+                    },
+                    "cmndatasvc": {
+                      "cmndatasvcendpoinurl": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosCommonDataSvcPort }}/ccds",
+                      "cmndatasvcuser": "{{ .Values.acumosCdsUser }}",
+                      "cmndatasvcpwd": "{{ .Values.acumosCdsPassword }}"
+                    },
+                    "probe": {
+                      "ImageName": "{{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosProtoViewerImage }}",
+                      "name": "proto_viewer",
+                      "internalPort": "{{ .Values.acumosProbePort }}",
+                      "probeNexusEndPoint": "http://{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusEndpointPort }}/repository/acumos-k8-models-maven"
+                    }
+                  }'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: acumos-logs
+       - name: acumos-openstack-client
+         image: {{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosOpenStackImage }}
+         ports:
+           - containerPort: {{ .Values.acumosOpenStackClientPort }}
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{ 
+                    "server": {
+                      "port": "{{ .Values.acumosOpenStackClientPort }}"
+                    },
+                    "docker": {
+                        "openstack": {
+                        "flavourName": "e6emedium",
+                        "securityGroupName": "{{ .Values.acumosSecurityGroupName }}",
+                        "endpoint": "http://{{ .Values.acumosOpenStackEndpoint }}/identity/v3",
+                        "userName": "{{ .Values.acumosOpenStackEndpointUsername }}",
+                        "password": "{{ .Values.acumosOpenStackEndpointPassword }}",
+                        "scopeProject": "7badda19df524dd58c2fe249fd02e7f6",
+                        "IdentifierName": "Default",
+                        "key": "e6e-key",
+                        "keyName": "/maven/home/e6e-key.pem",
+                        "vmRegisterNumber": "2600",
+                        "hostOpenStack": "{{ .Values.acumosOpenStackEndpoint }}",
+                        "hostUserName": "{{ .Values.acumosOpenStackHostUsername }}",
+                        "vmUserName": "{{ .Values.acumosOpenStackVMUsername }}",
+                        "dockerUserName": "{{ .Values.acumosNexusUsername }}",
+                        "dockerPassword": "{{ .Values.acumosNexusPassword }}",
+                        "bluePrintName": "blueprint-orchestrator",
+                        "bluePrintImageName": "{{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosBluePrintOrchestratorImage }}",
+                        "bluePrintUserName": "{{ .Values.acumosDockerUsername }}",
+                        "bluePrintPassword": "{{ .Values.acumosDockerPassword }}",
+                        "solutionPort":"{{ .Values.acumosOpenStackSolutionPort }}",
+                        "Sleeptime":"180000",
+                        "proxyIP":"{{ .Values.acumosOpenStackProxyIp }}",
+                        "proxyPort":"{{ .Values.acumosProxyPort }}",
+                        "openStackIP":"{{ .Values.acumosOpenStackEndpoint }}",
+                        "bluePrintPortNumber":"{{ .Values.acumosBluePrintPort }}"
+                         }
+                    },
+                    "nexus": {
+                      "url": "http://{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusEndpointPort }}/repository/acumos-k8-models-maven/",
+                      "nexusproxy": "NA",
+                      "password": "{{ .Values.acumosNexusPassword }}",
+                      "username": "{{ .Values.acumosNexusUsername }}",
+                      "groupId": "com.artifact"
+                    },
+                    "cmndatasvc": {
+                      "cmndatasvcendpoinurl": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosCommonDataSvcPort }}/ccds",
+                      "cmndatasvcuser": "{{ .Values.acumosCdsUser }}",
+                      "cmndatasvcpwd": "{{ .Values.acumosCdsPassword }}"
+                    }
+                  }'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: acumos-logs
+           - mountPath: /app/certs
+             name: acumos-certs             
+       - name: filebeat
+         image: {{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosFilebeatImage }}
+         ports:
+           - containerPort: {{ .Values.acumosFilebeatPort }}
+         env:
+           - name: LOGSTASH_HOST
+             value: {{ .Values.acumosLogstashHost }}.{{ .Values.namespace }}
+           - name: LOGSTASH_PORT
+             value: "{{ .Values.acumosLogstashPort }}"
+         volumeMounts:
+           - mountPath: /filebeat-logs
+             name: acumos-logs             
+       - name:  federation-gateway
+         image: {{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosFederationImage }}
+         ports:
+           - containerPort: {{ .Values.acumosFederationGatewayPort }}
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{ "federation" : {
+               "instance" : "gateway",
+               "instance.name" : "k8",
+               "operator" : "d468656f-57d0-46e3-9f94-7ffa4f66dc03",
+               "address" : "0.0.0.0",
+               "server" : {
+                 "port" : {{ .Values.acumosFederationGatewayPort }}
+               },
+               "ssl" : {
+                 "key-store" : "/app/certs/acumos-k8s.pkcs12",
+                 "key-store-password" : "{{ .Values.acumosKeyStorePwd }}",
+                 "key-store-type" : "PKCS12",
+                 "key-password" : "{{ .Values.acumosKeyStorePwd }}",
+                 "trust-store" : "/app/certs/acumosTrustStore.jks",
+                 "trust-store-password" : "{{ .Values.acumosTrustStorePwd }}"
+               }
+             },
+             "local" : {
+               "address": "0.0.0.0",
+               "server": {
+                 "port" : {{ .Values.acumosFederationLocalPort }}
+               },
+               "ssl" : {
+                 "key-store" : "/app/certs/acumos-k8s.pkcs12",
+                 "key-store-password" : "{{ .Values.acumosKeyStorePwd }}",
+                 "key-store-type" : "PKCS12",
+                 "key-password" : "{{ .Values.acumosKeyStorePwd }}",
+                 "trust-store" : "/app/certs/acumosTrustStore.jks",
+                 "trust-store-password" : "{{ .Values.acumosTrustStorePwd }}"
+               }
+             },
+             "nexus": {
+               "nexusendpointurl": "http://{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusEndpointPort }}/repository/acumos-k8-models-maven/",
+               "nexusproxy": "",
+               "nexuspassword": "{{ .Values.acumosNexusPassword }}",
+               "nexususername": "{{ .Values.acumosNexusUsername }}",
+               "nexusgroupid": "com.artifact"
+             },
+             "peer": {
+               "jobchecker": {
+                 "interval": 300
+               }
+             },
+             "cdms" : {
+               "client" : {
+                 "url": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosCommonDataSvcPort }}/ccds",
+                 "username": "{{ .Values.acumosCdsUser }}",
+                 "password": "{{ .Values.acumosCdsPassword }}"
+               }
+             }}'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: acumos-logs
+           - mountPath: /app/certs
+             name: acumos-certs
+     volumes:
+       - name: acumos-logs
+         persistentVolumeClaim:
+           claimName: acumos-volumeclaim
+       - name: acumos-output
+         persistentVolumeClaim:
+           claimName: acumos-output-volumeclaim
+       - name: acumos-certs
+         persistentVolumeClaim:
+           claimName: acumos-certs-volumeclaim
+       - name: acumos-webonboarding
+         persistentVolumeClaim:
+           claimName: acumos-webonboarding-volumeclaim
+     imagePullSecrets:
+       - name: acumossecret

@@ -1,7 +1,7 @@
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
-# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
 # ===================================================================================
 # This Acumos software file is distributed by AT&T and Tech Mahindra
 # under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: acumos-kong-deployment
-  namespace: ${ACUMOS_NAMESPACE}
+  namespace: "{{ .Values.namespace }}"
 spec:
   replicas: 1
   template:
@@ -33,11 +33,11 @@ spec:
         image: kong:0.11.0
         env:
           - name: KONG_ADMIN_LISTEN
-            value: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
+            value: "0.0.0.0:{{ .Values.acumosKongAdminPort }}, 0.0.0.0:{{ .Values.acumosKongAdmSslPort }} ssl"
           - name: KONG_PG_PASSWORD
-            value: ${ACUMOS_KONG_PG_PASSWORD}
+            value: {{ .Values.acumosKongPGPassword }}
           - name: KONG_PG_HOST
-            value: acumos-postgres.${ACUMOS_NAMESPACE}
+            value: acumos-postgres.{{ .Values.namespace }}
           - name: KONG_PROXY_ACCESS_LOG
             value: "/dev/stdout"
           - name: KONG_ADMIN_ACCESS_LOG
@@ -48,14 +48,15 @@ spec:
             value: "/dev/stderr"
         ports:
         - name: acumos-admin
-          containerPort: ${ACUMOS_KONG_ADMIN_PORT}
+          containerPort: {{ .Values.acumosKongAdminPort }}
           protocol: TCP
         - name: acumos-proxy
-          containerPort: ${ACUMOS_KONG_PROXY_PORT}
+          containerPort: {{ .Values.acumosKongProxyPort }}
           protocol: TCP
         - name: acumos-kong-ssl
-          containerPort: ${ACUMOS_KONG_SSL_PORT}
+          containerPort: {{ .Values.acumosKongSslPort }}
           protocol: TCP
         - name: acumos-adm-ssl
-          containerPort: ${ACUMOS_KONG_ADM_SSL_PORT}
+          containerPort: {{ .Values.acumosKongAdmSslPort }}
           protocol: TCP
+

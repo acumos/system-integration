@@ -15,20 +15,44 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
-{{- if .Values.elasticsearch.persistence.enabled }}
-kind: PersistentVolumeClaim
-apiVersion: v1
+apiVersion: extensions/v1beta1
+kind: Deployment
 metadata:
   labels:
-    app: elasticsearch
-  name: {{ .Values.elasticsearch.persistence.pvcName }}
+    app: acumos-proxy
+  name: acumos-proxy
   namespace: "{{ .Values.namespace }}"
-  annotations:
-    "helm.sh/resource-policy": Delete
 spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: {{ .Values.elasticsearch.persistence.size }}
-{{- end }}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: acumos-proxy
+    spec:
+      containers:
+        - name: acumos-proxy
+          image: sameersbn/squid:3.3.8-23
+          env:
+          - name: SQUID_CACHE_SIZE
+            value: "70000"
+          - name: SQUID_CACHE_MEM
+            value: "2048"
+          ports:
+          - containerPort: {{ .Values.acumosProxyPort }}
+            protocol: TCP
+          volumeMounts:
+            - mountPath: /var/cache/squid
+              name: squid-cache
+            - mountPath: /var/log/squid
+              name: squid-log
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.acumosProxyPort }}
+            initialDelaySeconds: 40
+            timeoutSeconds: 4
+      volumes:
+        - name: squid-cache
+          emptyDir: {}
+        - name: squid-log
+          emptyDir: {}
+
