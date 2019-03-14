@@ -1,0 +1,153 @@
+# ===================================================================================
+# Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+# Default values for elasticsearch.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+appVersion: "1.0.0"
+
+namespace: "acumos-ns01"
+clusterName: "k8-cluster-acumos"
+nexus3ReleaseRegistryLf: "nexus3.acumos.org:10004"
+nexus3RegistryName: "nexus3.acumos.org"
+# Ports
+acumosMariaDbPort: "3306"
+acumosMariaDbRootPassword: "XXXXXXX"
+acumosPortalFePort: "8085"
+acumosCmsPort: "9080"
+acumosPortalBePort: "8083"
+acumosPortalDsCompositionPort: "8088"
+acumosCommonDataSvcPort: "8000"
+acumosOnboardingAppPort: "8090"
+acumosFederationGatewayPort: "9084"
+acumosFederationLocalPort: "9884"
+acumosPlatOnPort: "9083"
+acumosAzureClientPort: "9081"
+acumosKongPostgresPort: "5432"
+acumosKongAdminPort: "8001"
+acumosKongProxyPort: "8000"
+acumosKongSslPort: "8443"
+acumosKongAdmSslPort: "8444"
+acumosNexusPort: "8001"
+acumosNexusEndpointPort: "8081"
+acumosProxyPort: "3128"
+acumosDockerPort: "2375"
+acumosValidationPort: "9603"
+acumosKibanaPort: "5601"
+acumosDeployedSolutionPort: "3330"
+acumosDataBrokerPort: "8556"
+acumosDataBrokerInternalPort: "8080"
+acumosDockerPlatformPort: "8002"
+acumosProbePort: "5006"
+acumosFilebeatPort: "5000"
+acumosOpenStackClientPort: "8007"
+acumosBluePrintPort: "8555"
+acumosOpenStackSolutionPort: "8336"
+acumosMetricBeatPort: "8098"
+acumosElasticSearchPort: "9200"
+acumosLogstashPort: "5044"
+acumosMicroServiceGenerationPort: "8333"
+acumosKubernetesClientPort: "8082"
+acumosJupyterPort: "8086"
+
+# Images
+acumosOnboardingImage: "onboarding-app:2.7.0"
+acumosPortalBeImage: "acumos-portal-be:2.2.5"
+acumosPortalFeImage: "acumos-portal-fe:2.2.5"
+acumosCmsImage: "acumos-cms-docker:1.3.5"
+acumosDesignStudioImage: "ds-compositionengine:2.0.6"
+acumosDataBrokerImage: "databroker-zipbroker:1.0.0"
+acumosCsvDataBrokerImage: "csvdatabroker:1.4.0"
+acumosCdsImage: "common-dataservice:2.1.2"
+acumosFederationImage: "federation-gateway:2.1.1"
+acumosFilebeatImage: "acumos-filebeat:2.0.7"
+acumosLogstashImage: "acumos-logstash:2.0.7"
+acumosKibanaImage: "acumos-kibana:2.0.7"
+acumosElasticsearchImage: "acumos-elasticsearch:2.0.7"
+acumosMetricBeatImage: "acumos-metricbeat:2.0.7"
+acumosAzureClientImage: "acumos-azure-client:2.0.8"
+acumosOpenStackImage: "openstack-client:2.0.8"
+acumosProtoViewerImage: "acumos_proto_viewer:1.5.7"
+acumosBluePrintOrchestratorImage: "blueprint-orchestrator:2.0.11"
+acumosOnboardingBaseRImage: "onboarding-base-r:1.0"
+acumosMicroServiceGenerationImage: "microservice-generation:2.6.0"
+acumosSqlDataBrokerImage: "sqldatabroker:1.2.0"
+acumosH20GenericJavaModelRunnerImage: "h2o-genericjava-modelrunner-2.2.3"
+acumosKubernetesClientImage: "kubernetes-client:2.0.3"
+
+#Nexus
+acumosDockerHost: "acumos-docker-service"
+acumosNexusService: "acumos-nexus-service"
+acumosNexusUsername: "XXXXX"
+acumosNexusPassword: "XXXXX"
+acumosProxy: "acumos-proxy"
+acumosDockerUsername: "XXXXX"
+acumosDockerPassword: "XXXXX"
+acumosDockerProxyHost: "acumos-docker-proxy-service"
+acumosDockerProxyPort: "8883"
+
+#Azure client
+acumosDeployedVMUser: "XXXXX"
+acumosDeployedVMPassword: "XXXXXXXXXX"
+acumosRWUserPassword: "XXXXX"
+acumosRWUserName: "XXXXX"
+acumosAzureContainerNamePrefix: "acumos-e6e"
+acumosAzureSubnet: "XXXXX-OAM-vsubnet"
+acumosAzureVnet: "XXXXX-OAM-XXXXX"
+acumosAzureNetworkGroupName: "E6E-XXXXX"
+
+#OpenStack client
+acumosSecurityGroupName: "E6E-Access"
+acumosOpenStackEndpoint: "XXXXX"
+acumosOpenStackEndpointUsername: "XXXXX"
+acumosOpenStackEndpointPassword: "XXXXX"
+acumosOpenStackProxyIp: "XXXXX"
+acumosOpenStackHostUsername: "v"
+acumosOpenStackVMUsername: "XXXXX"
+
+#Kong and Database
+acumosCdsDb: "CDS"
+acumosCdsUser: "ccds_client"
+acumosCdsPassword: "XXXXXX"
+acumosMariaDbUser: "XXXXXX"
+acumosMariaDbPassword: "XXXXX"
+acumosMariaDbUrl: "acumos-mysql"
+acumosCMSDb: "acumos_CMS"
+acumosCmsUser: "CMS_USER"
+acumosCmsPassword: "XXXXX"
+acumosKongPostgresUser: "kong"
+acumosKongPostgresPassword: "XXXXX"
+acumosKongPostgresDB: "kong"
+acumosKongPGPassword: "XXXXX"
+
+#PVC
+acumosMariaDbPvcStorage: "1Gi"
+acumosPVCStorage: "2Gi"
+acumosNexusPVCStorage: "50Gi"
+
+acumosQandAUrl: "stackoverflow.com"
+acumosMailJetId: "raikwar.vikas@gmail.com"
+acumosMailJetApiKey: "XXXXXXXXXXXXXXXXXXXX"
+acumosMailJetSecretKey: "XXXXXXXXXXXXXXXXXXXXXXXXX"
+acumosTrustStorePwd: "XXXXX"
+acumosKeyStorePwd: "XXXXX"
+acumosDockerRegistryEmail: "username@domain.com"
+acumosLogstashHost: "logstash-service"
+acumosELKHost: ""
+acumosHostname: "domain.com"
+cliPushService: "XXXXX"
+docUrl: "docs.acumos.org"
+
+

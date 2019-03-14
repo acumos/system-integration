@@ -1,5 +1,3 @@
-# ===============LICENSE_START=======================================================
-# Acumos Apache-2.0
 # ===================================================================================
 # Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
 # ===================================================================================
@@ -15,20 +13,64 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
-{{- if .Values.elasticsearch.persistence.enabled }}
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   labels:
-    app: elasticsearch
-  name: {{ .Values.elasticsearch.persistence.pvcName }}
+    app: acumos
+  name: acumos-volumeclaim
   namespace: "{{ .Values.namespace }}"
-  annotations:
-    "helm.sh/resource-policy": Delete
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Values.elasticsearch.persistence.size }}
-{{- end }}
+      storage: {{ .Values.acumosPVCStorage }}
+
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: acumos-certs-volumeclaim
+  namespace: "{{ .Values.namespace }}"
+  labels:
+    app: acumos-certs-volumeclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.acumosPVCStorage }}
+
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: acumos-output-volumeclaim
+  namespace: "{{ .Values.namespace }}"
+  labels:
+    app: acumos-output-volumeclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.acumosPVCStorage }}
+
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: acumos-webonboarding-volumeclaim
+  namespace: "{{ .Values.namespace }}"
+  labels:
+    app: acumos-webonboarding-volumeclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.acumosPVCStorage }}

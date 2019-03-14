@@ -39,14 +39,14 @@ spec:
         image: "{{ .Values.kibana.image.repository}}:{{ .Values.kibana.image.tag}}"
         imagePullPolicy: {{ .Values.elasticsearch.image.pullPolicy | quote }}
         ports:
-        - containerPort: 5601
+        - containerPort: {{ .Values.kibana.image.port}}
         volumeMounts:
           - name: kibana
             mountPath: /usr/share/kibana/config/kibana.yml
             subPath: kibana.yml
         env:
         - name: ELASTICSEARCH_URL
-          value: http://elasticsearch.{{ .Values.namespace }}:9200
+          value: http://elasticsearch.{{ .Values.namespace }}:{{ .Values.elasticsearch.image.port }}
       volumes:
         - name: kibana
           configMap:

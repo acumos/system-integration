@@ -22,12 +22,18 @@ appVersion: "1.0.0"
 
 namespace: "acumos-ns01"
 clusterName: "k8-cluster-elk"
+databaseName: "dbname"
+databasePortNo: "3306"
+databaseUserName: "username"
+databasePassword: "password"
+databaseUrl: "acumos-mysql"
 
 elasticsearch:
   image:
     repository: "nexus3.acumos.org:10004/acumos-elasticsearch"
-    tag: "1.18.2"
+    tag: "2.0.7"
     pullPolicy: "IfNotPresent"
+    port: "9200"
 
   persistence:
     enabled: true
@@ -49,11 +55,26 @@ elasticsearch:
 logstash:
   image:
     repository: "nexus3.acumos.org:10004/acumos-logstash"
-    tag: "1.18.2"
+    tag: "2.0.7"
     pullPolicy: "IfNotPresent"
+    port: "5044"
 
 kibana:
   image:
     repository: "nexus3.acumos.org:10004/acumos-kibana"
-    tag: "1.18.2"
+    tag: "2.0.7"
     pullPolicy: "IfNotPresent"
+    port: "5601"
+
+  tls:
+    crt: 
+    key: 
+  
+  ingress:
+    enabled: false
+    host: ""
+    whitelist:
+      enabled: false
+      ranges: ""
+    letsencrypt:
+      enabled: false
