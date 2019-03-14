@@ -25,7 +25,7 @@ metadata:
 spec:
   ports:
     - name: elasticsearch
-      port: 9200
-      targetPort: 9200
+      port: {{ .Values.elasticsearch.image.port }}
+      targetPort: {{ .Values.elasticsearch.image.port }}
   selector:
     app: elasticsearch

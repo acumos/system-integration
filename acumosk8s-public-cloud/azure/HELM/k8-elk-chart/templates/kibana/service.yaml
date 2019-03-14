@@ -26,7 +26,7 @@ spec:
   type: LoadBalancer
   ports:
   - name: kibana
-    port: 5601
-    targetPort: 5601
+    port: {{ .Values.kibana.image.port}}
+    targetPort: {{ .Values.kibana.image.port}}
   selector:
     app: kibana

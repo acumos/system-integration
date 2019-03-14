@@ -1,0 +1,62 @@
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  labels:
+    app: acumos-docker
+  name: acumos-docker
+  namespace: "{{ .Values.namespace }}"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: acumos-docker
+    spec:
+      volumes:
+      - name: docker-volume
+        emptyDir: {}
+      # Docker-commands-container
+      containers:
+      - name: acumos-docker-cmds
+        image: {{ .Values.docker.image.repository }}:{{ .Values.docker.image.tag }}
+        securityContext: 
+            privileged: true 
+        command: ['docker', 'run', '-p', '80:80', 'httpd:latest']
+        env:
+          - name: DOCKER_HOST
+            value: "tcp://0.0.0.0:{{ .Values.acumosDockerPort }}"
+        ports:
+        - name: acumos-docport
+          containerPort: {{ .Values.acumosDockerPort }}
+          protocol: TCP
+      # Docker-Daemon-container
+      - name: acumos-docker-daemon
+        image: {{ .Values.docker.image.repository }}:{{ .Values.docker.image.tag }}
+        securityContext: 
+            privileged: true
+        env:
+          - name: DIND_INSECURE_REGISTRIES
+            value: "[\"0.0.0.0/0\"]"
+          - name: DOCKER_OPTS
+            value: '--insecure-registry={{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusPort }}'
+        args: ["$(DOCKER_OPTS)"]
+        volumeMounts:
+        - name: docker-volume
+          mountPath: /var/lib/docker

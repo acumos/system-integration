@@ -16,17 +16,23 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 apiVersion: v1
-kind: ConfigMap
+kind: Service
 metadata:
-  name: elasticsearch
+  name: acumos-nexus-service
   namespace: "{{ .Values.namespace }}"
   labels:
-    app: elasticsearch
-data:
-  elasticsearch.yml: |
-    cluster.name: "{{ .Values.clusterName }}"
-    path.data: /usr/share/elasticsearch/data
-    network.host: "0.0.0.0"
-    discovery.zen.ping.unicast.hosts: elasticsearch.{{ .Values.namespace }}
-    discovery.zen.minimum_master_nodes: 1
+    app: acumos-nexus
+spec:
+  type: LoadBalancer
+  ports:
+  - port: {{ .Values.acumosNexusEndpointPort }}
+    targetPort: {{ .Values.acumosNexusEndpointPort }}
+    protocol: TCP
+    name: admin-http
+  - port: {{ .Values.acumosNexusPort }}
+    targetPort: {{ .Values.acumosNexusPort }}
+    protocol: TCP
+    name: docker-port 
+  selector:
+    app: acumos-nexus
 

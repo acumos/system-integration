@@ -15,18 +15,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
-apiVersion: v1
-kind: ConfigMap
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: elasticsearch
+  name: acumos-kong-migration
   namespace: "{{ .Values.namespace }}"
-  labels:
-    app: elasticsearch
-data:
-  elasticsearch.yml: |
-    cluster.name: "{{ .Values.clusterName }}"
-    path.data: /usr/share/elasticsearch/data
-    network.host: "0.0.0.0"
-    discovery.zen.ping.unicast.hosts: elasticsearch.{{ .Values.namespace }}
-    discovery.zen.minimum_master_nodes: 1
+spec:
+  template:
+    metadata:
+      name: acumos-kong-migration
+    spec:
+      containers:
+      - name: acumos-kong-migration
+        image: kong:0.11.0
+        env:
+          - name: KONG_NGINX_DAEMON
+            value: 'off'
+          - name: KONG_PG_PASSWORD
+            value: {{ .Values.acumosKongPGPassword }}
+          - name: KONG_PG_HOST
+            value: acumos-postgres.{{ .Values.namespace }}
+        command: [ "/bin/sh", "-c", "kong migrations up" ]
+      restartPolicy: Never
 

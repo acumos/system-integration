@@ -15,18 +15,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
-apiVersion: v1
-kind: ConfigMap
+apiVersion: extensions/v1beta1
+kind: Deployment
 metadata:
-  name: elasticsearch
-  namespace: "{{ .Values.namespace }}"
-  labels:
-    app: elasticsearch
-data:
-  elasticsearch.yml: |
-    cluster.name: "{{ .Values.clusterName }}"
-    path.data: /usr/share/elasticsearch/data
-    network.host: "0.0.0.0"
-    discovery.zen.ping.unicast.hosts: elasticsearch.{{ .Values.namespace }}
-    discovery.zen.minimum_master_nodes: 1
+ name: acumos-mysql
+ namespace: "{{ .Values.namespace }}"
+ labels:
+   app: acumos 
+spec:
+ replicas: 1
+ selector:
+   matchLabels:
+     app: acumos
+     tier: mysql
+ template:
+   metadata:
+     labels:
+       app: acumos
+       tier: mysql
+   spec:
+     containers:
+       - name: mysql
+         image: mariadb
+         ports:
+           - containerPort: {{ .Values.acumosMariaDbPort }}
+             name: mysql
+         env:
+           - name: MYSQL_ROOT_PASSWORD
+             value: {{ .Values.acumosMariaDbRootPassword }}
+         volumeMounts:
+           - name: mariadb-persistent-storage
+             mountPath: /var/lib/mysql
+     volumes:
+       - name: mariadb-persistent-storage
+         persistentVolumeClaim:
+           claimName: acumos-mariadb-volumeclaim
 

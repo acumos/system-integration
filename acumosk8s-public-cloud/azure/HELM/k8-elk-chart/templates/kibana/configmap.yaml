@@ -26,9 +26,4 @@ data:
   kibana.yml: |
     server.name: kibana
     server.host: "0"
-    elasticsearch.url: http://elasticsearch.{{ .Values.namespace }}:9200
-    xpack.security.enabled: false
-    xpack.monitoring.enabled: false
-    xpack.ml.enabled: false
-    xpack.graph.enabled: false
-    xpack.reporting.enabled: false
+    elasticsearch.url: http://elasticsearch.{{ .Values.namespace }}:{{ .Values.elasticsearch.image.port }}
