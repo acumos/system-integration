@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "befac8f7_4f4a6adf",
+        "filename": "AIO/oneclick_deploy.sh",
+        "patchSetId": 17
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-03-25T19:37:50Z",
+      "side": 1,
+      "message": "Docker is installed",
+      "revId": "4e0c1d3f95293ebb30f583b664a84bab1ae30c56",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ea0bd02_0ec64e90",
+        "filename": "AIO/setup_prereqs.sh",
+        "patchSetId": 17
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-03-25T19:37:50Z",
+      "side": 1,
+      "message": "Please validate that all 4 arguments are present, not empty; script should exit if not.",
+      "range": {
+        "startLine": 316,
+        "startChar": 0,
+        "endLine": 316,
+        "endChar": 23
+      },
+      "revId": "4e0c1d3f95293ebb30f583b664a84bab1ae30c56",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
