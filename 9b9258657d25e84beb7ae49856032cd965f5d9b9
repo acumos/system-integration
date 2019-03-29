@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0e3e94b1_bd7a4e03",
+        "filename": "AIO/setup_prereqs.sh",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-03-29T13:27:36Z",
+      "side": 1,
+      "message": "May I please request you name this setup-prereqs.sh with a hyphen (not underscore) to be consistent with other scripts?",
+      "revId": "9b9258657d25e84beb7ae49856032cd965f5d9b9",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
