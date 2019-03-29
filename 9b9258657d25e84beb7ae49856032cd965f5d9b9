@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5a7cecd9_7dd5eb62",
+        "filename": "AIO/setup_prereqs.sh",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2019-03-29T15:52:16Z",
+      "side": 1,
+      "message": "That\u0027s on my list for Sprint 5 (consistency cleanups).",
+      "parentUuid": "0e3e94b1_bd7a4e03",
+      "revId": "9b9258657d25e84beb7ae49856032cd965f5d9b9",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c5c380aa_ecdab3c7",
         "filename": "AIO/setup_prereqs.sh",
         "patchSetId": 22
@@ -30,6 +48,24 @@
       "writtenOn": "2019-03-29T13:45:40Z",
       "side": 1,
       "message": "Please extend this to recognize -help/--help, something to explain the 4 required arguments.",
+      "revId": "9b9258657d25e84beb7ae49856032cd965f5d9b9",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ab41f096_8ed88641",
+        "filename": "AIO/setup_prereqs.sh",
+        "patchSetId": 22
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2019-03-29T15:52:16Z",
+      "side": 1,
+      "message": "OK, I\u0027ll put that on the list for the next commit (Sprint 5). Verifying/validating input options and providing a \u0027usage\u0027 hint is something I can do.",
+      "parentUuid": "c5c380aa_ecdab3c7",
       "revId": "9b9258657d25e84beb7ae49856032cd965f5d9b9",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
