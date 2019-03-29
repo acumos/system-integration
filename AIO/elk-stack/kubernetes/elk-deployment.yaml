@@ -55,17 +55,17 @@ spec:
         - containerPort: 9200
         volumeMounts:
         - mountPath: /usr/share/elasticsearch/data
-          name: pv-<ACUMOS_ELK_NAMESPACE>-elasticsearch-data
+          name: elasticsearch-data
 # https://github.com/elastic/beats/issues/8253 (similar issue)
         securityContext:
           privileged: true
       restartPolicy: Always
       volumes:
-      - name: pv-<ACUMOS_ELK_NAMESPACE>-elasticsearch-data
+      - name: elasticsearch-data
         persistentVolumeClaim:
           claimName: pvc-<ACUMOS_ELK_NAMESPACE>-elasticsearch-data
       hostAliases:
-      - ip: "<ACUMOS_ELK_HOST>"
+      - ip: "<ACUMOS_ELK_HOST_IP>"
         hostnames:
         - "<ACUMOS_ELK_DOMAIN>"
 ---
@@ -111,9 +111,12 @@ spec:
         - containerPort: 5000
       restartPolicy: Always
       hostAliases:
-      - ip: "<ACUMOS_ELK_HOST>"
+      - ip: "<ACUMOS_ELK_HOST_IP>"
         hostnames:
         - "<ACUMOS_ELK_DOMAIN>"
+      - ip: "<ACUMOS_MARIADB_HOST_IP>"
+        hostnames:
+        - "<ACUMOS_MARIADB_HOST>"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -147,6 +150,6 @@ spec:
           privileged: true
       restartPolicy: Always
       hostAliases:
-      - ip: "<ACUMOS_ELK_HOST>"
+      - ip: "<ACUMOS_ELK_HOST_IP>"
         hostnames:
         - "<ACUMOS_ELK_DOMAIN>"

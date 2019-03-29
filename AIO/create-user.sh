@@ -36,65 +36,117 @@
 #.  role: optional role to set for the user (e.g. "admin")
 #
 
-function register_user() {
-  if [[ "$ACUMOS_DEPLOY_KONG" == "true" ]]; then
-    portal_base=https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT
-  else
-    portal_base=http://$ACUMOS_DOMAIN:$ACUMOS_PORTAL_FE_NODEPORT
-  fi
+function fail() {
+  reason="$1"
+  if [[ "$1" == "" ]]; then reason="unknown failure at $fname $fline"; fi
+  log "$reason"
+  exit 1
+}
 
-  curl -k -s -o /tmp/json -X POST $portal_base/api/users/register \
-    -H "Content-Type: application/json" \
-    -d "{\"request_body\":{ \"firstName\":\"$firstName\",
-         \"lastName\":\"$lastName\", \"emailId\":\"$emailId\",
-         \"username\":\"$username\", \"password\":\"$password\",
-         \"active\":true}}"
+function log() {
+  fname=$(caller 0 | awk '{print $2}')
+  fline=$(caller 0 | awk '{print $1}')
+  echo; echo "$fname:$fline ($(date)) $1"
+}
+
+function find_user() {
+  log "Find user $1"
+  local tmp="/tmp/$(uuidgen)"
+  curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
+    -k https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/user
+  users=$(jq -r '.content | length' $tmp)
+  i=0; userId=""
+  while [[ $i -lt $users && "$userId" == "" ]] ; do
+    if [[ "$(jq -r ".content[$i].loginName" $tmp)" == "$1" ]]; then
+      userId=$(jq -r ".content[$i].userId" $tmp)
+    fi
+    ((i++))
+  done
+  rm $tmp
+}
+
+function register_user() {
+  trap 'fail' ERR
+  local jsoninp="/tmp/$(uuidgen)"
+  cat <<EOF >$jsoninp
+{
+"request_body": {
+  "firstName":"$firstName",
+  "lastName":"$lastName",
+  "emailId":"$emailId",
+  "username":"$username",
+  "password":"$password",
+  "active":true
+  }
+}
+EOF
+  local jsonout="/tmp/$(uuidgen)"
+  local apiurl="https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT/api/users/register"
+  curl -k -s -o $jsonout -X POST $apiurl \
+    -H "Content-Type: application/json" -d @$jsoninp
+  i=0
+  while [[ "$(echo $jsonout | jq '.created')" != "" ]]; do
+    echo $jsonout
+    sleep 10
+    ((++i))
+    if [[ $i -eq 6 ]]; then
+      rm $jsoninp $jsonout
+      fail "Unable to register user after 1 minute"
+    fi
+    curl -k -s -o $jsonout -X POST $apiurl \
+      -H "Content-Type: application/json" -d @$jsoninp
+  done
+  rm $jsonout $jsoninp
 }
 
 function find_role() {
   trap 'fail' ERR
+  local tmp="/tmp/$(uuidgen)"
   log "Finding role name $1"
-  curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/role
-  roles=$(jq -r '.content | length' /tmp/json)
+  curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
+    -k https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/role
+  roles=$(jq -r '.content | length' $tmp)
   i=0; roleId=""
-  trap - ERR
   while [[ $i -lt $roles && "$roleId" == "" ]] ; do
-    name=$(jq -r ".content[$i].name" /tmp/json)
+    name=$(jq -r ".content[$i].name" $tmp)
     if [[ "$name" == "$1" ]]; then
-      roleId=$(jq -r ".content[$i].roleId" /tmp/json)
+      roleId=$(jq -r ".content[$i].roleId" $tmp)
     fi
-    ((i++))
+    ((++i))
   done
-  trap 'fail' ERR
+  rm $tmp
 }
 
 function create_role() {
   trap 'fail' ERR
   log "Create role name $1"
-  curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST \
-  http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/role \
+  local tmp="/tmp/$(uuidgen)"
+  curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST \
+  -k https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/role \
     -H "accept: */*" -H "Content-Type: application/json" \
     -d "{\"name\": \"$1\", \"active\": true}"
-  created=$(jq -r '.created' /tmp/json)
+  created=$(jq -r '.created' $tmp)
   if [[ "$created" == "null" ]]; then
-    cat /tmp/json
+    cat $tmp
     fail "Role $1 creation failed"
   fi
-  roleId=$(jq -r '.roleId' /tmp/json)
+  roleId=$(jq -r '.roleId' $tmp)
   log "Role name $1 created with roleId=$roleId"
+  rm $tmp
 }
 
 function assign_role() {
   trap 'fail' ERR
   log "Assign roleId $2 to userId $1"
-  curl -s -o /tmp/json -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST \
-    http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/user/$1/role/$2
-  status=$(jq -r '.status' /tmp/json)
+  local tmp="/tmp/$(uuidgen)"
+  curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST \
+    -k https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/user/$1/role/$2
+  status=$(jq -r '.status' $tmp)
   if [[ $status -ne 200 ]]; then
-    cat /tmp/json
+    cat $tmp
     fail "Role assignment failed, status $status"
   fi
+  rm $tmp
 }
 
 function setup_user() {
@@ -103,15 +155,6 @@ function setup_user() {
   if [[ "$userId" == "" ]]; then
     log "Create user $username"
     register_user
-    while [[ $(grep -c -e "An unexpected error occurred" -e "The upstream server is timing out" -e "An invalid response was received from the upstream server" /tmp/json) -gt 0 ]] ; do
-      log "Portal user registration API is not yet active, waiting 10 seconds"
-      sleep 10
-      register_user
-    done
-    if [[ "$(jq -r '.error_code' /tmp/json)" != "100" ]]; then
-      cat /tmp/json
-      fail "User account creation failed"
-    fi
     find_user $username
     log "Portal user $username created with userId=$userId"
   else
@@ -127,12 +170,12 @@ function setup_user() {
   fi
   log "Resulting user account record"
   curl -s -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT/ccds/user/$userId
+    -k https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/user/$userId
 }
 
+set -x
 trap 'fail' ERR
 source acumos-env.sh
-source utils.sh
 
 if [[ $# -ge 5 ]]; then
   username=$1
@@ -144,5 +187,5 @@ if [[ $# -ge 5 ]]; then
   setup_user
   log "User creation is complete"
 else
-  grep '#. ' $0 | sed -i -- 's/#.//g'
+  grep '#. ' $0 | sedi 's/#.//g'
 fi

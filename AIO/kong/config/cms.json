@@ -1,0 +1,15 @@
+{
+  "strip_uri": false,
+  "name": "cms",
+  "http_if_terminated": false,
+  "https_only": false,
+  "upstream_url": "http://cms-service:9080",
+  "uris": [
+    "/cms"
+  ],
+  "preserve_host": false,
+  "upstream_connect_timeout": 60000,
+  "upstream_read_timeout": 600000,
+  "upstream_send_timeout": 600000,
+  "retries": 5
+}
