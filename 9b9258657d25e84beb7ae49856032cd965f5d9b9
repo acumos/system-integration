@@ -16,6 +16,46 @@
       "revId": "9b9258657d25e84beb7ae49856032cd965f5d9b9",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c5c380aa_ecdab3c7",
+        "filename": "AIO/setup_prereqs.sh",
+        "patchSetId": 22
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-03-29T13:45:40Z",
+      "side": 1,
+      "message": "Please extend this to recognize -help/--help, something to explain the 4 required arguments.",
+      "revId": "9b9258657d25e84beb7ae49856032cd965f5d9b9",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1151c134_ec84e323",
+        "filename": "AIO/setup_prereqs.sh",
+        "patchSetId": 22
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-03-29T13:45:40Z",
+      "side": 1,
+      "message": "Please extend to detect empty/missing arguments and give up instead of continuing. I have made this error now multiple times and the script blithely continues then crashes.",
+      "range": {
+        "startLine": 314,
+        "startChar": 0,
+        "endLine": 314,
+        "endChar": 23
+      },
+      "revId": "9b9258657d25e84beb7ae49856032cd965f5d9b9",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
