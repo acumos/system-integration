@@ -97,11 +97,11 @@ for updated instructions.
   * avoid re-configuration of user's workstation where possible
   * migrate tools from kubernetes-client repo
 
-* `ACUMOS-2512: Move End User Guides Back to Component Repos so Projects have sole control <https://jira.acumos.org/browse/ACUMOS-2512>`
+* `ACUMOS-2512: Move End User Guides Back to Component Repos so Projects have sole control <https://jira.acumos.org/browse/ACUMOS-2512>`_
 
   * `Add oneclick-deploy content <https://gerrit.acumos.org/r/#/c/3770/>`_
 
-* `ACUMOS-2424: AIO support for user-supplied CA and server certs <https://jira.acumos.org/browse/ACUMOS-2424`_
+* `ACUMOS-2424: AIO support for user-supplied CA and server certs <https://jira.acumos.org/browse/ACUMOS-2424>`_
 
   * `AIO support for user-supplied CA and server certs <https://gerrit.acumos.org/r/#/c/3679/>`_
 
