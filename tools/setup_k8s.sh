@@ -25,8 +25,12 @@
 # - This script downloaded to a folder on the server to be the k8s master node
 # - key-based SSH setup between the k8s master node and other nodes
 # - 192.168.0.0/16 should not be used on your server network interface subnets
-# - If redeploying, stop any current cluster first with:
+# - If redeploying, stop/reset any current cluster first with:
 #   sudo kubeadm reset
+#   sudo iptables -F && sudo iptables -t nat -F && sudo iptables -t mangle -F && sudo iptables -X
+#   sudo rm /var/lib/cni/networks/k8s-pod-network/*
+#     # Per https://github.com/cloudnativelabs/kube-router/issues/383
+#     # coredns will stays "containerCreating" if no available pod IPs
 #
 # Usage: on the master node,
 # $ git clone git clone https://gerrit.acumos.org/r/kubernetes-client

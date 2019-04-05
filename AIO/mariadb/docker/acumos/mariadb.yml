@@ -33,7 +33,7 @@ services:
       MYSQL_PASSWORD: "${ACUMOS_MARIADB_USER_PASSWORD}"
     volumes:
       - type: bind
-        source: /var/${ACUMOS_MARIADB_NAMESPACE}/mariadb-data
+        source: /mnt/${ACUMOS_MARIADB_NAMESPACE}/mariadb-data
         target: /var/lib/mysql
 
   mariadb-adminer:
