@@ -36,14 +36,13 @@ services:
            - ${ACUMOS_DOCKER_MODEL_PORT}:${ACUMOS_DOCKER_MODEL_PORT}
        volumes:
            - type: bind
-             source: /var/${ACUMOS_NAMESPACE}/logs
+             source: /mnt/${ACUMOS_NAMESPACE}/logs
              target: /maven/logs
            - type: bind
-             source: /var/${ACUMOS_NAMESPACE}/nexus-data
+             source: /mnt/${ACUMOS_NAMESPACE}/nexus-data
              target: /nexus-data
        logging:
            driver: json-file
        extra_hosts:
            - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
        restart: on-failure
-

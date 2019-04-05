@@ -68,7 +68,8 @@ services:
                    \"mktPlaceEndPointURL\": \"http://portal-be-service:8083\"
                },
                \"microService\": {
-                   \"microServiceEndPointURL\": \"http://msg-service:8336\"
+                   \"microServiceEndPointURL\": \"http://msg-service:8336\",
+                   \"microServiceAsyncFlag\": \"false\"
                },
                \"requirements\": {
                    \"extraIndexURL\": \"${PYTHON_EXTRAINDEX}\",
@@ -96,10 +97,10 @@ services:
            - cds-service
        volumes:
            - type: bind
-             source: /var/${ACUMOS_NAMESPACE}/logs
+             source: /mnt/${ACUMOS_NAMESPACE}/logs
              target: /maven/logs
            - type: bind
-             source: /var/${ACUMOS_NAMESPACE}/output
+             source: /mnt/${ACUMOS_NAMESPACE}/output
              target: /temp/
        logging:
            driver: json-file
