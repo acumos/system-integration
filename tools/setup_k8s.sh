@@ -2,7 +2,7 @@
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
-# Copyright (C) 2017-2018 AT&T Intellectual Property. All rights reserved.
+# Copyright (C) 2017-2019 AT&T Intellectual Property. All rights reserved.
 # ===================================================================================
 # This Acumos software file is distributed by AT&T and Tech Mahindra
 # under the Apache License, Version 2.0 (the "License");
@@ -25,12 +25,16 @@
 # - This script downloaded to a folder on the server to be the k8s master node
 # - key-based SSH setup between the k8s master node and other nodes
 # - 192.168.0.0/16 should not be used on your server network interface subnets
-# - If redeploying, stop any current cluster first with:
+# - If redeploying, stop/reset any current cluster first with:
 #   sudo kubeadm reset
+#   sudo iptables -F && sudo iptables -t nat -F && sudo iptables -t mangle -F && sudo iptables -X
+#   sudo rm /var/lib/cni/networks/k8s-pod-network/*
+#     # Per https://github.com/cloudnativelabs/kube-router/issues/383
+#     # coredns will stays "containerCreating" if no available pod IPs
 #
 # Usage: on the master node,
-# $ git clone git clone https://gerrit.acumos.org/r/kubernetes-client
-# $ cd kubernetes-client/deploy/private
+# $ git clone git clone https://gerrit.acumos.org/r/system-integration
+# $ cd system-integration/tools
 # $ bash setup_k8s.sh "[nodes]"
 #   nodes: quoted, space-separated list of k8s worker nodes. If no nodes are
 #          specified a single all-in-one (AIO) cluster will be installed. To
@@ -336,7 +340,7 @@ EOF
     while [[ "$status" != "Ready" ]]; do
       log "node $host is \"$status\", waiting 10 seconds"
       status=$(kubectl get nodes | awk "/$host/ {print \$2}")
-      ((tries++))
+      tries=$((tries+1))
       if [[ tries -gt 18 ]]; then
         log "node $host is \"$status\" after 3 minutes; resetting kubeadm"
         ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \

@@ -25,7 +25,7 @@ services:
     image: acumos-elasticsearch
     volumes:
       - type: bind
-        source: /var/${ACUMOS_ELK_NAMESPACE}/elasticsearch-data
+        source: /mnt/${ACUMOS_ELK_NAMESPACE}/elasticsearch-data
         target: /usr/share/elasticsearch/data
     ports:
     #Node client default listens at 9200, metricbeat and logstash index data into Elasticsearch using this port.
@@ -54,8 +54,7 @@ services:
       - elasticsearch-service
     restart: on-failure
     extra_hosts:
-      - "${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_HOST_IP}"           
-
+      - "${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_HOST_IP}"
 
   kibana-service:
     image: acumos-kibana
