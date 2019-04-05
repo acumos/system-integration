@@ -90,10 +90,10 @@ services:
            - cds-service
        volumes:
            - type: bind
-             source: /var/${ACUMOS_NAMESPACE}/logs
+             source: /mnt/${ACUMOS_NAMESPACE}/logs
              target: /maven/logs
            - type: bind
-             source: /var/${ACUMOS_NAMESPACE}/certs
+             source: /mnt/${ACUMOS_NAMESPACE}/certs
              target: /app/certs
        logging:
            driver: json-file

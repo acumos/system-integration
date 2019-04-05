@@ -25,7 +25,7 @@
 #
 # Prerequisites:
 # - Ubuntu Xenial (16.04), Bionic (18.04), or Centos 7 hosts
-# - acumos-env.sh and mariadb-env.sh created and saved in the AIO_ROOT folder
+# - acumos_env.sh and mariadb_env.sh created and saved in the AIO_ROOT folder
 #
 # Usage:
 # $ bash setup_mariadb_.sh <AIO_ROOT>
@@ -92,6 +92,6 @@ EOF
   fi
 }
 
-source $1/acumos-env.sh
+source $1/acumos_env.sh
 source $1/utils.sh
 setup_mariadb_client

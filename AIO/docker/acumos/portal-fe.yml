@@ -78,7 +78,7 @@ services:
            - portal-be-service
        volumes:
            - type: bind
-             source: /var/${ACUMOS_NAMESPACE}/logs
+             source: /mnt/${ACUMOS_NAMESPACE}/logs
              target: /maven/logs
        logging:
            driver: json-file
