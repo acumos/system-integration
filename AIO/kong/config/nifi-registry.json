@@ -1,0 +1,15 @@
+{
+  "strip_uri": false,
+  "name": "nifi-registry",
+  "http_if_terminated": false,
+  "https_only": true,
+  "upstream_url": "https://nifi-registry-service:18080",
+  "uris": [
+    "/nifi-registry/"
+  ],
+  "preserve_host": false,
+  "upstream_connect_timeout": 60000,
+  "upstream_read_timeout": 600000,
+  "upstream_send_timeout": 600000,
+  "retries": 5
+}

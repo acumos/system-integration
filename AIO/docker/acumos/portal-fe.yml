@@ -34,9 +34,6 @@ services:
                       \"dsce\": {
                         \"url\": \"http://dsce-service:8088\"
                       },
-                      \"site\": {
-                        \"url\": \"http://cms-service:9080\"
-                      },
                       \"cmnt\": {
                         \"url\": \"http://delete-me\"
                       },
@@ -78,7 +75,7 @@ services:
            - portal-be-service
        volumes:
            - type: bind
-             source: /var/${ACUMOS_NAMESPACE}/logs
+             source: /mnt/${ACUMOS_NAMESPACE}/logs
              target: /maven/logs
        logging:
            driver: json-file

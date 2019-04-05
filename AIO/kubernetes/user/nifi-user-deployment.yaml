@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# What this is: kubernetes template for Acumos NiFi user service deployment
+# Uses Kong plugins
+# - https://docs.konghq.com/hub/kong-inc/request-transformer/
+# - https://docs.konghq.com/hub/kong-inc/cors/
+
+kind: Deployment
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: nifi-<NIFI_USER>
+  labels:
+     app: nifi-<NIFI_USER>
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+       app: nifi-<NIFI_USER>
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+         app: nifi-<NIFI_USER>
+    spec:
+      containers:
+      - name: nifi-<NIFI_USER>
+        image: apache/nifi:1.9.0
+        env:
+        - name: NIFI_WEB_PROXY_CONTEXT_PATH
+          value: "/nifi-<NIFI_USER>/"
+        - name: NIFI_USER
+          value: "<NIFI_USER>"
+        - name: ACUMOS_DOMAIN
+          value: "<ACUMOS_DOMAIN>"
+        - name: ACUMOS_KONG_PROXY_SSL_PORT
+          value: "<ACUMOS_KONG_PROXY_SSL_PORT>"
+        command: ['/bin/bash', '-c']
+        args:
+        - set -x;
+          curl -X DELETE http://kong-admin-service:8001/apis/nifi-$$NIFI_USER;
+          curl -X POST http://kong-admin-service:8001/apis
+          --data "strip_uri=true"
+          --data "name=nifi-$$NIFI_USER"
+          --data "http_if_terminated=false"
+          --data "https_only= true"
+          --data "upstream_url=http://nifi-$$NIFI_USER-service:8080/"
+          --data "uris=/nifi-$$NIFI_USER/"
+          --data "preserve_host=false"
+          --data "upstream_connect_timeout=60000"
+          --data "upstream_read_timeout=600000"
+          --data "upstream_send_timeout=600000"
+          --data "retries=5";
+          curl -X POST http://kong-admin-service:8001/apis/nifi-$$NIFI_USER/plugins
+          --data "name=request-transformer"
+          --data "config.add.headers=X-ProxyScheme:https,X-ProxyHost:$$ACUMOS_DOMAIN,X-ProxyPort:$$ACUMOS_KONG_PROXY_SSL_PORT,X-ProxyContextPath:/nifi-$$NIFI_USER/";
+          curl -X POST http://kong-admin-service:8001/apis/nifi-$$NIFI_USER/plugins
+          --data "name=cors"
+          --data "config.origins=*"
+          --data "config.methods=GET, POST"
+          --data "config.headers=Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Auth-Token"
+          --data "config.max_age=3600";
+          cd /opt/nifi/nifi-current/;
+          sed -i -- "s~nifi.web.proxy.context.path=.*~nifi.web.proxy.context.path=$$NIFI_WEB_PROXY_CONTEXT_PATH~" conf/nifi.properties;
+          cat conf/nifi.properties;
+          cat ../scripts/start.sh;
+          ../scripts/start.sh;
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: /opt/nifi/nifi-current/logs/
+          name: logs
+      restartPolicy: Always
+      volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: pvc-<ACUMOS_NAMESPACE>-logs

@@ -62,9 +62,6 @@ spec:
       restartPolicy: Always
       volumes:
       - name: mariadb-data
-#        hostPath:
-#          path: /var/<ACUMOS_MARIADB_NAMESPACE>/mariadb-data
-# TODO: debug access issues with PVC
         persistentVolumeClaim:
           claimName: pvc-<ACUMOS_MARIADB_NAMESPACE>-mariadb-data
       hostAliases:
