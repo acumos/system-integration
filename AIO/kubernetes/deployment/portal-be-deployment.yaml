@@ -51,7 +51,7 @@ spec:
                       "contextPath": "/"
                     },
                     "docker": {
-                      "host": "docker-dind-service",
+                      "host": "<ACUMOS_DOCKER_API_HOST>",
                       "port": "<ACUMOS_DOCKER_API_PORT>",
                       "registry": {
                         "url": "http://<ACUMOS_DOCKER_REGISTRY_HOST>:<ACUMOS_DOCKER_MODEL_PORT>/",

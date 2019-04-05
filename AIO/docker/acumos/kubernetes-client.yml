@@ -75,7 +75,7 @@ services:
            - 8082
        volumes:
            - type: bind
-             source: /var/${ACUMOS_NAMESPACE}/logs
+             source: /mnt/${ACUMOS_NAMESPACE}/logs
              target: /maven/logs
        logging:
            driver: json-file

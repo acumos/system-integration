@@ -66,7 +66,7 @@ spec:
                       }
                     },
                     "docker": {
-                      "host": "tcp://docker-dind-service:<ACUMOS_DOCKER_API_PORT>",
+                      "host": "tcp://<ACUMOS_DOCKER_API_HOST>:<ACUMOS_DOCKER_API_PORT>",
                       "registryURL": "http://<ACUMOS_DOCKER_REGISTRY_HOST>:<ACUMOS_DOCKER_MODEL_PORT>/",
                       "registryUsername": "<ACUMOS_NEXUS_RW_USER>",
                       "registryPassword": "<ACUMOS_NEXUS_RW_USER_PASSWORD>",

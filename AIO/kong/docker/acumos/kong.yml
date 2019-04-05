@@ -30,7 +30,7 @@ services:
          - 5432
        volumes:
          - type: bind
-           source: /var/${ACUMOS_NAMESPACE}/kong-db
+           source: /mnt/${ACUMOS_NAMESPACE}/kong-db
            target: /var/lib/postgresql
    kong-service:
        restart: on-failure
