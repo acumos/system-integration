@@ -21,7 +21,9 @@ version: '3.2'
 #
 services:
   metricbeat-service:
-    image: ${ACUMOS_METRICBEAT_IMAGE}
+# Have to build locally due to incorrect reference to {ELASTICSEARCH_HOST}:5601
+#    image: ${ACUMOS_METRICBEAT_IMAGE}
+    image: acumos-metricbeat
     network_mode: host
     volumes:
     #Mount the host filesystem to enable Metricbeat to monitor the host rather than the Metricbeat container.
