@@ -22,7 +22,7 @@
 #
 # Prerequisites:
 # - Ubuntu Xenial or Centos 7 server
-# - acumos-env.sh customized for this platform, as by oneclick_deploy.sh
+# - acumos_env.sh customized for this platform, as by oneclick_deploy.sh
 #
 # Usage: intended to be called from oneclick_deploy.sh and other scripts via
 # - source $AIO_ROOT/utils.sh
@@ -38,9 +38,9 @@ function fail() {
   cd $AIO_ROOT
   reason="$1"
   if [[ "$1" == "" ]]; then reason="unknown failure at $fname $fline"; fi
-  if [[ -e $AIO_ROOT/acumos-env.sh ]]; then
-    sedi "s/DEPLOY_RESULT=.*/DEPLOY_RESULT=fail/" acumos-env.sh
-    sedi "s/FAIL_REASON=.*/FAIL_REASON=\"$reason\"/" acumos-env.sh
+  if [[ -e $AIO_ROOT/acumos_env.sh ]]; then
+    sedi "s/DEPLOY_RESULT=.*/DEPLOY_RESULT=fail/" acumos_env.sh
+    sedi "s/FAIL_REASON=.*/FAIL_REASON=\"$reason\"/" acumos_env.sh
   fi
   log "$reason"
   exit 1
@@ -89,7 +89,12 @@ function create_acumos_registry_secret() {
   fi
 
   log "Create k8s secret for image pulling from docker"
-  b64=$(cat $HOME/.docker/config.json | base64 -w 0)
+  get_host_info
+  if [[ "$HOST_OS" == "macos" ]]; then
+    b64=$(cat $HOME/.docker/config.json | base64)
+  else
+    b64=$(cat $HOME/.docker/config.json | base64 -w 0)
+  fi
   cat <<EOF >acumos-registry.yaml
 apiVersion: v1
 kind: Secret
@@ -129,7 +134,7 @@ function delete_namespace() {
         sleep 10
       done
     fi
-  elif [[ $(kubectl get namespace $1) != "" ]]; then
+  elif [[ $(kubectl get namespace $1) ]]; then
     kubectl delete namespace $1
     while kubectl get namespace $1 ; do
       log "Waiting for namespace $1 to be deleted"
@@ -200,12 +205,12 @@ function setup_pv() {
   local namespace=$2
   local size=$3
   local owner=$4
-  local path=/var/$namespace/$1
+  local path=/mnt/$namespace/$1
   local name=pv-${namespace}-$pv
-  if [[ ! -e /var/$namespace ]]; then
-    log "Creating /var/$namespace as PV root folder"
-    sudo mkdir /var/$namespace
-    sudo chown $ACUMOS_HOST_USER:$ACUMOS_HOST_USER /var/$namespace
+  if [[ ! -e /mnt/$namespace ]]; then
+    log "Creating /mnt/$namespace as PV root folder"
+    sudo mkdir /mnt/$namespace
+    sudo chown $ACUMOS_HOST_USER:$ACUMOS_HOST_USER /mnt/$namespace
   fi
   if [[ ! -e $path ]]; then
     sudo mkdir -p $path
@@ -244,7 +249,7 @@ function delete_pv() {
   trap 'fail' ERR
   local pv=$1
   local namespace=$2
-  local path=/var/$namespace/$1
+  local path=/mnt/$namespace/$1
   local name=pv-${namespace}-$pv
   if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
     if [[ "$($k8s_cmd get pv $name)" != "" ]]; then
@@ -271,7 +276,7 @@ function wait_until_notfound() {
   local result=$($cmd)
   while [[ $(echo $result | grep -c "$what") -gt 0 ]]; do
     log "Waiting 10 seconds"
-    ((++i))
+    i=$((i+1))
     if [[ $i -eq $max ]]; then
       fail "Request did not succeed in $max tries"
     fi
@@ -289,7 +294,7 @@ function wait_until_success() {
   while ! $cmd ; do
     log "Command \"$cmd\" failed, waiting 10 seconds"
     sleep 10
-    ((++i))
+    i=$((i+1))
     if [[ $i -eq $max ]]; then
       fail "Request did not succeed in $max tries"
     fi
@@ -332,10 +337,10 @@ function inspect_pods_for_app() {
     while [[ $j -lt $nc ]] ; do
       name=$(echo $pods | jq ".items[$i].spec.containers[$j].name")
       kubectl logs -n $ACUMOS_NAMESPACE -l app=$app -c $name
-      ((++j))
+      j=$((j+1))
     done
     kubectl logs -n $namespace $pod
-    ((++i))
+    i=$((i+1))
   done
 }
 
@@ -347,7 +352,7 @@ function wait_running() {
   t=1
   check_running $app $namespace
   while [[ "$status" != "Running" && $t -le 30 ]]; do
-    ((t++))
+    t=$((t+1))
     sleep 10
     check_running $app $namespace
   done
@@ -441,8 +446,8 @@ function update_env() {
   # Reuse existing values if set
   if [[ "${!1}" == "" || "$3" == "force" ]]; then
     export $1=$2
-    log "Updating acumos-env.sh with \"export $1=$2\""
-    sedi "s~$1=.*~$1=$2~" $AIO_ROOT/acumos-env.sh
+    log "Updating acumos_env.sh with \"export $1=$2\""
+    sedi "s~$1=.*~$1=$2~" $AIO_ROOT/acumos_env.sh
   fi
 }
 
@@ -501,7 +506,7 @@ function save_logs() {
           echo "***** $name *****" >>  $logs/$app.log
           kubectl logs -n $ACUMOS_NAMESPACE -l app=$app -c $name >>  $logs/$app.log
         done
-        ((i++))
+        i=$((i+1))
       done
       rm $tmp
     fi
@@ -521,7 +526,7 @@ function find_user() {
     if [[ "$(jq -r ".content[$i].loginName" $tmp)" == "$1" ]]; then
       userId=$(jq -r ".content[$i].userId" $tmp)
     fi
-    ((i++))
+    i=$((i+1))
   done
   rm $tmp
   trap 'fail' ERR
@@ -546,8 +551,8 @@ function get_host_ip() {
   log "Determining host IP address for $1"
   if [[ $(host $1 | grep -c 'not found') -eq 0 ]]; then
     HOST_IP=$(host $1 | head -1 | cut -d ' ' -f 4)
-  elif [[ $(grep -c -P " $1( |$)" /etc/hosts) -gt 0 ]]; then
-    HOST_IP=$(grep -P "$1( |$)" /etc/hosts | cut -d ' ' -f 1)
+  elif [[ $(grep -c -E   " $1( |$)" /etc/hosts) -gt 0 ]]; then
+    HOST_IP=$(grep -E "$1( |$)" /etc/hosts | cut -d ' ' -f 1)
   else
     log "Please ensure $1 is resolvable thru DNS or hosts file"
     fail "IP address of $1 cannot be determined."
