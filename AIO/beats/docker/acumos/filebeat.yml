@@ -24,7 +24,7 @@ services:
     image: ${ACUMOS_FILEBEAT_IMAGE}
     volumes:
       - type: bind
-        source: /var/${ACUMOS_NAMESPACE}/logs
+        source: /mnt/${ACUMOS_NAMESPACE}/logs
         target: /filebeat-logs
     environment:
       - LOGSTASH_HOST=${ACUMOS_ELK_DOMAIN}

@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# What this is: kubernetes template for Acumos security-verification scanning
+# service deployment
+
+kind: Deployment
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: nifi-user
+  labels:
+    app: nifi-user
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nifi-user
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: nifi-user
+    spec:
+      containers:
+      - name: nifi-user
+        image: apache/nifi:1.9.0
+        env:
+        # Required by scripts/start.sh for secure operation (other option: ldap)
+        - name: AUTH
+          value: "tls"
+        - name: NIFI_VARIABLE_REGISTRY_PROPERTIES
+          value: "http://nifi-registry-service:18080"
+        - name: NIFI_WEB_PROXY_CONTEXT_PATH
+          value: "/nifi/user"
+        - name: NIFI_WEB_PROXY_HOST
+          value: "<ACUMOS_DOMAIN>:<ACUMOS_NIFI_USER_PORT>"
+        # /opt/nifi/scripts/secure.sh requires KEYSTORE_PATH
+        - name: KEYSTORE_PATH
+          value: "/conf/certs/<ACUMOS_KEYSTORE>"
+        - name: KEYSTORE_TYPE
+          value: "PKCS12"
+        - name: KEYSTORE_PASSWORD
+          value: "<ACUMOS_KEYSTORE_PASSWORD>"
+        - name: KEY_PASSWORD
+          value: "<ACUMOS_CERT_KEY_PASSWORD>"
+        # /opt/nifi/scripts/secure.sh requires TRUSTSTORE_PATH
+        - name: TRUSTSTORE_PATH
+          value: "/conf/certs/<ACUMOS_TRUSTSTORE>"
+        - name: TRUSTSTORE_TYPE
+          value: "JKS"
+        - name: TRUSTSTORE_PASSWORD
+          value: "<ACUMOS_TRUSTSTORE_PASSWORD>"
+        command: ['/bin/bash', '-c']
+        args:
+        - set -x;
+          cd /opt/nifi/nifi-current/;
+          sed -i -- "s~nifi.security.keystore=.*~nifi.security.keystore=$$KEYSTORE_PATH~" conf/nifi.properties;
+          sed -i -- "s~nifi.security.keystoreType=.*~nifi.security.keystoreType=$$KEYSTORE_TYPE~" conf/nifi.properties;
+          sed -i -- "s~nifi.security.keystorePasswd=.*~nifi.security.keystorePasswd=$$KEYSTORE_PASSWORD~" conf/nifi.properties;
+          sed -i -- "s~nifi.security.keyPasswd=.*~nifi.security.keyPasswd=$$KEY_PASSWORD~" conf/nifi.properties;
+          sed -i -- "s~nifi.security.truststore=.*~nifi.security.truststore=$$TRUSTSTORE_PATH~" conf/nifi.properties;
+          sed -i -- "s~nifi.security.truststoreType=.*~nifi.security.truststoreType=$$TRUSTSTORE_TYPE~" conf/nifi.properties;
+          sed -i -- "s~nifi.security.truststorePasswd=.*~nifi.security.truststorePasswd=$$TRUSTSTORE_PASSWORD~" conf/nifi.properties;
+          sed -i -- "s~nifi.web.https.host=.*~nifi.web.https.host=0.0.0.0~" conf/nifi.properties;
+          sed -i -- "s~nifi.web.https.port=.*~nifi.web.https.port=8443~" conf/nifi.properties;
+          sed -i -- "s~nifi.web.http.host=.*~nifi.web.http.host=~" conf/nifi.properties;
+          sed -i -- "s~nifi.web.http.port=.*~nifi.web.http.port=~" conf/nifi.properties;
+          sed -i -- "s~nifi.remote.input.http.enabled=.*~nifi.remote.input.http.enabled=~" conf/nifi.properties;
+          cat conf/nifi.properties;
+          sed -i -- "s~prop_replace 'nifi.web.http~#prop_replace 'nifi.web.http~g" ../scripts/start.sh;
+          cat ../scripts/start.sh;
+          ../scripts/start.sh;
+        ports:
+        - containerPort: 8443
+        volumeMounts:
+        - mountPath: /opt/nifi/nifi-current/logs/
+          name: logs
+        - mountPath: /conf/certs
+          name: certs-volume
+      restartPolicy: Always
+      volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+      - name: certs-volume
+        configMap:
+          name: acumos-store
