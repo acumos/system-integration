@@ -35,5 +35,5 @@ services:
       - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
     volumes:
       - type: bind
-        source: /var/${ACUMOS_NAMESPACE}/logs
+        source: /mnt/${ACUMOS_NAMESPACE}/${ACUMOS_NAMESPACE}/logs
         target: /var/log/acumos

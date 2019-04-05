@@ -73,7 +73,7 @@ Prerequisites for docker based deployment:
 * User running this script
 
   * has sudo privileges
-  * has installed docker per system-integration/tools/setup-docker.sh
+  * has installed docker per system-integration/tools/setup_docker.sh
   * has added themselves to the docker group (sudo usermod -G docker $USER),
     and re-logged-in to activate docker group membership
   * if deploying in preparation for use by a non-sudo user, has created the
@@ -84,7 +84,7 @@ Prerequisites for docker based deployment:
 
     * the main environment file system-integration/AIO/acumos-env
     * ELK-stack environment: see
-      system-integration/charts/elk-stack/setup-elk-env.sh as a guide to what
+      system-integration/charts/elk-stack/setup_elk_env.sh as a guide to what
       environment values can be customized. Customize the default values in
       that script, by changing the values after ':-" e.g. to change "true" to
       "false" replace the first line below with the second
@@ -93,7 +93,7 @@ Prerequisites for docker based deployment:
       * export ACUMOS_DEPLOY_METRICBEAT="${ACUMOS_DEPLOY_METRICBEAT:-false}"
 
     * MariaDB: as for the ELK_stack, customize
-      system-integration/charts/mariadb/setup-mariadb-env.sh
+      system-integration/charts/mariadb/setup_mariadb_env.sh
 
 Deploying for Yourself, as a Host Admin (sudo user)
 ...................................................
@@ -163,7 +163,7 @@ in the system-integration/AIO folder (example below)
 By default, the platform is not configured to require email confirmation of
 new accounts, so you can create a new account directly on the Portal home. To
 create an account with the Admin role (needed for various platform admin
-functions), use the create-user.sh script in the system-integration/AIO folder
+functions), use the create_user.sh script in the system-integration/AIO folder
 
 Generic Kubernetes Based Deployment
 -----------------------------------
@@ -191,7 +191,7 @@ permission, follow the process below.
   ..
 
   * if you see "usermod: group 'docker' does not exist", install docker (e.g.
-    using setup-docker.sh in the system-integration/tools folder) and run the
+    using setup_docker.sh in the system-integration/tools folder) and run the
     command above again. Once you do not see the message above, logout and re-login.
 
 * execute the following command to install/configure prerequisites, including
@@ -231,7 +231,7 @@ permission, follow the process below.
 * By default, the platform is not configured to require email confirmation of
   new accounts, so you can create a new account directly on the Portal home. To
   create an account with the Admin role (needed for various platform admin
-  functions), use the create-user.sh script in the system-integration/AIO folder
+  functions), use the create_user.sh script in the system-integration/AIO folder
 
 
 Preparation by Host Admin with Platform Deployment by Normal (non-sudo) User
@@ -294,30 +294,30 @@ In system-integration repo folder AIO:
 * oneclick_deploy.sh: the main script that kicks off the deployment, to setup
   an AIO instance of Acumos under a docker or kubernetes environment. Used by
   acumos_k8s_deploy.sh, or by users to initiate Acumos platform deployment.
-* acumos-env.sh: environment setup script that is customized as new
+* acumos_env.sh: environment setup script that is customized as new
   environment parameters get generated (e.g. passwords). Used by various
   scripts in this toolset, to set shell environment variables that they need.
 * utils.sh: utility script containing functions used by many of these scripts.
-* setup-keystore.sh: script that enables use of pre-configured CA and server
+* setup_keystore.sh: script that enables use of pre-configured CA and server
   certificates for an Acumos platform, or creation of new self-signed
   certificates.
 * clean.sh: script you can run as “bash clean.sh” to remove the Acumos install,
   to try it again etc.
-* docker-compose.sh: Script called by the other scripts as needed, to take
+* docker_compose.sh: Script called by the other scripts as needed, to take
   actions on the set of Acumos docker services. Used by oneclick_deploy.sh and
   clean.sh for docker-based deployments. You can also call this directly e.g.
   to tail the service container logs. See the script for details.
-* peer-test.sh: Automated deployment of two AIO platforms, with federation and
+* peer_test.sh: Automated deployment of two AIO platforms, with federation and
   demo model onboarding. Used to test federation use cases.
-* create-peer.sh: Automated setup of a peer relationship between two Acumos
-  AIO deployments. Used by peer-test.sh.
-* create-user.sh: Automated user provisioning and role assignment. Used by
-  peer-test.sh to create users for model onboarding, and portal admins for
+* create_peer.sh: Automated setup of a peer relationship between two Acumos
+  AIO deployments. Used by peer_test.sh.
+* create_user.sh: Automated user provisioning and role assignment. Used by
+  peer_test.sh to create users for model onboarding, and portal admins for
   testing federation actions on the Acumos platform.
 * create_subscription.sh: script to create a subscription for all models
   published by a federated Acumos platform.
-* bootstrap-models.sh: Model package onboarding via curl. Optionally called by
-  peer-test.sh.
+* bootstrap_models.sh: Model package onboarding via curl. Optionally called by
+  peer_test.sh.
 
 In folder AIO/docker/acumos:
 
@@ -335,7 +335,7 @@ In folder AIO/beats:
 
 In folder AIO/certs:
 
-* setup-certs.sh: script to create self-signed CA and server certs.
+* setup_certs.sh: script to create self-signed CA and server certs.
 * This folder is also used to stage user-provided certs to be used in Acumos
   platform deployment.
 
@@ -392,11 +392,11 @@ In tools:
     Grafana as a data visualization tool, for monitoring the Acumos platform's
     resources at the k8s level. Also deploys Grafana dashboards in the dashboards
     folder.
-  * setup-docker.sh: script to setup the docker version used for docker-based
+  * setup_docker.sh: script to setup the docker version used for docker-based
     platform deployment and interaction.
-  * setup-kubectl.sh: script to setup the kubectl tool used by other scripts and
+  * setup_kubectl.sh: script to setup the kubectl tool used by other scripts and
     the user to manage and interact with generic k8s based deployments.
-  * setup-pv.sh: script to setup host-based persistent volumes for use with
+  * setup_pv.sh: script to setup host-based persistent volumes for use with
     docker and k8s-based platform deployments.
 
 Release Scope
@@ -492,9 +492,9 @@ user, e.g.
 * any option selectable through the environment files, as prepared by the
   Admin in host preparation
 
-  * acumos-env.sh
-  * mariadb-env.sh
-  * elk-env.sh
+  * acumos_env.sh
+  * mariadb_env.sh
+  * elk_env.sh
 
 * use of pre-created server and CA certificates, truststore, and keystore
 
