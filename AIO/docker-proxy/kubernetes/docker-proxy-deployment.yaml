@@ -51,28 +51,30 @@ spec:
           value: "<ACUMOS_DOCKER_PROXY_PORT>"
         - name: ACUMOS_DOCKER_PROXY_AUTH_API_PORT
           value: "8000"
-        - name: ACUMOS_DOCKER_PROXY_AUTH_API_PORT
-          value: "8000"
         - name: ACUMOS_DOCKER_PROXY_AUTH_API_PATH
           value: "/auth"
         - name: ACUMOS_AUTH_URL
           value: "http://onboarding-service:8090/onboarding-app/v2/auth/"
-        - name: ACUMOS_DOCKER_PROXY_LOG_FILE
-          value: "/var/log/acumos/docker-proxy.log"
-        - name: ACUMOS_DOCKER_PROXY_LOG_LEVEL
-          value: "1"
         - name: ACUMOS_CDS_URL
           value: "http://cds-service:8000/ccds"
         - name: ACUMOS_CDS_USER
           value: "<ACUMOS_CDS_USER>"
         - name: ACUMOS_CDS_PASSWORD
           value: "<ACUMOS_CDS_PASSWORD>"
+        - name: ACUMOS_DOCKER_PROXY_LOG_FILE
+          value: "/var/log/acumos/docker-proxy.log"
+        - name: ACUMOS_DOCKER_PROXY_LOG_LEVEL
+          value: "1"
         ports:
         - containerPort: 8443
         command: ["/bin/bash", "-c"]
         args:
         - cp /etc/nginx/conf.d/nginx.conf /etc/nginx/nginx.conf;
-          while [[ $(apt-get update && apt-get install -y python python-pip) -eq 1 ]];
+          while ! apt-get update;
+            do sleep 10;
+               echo "Waiting for temporary DNS resolution issue to be fixed";
+            done;
+          while ! apt-get install -y python python-pip;
             do sleep 10;
                echo "Waiting for temporary DNS resolution issue to be fixed";
             done;

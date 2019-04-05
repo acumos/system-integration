@@ -67,7 +67,7 @@ spec:
          claimName: pvc-<ACUMOS_NAMESPACE>-logs
       - name: nexus-data
         hostPath:
-          path: /var/<ACUMOS_NAMESPACE>/nexus-data
+          path: /mnt/<ACUMOS_NAMESPACE>/nexus-data
 # TODO: debug access issues with PVC, necessitating the hostPath entry above
 #        persistentVolumeClaim:
 #         claimName: pvc-<ACUMOS_NAMESPACE>-nexus-data
