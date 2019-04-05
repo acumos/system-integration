@@ -85,7 +85,7 @@ function setup_prometheus() {
   exp=$(jq '.data.result|length' $tmp)
   log "$exp exporters are up"
   while [[ $exp -gt 0 ]]; do
-    ((exp--))
+    exp=$((exp-1))
     eip=$(jq -r ".data.result[$exp].metric.instance" $tmp)
     job=$(jq -r ".data.result[$exp].metric.job" $tmp)
     log "$job at $eip"
