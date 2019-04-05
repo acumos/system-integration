@@ -22,7 +22,7 @@
 #
 # Prerequisites:
 # - Ubuntu Xenial or Centos 7 server
-# - acumos-env.sh customized for this platform, as by oneclick_deploy.sh
+# - acumos_env.sh customized for this platform, as by oneclick_deploy.sh
 #
 # Usage: intended to be called from oneclick_deploy.sh and other scripts via
 # - source $AIO_ROOT/utils.sh
@@ -38,9 +38,9 @@ function fail() {
   cd $AIO_ROOT
   reason="$1"
   if [[ "$1" == "" ]]; then reason="unknown failure at $fname $fline"; fi
-  if [[ -e $AIO_ROOT/acumos-env.sh ]]; then
-    sedi "s/DEPLOY_RESULT=.*/DEPLOY_RESULT=fail/" acumos-env.sh
-    sedi "s/FAIL_REASON=.*/FAIL_REASON=\"$reason\"/" acumos-env.sh
+  if [[ -e $AIO_ROOT/acumos_env.sh ]]; then
+    sedi "s/DEPLOY_RESULT=.*/DEPLOY_RESULT=fail/" acumos_env.sh
+    sedi "s/FAIL_REASON=.*/FAIL_REASON=\"$reason\"/" acumos_env.sh
   fi
   log "$reason"
   exit 1
@@ -89,7 +89,12 @@ function create_acumos_registry_secret() {
   fi
 
   log "Create k8s secret for image pulling from docker"
-  b64=$(cat $HOME/.docker/config.json | base64 -w 0)
+  get_host_info
+  if [[ "$HOST_OS" == "macos" ]]; then
+    b64=$(cat $HOME/.docker/config.json | base64)
+  else
+    b64=$(cat $HOME/.docker/config.json | base64 -w 0)
+  fi
   cat <<EOF >acumos-registry.yaml
 apiVersion: v1
 kind: Secret
@@ -200,12 +205,12 @@ function setup_pv() {
   local namespace=$2
   local size=$3
   local owner=$4
-  local path=/var/$namespace/$1
+  local path=/mnt/$namespace/$1
   local name=pv-${namespace}-$pv
-  if [[ ! -e /var/$namespace ]]; then
-    log "Creating /var/$namespace as PV root folder"
-    sudo mkdir /var/$namespace
-    sudo chown $ACUMOS_HOST_USER:$ACUMOS_HOST_USER /var/$namespace
+  if [[ ! -e /mnt/$namespace ]]; then
+    log "Creating /mnt/$namespace as PV root folder"
+    sudo mkdir /mnt/$namespace
+    sudo chown $ACUMOS_HOST_USER:$ACUMOS_HOST_USER /mnt/$namespace
   fi
   if [[ ! -e $path ]]; then
     sudo mkdir -p $path
@@ -244,7 +249,7 @@ function delete_pv() {
   trap 'fail' ERR
   local pv=$1
   local namespace=$2
-  local path=/var/$namespace/$1
+  local path=/mnt/$namespace/$1
   local name=pv-${namespace}-$pv
   if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
     if [[ "$($k8s_cmd get pv $name)" != "" ]]; then
@@ -441,8 +446,8 @@ function update_env() {
   # Reuse existing values if set
   if [[ "${!1}" == "" || "$3" == "force" ]]; then
     export $1=$2
-    log "Updating acumos-env.sh with \"export $1=$2\""
-    sedi "s~$1=.*~$1=$2~" $AIO_ROOT/acumos-env.sh
+    log "Updating acumos_env.sh with \"export $1=$2\""
+    sedi "s~$1=.*~$1=$2~" $AIO_ROOT/acumos_env.sh
   fi
 }
 
@@ -546,8 +551,8 @@ function get_host_ip() {
   log "Determining host IP address for $1"
   if [[ $(host $1 | grep -c 'not found') -eq 0 ]]; then
     HOST_IP=$(host $1 | head -1 | cut -d ' ' -f 4)
-  elif [[ $(grep -c -P " $1( |$)" /etc/hosts) -gt 0 ]]; then
-    HOST_IP=$(grep -P "$1( |$)" /etc/hosts | cut -d ' ' -f 1)
+  elif [[ $(grep -c -E   " $1( |$)" /etc/hosts) -gt 0 ]]; then
+    HOST_IP=$(grep -E "$1( |$)" /etc/hosts | cut -d ' ' -f 1)
   else
     log "Please ensure $1 is resolvable thru DNS or hosts file"
     fail "IP address of $1 cannot be determined."
