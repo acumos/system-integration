@@ -84,16 +84,12 @@ services:
        ports:
            - ${ACUMOS_FEDERATION_LOCAL_PORT}:9011
            - ${ACUMOS_FEDERATION_PORT}:9084
-       links:
-           - cds-service
-       depends_on:
-           - cds-service
        volumes:
            - type: bind
-             source: /var/${ACUMOS_NAMESPACE}/logs
+             source: /mnt/${ACUMOS_NAMESPACE}/logs
              target: /maven/logs
            - type: bind
-             source: /var/${ACUMOS_NAMESPACE}/certs
+             source: /mnt/${ACUMOS_NAMESPACE}/certs
              target: /app/certs
        logging:
            driver: json-file

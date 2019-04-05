@@ -160,6 +160,12 @@ data:
        document_type => "%{type}"
        }
       }
+      else if "acumos-model-usage-logs" in [tags] {
+        elasticsearch {
+            hosts => ["elasticsearch:9200"]
+            index => "acumos-model-usage-logs"
+        }
+      }
       else {
      elasticsearch {
        hosts => ["elasticsearch:9200"]

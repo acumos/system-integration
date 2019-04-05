@@ -1,0 +1,163 @@
+apiVersion: apps/v1
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# What this is: kubernetes template for Acumos security-verification scanning
+# service deployment
+
+kind: Deployment
+metadata:
+  namespace: acumos
+  name: sv-scanning
+  labels:
+    app: sv-scanning
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sv-scanning
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: sv-scanning
+    spec:
+      imagePullSecrets:
+      - name: acumos-registry
+      containers:
+      - name: sv-scanning
+        image: nexus3.acumos.org:10004/security-verification:0.0.6
+        securityContext:
+          privileged: true
+        env:
+        - name: ACUMOS_ADMIN_USER
+          value: "admin"
+        - name: ACUMOS_CDS_HOST
+          value: "cds-service"
+        - name: ACUMOS_CDS_PORT
+          value: "8000"
+        - name: ACUMOS_CDS_USER
+          value: "ccds_client"
+        - name: ACUMOS_CDS_PASSWORD
+          value: ""
+        - name: ACUMOS_NEXUS_HOST
+          value: ""
+        - name: ACUMOS_NEXUS_API_PORT
+          value: "30881"
+        - name: ACUMOS_NEXUS_MAVEN_REPO
+          value: "acumos_model_maven"
+        - name: SPRING_APPLICATION_JSON
+          value: '{
+            "server" : {
+                   "port" : 9082
+            },
+            "cdms": {
+              "client": {
+                "url": "http://cds-service:8000/ccds",
+                "username": "ccds_client",
+                "password": "",
+                "host": "cds-service",
+                "port": "8000"
+              }
+            },
+            "nexus": {
+              "client": {
+                "url": "http://:30881/repository/acumos_model_maven/",
+                "proxy": "",
+                "password": "",
+                "username": "acumos_rw",
+                "groupid": "com.artifact",
+                "host": "",
+                "port": "30881",
+                "maven_repo": "acumos_model_maven"
+                }
+            },
+            "siteConfig": "{
+              \"verification\": {
+                \"externalScan\": \"false\",
+                \"allowedLicense\": [
+                  { \"type\": \"SPDX\", \"value\": \"Apache-2.0\" },
+                  { \"type\": \"SPDX\", \"value\": \"CC-BY-4.0\" },
+                  { \"type\": \"SPDX\", \"value\": \"BSD-3-Clause\" },
+                  { \"type\": \"VendorA\", \"value\": \"VendorA-OSS\" },
+                  { \"type\": \"CompanyB\", \"value\": \"CompanyB-Proprietary\" }
+                ],
+                \"licenseScan\": {
+                  \"created\": \"true\",
+                  \"updated\": \"true\",
+                  \"deploy\": \"false\",
+                  \"download\": \"false\",
+                  \"share\": \"false\",
+                  \"publishCompany\": \"false\",
+                  \"publishPublic\": \"false\"
+                },
+                \"securityScan\": {
+                  \"created\": \"true\",
+                  \"updated\": \"true\",
+                  \"deploy\": \"false\",
+                  \"download\": \"false\",
+                  \"share\": \"false\",
+                  \"publishCompany\": \"false\",
+                  \"publishPublic\": \"false\"
+                },
+                \"licenseVerify\": {
+                  \"deploy\": \"true\",
+                  \"download\": \"true\",
+                  \"share\": \"false\",
+                  \"publishCompany\": \"true\",
+                  \"publishPublic\": \"true\"
+                },
+                \"securityVerify\": {
+                  \"deploy\": \"true\",
+                  \"download\": \"true\",
+                  \"share\": \"false\",
+                  \"publishCompany\": \"true\",
+                  \"publishPublic\": \"true\"
+                }
+              }
+            }"
+          }'
+        command: ['/bin/bash', '-c']
+        args:
+        - set -x;
+          while ! apt-get update;
+            do echo "Retrying package update in 5 seconds..."; sleep 5; done;
+          while ! apt-get install -y wget curl git jq zip python-dev xz-utils zlib1g libxml2-dev libxslt1-dev bzip2;
+            do echo "Retrying package install in 5 seconds..."; sleep 5; done;
+          cd /maven/scan;
+          wget https://raw.githubusercontent.com/acumos/security-verification/master/scripts/dump_model.sh
+          wget https://raw.githubusercontent.com/acumos/security-verification/master/scripts/license_scan.sh
+          wget https://raw.githubusercontent.com/acumos/security-verification/master/scripts/scan_all.sh
+          cd /maven;
+          bash scan/setup_verification_site_config.sh $ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD $ACUMOS_ADMIN_USER;
+          java -jar security-verification-service-*.jar;
+        ports:
+        - containerPort: 9082
+        volumeMounts:
+        - mountPath: /maven/logs
+          name: logs
+      restartPolicy: Always
+      volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: pvc-acumos-logs
+      hostAliases:
+      - ip: ""
+        hostnames:
+        - ""

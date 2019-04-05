@@ -73,7 +73,7 @@ Prerequisites for docker based deployment:
 * User running this script
 
   * has sudo privileges
-  * has installed docker per system-integration/tools/setup-docker.sh
+  * has installed docker per system-integration/tools/setup_docker.sh
   * has added themselves to the docker group (sudo usermod -G docker $USER),
     and re-logged-in to activate docker group membership
   * if deploying in preparation for use by a non-sudo user, has created the
@@ -84,7 +84,7 @@ Prerequisites for docker based deployment:
 
     * the main environment file system-integration/AIO/acumos-env
     * ELK-stack environment: see
-      system-integration/charts/elk-stack/setup-elk-env.sh as a guide to what
+      system-integration/charts/elk-stack/setup_elk_env.sh as a guide to what
       environment values can be customized. Customize the default values in
       that script, by changing the values after ':-" e.g. to change "true" to
       "false" replace the first line below with the second
@@ -93,10 +93,21 @@ Prerequisites for docker based deployment:
       * export ACUMOS_DEPLOY_METRICBEAT="${ACUMOS_DEPLOY_METRICBEAT:-false}"
 
     * MariaDB: as for the ELK_stack, customize
-      system-integration/charts/mariadb/setup-mariadb-env.sh
+      system-integration/charts/mariadb/setup_mariadb_env.sh
 
 Deploying for Yourself, as a Host Admin (sudo user)
 ...................................................
+
+NOTE: If you are deploying into an Azure-based VM, pay attention to this
+special configuration need for the docker-engine; update the acumos_env.sh
+(in system-integration/AIO) script to set the ACUMOS_DEPLOY_DOCKER flag to
+"false", which will ensure that the docker-dind service is not installed.
+Docker-dind has known issues under Azure.
+
+  .. code-block:: bash
+
+    export ACUMOS_DEPLOY_DOCKER=false
+  ..
 
 If deploying the platform for yourself, run these commands:
 
@@ -117,6 +128,17 @@ Preparing as a Host Admin, with Platform Deployment as a Normal User
 
 If a Host Admin needs to run the privileged-user steps for a normal user that
 will take it from there:
+
+* NOTE: If you are deploying into an Azure-based VM, pay attention to this
+  special configuration need for the docker-engine; update the acumos_env.sh
+  (in system-integration/AIO) script to set the ACUMOS_DEPLOY_DOCKER flag to
+  "false", which will ensure that the docker-dind service is not installed.
+  Docker-dind has known issues under Azure.
+
+  .. code-block:: bash
+
+    export ACUMOS_DEPLOY_DOCKER=false
+  ..
 
 * As the Host Admin, run these commands:
 
@@ -163,10 +185,15 @@ in the system-integration/AIO folder (example below)
 By default, the platform is not configured to require email confirmation of
 new accounts, so you can create a new account directly on the Portal home. To
 create an account with the Admin role (needed for various platform admin
-functions), use the create-user.sh script in the system-integration/AIO folder
+functions), use the create_user.sh script in the system-integration/tests folder
 
-Generic Kubernetes Based Deployment
------------------------------------
+Kubernetes Based Deployment
+---------------------------
+
+The process below will support deployment under either a generic kubernetes
+distribution, or the OpenShift kubernetes distribution. The scripts will detect
+which distribution is installed and deploy per the requirements of that
+distribution.
 
 Deploying as a Privileged (sudo) User
 .....................................
@@ -191,16 +218,16 @@ permission, follow the process below.
   ..
 
   * if you see "usermod: group 'docker' does not exist", install docker (e.g.
-    using setup-docker.sh in the system-integration/tools folder) and run the
+    using setup_docker.sh in the system-integration/tools folder) and run the
     command above again. Once you do not see the message above, logout and re-login.
 
 * execute the following command to install/configure prerequisites, including
-  k8s, MariaDB, and the ELK stack, using your user account, and hostname as the
+  k8s, MariaDB, and the ELK stack, using your user account, and the hostname or
   domain name you will use to access the deployed platform.
 
   .. code-block:: bash
 
-    $ bash system-integration/AIO/acumos_k8s_prep.sh $USER $HOSTNAME
+    $ bash system-integration/AIO/acumos_k8s_prep.sh $USER <domain> 2>&1 | tee aio_prep.log
   ..
 
 * When you see "Prerequisites setup is complete." as the result of the
@@ -209,7 +236,7 @@ permission, follow the process below.
   .. code-block:: bash
 
     $ cd system-integration/AIO
-    $ bash acumos_k8s_deploy.sh
+    $ bash acumos_k8s_deploy.sh 2>&1 | tee aio_deploy.log
   ..
 
 * when that command completes successfully, you should see a set of URLs to
@@ -231,8 +258,7 @@ permission, follow the process below.
 * By default, the platform is not configured to require email confirmation of
   new accounts, so you can create a new account directly on the Portal home. To
   create an account with the Admin role (needed for various platform admin
-  functions), use the create-user.sh script in the system-integration/AIO folder
-
+  functions), use the create_user.sh script in the system-integration/AIO folder
 
 Preparation by Host Admin with Platform Deployment by Normal (non-sudo) User
 ............................................................................
@@ -254,7 +280,7 @@ This process is for a host Admin (sudo user) to prepare the host for a normal
 
   .. code-block:: bash
 
-    $ bash system-integration/AIO/acumos_k8s_prep.sh <user> $HOSTNAME
+    $ bash system-integration/AIO/acumos_k8s_prep.sh <user> <domain> 2>&1 | tee aio_prep.log
   ..
 
 * When prerequisites setup is complete, the Admin copies the resulting
@@ -272,11 +298,24 @@ This process is for a host Admin (sudo user) to prepare the host for a normal
   .. code-block:: bash
 
     $ cd system-integration/AIO
-    $ bash acumos_k8s_deploy.sh
+    $ bash acumos_k8s_deploy.sh 2>&1 | tee aio_deploy.log
   ..
 
+Generic Kubernetes Based Deployment
+-----------------------------------
+
+Release Scope
+=============
+
+To be added.
+
+Current Release (Boreas)
+------------------------
+
+To be added.
+
 What's included in the AIO tools
---------------------------------
+................................
 
 In system-integration repo folder AIO:
 
@@ -294,30 +333,33 @@ In system-integration repo folder AIO:
 * oneclick_deploy.sh: the main script that kicks off the deployment, to setup
   an AIO instance of Acumos under a docker or kubernetes environment. Used by
   acumos_k8s_deploy.sh, or by users to initiate Acumos platform deployment.
-* acumos-env.sh: environment setup script that is customized as new
+* acumos_env.sh: environment setup script that is customized as new
   environment parameters get generated (e.g. passwords). Used by various
   scripts in this toolset, to set shell environment variables that they need.
-* utils.sh: utility script containing functions used by many of these scripts.
-* setup-keystore.sh: script that enables use of pre-configured CA and server
+* setup_keystore.sh: script that enables use of pre-configured CA and server
   certificates for an Acumos platform, or creation of new self-signed
   certificates.
-* clean.sh: script you can run as “bash clean.sh” to remove the Acumos install,
-  to try it again etc.
-* docker-compose.sh: Script called by the other scripts as needed, to take
+* docker_compose.sh: Script called by the other scripts as needed, to take
   actions on the set of Acumos docker services. Used by oneclick_deploy.sh and
   clean.sh for docker-based deployments. You can also call this directly e.g.
   to tail the service container logs. See the script for details.
-* peer-test.sh: Automated deployment of two AIO platforms, with federation and
-  demo model onboarding. Used to test federation use cases.
-* create-peer.sh: Automated setup of a peer relationship between two Acumos
-  AIO deployments. Used by peer-test.sh.
-* create-user.sh: Automated user provisioning and role assignment. Used by
-  peer-test.sh to create users for model onboarding, and portal admins for
+* utils.sh: utility script containing functions used by many of these scripts.
+* redeploy_component.sh: Script that allows the redeployment of a single
+  component.
+
+In folder tests:
+
+* peer_test.sh: Peering and marketplace subsciptions setup for two AIO platforms.
+  Used to test federation use cases.
+* create_peer.sh: Automated setup of a peer relationship between two Acumos
+  AIO deployments. Used by peer_test.sh.
+* create_user.sh: Automated user provisioning and role assignment. Used by
+  peer_test.sh to create users for model onboarding, and portal admins for
   testing federation actions on the Acumos platform.
 * create_subscription.sh: script to create a subscription for all models
   published by a federated Acumos platform.
-* bootstrap-models.sh: Model package onboarding via curl. Optionally called by
-  peer-test.sh.
+* bootstrap_models.sh: Model package onboarding via curl. Optionally called by
+  peer_test.sh.
 
 In folder AIO/docker/acumos:
 
@@ -335,7 +377,7 @@ In folder AIO/beats:
 
 In folder AIO/certs:
 
-* setup-certs.sh: script to create self-signed CA and server certs.
+* setup_certs.sh: script to create self-signed CA and server certs.
 * This folder is also used to stage user-provided certs to be used in Acumos
   platform deployment.
 
@@ -392,22 +434,12 @@ In tools:
     Grafana as a data visualization tool, for monitoring the Acumos platform's
     resources at the k8s level. Also deploys Grafana dashboards in the dashboards
     folder.
-  * setup-docker.sh: script to setup the docker version used for docker-based
+  * setup_docker.sh: script to setup the docker version used for docker-based
     platform deployment and interaction.
-  * setup-kubectl.sh: script to setup the kubectl tool used by other scripts and
+  * setup_kubectl.sh: script to setup the kubectl tool used by other scripts and
     the user to manage and interact with generic k8s based deployments.
-  * setup-pv.sh: script to setup host-based persistent volumes for use with
+  * setup_pv.sh: script to setup host-based persistent volumes for use with
     docker and k8s-based platform deployments.
-
-Release Scope
-=============
-
-To be added.
-
-Current Release (Boreas)
-------------------------
-
-To be added.
 
 Kubernetes-Based Deployment Step-by-Step Guide
 ==============================================
@@ -418,6 +450,9 @@ Install Host Preparation by Admin
 ---------------------------------
 
 The script supporting this step is system-integration/AIO/acumos_k8s_prep.sh.
+
+NOTE: If you are deploying into an Azure-based VM, pay attention to the
+special configuration need for the docker-engine, as described below.
 
 Prerequisites:
 
@@ -452,6 +487,16 @@ The Admin user will follow this process:
   under it.
 * If you want to use a specific/updated/patched system-integration repo clone,
   place that system-integration clone in the install root folder
+* If you are deploying the platform in an Azure VM, update the acumos_env.sh
+  (in system-integration/AIO) script to set the ACUMOS_DEPLOY_DOCKER flag to
+  "false", which will ensure that the docker-dind service is not installed.
+  Docker-dind has known issues under Azure.
+
+  .. code-block:: bash
+
+    export ACUMOS_DEPLOY_DOCKER=false
+  ..
+
 
 * Then run the command
 
@@ -492,9 +537,9 @@ user, e.g.
 * any option selectable through the environment files, as prepared by the
   Admin in host preparation
 
-  * acumos-env.sh
-  * mariadb-env.sh
-  * elk-env.sh
+  * acumos_env.sh
+  * mariadb_env.sh
+  * elk_env.sh
 
 * use of pre-created server and CA certificates, truststore, and keystore
 
@@ -517,13 +562,26 @@ component/UI features.
 Updating Configuration and Components
 -------------------------------------
 
+Changes to the configuration can be applied through the following files. Note
+that some changes may break some aspects of the deployed platform, and the key
+items to avoid changing are listed below also.
+
+* under system-integration/AIO: these are environment files that are initially
+  configured by the user to select options, and can be updated to change those
+  options (within limits)
+
+  * acumos_env.sh
+  * elk_env.sh
+  * mariadb_env.sh
+
+
 Stopping, Restarting, and Reinstalling
 --------------------------------------
+
+Various
 
 Notes on Verified Features
 --------------------------
 
 Additional Notes
 ================
-
-
