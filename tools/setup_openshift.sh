@@ -105,7 +105,10 @@ EOF
     wget https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz
     tar -xf openshift-origin-client-tools-*.tar.gz
     cd openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit
-    sudo mv k* o* /usr/bin/.
+    if [[ -e /usr/bin/kubectl ]]; then sudo rm /usr/bin/kubectl; fi
+    if [[ -e /usr/bin/oc ]]; then sudo rm /usr/bin/oc; fi
+    if [[ -e /usr/bin/openshift.local.clusterup ]]; then sudo rm -rf /usr/bin/openshift.local.clusterup; fi
+    sudo mv kubectl oc openshift.local.clusterup /usr/bin/.
 
     log "Bring up the all-in-one cluster"
     # Add --public-hostname="$(hostname)" so you can browse the console!

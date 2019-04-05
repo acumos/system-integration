@@ -76,7 +76,7 @@ spec:
                       "cmndatasvcpwd": "<ACUMOS_CDS_PASSWORD>"
                     },
                     "docker": {
-                      "host": "docker-dind-service",
+                      "host": "<ACUMOS_DOCKER_API_HOST>",
                       "port": "<ACUMOS_DOCKER_API_PORT>",
                       "config": "/docker_host/.docker",
                       "registry": {

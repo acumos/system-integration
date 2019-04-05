@@ -22,7 +22,7 @@
 #
 # Prerequisites:
 # - Ubuntu Xenial or Centos 7 server
-# - acumos-env.sh customized for this platform, as by oneclick_deploy.sh
+# - acumos_env.sh customized for this platform, as by oneclick_deploy.sh
 #
 # Usage: intended to be called from oneclick_deploy.sh and other scripts via
 # - source $AIO_ROOT/utils.sh
@@ -38,9 +38,9 @@ function fail() {
   cd $AIO_ROOT
   reason="$1"
   if [[ "$1" == "" ]]; then reason="unknown failure at $fname $fline"; fi
-  if [[ -e $AIO_ROOT/acumos-env.sh ]]; then
-    sedi "s/DEPLOY_RESULT=.*/DEPLOY_RESULT=fail/" acumos-env.sh
-    sedi "s/FAIL_REASON=.*/FAIL_REASON=\"$reason\"/" acumos-env.sh
+  if [[ -e $AIO_ROOT/acumos_env.sh ]]; then
+    sedi "s/DEPLOY_RESULT=.*/DEPLOY_RESULT=fail/" acumos_env.sh
+    sedi "s/FAIL_REASON=.*/FAIL_REASON=\"$reason\"/" acumos_env.sh
   fi
   log "$reason"
   exit 1
@@ -441,8 +441,8 @@ function update_env() {
   # Reuse existing values if set
   if [[ "${!1}" == "" || "$3" == "force" ]]; then
     export $1=$2
-    log "Updating acumos-env.sh with \"export $1=$2\""
-    sedi "s~$1=.*~$1=$2~" $AIO_ROOT/acumos-env.sh
+    log "Updating acumos_env.sh with \"export $1=$2\""
+    sedi "s~$1=.*~$1=$2~" $AIO_ROOT/acumos_env.sh
   fi
 }
 

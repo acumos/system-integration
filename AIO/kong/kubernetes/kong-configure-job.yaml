@@ -44,11 +44,11 @@ spec:
         volumeMounts:
         - mountPath: /var/acumos/config
           name: kong-config
-        command: ['/bin/bash', '-c']
-        args:
-        - cp /var/acumos/config/configure-kong.sh .;
-          chmod 755 ./configure-kong.sh;
-          ./configure-kong.sh;
+        command: ['/bin/bash', '/var/acumos/config/configure_kong.sh']
+#        args:
+#        - cp /var/acumos/config/configure_kong.sh .;
+#          chmod 755 ./configure_kong.sh;
+#          ./configure_kong.sh;
       restartPolicy: Never
       volumes:
       - name: kong-config
