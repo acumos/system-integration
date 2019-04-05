@@ -72,13 +72,9 @@ services:
            }"
        expose:
            - 8085
-       links:
-           - portal-be-service
-       depends_on:
-           - portal-be-service
        volumes:
            - type: bind
-             source: /var/${ACUMOS_NAMESPACE}/logs
+             source: /mnt/${ACUMOS_NAMESPACE}/logs
              target: /maven/logs
        logging:
            driver: json-file

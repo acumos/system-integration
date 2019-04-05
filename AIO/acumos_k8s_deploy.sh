@@ -31,7 +31,7 @@
 #   acumos_k8s_prep.sh
 #
 # Usage:
-# - cd ~/system-integration/AIO
+# - cd system-integration/AIO
 # - bash acumos_k8s_deploy.sh
 #
 
@@ -47,11 +47,9 @@ function sedi () {
     sed --version >/dev/null 2>&1 && sed -i -- "$@" || sed -i "" "$@"
 }
 
-cp ~/acumos/env/*-env.sh .
+cp ~/acumos/env/*_env.sh .
 cp -r ~/acumos/certs .
 # Disable metricbeat while debugging issues
-sedi "s/ACUMOS_DEPLOY_ELK_METRICBEAT=.*/ACUMOS_DEPLOY_ELK_METRICBEAT=false/" acumos-env.sh
+sedi "s/ACUMOS_DEPLOY_ELK_METRICBEAT=.*/ACUMOS_DEPLOY_ELK_METRICBEAT=false/" acumos_env.sh
 
-stamp=$(date +"%y%m%d-%H%M%S")
-log="aio_k8s_generic-$stamp.log"
-bash oneclick_deploy.sh 2>&1 | tee ~/acumos/logs/$log
+bash oneclick_deploy.sh

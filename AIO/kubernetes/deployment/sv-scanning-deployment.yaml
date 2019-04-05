@@ -1,0 +1,159 @@
+apiVersion: apps/v1
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# What this is: kubernetes template for Acumos security-verification scanning
+# service deployment
+
+kind: Deployment
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: sv-scanning
+  labels:
+    app: sv-scanning
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sv-scanning
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: sv-scanning
+    spec:
+      imagePullSecrets:
+      - name: acumos-registry
+      containers:
+      - name: sv-scanning
+        image: <SECURITY_VERIFICATION_IMAGE>
+        securityContext:
+          privileged: true
+        env:
+        - name: ACUMOS_ADMIN_USER
+          value: "admin"
+        - name: ACUMOS_CDS_HOST
+          value: "cds-service"
+        - name: ACUMOS_CDS_PORT
+          value: "8000"
+        - name: ACUMOS_CDS_USER
+          value: "<ACUMOS_CDS_USER>"
+        - name: ACUMOS_CDS_PASSWORD
+          value: "<ACUMOS_CDS_PASSWORD>"
+        - name: ACUMOS_NEXUS_HOST
+          value: "<ACUMOS_NEXUS_HOST>"
+        - name: ACUMOS_NEXUS_API_PORT
+          value: "<ACUMOS_NEXUS_API_PORT>"
+        - name: ACUMOS_NEXUS_MAVEN_REPO
+          value: "<ACUMOS_NEXUS_MAVEN_REPO>"
+        - name: SPRING_APPLICATION_JSON
+          value: '{
+            "server" : {
+                   "port" : 9082
+            },
+            "cdms": {
+              "client": {
+                "url": "http://cds-service:8000/ccds",
+                "username": "<ACUMOS_CDS_USER>",
+                "password": "<ACUMOS_CDS_PASSWORD>",
+                "host": "cds-service",
+                "port": "8000"
+              }
+            },
+            "nexus": {
+              "client": {
+                "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/<ACUMOS_NEXUS_MAVEN_REPO_PATH>/<ACUMOS_NEXUS_MAVEN_REPO>/",
+                "proxy": "",
+                "password": "<ACUMOS_NEXUS_RW_USER_PASSWORD>",
+                "username": "<ACUMOS_NEXUS_RW_USER>",
+                "groupid": "com.artifact",
+                "host": "<ACUMOS_NEXUS_HOST>",
+                "port": "<ACUMOS_NEXUS_API_PORT>",
+                "maven_repo": "<ACUMOS_NEXUS_MAVEN_REPO>"
+                }
+            },
+            "siteConfig": "{
+              \"verification\": {
+                \"externalScan\": \"false\",
+                \"allowedLicense\": [
+                  { \"type\": \"SPDX\", \"value\": \"Apache-2.0\" },
+                  { \"type\": \"SPDX\", \"value\": \"CC-BY-4.0\" },
+                  { \"type\": \"SPDX\", \"value\": \"BSD-3-Clause\" },
+                  { \"type\": \"VendorA\", \"value\": \"VendorA-OSS\" },
+                  { \"type\": \"CompanyB\", \"value\": \"CompanyB-Proprietary\" }
+                ],
+                \"licenseScan\": {
+                  \"created\": \"true\",
+                  \"updated\": \"true\",
+                  \"deploy\": \"false\",
+                  \"download\": \"false\",
+                  \"share\": \"false\",
+                  \"publishCompany\": \"false\",
+                  \"publishPublic\": \"false\"
+                },
+                \"securityScan\": {
+                  \"created\": \"true\",
+                  \"updated\": \"true\",
+                  \"deploy\": \"false\",
+                  \"download\": \"false\",
+                  \"share\": \"false\",
+                  \"publishCompany\": \"false\",
+                  \"publishPublic\": \"false\"
+                },
+                \"licenseVerify\": {
+                  \"deploy\": \"true\",
+                  \"download\": \"true\",
+                  \"share\": \"false\",
+                  \"publishCompany\": \"true\",
+                  \"publishPublic\": \"true\"
+                },
+                \"securityVerify\": {
+                  \"deploy\": \"true\",
+                  \"download\": \"true\",
+                  \"share\": \"false\",
+                  \"publishCompany\": \"true\",
+                  \"publishPublic\": \"true\"
+                }
+              }
+            }"
+          }'
+        command: ['/bin/bash', '-c']
+        args:
+        - set -x;
+          while ! apt-get update;
+            do echo "Retrying package update in 5 seconds..."; sleep 5; done;
+          while ! apt-get install -y wget curl git jq zip python-dev xz-utils zlib1g libxml2-dev libxslt1-dev bzip2;
+            do echo "Retrying package install in 5 seconds..."; sleep 5; done;
+          cd /maven;
+          bash scan/setup_verification_site_config.sh $ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD $ACUMOS_ADMIN_USER;
+          java -jar security-verification-service-*.jar;
+        ports:
+        - containerPort: 9082
+        volumeMounts:
+        - mountPath: /maven/logs
+          name: logs
+      restartPolicy: Always
+      volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+      hostAliases:
+      - ip: "<ACUMOS_HOST_IP>"
+        hostnames:
+        - "<ACUMOS_HOST>"

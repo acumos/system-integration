@@ -98,7 +98,7 @@ spec:
       volumes:
       - name: kong-db
         hostPath:
-          path: /var/<ACUMOS_NAMESPACE>/kong-db
+          path: /mnt/<ACUMOS_NAMESPACE>/kong-db
 # TODO: debug access issues with PVC
 #        persistentVolumeClaim:
 #         claimName: pvc-<ACUMOS_NAMESPACE>-kong-db

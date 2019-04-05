@@ -48,10 +48,10 @@ services:
                  }
            }"
        ports:
-         - "8000:8000"
+         - "${ACUMOS_CDS_NODEPORT}:8000"
        volumes:
            - type: bind
-             source: /var/${ACUMOS_NAMESPACE}/logs
+             source: /mnt/${ACUMOS_NAMESPACE}/logs
              target: /maven/logs
        logging:
            driver: json-file

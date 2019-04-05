@@ -22,28 +22,31 @@
 #
 # Prerequisites:
 # - Ubuntu Xenial (16.04), Bionic (18.04), or Centos 7 hosts
-# - All hostnames specified in acumos-env.sh must be DNS-resolvable on all hosts
+# - All hostnames specified in acumos_env.sh must be DNS-resolvable on all hosts
 #   (entries in /etc/hosts or in an actual DNS server)
-# - For deployments behind proxies, set HTTP_PROXY and HTTPS_PROXY in acumos-env.sh
+# - For deployments behind proxies, set HTTP_PROXY and HTTPS_PROXY in acumos_env.sh
 # - For kubernetes based deployment
 #   - Kubernetes cluster deployed
 #   - kubectl installed on user's workstation, and configured to use the kube
-#     profile for the target cluster, e.g. though setup-kubectl.sh, e.g
-#     $ wget https://raw.githubusercontent.com/acumos/kubernetes-client/master/deploy/private/setup-kubectl.sh
-#     $ bash setup-kubectl.sh myk8smaster myuser mynamespace
+#     profile for the target cluster, e.g. though setup_kubectl.sh, e.g
+#     $ wget https://raw.githubusercontent.com/acumos/kubernetes-client/master/deploy/private/setup_kubectl.sh
+#     $ bash setup_kubectl.sh myk8smaster myuser mynamespace
 # - Host preparation steps by an admin (or sudo user)
 #   - Persistent volume pre-arranged and identified for PV-dependent components
-#     in acumos-env.sh. tools/setup-pv.sh may be used for this
+#     in acumos_env.sh. tools/setup_pv.sh may be used for this
 #   - the User running this script must have been added to the "docker" group
 #     $ sudo usermod <user> -G docker
 #   - AIO prerequisites setup by sudo user via setup_prereqs.sh
 #
 # Usage:
-# $ bash oneclick_deploy.sh
+#   For docker-based deployments, run this script on the AIO host.
+#   For k8s-based deployment, run this script on the AIO host or a workstation
+#   connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
+#   $ bash oneclick_deploy.sh
 #
 # NOTE: if redeploying with an existing Acumos database, or to upgrade an
 # existing Acumos CDS database, ensure to update the following values
-# from the current acumos-env.sh (as customized in the last install), as
+# from the current acumos_env.sh (as customized in the last install), as
 # these will not be updated by this script:
 #   ACUMOS_CDS_PREVIOUS_VERSION to the previous data version
 #   ACUMOS_CDS_VERSION to the upgraded version (or to the current version if
@@ -54,7 +57,7 @@
 function clean_env() {
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     log "Stop any running Acumos core docker-based components"
-    source docker-compose.sh down
+    bash $AIO_ROOT/docker_compose.sh $AIO_ROOT down
   else
     delete_namespace $ACUMOS_NAMESPACE
     pvs=$(kubectl get pv | awk '/Released/{print $1}')
@@ -93,8 +96,8 @@ function setup_acumos() {
     docker_login https://nexus3.acumos.org:10002
 
     log "Deploy Acumos core docker-based components"
-    source docker-compose.sh up -d --build
-    cd docker-proxy; source setup-docker-proxy.sh; cd $AIO_ROOT
+    bash $AIO_ROOT/docker_compose.sh $AIO_ROOT up -d --build
+    bash $AIO_ROOT/docker-proxy/setup_docker_proxy.sh $AIO_ROOT
   else
     log "Create PVCs in namespace $ACUMOS_NAMESPACE"
     setup_pvc logs $ACUMOS_NAMESPACE $ACUMOS_LOGS_PV_SIZE
@@ -103,6 +106,7 @@ function setup_acumos() {
     if [[ ! -e deploy ]]; then mkdir deploy; fi
     cp kubernetes/service/* deploy/.
     cp kubernetes/deployment/* deploy/.
+    cp kubernetes/rbac/* deploy/.
 
     log "Set variable values in k8s templates"
     replace_env deploy
@@ -119,7 +123,7 @@ function setup_acumos() {
     done
 
     log "Deploy docker-proxy"
-    cd docker-proxy; source setup-docker-proxy.sh; cd $AIO_ROOT
+    bash $AIO_ROOT/docker-proxy/setup_docker_proxy.sh $AIO_ROOT
 
     log "Wait for all Acumos core component pods to be Running"
     log "Wait for all Acumos pods to be Running"
@@ -129,8 +133,16 @@ function setup_acumos() {
       wait_running $app $ACUMOS_NAMESPACE
     done
 
-    log "Deploy jupyterhub"
-    bash ../charts/jupyterhub/setup-jupyterhub.sh $ACUMOS_NAMESPACE $ACUMOS_ONBOARDING_TOKENMODE
+    # TODO: Skip juputerhub for openshift - some unknown issues
+    if [[ "$K8S_DIST" == "generic" ]]; then
+      log "Deploy jupyterhub"
+      bash $AIO_ROOT/../charts/jupyterhub/setup_jupyterhub.sh \
+        $ACUMOS_NAMESPACE $ACUMOS_ONBOARDING_TOKENMODE
+    fi
+
+    log "Enable Pipeline Service to create NiFi user services under k8s"
+    kubectl create -f deploy/namespace-admin-role.yaml
+    kubectl create -f deploy/namespace-admin-rolebinding.yaml
   fi
 
   log "Customize aio-cms-host.yaml"
@@ -178,15 +190,15 @@ EOF
 }
 
 function set_env() {
-  log "Updating acumos-env.sh with \"export $1=$3\""
-  sedi "s/$1=.*/$1=$3/" acumos-env.sh
+  log "Updating acumos_env.sh with \"export $1=$3\""
+  sedi "s/$1=.*/$1=$3/" acumos_env.sh
   export $1=$3
 }
 
 set -x
-source acumos-env.sh
+WORK_DIR=$(pwd)
+source acumos_env.sh
 source utils.sh
-export WORK_DIR=$(pwd)
 update_env AIO_ROOT $WORK_DIR force
 update_env DEPLOY_RESULT "" force
 update_env FAIL_REASON "" force
@@ -199,19 +211,23 @@ update_env ACUMOS_DOCKER_REGISTRY_PASSWORD $ACUMOS_NEXUS_RW_USER_PASSWORD
 update_env ACUMOS_DOCKER_PROXY_USERNAME $(uuidgen)
 update_env ACUMOS_DOCKER_PROXY_PASSWORD $(uuidgen)
 
-log "Apply environment customizations to unset values in acumos-env.sh"
-source acumos-env.sh
+log "Apply environment customizations to unset values in acumos_env.sh"
+source acumos_env.sh
 
 prepare_env
-source setup-keystore.sh
+bash $AIO_ROOT/setup_keystore.sh $AIO_ROOT
 
-if [[ "$DEPLOYED_UNDER" == "k8s" && "$ACUMOS_DEPLOY_DOCKER" == "true" ]]; then
-  cd docker-engine; source setup-docker-engine.sh; cd $AIO_ROOT
+if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
+  if [[ "$ACUMOS_DEPLOY_DOCKER" == "true" ]]; then
+    bash $AIO_ROOT/docker-engine/setup_docker_engine.sh $AIO_ROOT
+  else
+    update_env ACUMOS_DOCKER_API_HOST $ACUMOS_HOST_IP force
+  fi
 fi
 
 if [[ "$ACUMOS_DEPLOY_MARIADB" == "true" && "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
-  source ../charts/mariadb/setup-mariadb-env.sh
-  cd mariadb; source setup-mariadb.sh; cd $AIO_ROOT
+  source $AIO_ROOT/../charts/mariadb/setup_mariadb_env.sh
+  bash $AIO_ROOT/mariadb/setup_mariadb.sh $AIO_ROOT
 fi
 
 # Supports use cases: MariaDB pre-setup (ACUMOS_DEPLOY_MARIADB=false),
@@ -220,51 +236,46 @@ if [[ "$ACUMOS_CDS_VERSION" != "$ACUMOS_CDS_PREVIOUS_VERSION" ]]; then
   update_env ACUMOS_SETUP_DB true
 fi
 if [[ "$ACUMOS_SETUP_DB" == "true" ]]; then
-  source setup-acumosdb.sh
+  bash $AIO_ROOT/setup_acumosdb.sh $AIO_ROOT
 fi
 
+# Apply any env updates from above
+source acumos_env.sh
 setup_acumos
 
-cd kong
-source setup-kong.sh
-cd $AIO_ROOT
+bash $AIO_ROOT/kong/setup_kong.sh $AIO_ROOT
 
 if [[ "$ACUMOS_DEPLOY_NEXUS" == "true" && "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
-  cd nexus; source setup-nexus.sh; cd $AIO_ROOT
+  bash $AIO_ROOT/nexus/setup_nexus.sh $AIO_ROOT
 fi
 
 setup_federation
 
 if [[ "$ACUMOS_DEPLOY_ELK" == "true" ]]; then
-  cd elk-stack
-  source setup-elk.sh
-  cd $AIO_ROOT
+  bash $AIO_ROOT/elk-stack/setup_elk.sh $AIO_ROOT
 fi
 
 cd beats
 if [[ "$ACUMOS_DEPLOY_ELK_FILEBEAT" == "true" ]]; then
-  source setup-beats.sh filebeat
+  bash $AIO_ROOT/beats/setup_beats.sh $AIO_ROOT filebeat
 fi
 if [[ "$ACUMOS_DEPLOY_ELK_METRICBEAT" == "true" ]]; then
-  source setup-beats.sh metricbeat
+  bash $AIO_ROOT/beats/setup_beats.sh $AIO_ROOT metricbeat
 fi
-cd $AIO_ROOT
+cd $WORK_DIR
 
 set +x
 
-sedi "s/DEPLOY_RESULT=.*/DEPLOY_RESULT=success/" acumos-env.sh
+sedi "s/DEPLOY_RESULT=.*/DEPLOY_RESULT=success/" acumos_env.sh
 
 log "Deploy is complete."
 echo "You can access the Acumos portal and other services at the URLs below,"
 echo "assuming hostname \"$ACUMOS_DOMAIN\" is resolvable from your workstation:"
-echo "One optional/manual step remains: if needed, complete the Hippo CMS"
-echo "config as described in https://docs.acumos.org/en/latest/submodules/system-integration/docs/oneclick-deploy/user-guide.html#install-process"
 
 cat <<EOF >acumos.url
 Portal: https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT
 Common Data Service: https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/swagger-ui.html
 Kibana: http://$ACUMOS_ELK_DOMAIN:$ACUMOS_ELK_KIBANA_PORT/app/kibana
-Hippo CMS: https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT/cms/console/?1&path=/
 Nexus: http://$ACUMOS_NEXUS_DOMAIN:$ACUMOS_NEXUS_API_PORT
 Mariadb Admin: http://$ACUMOS_DOMAIN:$ACUMOS_MARIADB_ADMINER_PORT
 EOF
