@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7d01f3cb_333a2aa9",
+        "filename": "docs/oneclick-deploy/user-guide.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-04-12T17:38:31Z",
+      "side": 1,
+      "message": "Please correct the path to say \"tools/\" not \"AIO\" :/",
+      "range": {
+        "startLine": 166,
+        "startChar": 12,
+        "endLine": 166,
+        "endChar": 78
+      },
+      "revId": "93a459eee3c18cc25069e59007c7d72c3aa6c06f",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
