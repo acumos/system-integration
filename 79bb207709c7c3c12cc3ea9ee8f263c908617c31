@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c79160f2_bd27ea34",
+        "filename": "docs/oneclick-deploy/user-guide.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-04-12T18:19:34Z",
+      "side": 1,
+      "message": "should be tools ?",
+      "range": {
+        "startLine": 323,
+        "startChar": 10,
+        "endLine": 323,
+        "endChar": 15
+      },
+      "revId": "79bb207709c7c3c12cc3ea9ee8f263c908617c31",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
