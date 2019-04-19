@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2ad71d09_c55fce68",
+        "filename": "docs/oneclick-deploy/user-guide.rst",
+        "patchSetId": 18
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-04-19T14:09:23Z",
+      "side": 1,
+      "message": "May I suggest putting this as the #1 bullet and including the command (\"git clone https://gerrit.acumos.org/r/system-integration\")? Because that\u0027s the A-number-1 prereq.  For example, #2 bullet system-integration/tools/setup_docker.sh comes from there.",
+      "range": {
+        "startLine": 81,
+        "startChar": 0,
+        "endLine": 81,
+        "endChar": 72
+      },
+      "revId": "8c169ba9d28da4b18904382ed4b5f9a27cb9ffdd",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a79e7b34_931cece0",
+        "filename": "docs/oneclick-deploy/user-guide.rst",
+        "patchSetId": 18
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-04-19T14:09:23Z",
+      "side": 1,
+      "message": "Is this only for the K8S configuration?  I believe docker-in-docker is not used/needed in the docker configuration, is that right?  But to be careful I will do this anyhow.",
+      "range": {
+        "startLine": 101,
+        "startChar": 6,
+        "endLine": 101,
+        "endChar": 49
+      },
+      "revId": "8c169ba9d28da4b18904382ed4b5f9a27cb9ffdd",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
