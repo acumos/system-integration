@@ -155,7 +155,8 @@ spec:
                      "mktPlaceEndPointURL": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosPortalBePort }}"
                    },
                    "microService": {
-                     "microServiceEndPointURL": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosMicroServiceGenerationPort }}/microservice-generation"
+                     "microServiceEndPointURL": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosMicroServiceGenerationPort }}/microservice-generation",
+                     "microServiceAsyncFlag": "false"
                    },
                    "requirements": {
                      "extraIndexURL": "",
@@ -687,7 +688,105 @@ spec:
            - mountPath: /maven/logs
              name: acumos-logs
            - mountPath: /app/certs
-             name: acumos-certs             
+             name: acumos-certs
+       - name: sv-scanning
+         image: {{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosSecurityVerificationImage }}
+         securityContext:
+           privileged: true
+         env:
+           - name: ACUMOS_ADMIN_USER
+             value: "admin"
+           - name: ACUMOS_CDS_HOST
+             value: "acumos.{{ .Values.namespace }}"
+           - name: ACUMOS_CDS_PORT
+             value: "{{ .Values.acumosCommonDataSvcPort }}"
+           - name: ACUMOS_CDS_USER
+             value: "{{ .Values.acumosCdsUser }}"
+           - name: ACUMOS_CDS_PASSWORD
+             value: "{{ .Values.acumosCdsPassword }}"
+           - name: SPRING_APPLICATION_JSON
+             value: '{
+             "server" : {
+                   "port" : {{ .Values.acumosSecurityVerificationPort }}
+            },
+            "cdms": {
+              "client": {
+                 "url": "http://acumos.{{ .Values.namespace }}:{{ .Values.acumosCommonDataSvcPort }}/ccds",
+                 "username": "{{ .Values.acumosCdsUser }}",
+                 "password": "{{ .Values.acumosCdsPassword }}"
+              }
+            },
+            "nexus": {
+               "nexusendpointurl": "http://{{ .Values.acumosNexusService }}.{{ .Values.namespace }}:{{ .Values.acumosNexusEndpointPort }}/repository/acumos-k8-models-maven/",
+               "nexusproxy": "",
+               "nexuspassword": "{{ .Values.acumosNexusPassword }}",
+               "nexususername": "{{ .Values.acumosNexusUsername }}",
+               "nexusgroupid": "com.artifact"
+                }
+            },
+            "siteConfig": "{
+              \"verification\": {
+                \"externalScan\": \"false\",
+                \"allowedLicense\": [
+                  { \"type\": \"SPDX\", \"value\": \"Apache-2.0\" },
+                  { \"type\": \"SPDX\", \"value\": \"CC-BY-4.0\" },
+                  { \"type\": \"SPDX\", \"value\": \"BSD-3-Clause\" },
+                  { \"type\": \"VendorA\", \"value\": \"VendorA-OSS\" },
+                  { \"type\": \"CompanyB\", \"value\": \"CompanyB-Proprietary\" }
+                ],
+                \"licenseScan\": {
+                  \"created\": \"true\",
+                  \"updated\": \"true\",
+                  \"deploy\": \"false\",
+                  \"download\": \"false\",
+                  \"share\": \"false\",
+                  \"publishCompany\": \"false\",
+                  \"publishPublic\": \"false\"
+                },
+                \"securityScan\": {
+                  \"created\": \"true\",
+                  \"updated\": \"true\",
+                  \"deploy\": \"false\",
+                  \"download\": \"false\",
+                  \"share\": \"false\",
+                  \"publishCompany\": \"false\",
+                  \"publishPublic\": \"false\"
+                },
+                \"licenseVerify\": {
+                  \"deploy\": \"true\",
+                  \"download\": \"true\",
+                  \"share\": \"false\",
+                  \"publishCompany\": \"true\",
+                  \"publishPublic\": \"true\"
+                },
+                \"securityVerify\": {
+                  \"deploy\": \"true\",
+                  \"download\": \"true\",
+                  \"share\": \"false\",
+                  \"publishCompany\": \"true\",
+                  \"publishPublic\": \"true\"
+                }
+              }
+            }"
+          }'
+         command: ['/bin/bash', '-c']
+         args:
+         - set -x;
+          while ! apt-get update;
+            do echo "Retrying package update in 5 seconds..."; sleep 5; done;
+          while ! apt-get install -y wget curl git jq zip python-dev xz-utils zlib1g libxml2-dev libxslt1-dev bzip2;
+            do echo "Retrying package install in 5 seconds..."; sleep 5; done;
+          cd /maven/scan;
+          wget https://github.com/nexB/scancode-toolkit/releases/download/v3.0.2/scancode-toolkit-3.0.2.zip;
+          unzip scancode-toolkit-3.0.2.zip;
+          cd /maven;
+          bash scan/setup_verification_site_config.sh $ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD $ACUMOS_ADMIN_USER;
+          java -jar security-verification-service-*.jar;
+         ports:
+          - containerPort: {{ .Values.acumosSecurityVerificationPort }}
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: acumos-logs             
        - name: filebeat
          image: {{ .Values.nexus3ReleaseRegistryLf }}/{{ .Values.acumosFilebeatImage }}
          ports:

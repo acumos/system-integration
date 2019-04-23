@@ -61,6 +61,7 @@ acumosLogstashPort: "5044"
 acumosMicroServiceGenerationPort: "8333"
 acumosKubernetesClientPort: "8082"
 acumosJupyterPort: "8086"
+acumosSecurityVerificationPort: "9082"
 
 # Images
 acumosOnboardingImage: "onboarding-app:2.7.0"
@@ -86,6 +87,7 @@ acumosMicroServiceGenerationImage: "microservice-generation:2.6.0"
 acumosSqlDataBrokerImage: "sqldatabroker:1.2.0"
 acumosH20GenericJavaModelRunnerImage: "h2o-genericjava-modelrunner-2.2.3"
 acumosKubernetesClientImage: "kubernetes-client:2.0.3"
+acumosSecurityVerificationImage: "security-verification:0.0.7"
 
 #Nexus
 acumosDockerHost: "acumos-docker-service"

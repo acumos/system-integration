@@ -71,7 +71,11 @@ spec:
     - port: {{ .Values.acumosAzureClientPort }}
       targetPort: {{ .Values.acumosAzureClientPort }}
       protocol: TCP
-      name: azure-client        
+      name: azure-client
+    - port: {{ .Values.acumosSecurityVerificationPort }}
+      targetPort: {{ .Values.acumosSecurityVerificationPort }}
+      protocol: TCP
+      name: sv-scanning      
   selector:
     app: acumos
     tier: frontend
