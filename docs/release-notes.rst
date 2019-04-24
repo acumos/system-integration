@@ -28,6 +28,26 @@ All-in-One (OneClick Deploy)
 ............................
 
 ----------------------------
+Version 2.2.0, 23 April 2019
+----------------------------
+
+This release completes the planned work for the Boreas release, minus any items
+not delivered so far and on the candidate list for deferral to Clio. Further
+releases in Boreas will align the AIO tools with the latest weekly releases,
+address bugs, and any remaining items that can't be deferred.
+
+* `Update to weekly assembly Acumos_1904021700 <https://gerrit.acumos.org/r/#/c/4089/>`_
+
+  * Delivers Jira items
+
+    * `ACUMOS-2714: Deploy security-verification component <https://jira.acumos.org/browse/ACUMOS-2714>`_
+    * `ACUMOS-2715: Support Helm use in Openshift deployments <https://jira.acumos.org/browse/ACUMOS-2715>`_
+    * `ACUMOS-2716: Add option for docker-on-host to address Azure-k8s issues <https://jira.acumos.org/browse/ACUMOS-2716>`_
+    * `ACUMOS-2717: Update to weekly assembly Acumos_1904021700 <https://jira.acumos.org/browse/ACUMOS-2717>`_
+    * `ACUMOS-2718: Add input parameter check and usage help to scripts <https://jira.acumos.org/browse/ACUMOS-2718>`_
+    * `ACUMOS-2721: Add scripts enabling redeployment of specific components <https://jira.acumos.org/browse/ACUMOS-2721>`_
+    
+----------------------------
 Version 2.1.0, 29 March 2019
 ----------------------------
 
@@ -43,6 +63,7 @@ The process for deploying the AIO platform has changed. Please review the
 `One Click Deploy User Guide <https://docs.acumos.org/en/latest/submodules/system-integration/docs/oneclick-deploy/index.html>`_
 for updated instructions.
 
+* `Fix release notes link <https://gerrit.acumos.org/r/#/c/4047/>`_
 * `AIO upgrade to CDS 2.0 <https://gerrit.acumos.org/r/#/c/3897/>`_
 
   * Delivers Jira items
