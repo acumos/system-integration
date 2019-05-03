@@ -214,7 +214,7 @@ permission, follow the process below.
 
   .. code-block:: bash
 
-    $ if [[ "$(id -nG "$USER" | grep docker)" == "" ]]; then sudo usermod -G docker $USER; fi
+    $ if [[ "$(id -nG "$USER" | grep docker)" == "" ]]; then sudo usermod -aG docker $USER; fi
   ..
 
   * if you see "usermod: group 'docker' does not exist", install docker (e.g.
