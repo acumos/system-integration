@@ -89,6 +89,10 @@ spec:
                       "probeApiPort": "5006",
                       "probeExternalPort": "30800",
                       "probeSchemaPort": "80"
+                    },
+                    "logstash": {
+                      "host": "<ACUMOS_LOGSTASH_HOST>",
+                      "port": "<ACUMOS_LOGSTASH_PORT>"
                     }
                   }'
         ports:

@@ -42,15 +42,15 @@ export ACUMOS_RELEASE=nexus3.acumos.org:10002
 # Core components
 export AZURE_CLIENT_IMAGE=$ACUMOS_STAGING/acumos-azure-client:2.0.12
 export PORTAL_CMS_IMAGE=$ACUMOS_RELEASE/acumos-cms-docker:1.3.5
-export PORTAL_BE_IMAGE=$ACUMOS_STAGING/acumos-portal-be:2.2.7
-export PORTAL_FE_IMAGE=$ACUMOS_STAGING/acumos-portal-fe:2.2.7
-export COMMON_DATASERVICE_IMAGE=$ACUMOS_STAGING/common-dataservice:2.1.2
+export PORTAL_BE_IMAGE=$ACUMOS_STAGING/acumos-portal-be:2.2.10
+export PORTAL_FE_IMAGE=$ACUMOS_STAGING/acumos-portal-fe:2.2.10
+export COMMON_DATASERVICE_IMAGE=$ACUMOS_STAGING/common-dataservice:2.2.2
 export DESIGNSTUDIO_IMAGE=$ACUMOS_STAGING/ds-compositionengine:2.0.6
 export FEDERATION_IMAGE=$ACUMOS_STAGING/federation-gateway:2.1.2
-export KUBERNETES_CLIENT_IMAGE=$ACUMOS_STAGING/kubernetes-client:2.0.7
-export MICROSERVICE_GENERATION_IMAGE=$ACUMOS_STAGING/microservice-generation:2.8.0
-export ONBOARDING_IMAGE=$ACUMOS_STAGING/onboarding-app:2.10.0
-export SECURITY_VERIFICATION_IMAGE=$ACUMOS_STAGING/security-verification:0.0.7
+export KUBERNETES_CLIENT_IMAGE=$ACUMOS_STAGING/kubernetes-client:2.0.10
+export MICROSERVICE_GENERATION_IMAGE=$ACUMOS_SNAPSHOT/microservice-generation:2.9.6-SNAPSHOT
+export ONBOARDING_IMAGE=$ACUMOS_STAGING/onboarding-app:2.12.4
+export SECURITY_VERIFICATION_IMAGE=$ACUMOS_STAGING/security-verification:0.0.9
 export OPENSTACK_CLIENT_IMAGE=$ACUMOS_STAGING/openstack-client:2.0.10
 
 # Model-execution-components
@@ -115,7 +115,7 @@ export HTTPS_PROXY=""
 export ACUMOS_ADMIN_EMAIL='acumos@example.com'
 export ACUMOS_CDS_PREVIOUS_VERSION=
 export ACUMOS_CDS_NODEPORT=30800
-export ACUMOS_CDS_VERSION=2.1
+export ACUMOS_CDS_VERSION=2.2
 export ACUMOS_CDS_DB='acumos_cds'
 export ACUMOS_CDS_USER=ccds_client
 export ACUMOS_CDS_PASSWORD=
@@ -146,6 +146,10 @@ export ACUMOS_SECURITY_VERIFICATION_PORT=30982
 export ACUMOS_NIFI_REGISTRY_PORT=31443
 export PYTHON_EXTRAINDEX=
 export PYTHON_EXTRAINDEX_HOST=
+
+# Acumos ELK component options
+export ACUMOS_LOGSTASH_HOST=$ACUMOS_DOMAIN
+export ACUMOS_LOGSTASH_PORT=30500
 
 # Acumos model deployment options
 export ACUMOS_DATA_BROKER_INTERNAL_PORT=8080
