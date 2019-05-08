@@ -164,6 +164,7 @@ done
 
 # mariadb setup
 cd $AIO_ROOT
+update_env AIO_ROOT $(pwd) force
 update_env DEPLOYED_UNDER k8s force
 update_env K8S_DIST $K8S_DIST force
 export ACUMOS_HOST_IP=$(/sbin/ip route get 8.8.8.8 | head -1 | sed 's/^.*src //' | awk '{print $1}')

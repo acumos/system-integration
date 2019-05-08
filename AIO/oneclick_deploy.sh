@@ -215,7 +215,7 @@ log "Apply environment customizations to unset values in acumos_env.sh"
 source acumos_env.sh
 
 prepare_env
-bash $AIO_ROOT/setup_keystore.sh $AIO_ROOT
+bash $AIO_ROOT/setup_keystore.sh
 
 if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
   if [[ "$ACUMOS_DEPLOY_DOCKER" == "true" ]]; then
@@ -236,7 +236,7 @@ if [[ "$ACUMOS_CDS_VERSION" != "$ACUMOS_CDS_PREVIOUS_VERSION" ]]; then
   update_env ACUMOS_SETUP_DB true
 fi
 if [[ "$ACUMOS_SETUP_DB" == "true" ]]; then
-  bash $AIO_ROOT/setup_acumosdb.sh $AIO_ROOT
+  bash $AIO_ROOT/setup_acumosdb.sh
 fi
 
 # Apply any env updates from above

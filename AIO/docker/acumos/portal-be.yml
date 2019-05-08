@@ -90,7 +90,11 @@ services:
                         \"verifyToken\": {
                           \"exp_time\": 24
                         },
-                      \"cloud_enabled\": \"[{\\\"cloudEnabled\\\" : \\\"true\\\", \\\"cloudName\\\" : \\\"azure\\\", \\\"cloudDisplayText\\\" : \\\"Microsoft Azure\\\", \\\"imageUrl\\\": \\\"/images/deploy-cloud/microsoft_azure.png\\\" },{ \\\"cloudEnabled\\\" : \\\"true\\\", \\\"cloudName\\\" : \\\"rackspace\\\", \\\"cloudDisplayText\\\" : \\\"Rackspace\\\", \\\"imageUrl\\\" : \\\"/images/deploy-cloud/rackspace.png\\\" },{ \\\"cloudEnabled\\\" : \\\"false\\\",  \\\"cloudName\\\" : \\\"gcp\\\", \\\"cloudDisplayText\\\" : \\\"Google Cloud Platform\\\", \\\"imageUrl\\\" : \\\"/images/deploy-cloud/google_cloud_platform.png\\\" },{ \\\"cloudEnabled\\\" : \\\"true\\\",  \\\"cloudName\\\" : \\\"deploylocal\\\", \\\"cloudDisplayText\\\" : \\\"Deploy To Local\\\", \\\"imageUrl\\\": \\\"/images/deploy-cloud/deploy_to_local.png\\\" },{ \\\"cloudEnabled\\\" : \\\"false\\\", \\\"cloudName\\\" : \\\"whitebox\\\", \\\"cloudDisplayText\\\" : \\\"Deploy To White Box\\\", \\\"imageUrl\\\" : \\\"/images/deploy-cloud/deploy_to_whitebox.png\\\" }]\"
+                      \"cloud_enabled\": \"[{\\\"cloudEnabled\\\" : \\\"true\\\", \\\"cloudName\\\" : \\\"azure\\\", \\\"cloudDisplayText\\\" : \\\"Microsoft Azure\\\", \\\"imageUrl\\\": \\\"/images/deploy-cloud/microsoft_azure.png\\\" },{ \\\"cloudEnabled\\\" : \\\"true\\\", \\\"cloudName\\\" : \\\"rackspace\\\", \\\"cloudDisplayText\\\" : \\\"Rackspace\\\", \\\"imageUrl\\\" : \\\"/images/deploy-cloud/rackspace.png\\\" },{ \\\"cloudEnabled\\\" : \\\"false\\\",  \\\"cloudName\\\" : \\\"gcp\\\", \\\"cloudDisplayText\\\" : \\\"Google Cloud Platform\\\", \\\"imageUrl\\\" : \\\"/images/deploy-cloud/google_cloud_platform.png\\\" },{ \\\"cloudEnabled\\\" : \\\"true\\\",  \\\"cloudName\\\" : \\\"deploylocal\\\", \\\"cloudDisplayText\\\" : \\\"Deploy To Local\\\", \\\"imageUrl\\\": \\\"/images/deploy-cloud/deploy_to_local.png\\\" },{ \\\"cloudEnabled\\\" : \\\"false\\\", \\\"cloudName\\\" : \\\"whitebox\\\", \\\"cloudDisplayText\\\" : \\\"Deploy To White Box\\\", \\\"imageUrl\\\" : \\\"/images/deploy-cloud/deploy_to_whitebox.png\\\" }]\",
+                      \"sv\": {
+                        \"enabled\": \"true\",
+                        \"api\": \"http://sv-scanning-service:9082/scan\"
+                        }
                       },
                       \"submitValidation\": {
                         \"api\": \"http://validation-client-service:9603/status/v1.0/tasks\"

@@ -27,8 +27,7 @@
 #   For docker-based deployments, run this script on the AIO host.
 #   For k8s-based deployment, run this script on the AIO host or a workstation
 #   connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
-#   $ bash setup_acumosdb.sh <AIO_ROOT>
-#     AIO_ROOT: path to AIO folder where environment files are
+#   $ bash setup_acumosdb.sh
 #
 
 function clean_db() {
@@ -36,9 +35,6 @@ function clean_db() {
   log "Remove Acumos databases if present in MariaDB"
   if [[ $(mysql $server --user=root --password=$ACUMOS_MARIADB_PASSWORD -e "DROP DATABASE $ACUMOS_CDS_DB;") ]]; then
     log "Database $ACUMOS_CDS_DB dropped"
-  fi
-  if [[ $(mysql $server --user=root --password=$ACUMOS_MARIADB_PASSWORD -e "DROP DATABASE $ACUMOS_CMS_DB;") ]]; then
-    log "Database $ACUMOS_CMS_DB dropped"
   fi
   log "Create database $ACUMOS_CDS_DB"
   mysql $server --user=root --password=$ACUMOS_MARIADB_PASSWORD \
@@ -58,10 +54,6 @@ function new_db() {
   wget https://raw.githubusercontent.com/acumos/common-dataservice/master/cmn-data-svc-server/db-scripts/cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql
   sedi "1s/^/use $ACUMOS_CDS_DB;\n/" cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql
   mysql $server --user=$ACUMOS_MARIADB_USER --password=$ACUMOS_MARIADB_USER_PASSWORD < cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql
-
-  log "Create database $ACUMOS_CMS_DB"
-  mysql $server --user=root --password=$ACUMOS_MARIADB_PASSWORD \
-    -e "CREATE DATABASE $ACUMOS_CMS_DB; USE $ACUMOS_CMS_DB; GRANT ALL PRIVILEGES ON $ACUMOS_CMS_DB.* TO \"$ACUMOS_MARIADB_USER\"@'%' IDENTIFIED BY \"$ACUMOS_MARIADB_USER_PASSWORD\";"
 }
 
 function upgrade_db() {
@@ -93,24 +85,12 @@ function setup_acumosdb() {
   fi
 }
 
-if [[ $# -lt 1 ]]; then
-  cat <<'EOF'
-Usage:
-  For docker-based deployments, run this script on the AIO host.
-  For k8s-based deployment, run this script on the AIO host or a workstation
-  connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
-  $ bash setup_acumosdb.sh <AIO_ROOT>
-    AIO_ROOT: path to AIO folder where environment files are
-EOF
-  echo "All parameters not provided"
-  exit 1
-fi
-
+set -x
 WORK_DIR=$(pwd)
-export AIO_ROOT=$1
-source $AIO_ROOT/acumos_env.sh
-source $AIO_ROOT/utils.sh
+cd $(dirname "$0")
+source acumos_env.sh
+export AIO_ROOT=$(pwd)
+source utils.sh
 trap 'fail' ERR
-cd $AIO_ROOT
 setup_acumosdb
 cd $WORK_DIR
