@@ -164,6 +164,7 @@ done
 
 # mariadb setup
 cd $AIO_ROOT
+update_env AIO_ROOT $(pwd) force
 update_env DEPLOYED_UNDER k8s force
 update_env K8S_DIST $K8S_DIST force
 export ACUMOS_HOST_IP=$(/sbin/ip route get 8.8.8.8 | head -1 | sed 's/^.*src //' | awk '{print $1}')
@@ -182,6 +183,7 @@ delete_namespace $ACUMOS_MARIADB_NAMESPACE
 delete_pvc mariadb-data $ACUMOS_MARIADB_NAMESPACE
 reset_pv mariadb-data $ACUMOS_MARIADB_NAMESPACE \
     $MARIADB_DATA_PV_SIZE "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
+bash $WORK_DIR/system-integration/tools/setup_mariadb_client.sh $AIO_ROOT
 bash $WORK_DIR/system-integration/charts/mariadb/setup_mariadb.sh \
   $AIO_ROOT $(hostname) $K8S_DIST
 cp $WORK_DIR/system-integration/charts/mariadb/mariadb_env.sh $WORK_DIR/acumos/env/.
