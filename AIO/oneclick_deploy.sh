@@ -127,7 +127,7 @@ function setup_acumos() {
 
     log "Wait for all Acumos core component pods to be Running"
     log "Wait for all Acumos pods to be Running"
-    apps="azure-client cms cds dsce federation kubernetes-client msg onboarding \
+    apps="azure-client cds dsce federation kubernetes-client msg onboarding \
       portal-be portal-fe"
     for app in $apps; do
       wait_running $app $ACUMOS_NAMESPACE
@@ -139,14 +139,7 @@ function setup_acumos() {
       bash $AIO_ROOT/../charts/jupyterhub/setup_jupyterhub.sh \
         $ACUMOS_NAMESPACE $ACUMOS_ONBOARDING_TOKENMODE
     fi
-
-    log "Enable Pipeline Service to create NiFi user services under k8s"
-    kubectl create -f deploy/namespace-admin-role.yaml
-    kubectl create -f deploy/namespace-admin-rolebinding.yaml
   fi
-
-  log "Customize aio-cms-host.yaml"
-  sedi "s~<ACUMOS_DOMAIN>~$ACUMOS_DOMAIN~g" aio-cms-host.yaml
 }
 
 function setup_federation() {
@@ -215,7 +208,7 @@ log "Apply environment customizations to unset values in acumos_env.sh"
 source acumos_env.sh
 
 prepare_env
-bash $AIO_ROOT/setup_keystore.sh $AIO_ROOT
+bash $AIO_ROOT/setup_keystore.sh
 
 if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
   if [[ "$ACUMOS_DEPLOY_DOCKER" == "true" ]]; then
@@ -236,7 +229,7 @@ if [[ "$ACUMOS_CDS_VERSION" != "$ACUMOS_CDS_PREVIOUS_VERSION" ]]; then
   update_env ACUMOS_SETUP_DB true
 fi
 if [[ "$ACUMOS_SETUP_DB" == "true" ]]; then
-  bash $AIO_ROOT/setup_acumosdb.sh $AIO_ROOT
+  bash $AIO_ROOT/setup_acumosdb.sh
 fi
 
 # Apply any env updates from above
@@ -277,6 +270,8 @@ Portal: https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT
 Common Data Service: https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/swagger-ui.html
 Kibana: http://$ACUMOS_ELK_DOMAIN:$ACUMOS_ELK_KIBANA_PORT/app/kibana
 Nexus: http://$ACUMOS_NEXUS_DOMAIN:$ACUMOS_NEXUS_API_PORT
-Mariadb Admin: http://$ACUMOS_DOMAIN:$ACUMOS_MARIADB_ADMINER_PORT
 EOF
+if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
+  echo "Mariadb Admin: http://$ACUMOS_DOMAIN:$ACUMOS_MARIADB_ADMINER_PORT" >>acumos.url
+fi
 cat acumos.url
