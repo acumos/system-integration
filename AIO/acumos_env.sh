@@ -147,6 +147,10 @@ export ACUMOS_NIFI_REGISTRY_PORT=31443
 export PYTHON_EXTRAINDEX=
 export PYTHON_EXTRAINDEX_HOST=
 
+# Acumos ELK component options
+source $AIO_ROOT/../charts/elk-stack/setup_elk_env.sh
+
+
 # Acumos model deployment options
 export ACUMOS_DATA_BROKER_INTERNAL_PORT=8080
 export ACUMOS_DATA_BROKER_PORT=8556
