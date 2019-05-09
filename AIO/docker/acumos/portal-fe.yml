@@ -34,9 +34,6 @@ services:
                       \"dsce\": {
                         \"url\": \"http://dsce-service:8088\"
                       },
-                      \"site\": {
-                        \"url\": \"http://cms-service:9080\"
-                      },
                       \"cmnt\": {
                         \"url\": \"http://delete-me\"
                       },

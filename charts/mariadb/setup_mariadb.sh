@@ -76,21 +76,8 @@ function mariadb_customize_sql() {
   trap 'mariadb_fail' ERR
   cd /tmp/charts/stable/mariadb
   # Issue bug to https://github.com/helm/charts/tree/master/stable/mariadb
-  sedi 's/{{ template "master.fullname" . }}/mariadb/' \
+  sed -i -- 's/{{ template "master.fullname" . }}/mariadb/' \
     templates/initialization-configmap.yaml
-  cd files/docker-entrypoint-initdb.d
-  wget -O /tmp/$sql $base/$sql
-  if [[ ! -e /tmp/$sql ]]; then
-    echo "No available CDS script $sql"
-    exit 1
-  fi
-  echo "use $ACUMOS_CDS_DB;" >$sql
-  cat /tmp/$sql >>$sql
-
-  cat <<EOF >user.sql
-USE $ACUMOS_CDS_DB;
-GRANT ALL PRIVILEGES ON $ACUMOS_CDS_DB.* TO "$ACUMOS_MARIADB_USER"@'%' IDENTIFIED BY "$ACUMOS_MARIADB_USER_PASSWORD";
-EOF
 }
 
 function mariadb_deploy_chart() {
@@ -173,7 +160,22 @@ EOF
   mariadb_deploy_chart '.'
   wait_running mariadb $ACUMOS_MARIADB_NAMESPACE
 
-  cd $WORK_DIR
+  log "Wait for mariadb server to accept connections"
+  i=0
+  while ! mysql -h $ACUMOS_MARIADB_HOST_IP -P $ACUMOS_MARIADB_PORT --user=root \
+  --password=$ACUMOS_MARIADB_PASSWORD -e "SHOW DATABASES;" ; do
+    i=$((i+1))
+    if [[ $i -gt 30 ]]; then
+      fail "MariaDB failed to respond after 5 minutes"
+    fi
+    log "Mariadb server is not yet accepting connections from $ACUMOS_MARIADB_ADMIN_HOST"
+    sleep 10
+  done
+
+  log "Initialize Acumos database"
+  # CDS 2.2 added portal assets (images) to the DDL so we can't use a configmap
+  # anymore (DDL > 1MB)
+  bash $AIO_ROOT/setup_acumosdb.sh
 }
 
 
@@ -196,7 +198,7 @@ export ACUMOS_MARIADB_HOST=$2
 export DEPLOYED_UNDER=k8s
 export K8S_DIST=$3
 source $AIO_ROOT/utils.sh
-cd $AIO_ROOT/../charts/mariadb
+cd $(dirname "$0")
 
 if [[ -e mariadb_env.sh ]]; then
   log "Using prepared mariadb_env.sh for customized environment values"
@@ -208,6 +210,7 @@ set_k8s_env
 source setup_mariadb_env.sh
 mariadb_clean
 mariadb_setup
+cd $(dirname "$0")
 # Prevent ACUMOS_CDS_VERSION in mariadb-env fron overriding acumos_env.sh,
 # since it may be updated later by acumos_env.sh
 sedi "s/ACUMOS_CDS_VERSION=/#ACUMOS_CDS_VERSION=/" mariadb_env.sh

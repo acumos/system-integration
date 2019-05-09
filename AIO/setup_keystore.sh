@@ -30,8 +30,7 @@
 #   For docker-based deployments, run this script on the AIO host.
 #   For k8s-based deployment, run this script on the AIO host or a workstation
 #   connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
-#   $ bash setup_keystore.sh <AIO_ROOT>
-#     AIO_ROOT: path to AIO folder where environment files are
+#   $ bash setup_keystore.sh
 #
 
 function update_cert_env() {
@@ -47,7 +46,9 @@ function setup_keystore() {
     log "Using existing user-prepared files in certs subfolder"
   else
     log "Creating new certs in certs subfolder"
-    bash certs/setup_certs.sh $AIO_ROOT $ACUMOS_CERT_PREFIX $ACUMOS_DOMAIN
+    cd certs
+    bash setup_certs.sh $AIO_ROOT $ACUMOS_CERT_PREFIX $ACUMOS_DOMAIN
+    cd ..
   fi
 
   if [[ ! -e certs/cert_env.sh ]]; then
@@ -77,24 +78,12 @@ function setup_keystore() {
   fi
 }
 
-if [[ $# -lt 1 ]]; then
-  cat <<'EOF'
-Usage:
-  For docker-based deployments, run this script on the AIO host.
-  For k8s-based deployment, run this script on the AIO host or a workstation
-  connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
-  $ bash setup_keystore.sh <AIO_ROOT>
-    AIO_ROOT: path to AIO folder where environment files are
-EOF
-  echo "All parameters not provided"
-  exit 1
-fi
-
+set -x
 WORK_DIR=$(pwd)
-export AIO_ROOT=$1
-source $AIO_ROOT/acumos_env.sh
-source $AIO_ROOT/utils.sh
+cd $(dirname "$0")
+source acumos_env.sh
+export AIO_ROOT=$(pwd)
+source utils.sh
 trap 'fail' ERR
-cd $AIO_ROOT
 setup_keystore
 cd $WORK_DIR

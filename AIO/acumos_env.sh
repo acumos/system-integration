@@ -25,7 +25,7 @@
 #
 
 # Version of the AIO toolset
-export ACUMOS_AIO_VERSION=2.2.0
+export ACUMOS_AIO_VERSION=2.2.2
 
 # Acumos project Registries
 export ACUMOS_PROJECT_NEXUS_USERNAME=docker
@@ -38,20 +38,28 @@ export ACUMOS_STAGING=nexus3.acumos.org:10004
 export ACUMOS_RELEASE=nexus3.acumos.org:10002
 
 # Images per Boreas release assembly
-# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_1904021700
+# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_1904301100
 # Core components
-export AZURE_CLIENT_IMAGE=$ACUMOS_STAGING/acumos-azure-client:2.0.12
-export PORTAL_CMS_IMAGE=$ACUMOS_RELEASE/acumos-cms-docker:1.3.5
-export PORTAL_BE_IMAGE=$ACUMOS_STAGING/acumos-portal-be:2.2.7
-export PORTAL_FE_IMAGE=$ACUMOS_STAGING/acumos-portal-fe:2.2.7
-export COMMON_DATASERVICE_IMAGE=$ACUMOS_STAGING/common-dataservice:2.1.2
-export DESIGNSTUDIO_IMAGE=$ACUMOS_STAGING/ds-compositionengine:2.0.6
-export FEDERATION_IMAGE=$ACUMOS_STAGING/federation-gateway:2.1.2
-export KUBERNETES_CLIENT_IMAGE=$ACUMOS_STAGING/kubernetes-client:2.0.7
-export MICROSERVICE_GENERATION_IMAGE=$ACUMOS_STAGING/microservice-generation:2.8.0
-export ONBOARDING_IMAGE=$ACUMOS_STAGING/onboarding-app:2.10.0
-export SECURITY_VERIFICATION_IMAGE=$ACUMOS_STAGING/security-verification:0.0.7
+export AZURE_CLIENT_IMAGE=$ACUMOS_STAGING/acumos-azure-client:2.0.13
+export PORTAL_BE_IMAGE=$ACUMOS_STAGING/acumos-portal-be:2.2.10
+export PORTAL_FE_IMAGE=$ACUMOS_STAGING/acumos-portal-fe:2.2.10
+export COMMON_DATASERVICE_IMAGE=$ACUMOS_STAGING/common-dataservice:2.2.2
+export DESIGNSTUDIO_IMAGE=$ACUMOS_STAGING/ds-compositionengine:2.0.8
+export FEDERATION_IMAGE=$ACUMOS_STAGING/federation-gateway:2.2.0
+export KUBERNETES_CLIENT_IMAGE=$ACUMOS_STAGING/kubernetes-client:2.0.10
+export MICROSERVICE_GENERATION_IMAGE=$ACUMOS_STAGING/microservice-generation:2.10.0
+export ONBOARDING_IMAGE=$ACUMOS_STAGING/onboarding-app:2.12.0
+export SECURITY_VERIFICATION_IMAGE=$ACUMOS_SNAPSHOT/security-verification:0.0.13-SNAPSHOT
 export OPENSTACK_CLIENT_IMAGE=$ACUMOS_STAGING/openstack-client:2.0.10
+export MLWB_PROJECT_SERVICE_IMAGE=$ACUMOS_STAGING/project-service:1.0.0
+export MLWB_NOTEBOOK_SERVICE_IMAGE=$ACUMOS_STAGING/notebook-service:1.0.0
+export MLWB_PIPELINE_SERVICE_IMAGE=$ACUMOS_STAGING/pipeline-service:1.0.0
+export MLWB_DASHBOARD_IMAGE=$ACUMOS_STAGING/Dashboard-webcomponent:1.0.2
+export MLWB_HOME_IMAGE=$ACUMOS_STAGING/home-webcomponent:1.0.2
+export MLWB_NOTEBOOK_CATALOG_IMAGE=$ACUMOS_STAGING/notebook-catalog-webcomponent:1.0.2
+export MLWB_WEBCOMPONENT_IMAGE=$ACUMOS_STAGING/webcomponent:1.0.2
+export MLWB_PROJECT_IMAGE=$ACUMOS_STAGING/project-webcomponent:1.0.2
+export MLWB_CATALOG_IMAGE=$ACUMOS_STAGING/project-catalog-webcomponent:1.0.2
 
 # Model-execution-components
 export DATABROKER_SQLBROKER_IMAGE=$ACUMOS_RELEASE/sqldatabroker:1.2.0
@@ -60,7 +68,7 @@ export ONBOARDING_BASE_IMAGE=$ACUMOS_RELEASE/onboarding-base-r:1.0.0
 export BLUEPRINT_ORCHESTRATOR_IMAGE=$ACUMOS_STAGING/blueprint-orchestrator:2.0.12
 export H2O_GENERICJAVA_MODELRUNNER_IMAGE=$ACUMOS_RELEASE/h2o-genericjava-modelrunner-2.2.3
 export DATABROKER_ZIPBROKER_IMAGE=$ACUMOS_RELEASE/databroker-zipbroker:0.0.1
-export PROTO_VIEWER_IMAGE=$ACUMOS_RELEASE/acumos-proto-viewer:1.5.6
+export PROTO_VIEWER_IMAGE=$ACUMOS_RELEASE/acumos-proto-viewer:1.5.7
 
 # Set by oneclick_deploy.sh
 export DEPLOYED_UNDER=
@@ -88,6 +96,7 @@ export ACUMOS_DEPLOY_NEXUS=true
 export ACUMOS_DEPLOY_ELK=true
 export ACUMOS_DEPLOY_ELK_METRICBEAT=true
 export ACUMOS_DEPLOY_ELK_FILEBEAT=true
+export ACUMOS_DEPLOY_MLWB=true
 export ACUMOS_DOCKER_API_HOST=docker-dind-service
 export ACUMOS_DOCKER_API_PORT=2375
 export ACUMOS_NEXUS_ADMIN_PASSWORD=admin123
@@ -115,11 +124,10 @@ export HTTPS_PROXY=""
 export ACUMOS_ADMIN_EMAIL='acumos@example.com'
 export ACUMOS_CDS_PREVIOUS_VERSION=
 export ACUMOS_CDS_NODEPORT=30800
-export ACUMOS_CDS_VERSION=2.1
+export ACUMOS_CDS_VERSION=2.2
 export ACUMOS_CDS_DB='acumos_cds'
 export ACUMOS_CDS_USER=ccds_client
 export ACUMOS_CDS_PASSWORD=
-export ACUMOS_CMS_DB='acumos_cms'
 export ACUMOS_DOCKER_PROXY_HOST=$ACUMOS_DOMAIN
 export ACUMOS_DOCKER_PROXY_PORT=30883
 export ACUMOS_DOCKER_PROXY_USERNAME=

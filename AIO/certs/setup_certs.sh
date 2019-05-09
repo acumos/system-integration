@@ -139,12 +139,11 @@ EOF
   exit 1
 fi
 
+set -x
 WORK_DIR=$(pwd)
 export AIO_ROOT=$1
-source $AIO_ROOT/acumos_env.sh
 source $AIO_ROOT/utils.sh
 trap 'fail' ERR
-cd $AIO_ROOT/certs
 export HOST_OS=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
 name=$2
 sn=$3
