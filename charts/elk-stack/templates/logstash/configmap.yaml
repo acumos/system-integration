@@ -25,110 +25,86 @@ metadata:
 data:
   logstash.conf: |-
     input {
-       jdbc {
-       jdbc_driver_library => "${ACUMOS_ELK_JDBC_DRIVER_LIBRARY}"
-       jdbc_driver_class => "${ACUMOS_ELK_JDBC_DRIVER_CLASS}"
-       jdbc_connection_string => "${ACUMOS_ELK_JDBC_CONNECTION_STRING}"
-       jdbc_user => "${ACUMOS_ELK_JDBC_USERNAME}"
-       jdbc_password => "${ACUMOS_ELK_JDBC_PASSWORD}"
-       jdbc_validate_connection => true
-       schedule => "* * * * *"
-       statement => "SELECT * FROM C_SOLUTION_DOWNLOAD"
-       type => "solution_downloaded"
-       tags => ["database"]
+      jdbc {
+        jdbc_driver_library => "${ACUMOS_ELK_JDBC_DRIVER_LIBRARY}"
+        jdbc_driver_class => "${ACUMOS_ELK_JDBC_DRIVER_CLASS}"
+        jdbc_connection_string => "${ACUMOS_ELK_JDBC_CONNECTION_STRING}"
+        jdbc_user => "${ACUMOS_ELK_JDBC_USERNAME}"
+        jdbc_password => "${ACUMOS_ELK_JDBC_PASSWORD}"
+        jdbc_validate_connection => true
+        schedule => "0 * * * *"
+        statement => "SELECT * FROM C_SOLUTION_DOWNLOAD"
+        sql_log_level => "error"
+        tags => ["database"]
       }
       jdbc {
-       jdbc_driver_library => "${ACUMOS_ELK_JDBC_DRIVER_LIBRARY}"
-       jdbc_driver_class => "${ACUMOS_ELK_JDBC_DRIVER_CLASS}"
-       jdbc_connection_string => "${ACUMOS_ELK_JDBC_CONNECTION_STRING}"
-       jdbc_user => "${ACUMOS_ELK_JDBC_USERNAME}"
-       jdbc_password => "${ACUMOS_ELK_JDBC_PASSWORD}"
-       jdbc_validate_connection => true
-       schedule => "* * * * *"
-       statement => "SELECT * FROM C_USER"
-       type => "no_of_user"
-       tags => ["database"]
+        jdbc_driver_class => "${ACUMOS_ELK_JDBC_DRIVER_CLASS}"
+        jdbc_driver_library => "${ACUMOS_ELK_JDBC_DRIVER_LIBRARY}"
+        jdbc_connection_string => "${ACUMOS_ELK_JDBC_CONNECTION_STRING}"
+        jdbc_user => "${ACUMOS_ELK_JDBC_USERNAME}"
+        jdbc_password => "${ACUMOS_ELK_JDBC_PASSWORD}"
+        jdbc_validate_connection => true
+        schedule => "* * * * *"
+        statement => "SELECT USER_ID,FIRST_NAME,MIDDLE_NAME,LAST_NAME,ORG_NAME,EMAIL,LOGIN_NAME,ACTIVE_YN,LAST_LOGIN_DATE,CREATED_DATE,MODIFIED_DATE,LOGIN_FAIL_COUNT,LOGIN_PASS_EXPIRE_DATE,LOGIN_FAIL_DATE FROM C_USER"
+        sql_log_level => "error"
+        tags => ["database"]
       }
       jdbc {
-       jdbc_driver_library => "${ACUMOS_ELK_JDBC_DRIVER_LIBRARY}"
-       jdbc_driver_class => "${ACUMOS_ELK_JDBC_DRIVER_CLASS}"
-       jdbc_connection_string => "${ACUMOS_ELK_JDBC_CONNECTION_STRING}"
-       jdbc_user => "${ACUMOS_ELK_JDBC_USERNAME}"
-       jdbc_password => "${ACUMOS_ELK_JDBC_PASSWORD}"
-       jdbc_validate_connection => true
-       schedule => "* * * * *"
-       statement => "SELECT * FROM C_SOLUTION_DEPLOYMENT"
-       type => "solution_deployed"
-       tags => ["database"]
+        jdbc_driver_library => "${ACUMOS_ELK_JDBC_DRIVER_LIBRARY}"
+        jdbc_driver_class => "${ACUMOS_ELK_JDBC_DRIVER_CLASS}"
+        jdbc_connection_string => "${ACUMOS_ELK_JDBC_CONNECTION_STRING}"
+        jdbc_user => "${ACUMOS_ELK_JDBC_USERNAME}"
+        jdbc_password => "${ACUMOS_ELK_JDBC_PASSWORD}"
+        jdbc_validate_connection => true
+        schedule => "0 * * * *"
+        statement => "SELECT * FROM C_SOLUTION_DEPLOYMENT"
+        sql_log_level => "error"
+        tags => ["database"]
       }
       jdbc {
-       jdbc_driver_library => "${ACUMOS_ELK_JDBC_DRIVER_LIBRARY}"
-       jdbc_driver_class => "${ACUMOS_ELK_JDBC_DRIVER_CLASS}"
-       jdbc_connection_string => "${ACUMOS_ELK_JDBC_CONNECTION_STRING}"
-       jdbc_user => "${ACUMOS_ELK_JDBC_USERNAME}"
-       jdbc_password => "${ACUMOS_ELK_JDBC_PASSWORD}"
-       jdbc_validate_connection => true
-       schedule => "* * * * *"
-       statement => "SELECT * FROM C_SOLUTION"
-       type => "all_solution"
-       tags => ["database"]
+        jdbc_driver_library => "${ACUMOS_ELK_JDBC_DRIVER_LIBRARY}"
+        jdbc_driver_class => "${ACUMOS_ELK_JDBC_DRIVER_CLASS}"
+        jdbc_connection_string => "${ACUMOS_ELK_JDBC_CONNECTION_STRING}"
+        jdbc_user => "${ACUMOS_ELK_JDBC_USERNAME}"
+        jdbc_password => "${ACUMOS_ELK_JDBC_PASSWORD}"
+        jdbc_validate_connection => true
+        schedule => "* * * * *"
+        statement => "SELECT SOLUTION_ID,NAME,VIEW_COUNT,DOWNLOAD_COUNT,RATING_AVG_TENTHS,RATING_COUNT,FEATURED_YN,USER_ID,ACTIVE_YN,MODEL_TYPE_CD,TOOLKIT_TYPE_CD,CREATED_DATE,MODIFIED_DATE,LAST_DOWNLOAD FROM C_SOLUTION"
+        sql_log_level => "error"
+        tags => ["database"]
       }
       jdbc {
-       jdbc_driver_library => "${ACUMOS_ELK_JDBC_DRIVER_LIBRARY}"
-       jdbc_driver_class => "${ACUMOS_ELK_JDBC_DRIVER_CLASS}"
-       jdbc_connection_string => "${ACUMOS_ELK_JDBC_CONNECTION_STRING}"
-       jdbc_user => "${ACUMOS_ELK_JDBC_USERNAME}"
-       jdbc_password => "${ACUMOS_ELK_JDBC_PASSWORD}"
-       jdbc_validate_connection => true
-       schedule => "* * * * *"
-       statement => "SELECT * FROM C_SOLUTION_REV"
-       type => "revision_solution"
-       tags => ["database"]
+        jdbc_driver_library => "${ACUMOS_ELK_JDBC_DRIVER_LIBRARY}"
+        jdbc_driver_class => "${ACUMOS_ELK_JDBC_DRIVER_CLASS}"
+        jdbc_connection_string => "${ACUMOS_ELK_JDBC_CONNECTION_STRING}"
+        jdbc_user => "${ACUMOS_ELK_JDBC_USERNAME}"
+        jdbc_password => "${ACUMOS_ELK_JDBC_PASSWORD}"
+        jdbc_validate_connection => true
+        schedule => "* * * * *"
+        statement => "SELECT * FROM C_SOLUTION_REV"
+        sql_log_level => "error"
+        tags => ["database"]
       }
       jdbc {
-       jdbc_driver_library => "${ACUMOS_ELK_JDBC_DRIVER_LIBRARY}"
-       jdbc_driver_class => "${ACUMOS_ELK_JDBC_DRIVER_CLASS}"
-       jdbc_connection_string => "${ACUMOS_ELK_JDBC_CONNECTION_STRING}"
-       jdbc_user => "${ACUMOS_ELK_JDBC_USERNAME}"
-       jdbc_password => "${ACUMOS_ELK_JDBC_PASSWORD}"
-       jdbc_validate_connection => true
-       schedule => "* * * * *"
-       statement => "SELECT * FROM C_SOLUTION s inner join C_SOLUTION_REV r ON s.SOLUTION_ID = r.SOLUTION_ID AND r.ACCESS_TYPE_CD='OR' and s.ACTIVE_YN ='Y'"
-       type => "company_model"
-       tags => ["database"]
-      }
-      jdbc {
-       jdbc_driver_library => "${ACUMOS_ELK_JDBC_DRIVER_LIBRARY}"
-       jdbc_driver_class => "${ACUMOS_ELK_JDBC_DRIVER_CLASS}"
-       jdbc_connection_string => "${ACUMOS_ELK_JDBC_CONNECTION_STRING}"
-       jdbc_user => "${ACUMOS_ELK_JDBC_USERNAME}"
-       jdbc_password => "${ACUMOS_ELK_JDBC_PASSWORD}"
-       jdbc_validate_connection => true
-       schedule => "* * * * *"
-       statement => "SELECT * FROM C_SOLUTION s inner join C_SOLUTION_REV r ON s.SOLUTION_ID = r.SOLUTION_ID AND r.ACCESS_TYPE_CD='PB' and s.ACTIVE_YN ='Y'"
-       type => "public_model"
-       tags => ["database"]
-      }
-      jdbc {
-       jdbc_driver_library => "${ACUMOS_ELK_JDBC_DRIVER_LIBRARY}"
-       jdbc_driver_class => "${ACUMOS_ELK_JDBC_DRIVER_CLASS}"
-       jdbc_connection_string => "${ACUMOS_ELK_JDBC_CONNECTION_STRING}"
-       jdbc_user => "${ACUMOS_ELK_JDBC_USERNAME}"
-       jdbc_password => "${ACUMOS_ELK_JDBC_PASSWORD}"
-       jdbc_validate_connection => true
-       schedule => "* * * * *"
-       statement => "SELECT * FROM C_SOLUTION s inner join C_SOLUTION_REV r ON s.SOLUTION_ID = r.SOLUTION_ID AND r.ACCESS_TYPE_CD='PR' and s.ACTIVE_YN ='Y'"
-       type => "private_model"
-       tags => ["database"]
+        jdbc_driver_library => "${ACUMOS_ELK_JDBC_DRIVER_LIBRARY}"
+        jdbc_driver_class => "${ACUMOS_ELK_JDBC_DRIVER_CLASS}"
+        jdbc_connection_string => "${ACUMOS_ELK_JDBC_CONNECTION_STRING}"
+        jdbc_user => "${ACUMOS_ELK_JDBC_USERNAME}"
+        jdbc_password => "${ACUMOS_ELK_JDBC_PASSWORD}"
+        jdbc_validate_connection => true
+        schedule => "* * * * *"
+        statement => "select solution.name,CONCAT(user.first_name,' ',user.last_name) from c_solution solution inner join c_user user on user.USER_ID = solution.USER_ID"
+        sql_log_level => "error"
+        tags => ["database"]
       }
 
       beats {
         port => 5044
         codec => plain {
-                 charset => "ISO-8859-1"
-                       }
-            }
+          charset => "ISO-8859-1"
         }
+      }
+    }
      filter  {
        if ([source] =~ /access.log$/){
           grok {
@@ -151,28 +127,27 @@ data:
           }
         }
       }
-      output {
-       stdout { codec => json_lines }
-       if "database" in [tags]{
-       elasticsearch {
-       hosts => ["elasticsearch:9200"]
-       index => "testdb"
-       document_type => "%{type}"
-       }
+    output {
+      stdout { codec => json_lines }
+      if "database" in [tags] {
+        elasticsearch {
+          hosts => ["elasticsearch:9200"]
+           index => "testdb"
+        }
       }
       else if "acumos-model-usage-logs" in [tags] {
         elasticsearch {
-            hosts => ["elasticsearch:9200"]
-            index => "acumos-model-usage-logs"
+          hosts => ["elasticsearch:9200"]
+          index => "acumos-model-usage-logs"
         }
       }
       else {
-     elasticsearch {
-       hosts => ["elasticsearch:9200"]
-       index => "logstash"
-           }
+        elasticsearch {
+          hosts => ["elasticsearch:9200"]
+          index => "logstash"
+        }
       }
-     }
+    }
   logstash.yml: |-
     http.host: "0.0.0.0"
     path.config: /usr/share/logstash/config

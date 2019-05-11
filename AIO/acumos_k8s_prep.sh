@@ -25,14 +25,16 @@
 #
 # Prerequisites:
 # - Ubuntu Xenial/Bionic or Centos 7 server
+# - All hostnames specified in acumos_env.sh must be DNS-resolvable on all hosts
+#   (entries in /etc/hosts or in an actual DNS server)
+# - For deployments behind proxies, set HTTP_PROXY and HTTPS_PROXY in acumos_env.sh
 # - Initial basic setup (manual), assuming the non-sudo user is "acumos"
 #   sudo useradd -m acumos
 # - User running this script has:
 #   - Installed docker per system-integration/tools/setup_docker.sh
-#   - Added themselves to the docker group (sudo usermod -G docker $USER)
+#   - Added themselves to the docker group (sudo usermod -aG docker $USER)
 #   - Logged out and back in, to activate docker group membership
 # - cd to your home folder, as the root of this installation process
-# - create subfolders "acumos" and folders "env", "logs", "certs"
 # - If you want to use a specific/updated/patched system-integration repo clone,
 #   place that system-integration clone in the home folder
 # - Then run the command below
@@ -115,8 +117,13 @@ else
   sudo apt-get purge -y docker-ce docker docker-engine docker.io
 fi
 sudo iptables -F && sudo iptables -t nat -F && sudo iptables -t mangle -F && sudo iptables -X
+if [[ $(which docker) ]]; then docker system prune -a -f; fi
 if [[ ! $(sudo rm -rf /mnt/$ACUMOS_NAMESPACE/docker) ]]; then
   echo "Warning: all docker data could not be deleted"
+  if [[ "$K8S_DIST" == "openshift" ]]; then
+    # Retrying this can resolve issues with resources under OpenShift deploys
+    bash cleanup.sh
+  fi
 fi
 sudo rm -rf /mnt/$ACUMOS_NAMESPACE/*
 

@@ -51,7 +51,7 @@ function log() {
 
 function setup_peer() {
   trap 'fail' ERR
-  local cdsapi="https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/peer"
+  local cdsapi="https://$ACUMOS_DOMAIN/ccds/peer"
   local creds="$ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD"
   local peers=$(curl -s -u $creds -k $cdsapi)
   local np=$(echo $peers | jq '.content | length')
