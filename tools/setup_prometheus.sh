@@ -40,19 +40,6 @@
 # https://github.com/prometheus/haproxy_exporter
 # https://github.com/prometheus/collectd_exporter
 
-trap 'fail' ERR
-
-function fail() {
-  log "$1"
-  exit 1
-}
-
-function log() {
-  f=$(caller 0 | awk '{print $2}')
-  l=$(caller 0 | awk '{print $1}')
-  echo; echo "$f:$l ($(date)) $1"
-}
-
 function setup_prereqs() {
 	log "Setup prerequisites"
   if [[ "$dist" == "ubuntu" ]]; then
@@ -134,7 +121,7 @@ EOF
   # To add additional dashboards, browse the URL above and import the dashboard via the id displayed for the dashboard
   # Select the home icon (upper left), Dashboards / Import, enter the id, select load, and select the Prometheus datasource
 
-  cd dashboards
+  cd $AIO_ROOT/../tools/dashboards
   if [[ $(ls *.json) ]]; then
     boards=$(ls *.json)
     for board in $boards; do
@@ -145,19 +132,8 @@ EOF
   fi
 }
 
-function wait_until_notfound() {
-  cmd="$1"
-  what="$2"
-  log "Waiting until $what is missing from output of \"$cmd\""
-  result=$($cmd)
-  while [[ $(echo $result | grep -c "$what") -gt 0 ]]; do
-    log "Waiting 10 seconds"
-    sleep 10
-    result=$($cmd)
-  done
-}
-
 function clean() {
+  trap 'fail' ERR
   log "Removing Grafana"
   helm delete --purge gf
   wait_until_notfound "kubectl get pods -n default" grafana
@@ -167,7 +143,13 @@ function clean() {
   wait_until_notfound "kubectl get pods -n default" prometheus
 }
 
-export WORK_DIR=$(pwd)
+set -x
+trap 'fail' ERR
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+export AIO_ROOT="$(cd ../AIO; pwd -P)"
+source $AIO_ROOT/utils.sh
+cd $WORK_DIR
 dist=$(grep -m 1 'ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
 distver=$(grep -m 1 'VERSION_ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
 host_ip=$(/sbin/ip route get 8.8.8.8 | head -1 | sed 's/^.*src //' | awk '{print $1}')
@@ -185,4 +167,3 @@ else
   log "Grafana dashboards are available at http://$host_ip:30330 (login as admin/admin)"
   log "Grafana API is available at http://admin:admin@$host_ip:30330/api/v1/query?query=<string>"
 fi
-cd $WORK_DIR

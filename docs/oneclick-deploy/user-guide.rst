@@ -19,9 +19,8 @@ Introduction
 ============
 
 This user guide describes how to deploy Acumos platforms using the
-"One Click deploy" tools designed for developers or those who want a simple and
-automated way to deploy an Acumos platform. Currently deployment supports an
-all-in-one (AIO) target.
+"One Click deploy" tools designed for those who want a simple and automated way
+to deploy an Acumos platform.
 
 What is an AIO deploy?
 ----------------------
@@ -33,9 +32,23 @@ single virtual machine or physical host machine.
 For k8s based deployments, both generic (standard k8s project tools) and
 OpenShift (RedHat's k8s distribution) are supported.
 
-Options also allow the user to deploy the platform on a cluster of nodes, to
-deploy a subset of the components, and to use some components that have
-previously deployed somewhere.
+Options allow the user to deploy the platform:
+
+* on a cluster of k8s nodes (note: distributing specific components across nodes
+  based upon node labels is planned for future releases)
+* with a subset of the components
+* to use some components that have previously deployed somewhere, e.g. as a
+  shared service
+
+The resulting Acumos platform is illustrated in the following two figures, the
+first representing the overall architecture, and the second the architecture of
+the MLWB (Machine-Learning Workbench) subsystem.
+
+.. image:: images/acumos-architecture-detail-boreas.png
+   :width: 100 %
+
+.. image:: images/mlwb.png
+   :width: 100 %
 
 Deploying the Platform, For the Impatient (TL;DR)
 =================================================
@@ -74,7 +87,7 @@ Prerequisites for docker based deployment:
 
   * has sudo privileges
   * has installed docker per system-integration/tools/setup_docker.sh
-  * has added themselves to the docker group (sudo usermod -G docker $USER),
+  * has added themselves to the docker group (sudo usermod -aG docker $USER),
     and re-logged-in to activate docker group membership
   * if deploying in preparation for use by a non-sudo user, has created the
     user account (sudo useradd -m <user>)
@@ -123,6 +136,13 @@ If deploying the platform for yourself, run these commands:
     * <domain> is the name you want to use for the Acumos portal. This can be a
       hostname or FQDN.
 
+  * The commands above include saving of the detailed deployment actions to a
+    log file 'deploy.txt'. This can be helpful in getting support from the
+    Acumos project team, to overcome issues you might encounter. If you don't
+    want to save the log, just leave out the part of the commands above that
+    starts with the 'pipe' ('|').
+
+
 Preparing as a Host Admin, with Platform Deployment as a Normal User
 ....................................................................
 
@@ -146,10 +166,6 @@ will take it from there:
 
     cd system-integration/AIO/
     bash setup_prereqs.sh docker <domain> <user> 2>&1 | tee aio_deploy.log
-    cp -r ~/acumos /home/<user>/.
-    cp -r ~/system-integration /home/<user>/.
-    sudo chmod -R <user>:<user> /home/<user>/acumos
-    sudo chmod -R <user>:<user> /home/<user>/system-integration
   ..
 
   * where:
@@ -165,22 +181,28 @@ will take it from there:
     bash oneclick_deploy.sh 2>&1 | tee -a aio_deploy.log
   ..
 
+* As described above, if you don't need to save the deploy logs, leave out the
+  the part of the commands above that starts with the 'pipe' ('|').
+
+
 When Deployment is Complete
 ...........................
 
-When deployment has completed, you should see a set of URLs to access the
-various platform services. You can also view the file "acumos.url" which will be
-in the system-integration/AIO folder (example below)
+When deployment has completed, you should see a success message with a set of
+URLs to access the various platform services. You can also view the file
+"acumos.url" which will be in the system-integration/AIO folder (example below)
 
 .. code-block:: bash
 
-  $ cat system-integration/AIO/acumos.url
-  Portal: https://acumos.example.com:30443
-  Common Data Service: https://acumos.example.com:30443/ccds/swagger-ui.html
-  Kibana: http://acumos.example.com:30561/app/kibana
-  Nexus: http://acumos.example.com:30881
-  Mariadb Admin: http://acumos.example.com:30380
-  Kong Admin: http://acumos.example.com:30081
+   You can access the Acumos portal and other services at the URLs below,
+   assuming hostname "acumos.example.com" is resolvable from your workstation:
+
+   Portal: https://acumos.example.com
+   Common Data Service Swagger UI: https://acumos.example.com/ccds/swagger-ui.html
+   Portal Swagger UI: https://acumos.example.com/api/swagger-ui.html
+   Onboarding Service Swagger UI: https://acumos.example.com/onboarding-app/swagger-ui.html
+   Kibana: http://<IP address of acumos.example.com>:30561/app/kibana
+   Nexus: http://<IP address of acumos.example.com>:30881
 
 By default, the platform is not configured to require email confirmation of
 new accounts, so you can create a new account directly on the Portal home. To
@@ -236,29 +258,32 @@ permission, follow the process below.
   .. code-block:: bash
 
     $ cd system-integration/AIO
-    $ bash acumos_k8s_deploy.sh 2>&1 | tee aio_deploy.log
+    $ bash oneclick_deploy.sh 2>&1 | tee aio_deploy.log
   ..
 
-* when that command completes successfully, you should see a set of URLs to
-  access the various platform services. You can also view the file "acumos.url"
-  which will be in the system-integration/AIO folder (example below)
+* As described above, if you don't need to save the deploy logs, leave out the
+  the part of the commands above that starts with the 'pipe' ('|').
 
-  .. code-block:: bash
+When deployment has completed, you should see a success message with a set of
+URLs to access the various platform services. You can also view the file
+"acumos.url" which will be in the system-integration/AIO folder (example below)
 
-    $ cat system-integration/AIO/acumos.url
-    Portal: https://acumos.example.com:30443
-    Common Data Service: https://acumos.example.com:30443/ccds/swagger-ui.html
-    Kibana: http://acumos.example.com:30561/app/kibana
-    Nexus: http://acumos.example.com:30881
-    Mariadb Admin: http://acumos.example.com:30380
-    Kong Admin: http://acumos.example.com:30081
+.. code-block:: bash
 
-  ..
+   You can access the Acumos portal and other services at the URLs below,
+   assuming hostname "acumos.example.com" is resolvable from your workstation:
 
-* By default, the platform is not configured to require email confirmation of
-  new accounts, so you can create a new account directly on the Portal home. To
-  create an account with the Admin role (needed for various platform admin
-  functions), use the create_user.sh script in the system-integration/AIO folder
+   Portal: https://acumos.example.com
+   Common Data Service Swagger UI: https://acumos.example.com/ccds/swagger-ui.html
+   Portal Swagger UI: https://acumos.example.com/api/swagger-ui.html
+   Onboarding Service Swagger UI: https://acumos.example.com/onboarding-app/swagger-ui.html
+   Kibana: http://<IP address of acumos.example.com>:30561/app/kibana
+   Nexus: http://<IP address of acumos.example.com>:30881
+
+By default, the platform is not configured to require email confirmation of
+new accounts, so you can create a new account directly on the Portal home. To
+create an account with the Admin role (needed for various platform admin
+functions), use the create_user.sh script in the system-integration/tests folder
 
 Preparation by Host Admin with Platform Deployment by Normal (non-sudo) User
 ............................................................................
@@ -298,21 +323,42 @@ This process is for a host Admin (sudo user) to prepare the host for a normal
   .. code-block:: bash
 
     $ cd system-integration/AIO
-    $ bash acumos_k8s_deploy.sh 2>&1 | tee aio_deploy.log
+    $ bash oneclick_deploy.sh 2>&1 | tee aio_deploy.log
   ..
 
-Generic Kubernetes Based Deployment
------------------------------------
+* As described above, if you don't need to save the deploy logs, leave out the
+  the part of the commands above that starts with the 'pipe' ('|').
+
+When deployment has completed, you should see a success message with a set of
+URLs to access the various platform services. You can also view the file
+"acumos.url" which will be in the system-integration/AIO folder (example below)
+
+.. code-block:: bash
+
+   You can access the Acumos portal and other services at the URLs below,
+   assuming hostname "acumos.example.com" is resolvable from your workstation:
+
+   Portal: https://acumos.example.com
+   Common Data Service Swagger UI: https://acumos.example.com/ccds/swagger-ui.html
+   Portal Swagger UI: https://acumos.example.com/api/swagger-ui.html
+   Onboarding Service Swagger UI: https://acumos.example.com/onboarding-app/swagger-ui.html
+   Kibana: http://<IP address of acumos.example.com>:30561/app/kibana
+   Nexus: http://<IP address of acumos.example.com>:30881
+
+By default, the platform is not configured to require email confirmation of
+new accounts, so you can create a new account directly on the Portal home. To
+create an account with the Admin role (needed for various platform admin
+functions), use the create_user.sh script in the system-integration/tests folder
 
 Release Scope
 =============
 
-To be added.
-
 Current Release (Boreas)
 ------------------------
 
-To be added.
+The `Acumos wiki <https://wiki.acumos.org/display/OAM/System+Integration>`_
+describes the principle goals and related deployment scenarios supported by the
+AIO toolset, and regularly verified in testing.
 
 What's included in the AIO tools
 ................................
@@ -326,16 +372,14 @@ In system-integration repo folder AIO:
 * setup_prereqs.sh: Prerequisite setup script for AIO deployment of the
   Acumos platform. Intended to support users who do not have sudo permission, to
   have a host admin (sudo user) run this script in advance for them. Used by
-  acumos_k8s_prep.sh and other target environment support scripts (WIP).
-* acumos_k8s_deploy.sh: Script used by a normal to deploy/manage the Acumos
-  platform under generic k8s, once the host has been prepared by an admin using
-  acumos_k8s_prep.sh.
+  acumos_k8s_prep.sh and other target environment support scripts.
 * oneclick_deploy.sh: the main script that kicks off the deployment, to setup
   an AIO instance of Acumos under a docker or kubernetes environment. Used by
   acumos_k8s_deploy.sh, or by users to initiate Acumos platform deployment.
 * acumos_env.sh: environment setup script that is customized as new
   environment parameters get generated (e.g. passwords). Used by various
   scripts in this toolset, to set shell environment variables that they need.
+* setup_acumosdb.sh: script that initializes the Acumos database under MariaDB.
 * setup_keystore.sh: script that enables use of pre-configured CA and server
   certificates for an Acumos platform, or creation of new self-signed
   certificates.
@@ -346,47 +390,36 @@ In system-integration repo folder AIO:
 * utils.sh: utility script containing functions used by many of these scripts.
 * redeploy_component.sh: Script that allows the redeployment of a single
   component.
+* clean.sh: if needed, this script allows a privileged user to remove all
+  components and dependencies of the Acumos platform installed by the tools
+  above.
 
-In folder tests:
-
-* peer_test.sh: Peering and marketplace subsciptions setup for two AIO platforms.
-  Used to test federation use cases.
-* create_peer.sh: Automated setup of a peer relationship between two Acumos
-  AIO deployments. Used by peer_test.sh.
-* create_user.sh: Automated user provisioning and role assignment. Used by
-  peer_test.sh to create users for model onboarding, and portal admins for
-  testing federation actions on the Acumos platform.
-* create_subscription.sh: script to create a subscription for all models
-  published by a federated Acumos platform.
-* bootstrap_models.sh: Model package onboarding via curl. Optionally called by
-  peer_test.sh.
-
-In folder AIO/docker/acumos:
-
-* docker-compose yaml files and deployment script for Acumos core components.
-
-In folder AIO/kubernetes:
-
-* under deployment, kubernetes deployment templates for all system components
-* under service, kubernetes service templates for all system components
-
-In folder AIO/beats:
+In AIO/beats:
 
 * deployment scripts and templates for the Filebeat and Metricbeat services
   as ELK stack components deployed along with the Acumos platform.
 
-In folder AIO/certs:
+In AIO/certs:
+
+* setup_certs.sh: creates self-signed certificates (CA and server), keystore,
+  and truststore for use by core platform components.
+
+In AIO/docker/acumos:
+
+* docker-compose yaml files and deployment script for Acumos core components.
+
+In AIO/certs:
 
 * setup_certs.sh: script to create self-signed CA and server certs.
 * This folder is also used to stage user-provided certs to be used in Acumos
   platform deployment.
 
-In folder AIO/docker-engine:
+In AIO/docker-engine:
 
 * scripts and templates to deploy docker-in-docker as the docker-engine service
-  for k8s-based Acumos platforms
+  for k8s-based Acumos platforms, or the docker-engine service on the AIO host
 
-In folder AIO/docker-proxy:
+In AIO/docker-proxy:
 
 * scripts and templates for deployment of the docker-proxy core component of the
   Acumos platform
@@ -395,10 +428,24 @@ In AIO/elk-stack:
 
 * scripts and templates to deploy the ELK stack core components under docker
 
+In AIO/ingress:
+
+* scripts and templates to deploy the
+  `NGINX Ingress Controller for Kubernetes <https://github.com/kubernetes/ingress-nginx>`_,
+  and ingress rules for Acumos core components.
+
 In AIO/kong:
 
 * scripts and templates to deploy the Kong service as an ingress controller for
-  the Acumos platform
+  the Acumos platform, as deployed under docker
+
+In AIO/kubernetes:
+
+* under deployment, kubernetes deployment templates for all system components
+* under service, kubernetes service templates for all system components
+* under configmap, kubernetes configmap templates for all system components
+* under rbac, kubernetes role-based access control templates enabling system
+  components to invoke kubernetes cluster operations
 
 In AIO/mariadb:
 
@@ -421,43 +468,190 @@ In charts:
   * nifi: the NiFi service for data pipeline development
   * zeppelin: the Zeppelin service for notebook-based model development
 
+    * NOTE: Zeppelin deployment is a single, multi-user instance which is
+      provided for experimental use in Boreas. Single-user instance deployment
+      is coming in the next release (Clio).
+
+In tests:
+
+* peer_test.sh: Peering and marketplace subsciptions setup for two AIO platforms.
+  Used to test federation use cases.
+* create_peer.sh: Automated setup of a peer relationship between two Acumos
+  AIO deployments. Used by peer_test.sh.
+* create_user.sh: Automated user provisioning and role assignment. Used by
+  scripts in this repo to create default admin accounts. Can also be used to
+  create user accounts for testing or platform use.
+* create_subscription.sh: creates a federation subscription for all models
+  published by a federated Acumos platform.
+* bootstrap_models.sh: Model package onboarding via curl, for all models in
+  a folder.
+* onboard_model.sh: Model package onboarding via curl.
+* license_scan.sh: invokes a license scan for a solution, using the Security
+  Verification Scanning Service.
+
 In tools:
 
-  * setup_helm.sh: script to setup Helm as a service deployment tool
-  * setup_k8s.sh: script to setup a generic k8s cluster
-  * setup_mariadb_client.sh: script to setup the MariaDB client as used by other
-    scripts to configure the Acumos database
-  * setup_openshift_client.sh: script to setup the OpenShift client (oc) tool
+  * add_host_alias.sh: adds a host alias to an Acumos core component, e.g.
+    for hostnames/FQDNs that are not resolvable through DNS.
+  * setup_docker.sh: deploys the docker version used for docker-based
+    platform deployment and interaction.
+  * setup_helm.sh: deploys Helm as a service deployment tool.
+  * setup_k8s.sh: deploys a generic k8s cluster.
+  * setup_kubectl.sh: deploys and uses the kubectl tool used by other scripts and
+    the user to manage and interact with generic k8s based deployments.
+  * setup_mariadb_client.sh: deploys the MariaDB client as used by other
+    scripts to configure the Acumos database.
+  * setup_openshift.sh: deploys an OpenShift Origin 3.11 kubernetes cluster, for
+    subsequent Acumos platform deploymet on Centos 7 servers.
+  * setup_openshift_client.sh: deploys the OpenShift client (oc) tool
     used by other scripts and users to manage and interact with OpenShift based
     platform deployments.
-  * setup_prometheus.sh: script to setup the Prometheus monitoring service, with
+  * setup_prometheus.sh: deploys the Prometheus monitoring service, with
     Grafana as a data visualization tool, for monitoring the Acumos platform's
     resources at the k8s level. Also deploys Grafana dashboards in the dashboards
     folder.
-  * setup_docker.sh: script to setup the docker version used for docker-based
-    platform deployment and interaction.
-  * setup_kubectl.sh: script to setup the kubectl tool used by other scripts and
-    the user to manage and interact with generic k8s based deployments.
-  * setup_pv.sh: script to setup host-based persistent volumes for use with
+  * setup_pv.sh: deploys host-based persistent volumes for use with
     docker and k8s-based platform deployments.
 
-Kubernetes-Based Deployment Step-by-Step Guide
-==============================================
+Deployment Step-by-Step Guide
+=============================
 
-Prerequisites for each step are described for the step.
+The steps in this process are illustrated by the following figure. Note this
+figure refers to kubernetes, but the same basic process applies for docker.
+
+Prerequisites for each step are described for the step, under
+`Pre-Arrangement of Ingress Certs`_, `Install Host Preparation by Admin`_, and
+`Platform Deployment`_.
+
+1) Host Admin clones the system-integration repo, or uses a local/customized
+   clone.
+2) Host Admin customizes the environment files and/or certs as desired, per
+   `Pre-Arrangement of Ingress Certs`_
+3) The Admin runs the applicable host preparation script as described in
+   `Install Host Preparation by Admin`_
+4) The user (Admin, if installing for their self) further updates the
+   environment files and certs as desired, per `Platform Deployment`_
+5) The user deploys the rest of the platform components via script
+   'oneclick_deploy.sh', per `Platform Deployment`_
+
+.. image:: images/aio-k8s-deployment.png
+   :width: 100 %
+
+Pre-Arrangement of Ingress Certs
+--------------------------------
+
+If you deploy the AIO platform often or in multiple test environments, you may
+find it useful to pre-arrange the ingress certs that will be used to access the
+platform(s), either using commercial cert providers, or the self-signed cert
+tools provided in the system-integration repo. This allows you and users for
+example to use web browser tools to trust self-signed certs, avoiding browser
+warnings.
+
+Creating a Self-Signed Cert
++++++++++++++++++++++++++++
+
+The Acumos tool supporting creation of self-signed certs is in
+system-integration/AIO/certs/setup_certs.sh. An example is given below, showing
+how to select the parameters for setting up a cert and related files that are
+usable on multiple hosts, by hostname/domain and IP address:
+
+* This script is invoked as:
+
+.. code-block:: bash
+
+  bash setup_certs.sh <name> <subject-name> ["alt-names"] ["alt-ips"]
+..
+
+Where:
+
+* name: name prefix to use in the generated files (e.g. acumos)
+* subject-name: primary domain name to associate
+* alt-names: quoted, space-delimited set of alternate names
+* alt-ips: quoted, space-delimited set of alternate IP addresses
+
+as in the example:
+
+.. code-block:: bash
+
+  cd system-integration/AIO/certs
+  bash setup-certs.sh acumos acumos \
+    "test01 test02 test03 acumos-test04.eastus.cloudapp.azure.com" \
+    "10.1.0.2 10.1.0.3 10.1.0.4 10.1.0.5"
+..
+
+This will generate the following files:
+
+* acumos-ca.key: self-signed CA private key
+* acumos-ca.crt: self-signed CA certificate
+* acumos.key: server cert private key
+* acumos.crt: server cert
+* acumos-keystore.p12: PKCS12 format keystore with server cert
+* acumos-truststore.jks: JKS format truststore with CA cert
+* cert_env.sh: environment file with the related passwords
+
+Using Commercial Certs
+++++++++++++++++++++++
+
+NOTE: the process below has not been verified. If you need to following this
+process and encounter issues, reach out to the
+`Acumos Community mail list <https://lists.lfai.foundation/g/acumosai-community>`_
+for help.
+
+To use commercial certs with the Acumos AIO platform, follow these steps:
+
+* place the server cert and private key in folder system-integration/AIO/certs
+* update related values in system-integration/AIO/acumos_env.sh and put these
+  commands into a file system-integration/AIO/cert_env.sh
+
+  * export ACUMOS_CERT_PREFIX=<prefix you want to use for your keystore/truststore
+  * export ACUMOS_CERT=<name of the server cert file)
+  * export ACUMOS_CERT_KEY=<name of the server cert private key file>
+  * export ACUMOS_CERT_KEY_PASSWORD=<passphrase for the cert private key>
+
+* run the commands below, which create the keystore and truststore for Acumos
+
+  .. code-block:: bash
+
+    cd system-integration/AIO/certs
+    source cert_env.sh
+    KEYSTORE_PASSWORD=$(uuidgen)
+    echo "export KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD" >>cert_env.sh
+    openssl pkcs12 -export \
+      -in $ACUMOS_CERT \
+      -inkey $ACUMOS_CERT_KEY \
+      -passin pass:$CERT_KEY_PASSWORD \
+      -certfile $ACUMOS_CERT \
+      -out $ACUMOS_CERT_PREFIX-keystore.p12 \
+      -passout pass:$KEYSTORE_PASSWORD
+
+    TRUSTSTORE_PASSWORD=$(uuidgen)
+    echo "export TRUSTSTORE_PASSWORD=$TRUSTSTORE_PASSWORD" >>cert_env.sh
+    keytool -import \
+      -file $ACUMOS_CERT \
+      -alias $ACUMOS_CERT_PREFIX-ca \
+      -keystore $ACUMOS_CERT_PREFIX-truststore.jks \
+      -storepass $TRUSTSTORE_PASSWORD -noprompt
+
+  ..
 
 Install Host Preparation by Admin
 ---------------------------------
 
-The script supporting this step is system-integration/AIO/acumos_k8s_prep.sh.
-
-NOTE: If you are deploying into an Azure-based VM, pay attention to the
+NOTE: If you are deploying under k8s into an Azure-based VM, pay attention to the
 special configuration need for the docker-engine, as described below.
 
 Prerequisites:
 
 * Ubuntu Xenial/Bionic or Centos 7 server
-* Admin user account is part of the "docker" group
+* All hostnames specified in acumos_env.sh must be DNS-resolvable on all hosts
+  (entries in /etc/hosts or in an actual DNS server)
+* For deployments behind proxies, set HTTP_PROXY and HTTPS_PROXY in acumos_env.sh
+* Admin user running this script has:
+
+  * Installed docker per system-integration/tools/setup_docker.sh
+  * Added themselves to the docker group (sudo usermod -aG docker $USER)
+  * Logged out and back in, to activate docker group membership
+
 * Initial basic setup (manual)
 
   * If you are an Admin and deploying the platform for a normal user, assuming
@@ -466,11 +660,6 @@ Prerequisites:
     .. code-block:: bash
 
       sudo useradd -m acumos
-      mkdir -p ~/acumos/env
-      mkdir -p ~/acumos/logs
-      mkdir -p ~/acumos/certs
-      sudo cp -r ~/acumos /home/acumos/.
-      sudo chown -R acumos:acumos /home/acumos/acumos
     ..
 
 This process prepares the host with prerequisites that normal users do not have
@@ -482,12 +671,14 @@ permission to arrange. This includes:
 
 The Admin user will follow this process:
 
-* cd to a folder that you want to use as the root of this installation process
-* create in that folder a subfolder "acumos" and folders "env", "logs", "certs"
-  under it.
-* If you want to use a specific/updated/patched system-integration repo clone,
-  place that system-integration clone in the install root folder
-* If you are deploying the platform in an Azure VM, update the acumos_env.sh
+* 'install root folder' refers to the Admin user's home folder. Installation
+  in other root folders is a work in progress, and not yet fully verified.
+* create in the install root folder a subfolder "acumos" and folders "env",
+  "logs", "certs" under it.
+* in the install root folder, clone the system-integration repo (branch, tag,
+  commit, or master), and make any desired updates to it (e.g. checkout a
+  specific patch)
+* If you are deploying the platform under k8s in an Azure VM, update acumos_env.sh
   (in system-integration/AIO) script to set the ACUMOS_DEPLOY_DOCKER flag to
   "false", which will ensure that the docker-dind service is not installed.
   Docker-dind has known issues under Azure.
@@ -497,91 +688,234 @@ The Admin user will follow this process:
     export ACUMOS_DEPLOY_DOCKER=false
   ..
 
+* If you are deploying under docker, run the command
 
-* Then run the command
+.. code-block:: bash
+
+  bash setup_prereqs.sh <under> <domain> <user>
+..
+
+  * under: docker (install prereqs for docker or k8s based deployment)
+  * domain: FQDN of platform
+  * user: user that will be completing Acumos platform setup via
+          oneclick_deploy.sh (if installing for yourself, use $USER)
+
+
+* If you are deploying under k8s, run the command
 
   .. code-block:: bash
 
-    bash system-integration/AIO/acumos_k8s_prep.sh <user> <domain> [clone]
+    bash system-integration/AIO/acumos_k8s_prep.sh <user> <domain>
   ..
 
   * user: non-sudo user account (use $USER if deploying for yourself)
   * domain: domain name of Acumos platorm (resolves to this host)
-  * clone: if "clone", the current system-integration repo will be cloned.
-  *   Otherwise place the system-integration version to be used at
-      ~/system-integration
 
-When the process is complete, if you are deploying the platform for yourself,
+When the process is complete, acumos_k8s_prep.sh will have copied the
+updated system-integration clone and environment files to the platform
+deployment user's home folder. If you are deploying the platform for yourself,
 proceed to the next section. If preparing the platform for a normal user,
 the user should execute the process in the next section.
 
 Platform Deployment
 -------------------
 
-The script supporting this step is system-integration/AIO/acumos_k8s_deploy.sh.
+The script supporting this step is system-integration/AIO/oneclick_deploy.sh.
 
 Prerequisites:
 
 * User workstation is Ubuntu Xenial/Bionic, Centos 7, or MacOS
-* acumos_k8s_prep.sh run by a sudo user
-* prepare a clone of the system-integration repo in the root folder of
-  your user account. This can be a fresh clone or a patched/updated clone.
-* As setup by acumos_k8s_prep.sh, make sure you have a folder "acumos" with
-  subfolders "env", "logs", and "certs". Put any customized environment files
-  and certs there, or use the ones provided by the sudo user that ran
-  acumos_k8s_prep.sh
+* acumos_k8s_prep.sh (for k8s based deploy) or setup_prereqs.sh (for docker
+  based deploy) run by a sudo user
+* As setup by those scripts, a user home folder "acumos" with subfolders "env",
+  "logs", and "certs". These folders are created by the prerequisites scripts
+  principally as a backup to the environment files under system-integration/AIO.
 
 This process deploys the Acumos platform with the options selectable by the
 user, e.g.
 
-* any option selectable through the environment files, as prepared by the
-  Admin in host preparation
+* any option selectable through the environment files, which can be customized
+  in the backup folder "acumos/env" or directly in the system-integration clone
+  under:
 
-  * acumos_env.sh
-  * mariadb_env.sh
-  * elk_env.sh
+  * ~/system-integration/AIO/acumos/env/acumos_env.sh
+  * ~/system-integration/AIO/acumos/env/mariadb_env.sh
+  * ~/system-integration/AIO/acumos/env/elk_env.sh
+  * ~/system-integration/AIO/mlwb/mlwb_env.sh
+  * NOTE
 
-* use of pre-created server and CA certificates, truststore, and keystore
+    * for k8s based deployments, since acumos_k8s_prep.sh by default will have
+      deployed MariaDB and the ELK stack core, do not modify the related
+      environment values unless you disabled deployment of MariaDb or ELK by
+      setting ACUMOS_DEPLOY_MARIADB and/or ACUMOS_DEPLOY_ELK to 'false' in acumos_env.sh
+    * a detailed description of the customizable environment values is not
+      provided here, but the Acumos community can assist you with any support
+      questions you may have via the
+      `Acumos Community mail list <https://lists.lfai.foundation/g/acumosai-community>`_
 
-The user will follow this process:
+* use of pre-created certs per `Pre-Arrangement of Ingress Certs`_
 
-* update environment files for any desired options
-* run the commands
+* if you updated the environment files or certificates under ~/acumos, prior
+  to running the deployment command below, copy those updates into the
+  system-integration clone:
 
-* Then run the command
+  * cp ~/acumos/env/* ~/system-integration/AIO/.
+  * cp ~/acumos/certs/* ~/system-integration/AIO/certs/.
+
+To deploy the rest of the platform components, run the commands:
 
   .. code-block:: bash
 
     cd ~/system-integration/AIO
-    bash acumos_k8s_deploy.sh
+    bash oneclick_deploy.sh
   ..
 
 When the process is complete, you will see a set of URLs to the main platform
-component/UI features.
+component/UI features, as described above.
 
 Updating Configuration and Components
 -------------------------------------
 
-Changes to the configuration can be applied through the following files. Note
-that some changes may break some aspects of the deployed platform, and the key
-items to avoid changing are listed below also.
+Changes to the configuration can be applied as described in the previous section.
+Note that if you are making changes to the configuration of a deployed platform,
+some changes may break some aspects of the platform, so be careful.
 
-* under system-integration/AIO: these are environment files that are initially
-  configured by the user to select options, and can be updated to change those
-  options (within limits)
+The most commonly updated configuration items include:
 
-  * acumos_env.sh
-  * elk_env.sh
-  * mariadb_env.sh
+* in acumos_env.sh
+
+  * component versions
+  * component hosts and ports, e.g. for reuse of previously deployed components,
+    e.g. a shared docker-engine, docker registry, MariaDB, Nexus, or ELK stack service
+  * component credentials (user and/or password)
+  * ports, to avoid conflict with other deployments in the same environment
+  * Nexus repo details
+  * HTTP proxy
+  * CDS (Common Dataservice) database version
+  * model onboarding tokenmode
+  * operator ID
+  * kubernetes namespace
+  * Persistent Volume options
+
+* docker-compose templates in AIO/docker/acumos or kubernetes templates in
+  AIO/kubernetes
+
+  * Note: make sure the template modifications are compatible with previously
+    deployed components, and the version of the related Acumos component you
+    are deploying/re-deploying
+
+Stopping, Restarting, Redeploying
+---------------------------------
+
+Note: the following sections assume that you have deployed the Acumos platform
+from the system-integration folder in your user home directory, i.e. "~/".
+
+Docker-Based Deployments
+++++++++++++++++++++++++
+
+To stop components running under docker and remove the containers, execute the
+following commands from the "docker" folder related to the type of component,
+referencing the related docker-compose yaml file as "<yml>":
+
+.. code-block:: bash
+
+  cd ~/system-integration/<docker folder>
+  source ~/system-integration/AIO/acumos_env.sh
+  docker-compose -f acumos/<yml> down
+..
+
+The related docker folders are:
+
+* AIO/docker, for Acumos core components azure-client, common-data-svc,
+  dsce (AcuCompose), federation, kubernetes-client, microservice-generation,
+  onboarding, portal-be, portal-fe, sv-scanning
+* AIO/docker-proxy/docker, for the docker-proxy core component
+* AIO/mlwb/docker, for the MLWB components
+* AIO/nexus/docker, for nexus
+* AIO/mariadb/docker, for mariadb
+* AIO/kong/docker, for kong
+* AIO/elk-stack/docker, for the core ELK-stack components elasticsearch,
+  logstash, kibana
+* AIO/beats/docker, for the "beats" components filebeat, metricbeat
+
+To restart these components, e.g. after updating the related configuration files,
+issue the following command:
+
+.. code-block:: bash
+
+  cd ~/system-integration/<docker folder>
+  source ~/system-integration/AIO/acumos_env.sh
+  docker-compose -f acumos/<yml> up -d --build
+..
+
+If you want to automatically stop and redeploy the components in one command:
+
+* for Acumos core components (azure-client-service, cds-service, dsce-service,
+  federation-service, kubernetes-client-service, msg-service, onboarding-service,
+  portal-be-service, portal-fe-service, sv-scanning-service)
+
+  .. code-block:: bash
+
+    bash ~/system-integration/AIO/redeploy_component.sh <component>
+  ..
+
+* for the other components, a specific redeployment script is provided in the
+  related folder (docker-proxy, mlwb, nexus, mariadb, kong, elk-stack, beats)
+
+  .. code-block:: bash
+
+    bash ~/system-integration/AIO/<folder>/setup_*.sh  ~/system-integration/AIO/
+  ..
+
+Kubernetes-Based Deployments
+++++++++++++++++++++++++++++
+
+Because kubernetes-based components may depend upon a variety of other
+kubernetes resources specific to them or shared with other components (e.g.
+configmaps, secrets, PVCs), simply redeploying the specific
+components after any required configuration updates is recommended.
+
+The configuration files specific the components are generally under a subfolder
+"kubernetes", and are specific to the type of resource (e.g. service, deployment,
+configmap, secret, PVC, etc). Once you have updated these as needed, you can'
+redeploy the component and any resources specific to it (not shared) via the
+command:
+
+* for core components under AIO/kubernetes/deployment, using the component names
+  per the "app:" value in the related deployment template (azure-client, cds,
+  dsce, federation, kubernetes-client, msg, onboarding, portal-be, portal-fe,
+  sv-scanning):
+
+  .. code-block:: bash
+
+    bash ~/system-integration/AIO/redeploy_component.sh <component>
+  ..
+
+* for the other components, running the related "setup_*.sh" command as described
+  for docker
+
+If you just need to stop a component, use the following command and reference the
+related "app" label:
 
 
-Stopping, Restarting, and Reinstalling
---------------------------------------
+.. code-block:: bash
 
-Various
+  kubectl delete deployment -n acumos -l app=<app>
+..
 
-Notes on Verified Features
---------------------------
+You can see all the component-related "app" labels via the command:
 
-Additional Notes
-================
+.. code-block:: bash
+
+  kubectl get deployment -n acumos -o wide
+..
+
+After stopping the component, you can redeploy it as needed using the methods
+described above.
+
+Logs Location
+=============
+
+Logs are easily accessible on the AIO host under /mnt/<ACUMOS_NAMESPACE>/logs
+directory ('<ACUMOS_NAMESPACE>' is by default 'acumos'). That directory is
+mounted by most Acumos components as their log directory.

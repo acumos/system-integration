@@ -32,8 +32,10 @@
 # $ vs=$(sudo ls -1 /var/lib/docker/volumes); for v in $vs; do sudo docker volume rm $v; done
 
 set -x
+trap 'fail' ERR
 WORK_DIR=$(pwd)
 cd $(dirname "$0")
+source utils.sh
 source acumos_env.sh
 nss="$ACUMOS_NAMESPACE $ACUMOS_MARIADB_NAMESPACE $ACUMOS_ELK_NAMESPACE"
 if [[ $(kubectl get namespaces) ]]; then

@@ -86,11 +86,10 @@ function setup_acumosdb() {
 }
 
 set -x
+trap 'fail' ERR
 WORK_DIR=$(pwd)
 cd $(dirname "$0")
-source acumos_env.sh
-export AIO_ROOT=$(pwd)
 source utils.sh
-trap 'fail' ERR
+source acumos_env.sh
 setup_acumosdb
 cd $WORK_DIR

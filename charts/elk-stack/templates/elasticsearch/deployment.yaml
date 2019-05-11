@@ -60,7 +60,7 @@ spec:
         imagePullPolicy: {{ .Values.elasticsearch.image.pullPolicy | quote }}
         env:
         - name: ES_JAVA_OPTS
-          value: "-Djava.net.preferIPv4Stack=true -Xms4g -Xmx4g"
+          value: "-Djava.net.preferIPv4Stack=true -Xmx<ACUMOS_ELK_ES_JAVA_HEAP_MAX_SIZE> -Xms<ACUMOS_ELK_ES_JAVA_HEAP_MIN_SIZE>"
         ports:
         - containerPort: 9300
         - containerPort: 9200
