@@ -22,7 +22,7 @@ apiVersion: apps/v1
 
 kind: Deployment
 metadata:
-  namespace: <ACUMOS_NAMESPACE>
+  namespace: acumos
   name: portal-be
   labels:
     app: portal-be
@@ -42,7 +42,7 @@ spec:
       - name: acumos-registry
       containers:
       - name: portal-be
-        image: <PORTAL_BE_IMAGE>
+        image: nexus3.acumos.org:10004/acumos-portal-be:2.2.10
         env:
         - name: SPRING_APPLICATION_JSON
           value: '{
@@ -51,30 +51,30 @@ spec:
                       "contextPath": "/"
                     },
                     "docker": {
-                      "host": "<ACUMOS_DOCKER_API_HOST>",
-                      "port": "<ACUMOS_DOCKER_API_PORT>",
+                      "host": "docker-dind-service",
+                      "port": "2375",
                       "registry": {
-                        "url": "http://<ACUMOS_DOCKER_REGISTRY_HOST>:<ACUMOS_DOCKER_MODEL_PORT>/",
-                        "username": "<ACUMOS_DOCKER_REGISTRY_USER>",
-                        "password": "<ACUMOS_DOCKER_REGISTRY_PASSWORD>",
-                        "email": "<ACUMOS_ADMIN_EMAIL>"
+                        "url": "http://:30882/",
+                        "username": "acumos_rw",
+                        "password": "",
+                        "email": "acumos@example.com"
                       },
                       "imagetag": {
-                        "prefix": "<ACUMOS_DOCKER_IMAGETAG_PREFIX>"
+                        "prefix": "nexus:30882"
                       }
                     },
                     "nexus": {
-                      "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/<ACUMOS_NEXUS_MAVEN_REPO_PATH>/<ACUMOS_NEXUS_MAVEN_REPO>/",
+                      "url": "http://:30881/repository/acumos_model_maven/",
                       "proxy": "",
-                      "password": "<ACUMOS_NEXUS_RW_USER_PASSWORD>",
-                      "username": "<ACUMOS_NEXUS_RW_USER>",
+                      "password": "",
+                      "username": "acumos_rw",
                       "groupid": "com.artifact"
                     },
                     "cdms": {
                       "client": {
                         "url": "http://cds-service:8000/ccds",
-                        "username": "<ACUMOS_CDS_USER>",
-                        "password": "<ACUMOS_CDS_PASSWORD>"
+                        "username": "ccds_client",
+                        "password": ""
                       }
                     },
                     "qanda": {
@@ -90,9 +90,9 @@ spec:
                           "dcae_url": "http://onboarding-service:8090/onboarding-app/v2/dcae_models"
                         }
                       },
-                      "cliPushUrl": "<ACUMOS_ONBOARDING_CLIPUSHURL>",
-                      "cliAuthUrl": "<ACUMOS_ONBOARDING_CLIAUTHURL>",
-                      "tokenmode": "<ACUMOS_ONBOARDING_TOKENMODE>"
+                      "cliPushUrl": "https://:30443/onboarding-app/v2/models",
+                      "cliAuthUrl": "https://:30443/onboarding-app/v2/auth",
+                      "tokenmode": "jwtToken"
                     },
                     "model": {
                       "storage": {
@@ -123,17 +123,17 @@ spec:
                         "api": "http://validation-client-service:9603/status/v1.0/tasks"
                       },
                       "dashboard": {
-                        "url": "http://<ACUMOS_ELK_DOMAIN>:<ACUMOS_ELK_KIBANA_PORT>"
+                        "url": "http://:"
                       },
                       "mailjet": {
                         "api": {
                           "key": "replace-as-needed"
                         },
                         "secret": {
-                          "key": "<ACUMOS_JWT_KEY>"
+                          "key": ""
                         },
                         "address": {
-                          "from": "<ACUMOS_ADMIN_EMAIL>"
+                          "from": "acumos@example.com"
                         }
                       },
                       "ui": {
@@ -173,16 +173,16 @@ spec:
                     },
                     "client": {
                       "ssl": {
-                        "key-store": "/app/certs/<ACUMOS_KEYSTORE>",
-                        "key-store-password": "<ACUMOS_KEYSTORE_PASSWORD>",
+                        "key-store": "/app/certs/acumos-keystore.p12",
+                        "key-store-password": "",
                         "key-store-type": "PKCS12",
-                        "key-password": "<ACUMOS_CERT_KEY_PASSWORD>",
-                        "trust-store": "/app/certs/<ACUMOS_TRUSTSTORE>",
-                        "trust-store-password": "<ACUMOS_TRUSTSTORE_PASSWORD>"
+                        "key-password": "",
+                        "trust-store": "/app/certs/acumos-truststore.jks",
+                        "trust-store-password": ""
                       }
                     },
                     "gateway": {
-                      "url": "https://<ACUMOS_FEDERATION_HOST>:<ACUMOS_FEDERATION_LOCAL_PORT>"
+                      "url": "https://:30985"
                     },
                     "dcae": {
                       "model": {
@@ -204,13 +204,13 @@ spec:
                       }
                     },
                     "document": {
-                      "size": "<ACUMOS_PORTAL_DOCUMENT_MAX_SIZE>"
+                      "size": "100000000"
                     },
                     "jupyter" : {
-                      "url" : "http://<ACUMOS_DOMAIN>/"
+                      "url" : "http:///"
                     },
                     "image": {
-                      "size": "<ACUMOS_PORTAL_IMAGE_MAX_SIZE>"
+                      "size": "1000KB"
                     }
                   }'
         ports:
@@ -224,11 +224,11 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+          claimName: pvc-acumos-logs
       - name: certs-volume
         configMap:
           name: acumos-store
       hostAliases:
-      - ip: "<ACUMOS_HOST_IP>"
+      - ip: ""
         hostnames:
-        - "<ACUMOS_HOST>"
+        - ""

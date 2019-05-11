@@ -107,7 +107,7 @@ services:
                           \"key\": \"replace-as-needed\"
                         },
                         \"secret\": {
-                          \"key\": \"replace-as-needed\"
+                          \"key\": \"${ACUMOS_JWT_KEY}\"
                         },
                         \"address\": {
                           \"from\": \"${ACUMOS_ADMIN_EMAIL}\"
