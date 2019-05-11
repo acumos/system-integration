@@ -28,7 +28,7 @@
 #   (entries in /etc/hosts or in an actual DNS server)
 # - User running this script has:
 #   - Installed docker per system-integration/tools/setup_docker.sh
-#   - Added themselves to the docker group (sudo usermod -G docker $USER)
+#   - Added themselves to the docker group (sudo usermod -aG docker $USER)
 #   - Logged out and back in, to activate docker group membership
 # - If deploying in preparation for use by a non-sudo user
 #   - Created the user account (sudo useradd -m <user>)
@@ -60,7 +60,7 @@ function setup_prereqs() {
   if [[ $(host $ACUMOS_DOMAIN | grep -c 'not found') -gt 0 ]]; then
     if [[ $(grep -c -E " $ACUMOS_DOMAIN( |$)" /etc/hosts) -eq 0 ]]; then
       log "Add $ACUMOS_DOMAIN to /etc/hosts"
-      echo "$ACUMOS_DOMAIN $ACUMOS_HOST_IP" | sudo tee -a /etc/hosts
+      echo "$ACUMOS_HOST_IP $ACUMOS_DOMAIN" | sudo tee -a /etc/hosts
     fi
   fi
 
@@ -222,8 +222,6 @@ function prepare_mariadb() {
     else
       bash mariadb/docker_compose.sh $AIO_ROOT down
     fi
-    log "Remove any existing PV data for mariadb-service"
-    delete_pv mariadb-data $ACUMOS_MARIADB_NAMESPACE
     log "Setup the mariadb-data PV"
     reset_pv mariadb-data $ACUMOS_MARIADB_NAMESPACE \
       $MARIADB_DATA_PV_SIZE "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
@@ -251,6 +249,9 @@ function prepare_acumos() {
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     reset_pv certs $ACUMOS_NAMESPACE $ACUMOS_CERTS_PV_SIZE \
       "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
+
+    reset_pv sv $ACUMOS_NAMESPACE 10Mi \
+      "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
   fi
 }
 
@@ -276,15 +277,28 @@ function prepare_nexus() {
 
 function prepare_elk() {
   trap 'fail' ERR
-
   if [[ "$ACUMOS_DEPLOY_ELK" == "true" ]]; then
     source $AIO_ROOT/../charts/elk-stack/setup_elk_env.sh
     cp elk_env.sh $AIO_ROOT/../charts/elk-stack/.
     if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
       delete_namespace $ACUMOS_ELK_NAMESPACE
+      if [[ ! $($k8s_cmd get pv elasticsearch-data) ]]; then
+        setup_pv elasticsearch-data $ACUMOS_ELK_NAMESPACE \
+          $ACUMOS_ELASTICSEARCH_DATA_PV_SIZE "1000:1000"
+      fi
+    else
+      setup_pv elasticsearch-data $ACUMOS_ELK_NAMESPACE \
+        $ACUMOS_ELASTICSEARCH_DATA_PV_SIZE "1000:1000"
     fi
-    reset_pv elasticsearch-data $ACUMOS_ELK_NAMESPACE \
-      $ACUMOS_ELASTICSEARCH_DATA_PV_SIZE "1000:1000"
+  fi
+}
+
+function prepare_mlwb() {
+  trap 'fail' ERR
+  if [[ "$ACUMOS_DEPLOY_MLWB" == "true" ]]; then
+    source $AIO_ROOT/mlwb/mlwb_env.sh
+    reset_pv nifi-registry $ACUMOS_NAMESPACE \
+      $MLWB_NIFI_REGISTRY_PV_SIZE "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
   fi
 }
 
@@ -364,6 +378,7 @@ prepare_acumos
 prepare_docker_engine
 prepare_kong
 prepare_nexus
+prepare_mlwb
 
 mkdir -p $AIO_ROOT/../../acumos/env $AIO_ROOT/../../acumos/certs $AIO_ROOT/../../acumos/logs
 cp $AIO_ROOT/*_env.sh $AIO_ROOT/../../acumos/env/.

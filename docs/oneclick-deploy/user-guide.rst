@@ -74,7 +74,7 @@ Prerequisites for docker based deployment:
 
   * has sudo privileges
   * has installed docker per system-integration/tools/setup_docker.sh
-  * has added themselves to the docker group (sudo usermod -G docker $USER),
+  * has added themselves to the docker group (sudo usermod -aG docker $USER),
     and re-logged-in to activate docker group membership
   * if deploying in preparation for use by a non-sudo user, has created the
     user account (sudo useradd -m <user>)

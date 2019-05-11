@@ -460,6 +460,7 @@ function replace_env() {
   else files="$1/*.yaml"; fi
   vars=$(grep -Rho '<[^<.]*>' $files | sed 's/<//' | sed 's/>//' | sort | uniq)
   for f in $files; do
+    echo "Replacing env variables in $f"
     for v in $vars ; do
       eval vv=\$$v
       sedi "s~<$v>~$vv~g" $f
@@ -517,7 +518,7 @@ function find_user() {
   log "Find user $1"
   local tmp="/tmp/$(uuidgen)"
   curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    -k https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/user
+    -k https://$ACUMOS_HOST/ccds/user
   users=$(jq -r '.content | length' $tmp)
   i=0; userId=""
   # Disable trap as not finding the user will trigger ERR
@@ -551,7 +552,7 @@ function get_host_ip() {
   log "Determining host IP address for $1"
   if [[ $(host $1 | grep -c 'not found') -eq 0 ]]; then
     HOST_IP=$(host $1 | head -1 | cut -d ' ' -f 4)
-  elif [[ $(grep -c -E   " $1( |$)" /etc/hosts) -gt 0 ]]; then
+  elif [[ $(grep -c -E " $1( |$)" /etc/hosts) -gt 0 ]]; then
     HOST_IP=$(grep -E "$1( |$)" /etc/hosts | cut -d ' ' -f 1)
   else
     log "Please ensure $1 is resolvable thru DNS or hosts file"
