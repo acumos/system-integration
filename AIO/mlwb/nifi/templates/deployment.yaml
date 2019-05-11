@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2019 AT&T Intellectual Property. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+kind: Deployment
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: nifi-$USER
+  labels:
+    app: nifi-$USER
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nifi-$USER
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: nifi-$USER
+    spec:
+      securityContext:
+        runAsUser: 0
+        fsGroup: 1000
+      containers:
+      - name: apache
+        image: "httpd:2.4"
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /usr/local/apache2/conf/httpd.conf
+          name: apache-configmap
+          subPath: httpd.conf
+        - mountPath: /usr/local/apache2/conf/extra/local.conf
+          name: apache-configmap
+          subPath: local.conf
+        - mountPath: /opt/sslkey
+          name: nifi-certs
+        resources:
+          limits:
+            cpu: "0.5"
+            memory: "500Mi"
+          requests:
+            cpu: "0.5"
+            memory: "500Mi"
+      - name: nifi
+        image: apache/nifi:1.9.2
+        command: ['/bin/bash', '-c']
+        args:
+        - bash /opt/nifi/nifi-current/bin/start.sh;
+        ports:
+        - containerPort: 19443
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /opt/nifi/nifi-current/bin/start.sh
+          subPath: start.sh
+          name: nifi-configmap
+        - mountPath: /opt/nifi/nifi-current/conf/nifi.properties
+          subPath: nifi.properties
+          name: nifi-configmap
+        - mountPath: /opt/nifi/nifi-current/conf/sslkey
+          name: nifi-certs
+
+      volumes:
+      - name: apache-configmap
+        configMap:
+          name: nifi-apache-configmap-$USER
+      - name: nifi-certs
+        secret:
+          secretName: nifi-certs
+      - name: nifi-configmap
+        configMap:
+          name: nifi-configmap-$USER

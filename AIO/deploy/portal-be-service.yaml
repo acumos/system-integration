@@ -1,4 +1,4 @@
-apiVersion: batch/v1
+apiVersion: v1
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -17,36 +17,20 @@ apiVersion: batch/v1
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 
-# What this is: kubernetes template for Acumos kong deployment
+# What this is: kubernetes template for Acumos portal-be service
 # How to use:
 
-kind: Job
+kind: Service
 metadata:
-  namespace: <ACUMOS_NAMESPACE>
-  name: kong-configure
+  namespace: acumos
+  name: portal-be-service
+  labels:
+    app: portal-be
 spec:
-  template:
-    spec:
-      containers:
-      - name: kong-configure
-        image: buildpack-deps:bionic-curl
-        env:
-        - name: KONG_ADMIN_HOST
-          value: "kong-admin-service"
-        - name: KONG_ADMIN_PORT
-          value: "8001"
-        - name: ACUMOS_DOMAIN
-          value: <ACUMOS_DOMAIN>
-        - name: ACUMOS_CERT
-          value: <ACUMOS_CERT>
-        - name: ACUMOS_CERT_KEY
-          value: <ACUMOS_CERT_KEY>
-        volumeMounts:
-        - mountPath: /var/acumos/config
-          name: kong-config
-        command: ['/bin/bash', '/var/acumos/config/configure_kong.sh']
-      restartPolicy: Never
-      volumes:
-      - name: kong-config
-        configMap:
-          name: kong-config
+  selector:
+    app: portal-be
+  type: ClusterIP
+  ports:
+  - name: portal-be-port
+    port: 8083
+    targetPort: 8083
