@@ -151,6 +151,41 @@ EOF
     http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script/ -d @nexus-script.json
   curl -v -X POST -u $ACUMOS_NEXUS_ADMIN_USERNAME:$ACUMOS_NEXUS_ADMIN_PASSWORD -H "Content-Type: text/plain" \
     http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script/list-users/run
+
+  log "Disable strict content validation, and enable write ('redeploy')"
+  cat <<EOF >nexus-admin.json
+{
+  "action": "coreui_Repository",
+  "method": "update",
+  "data": [
+    {
+      "attributes": {
+        "maven": {
+          "versionPolicy": "RELEASE",
+          "layoutPolicy": "STRICT"
+        },
+        "storage": {
+          "blobStoreName": "default",
+          "strictContentTypeValidation": false,
+          "writePolicy": "ALLOW"
+        }
+      },
+      "name": "acumos_model_maven",
+      "format": "maven2",
+      "type": "hosted",
+      "url": "http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/$ACUMOS_NEXUS_MAVEN_REPO_PATH/$ACUMOS_NEXUS_MAVEN_REPO/",
+      "online": true
+    }
+  ]
+  ,
+  "type": "rpc",
+  "tid": 18
+}
+EOF
+  curl -v -u $ACUMOS_NEXUS_ADMIN_USERNAME:$ACUMOS_NEXUS_ADMIN_PASSWORD \
+    -H 'Content-Type: application/json' \
+    -X POST $ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/extdirect \
+    -d @nexus-admin.json
 }
 
 if [[ $# -lt 1 ]]; then

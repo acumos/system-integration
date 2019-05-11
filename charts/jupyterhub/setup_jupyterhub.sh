@@ -24,16 +24,24 @@
 # - kubernetes cluster installed
 # - PVs setup for jupyterhub data, e.g. via the setup_pv.sh script from the
 #   Acumos training repo
-# - helm installed under the k8s cluster
+# - helm installed under the k8s cluster, e.g. via
+#   wget https://storage.googleapis.com/kubernetes-helm/helm-v2.12.3-linux-amd64.tar.gz
+#   gzip -d helm-v2.12.3-linux-amd64.tar.gz
+#   tar -xvf helm-v2.12.3-linux-amd64.tar
+#   sudo cp linux-amd64/helm /usr/local/sbin/.
+#   helm init
 # - kubectl and helm installed on the user's workstation
 # - user workstation setup to use a k8s profile for the target k8s cluster
 #   e.g. using the Acumos kubernetes-client repo tools
 #   $ bash kubernetes-client/deploy/private/setup_kubectl.sh k8smaster ubuntu acumos
 #
 # Usage: on the user's workstation
-# $ bash setup-jupytyerhub.sh <namespace> <token_mode>
-#   namespace: namespace to deploy under
-#   token_mode: value of ACUMOS_ONBOARDING_TOKENMODE for the Acumos platform
+# $ bash setup-jupytyerhub.sh <env>
+#   env: path to acumos_env.sh, which defines at minimum
+#     ACUMOS_NAMESPACE
+#     ACUMOS_ONBOARDING_TOKENMODE
+#     ACUMOS_CDS_USER
+#     ACUMOS_CDS_PASSWORD
 #
 # To release a failed PV:
 # kubectl patch pv/pv-5 --type json -p '[{ "op": "remove", "path": "/spec/claimRef" }]'
@@ -51,25 +59,11 @@ function log() {
   set -x
 }
 
-function prereqs() {
- log "Setup prerequisites"
- # Per https://z2jh.jupyter.org/en/latest/setup-jupyterhub.html
- if [[ ! $(which helm) ]]; then
-   # Install a helm client per https://github.com/helm/helm/releases"
-   wget https://storage.googleapis.com/kubernetes-helm/helm-v2.12.3-linux-amd64.tar.gz
-   gzip -d helm-v2.12.3-linux-amd64.tar.gz
-   tar -xvf helm-v2.12.3-linux-amd64.tar
-   sudo cp linux-amd64/helm /usr/local/sbin/.
- fi
-
- log "Initialize helm"
- helm init
-}
-
 function setup() {
   if [[ "$(helm list jupyterhub)" != "" ]]; then
     log "Delete/purge current jupyterhub service"
-    helm delete --purge jupyterhub
+    helm delete --purge jupyterhub jupyterhub-ingress
+    kubectl delete ingress -n $ACUMOS_NAMESPACE jupyterhub-ingress && true
   fi
   log "Setup jupyterhub"
   log "Add jupyterhub repo to helm"
@@ -88,45 +82,68 @@ persistent storage, add selectable notebook environments"
   cat <<EOF >$tmp
 proxy:
   secretToken: "$secret"
+  type: ClusterIP
 hub:
   extraConfig: |
+    from traitlets import Unicode
+    from jupyterhub.auth import Authenticator
+    import json
+    import requests
+    import os, sys
+    from tornado import gen
+    class AcumosAuthenticator(Authenticator):
+      @gen.coroutine
+      def authenticate(self, handler, data):
+        cds_url = "http://cds-service:8000/ccds/user/login"
+        cds_user = "$ACUMOS_CDS_USER"
+        cds_password = "$ACUMOS_CDS_PASSWORD"
+        username = data['username']
+        data = {"name" : username, "pass" : data['password']}
+        data_json = json.dumps(data)
+        headers = {'Content-type': 'application/json'}
+        response = requests.post(cds_url, data=data_json, headers=headers,auth=(cds_user, cds_password))
+        json_data = json.loads(response.text)
+        if json_data.get('authToken')   :
+          return username
+        else:
+          return None
+    c.JupyterHub.authenticator_class = AcumosAuthenticator
     c.Spawner.cmd = ['jupyter-labhub']
-#    c.KubeSpawner.profile_list = [
-#        {
-#            "display_name": "Minimal environment",
-#            "kubespawner_override": {
-#                "image": "jupyter/minimal-notebook:$tag"
-#            }
-#        }, {
-#            "display_name": "R environment",
-#            "kubespawner_override": {
-#                "image": "jupyter/r-notebook:$tag"
-#            }
-#            "display_name": "Scipy environment",
-#            "kubespawner_override": {
-#                "image": "jupyter/scipy-notebook:$tag"
-#            }
-#        }, {
-#            "display_name": "Tensorflow environment",
-#            "kubespawner_override": {
-#            }
-#        }, {
-#            "display_name": "Datascience environment",
-#            "kubespawner_override": {
-#                "image": "jupyter/datascience-notebook:$tag"
-#            }
-#        }, {
-#            "display_name": "Pyspark environment",
-#            "kubespawner_override": {
-#                "image": "jupyter/pyspark-notebook:$tag"
-#            }
-#        }, {
-#            "display_name": "All-spark environment",
-#            "kubespawner_override": {
-#                "image": "jupyter/all-spark-notebook:$tag"
-#            }
-#        }
-#    ]
+    c.KubeSpawner.profile_list = [
+      { "display_name": "Minimal environment",
+        "kubespawner_override": {
+          "image": "jupyter/minimal-notebook:$tag"
+        }
+      },
+      { "display_name": "R environment",
+        "kubespawner_override": {
+          "image": "jupyter/r-notebook:$tag"
+        }
+      },
+      { "display_name": "Scipy environment",
+        "kubespawner_override": {
+          "image": "jupyter/scipy-notebook:$tag"
+        }
+      },
+      { "display_name": "Tensorflow environment",
+        "kubespawner_override": {}
+      },
+      { "display_name": "Datascience environment",
+        "kubespawner_override": {
+          "image": "jupyter/datascience-notebook:$tag"
+        }
+      },
+      { "display_name": "Pyspark environment",
+        "kubespawner_override": {
+          "image": "jupyter/pyspark-notebook:$tag"
+        }
+      },
+      { "display_name": "All-spark environment",
+        "kubespawner_override": {
+          "image": "jupyter/all-spark-notebook:$tag"
+        }
+      }
+    ]
 singleuser:
   extraEnv:
     ACUMOS_ONBOARDING_TOKENMODE: $ACUMOS_ONBOARDING_TOKENMODE
@@ -174,23 +191,44 @@ EOF
   log "Install jupyterhub"
   RELEASE=jupyterhub
 
-  if [[ ! $(helm upgrade --install $RELEASE jupyterhub/jupyterhub --namespace $namespace --version=v0.7.0-beta.1 --values $tmp) ]]; then
+  if [[ ! $(helm upgrade --install $RELEASE jupyterhub/jupyterhub --namespace $ACUMOS_NAMESPACE --version=v0.7.0-beta.1 --values $tmp) ]]; then
     fail "Jupyterhub install via Helm failed"
   fi
   rm $tmp
 
+  log "Setup ingress for Jupyterhub"
+  cat <<EOF >jupyterhub-ingress.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: $ACUMOS_NAMESPACE
+  name: jupyterhub-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  tls:
+  - hosts:
+    - $ACUMOS_DOMAIN
+    secretName: ingress-cert
+  rules:
+  - host: $ACUMOS_DOMAIN
+    http:
+      paths:
+      - path: "/hub/"
+        backend:
+          serviceName: hub
+          servicePort: 8081
+      - path: "/user/"
+        backend:
+          serviceName: proxy-public
+          servicePort: 80
+EOF
+
+  kubectl create -f jupyterhub-ingress.yaml
+
   log "Deploy is complete!"
-  cluster=$(kubectl config get-contexts \
-    $(kubectl config view | awk '/current-context/{print $2}') \
-    | awk '/\*/{print $3}')
-  server=$(kubectl config view \
-    -o jsonpath="{.clusters[?(@.name == \"$cluster\")].cluster.server}" \
-    | cut -d '/' -f 3 | cut -d ':' -f 1)
-  nodePort=$(kubectl get svc -n $namespace -o json proxy-public | jq  '.spec.ports[0].nodePort')
-  echo "Access jupyterhub at http://$server:$nodePort"
+  echo "Access jupyterhub at https://$ACUMOS_DOMAIN/hub/"
 }
 
-namespace=$1
-ACUMOS_ONBOARDING_TOKENMODE=$2
-prereqs
+source $1
 setup
