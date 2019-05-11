@@ -19,69 +19,74 @@ version: '3.2'
 
 # docker-compose for ds-compositionengine
 services:
-   dsce-service:
-       image: ${DESIGNSTUDIO_IMAGE}
-       environment:
-           SPRING_APPLICATION_JSON: "{
-                          \"server\": {
-                                \"port\": 8088
-                          },
-                          \"gdmJarName\":\"gdmservice-1.2.0-SNAPSHOT.jar\",
-                          \"dateformat\": \"yyyy-MM-dd-HH-mm-ss-SSS\",
-                          \"solutionResultsetSize\": \"2000\",
-                          \"cdsCheckInterval\": 10000,
-                          \"cdsCheckAttempt\": 4,
-                          \"imagedatabrokerURI\": \"${DATABROKER_ZIPBROKER_IMAGE}\",
-                          \"csvdatabrokerURI\": \"${DATABROKER_CSVBROKER_IMAGE}\",
-                          \"sqldatabrokerURI\": \"${DATABROKER_SQLBROKER_IMAGE}\",
-                          \"jsondatabrokerURI\": \"NA\",
-                          \"sqldatabrokerURI\": \"NA\",
-                          \"lib\": \"/maven/\",
-                          \"tosca\": {
-                                \"outputfolder\": \"/tmp/output/\"
-                          },
-                          \"nexus\": {
-                                \"nexusendpointurl\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/${ACUMOS_NEXUS_MAVEN_REPO_PATH}/${ACUMOS_NEXUS_MAVEN_REPO}/\",
-                                \"nexusproxy\": \"\",
-                                \"nexuspassword\": \"${ACUMOS_NEXUS_RW_USER_PASSWORD}\",
-                                \"nexususername\": \"${ACUMOS_NEXUS_RW_USER}\",
-                                \"nexusgroupid\": \"com.artifact\"
-                          },
-                          \"cmndatasvc\": {
-                                \"cmndatasvcendpoinurl\": \"http://cds-service:8000/ccds\",
-                                \"cmndatasvcuser\": \"${ACUMOS_CDS_USER}\",
-                                \"cmndatasvcpwd\": \"${ACUMOS_CDS_PASSWORD}\"
-                          },
-                          \"docker\": {
-                                \"host\": \"${ACUMOS_DOCKER_API_HOST}\",
-                                \"port\": \"${ACUMOS_DOCKER_API_PORT}\",
-                                \"config\": \"/docker_host/.docker\",
-                                \"registry\": {
-                                        \"url\": \"http://${ACUMOS_DOCKER_REGISTRY_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/\",
-                                        \"username\": \"${ACUMOS_DOCKER_REGISTRY_USER}\",
-                                        \"password\": \"${ACUMOS_DOCKER_REGISTRY_PASSWORD}\",
-                                        \"email\": \"${ACUMOS_ADMIN_EMAIL}\"
-                                            },
-                                \"tls\": {\"verify\": \"false\"},
-                                \"api\": {\"version\": \"1.23\"},
-                                \"imagetag\": {
-                                        \"prefix\": \"${ACUMOS_DOCKER_REGISTRY_HOST}:${ACUMOS_DOCKER_MODEL_PORT}\"
-                                            },
-                                \"max_total_connections\": \"1\",
-                                \"max_per_route_connections\": \"1\"
-                            }
-                        }"
-       expose:
-           - 8088
-       volumes:
-           - type: bind
-             source: /mnt/${ACUMOS_NAMESPACE}/logs
-             target: /maven/logs
-           - type: bind
-             source: /mnt/${ACUMOS_NAMESPACE}/output
-             target: /temp/
-       logging:
-           driver: json-file
-       extra_hosts:
-           - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
-       restart: on-failure
+  dsce-service:
+    image: ${DESIGNSTUDIO_IMAGE}
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "logging": {
+          "level": {
+            "root": "${ACUMOS_LOG_LEVEL}"
+          }
+        },
+        "server": {
+          "port": 8088
+          },
+        "gdmJarName":"gdmservice-1.2.0-SNAPSHOT.jar",
+        "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
+        "solutionResultsetSize": "2000",
+        "cdsCheckInterval": 10000,
+        "cdsCheckAttempt": 4,
+        "imagedatabrokerURI": "${DATABROKER_ZIPBROKER_IMAGE}",
+        "csvdatabrokerURI": "${DATABROKER_CSVBROKER_IMAGE}",
+        "sqldatabrokerURI": "${DATABROKER_SQLBROKER_IMAGE}",
+        "jsondatabrokerURI": "NA",
+        "sqldatabrokerURI": "NA",
+        "lib": "/maven/",
+        "tosca": {
+          "outputfolder": "/tmp/output/"
+        },
+        "nexus": {
+          "nexusendpointurl": "http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/${ACUMOS_NEXUS_MAVEN_REPO_PATH}/${ACUMOS_NEXUS_MAVEN_REPO}/",
+          "nexusproxy": "",
+          "nexuspassword": "${ACUMOS_NEXUS_RW_USER_PASSWORD}",
+          "nexususername": "${ACUMOS_NEXUS_RW_USER}",
+          "nexusgroupid": "${ACUMOS_NEXUS_GROUP}"
+        },
+        "cmndatasvc": {
+          "cmndatasvcendpoinurl": "http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds",
+            "cmndatasvcuser": "${ACUMOS_CDS_USER}",
+            "cmndatasvcpwd": "${ACUMOS_CDS_PASSWORD}"
+        },
+        "docker": {
+          "host": "${ACUMOS_DOCKER_API_HOST}",
+          "port": "${ACUMOS_DOCKER_API_PORT}",
+          "config": "/docker_host/.docker",
+          "registry": {
+            "url": "http://${ACUMOS_DOCKER_REGISTRY_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/",
+            "username": "${ACUMOS_DOCKER_REGISTRY_USER}",
+            "password": "${ACUMOS_DOCKER_REGISTRY_PASSWORD}",
+            "email": "${ACUMOS_ADMIN_EMAIL}"
+          },
+          "tls": {"verify": "false"},
+          "api": {"version": "1.23"},
+          "imagetag": {
+            "prefix": "${ACUMOS_DOCKER_REGISTRY_HOST}:${ACUMOS_DOCKER_MODEL_PORT}"
+          },
+          "max_total_connections": "1",
+          "max_per_route_connections": "1"
+        }
+         }'
+    expose:
+      - 8088
+    volumes:
+      - type: bind
+        source: /mnt/${ACUMOS_NAMESPACE}/logs
+        target: /maven/logs
+      - type: bind
+        source: /mnt/${ACUMOS_NAMESPACE}/output
+        target: /temp/
+    logging:
+      driver: json-file
+    extra_hosts:
+      - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
+    restart: on-failure
