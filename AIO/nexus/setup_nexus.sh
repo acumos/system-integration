@@ -27,8 +27,7 @@
 # For docker-based deployments, run this script on the AIO host.
 # For k8s-based deployment, run this script on the AIO host or a workstation
 # connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
-# $ bash setup_nexus.sh <AIO_ROOT>
-#   AIO_ROOT: path to AIO folder where environment files are
+# $ bash setup_nexus.sh
 #
 
 setup_nexus_repo() {
@@ -74,7 +73,7 @@ function clean_nexus() {
   trap 'fail' ERR
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     log "Stop any existing docker based components for nexus-service"
-    bash docker_compose.sh $AIO_ROOT down
+    bash docker_compose.sh down
   else
     log "Stop any existing k8s based components for nexus-service"
     if [[ ! -e deploy/nexus-service.yaml ]]; then
@@ -92,7 +91,7 @@ function clean_nexus() {
 function setup_nexus() {
   trap 'fail' ERR
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-    bash docker_compose.sh $AIO_ROOT up -d --build --force-recreate
+    bash docker_compose.sh up -d --build --force-recreate
     wait_running nexus-service
   else
     log "Setup the nexus-data PVC"
@@ -151,27 +150,50 @@ EOF
     http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script/ -d @nexus-script.json
   curl -v -X POST -u $ACUMOS_NEXUS_ADMIN_USERNAME:$ACUMOS_NEXUS_ADMIN_PASSWORD -H "Content-Type: text/plain" \
     http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script/list-users/run
+
+  log "Disable strict content validation, and enable write ('redeploy')"
+  cat <<EOF >nexus-admin.json
+{
+  "action": "coreui_Repository",
+  "method": "update",
+  "data": [
+    {
+      "attributes": {
+        "maven": {
+          "versionPolicy": "RELEASE",
+          "layoutPolicy": "STRICT"
+        },
+        "storage": {
+          "blobStoreName": "default",
+          "strictContentTypeValidation": false,
+          "writePolicy": "ALLOW"
+        }
+      },
+      "name": "acumos_model_maven",
+      "format": "maven2",
+      "type": "hosted",
+      "url": "http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/$ACUMOS_NEXUS_MAVEN_REPO_PATH/$ACUMOS_NEXUS_MAVEN_REPO/",
+      "online": true
+    }
+  ]
+  ,
+  "type": "rpc",
+  "tid": 18
+}
+EOF
+  curl -v -u $ACUMOS_NEXUS_ADMIN_USERNAME:$ACUMOS_NEXUS_ADMIN_PASSWORD \
+    -H 'Content-Type: application/json' \
+    -X POST $ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/extdirect \
+    -d @nexus-admin.json
 }
 
-if [[ $# -lt 1 ]]; then
-  cat <<'EOF'
-Usage:
-  For docker-based deployments, run this script on the AIO host.
-  For k8s-based deployment, run this script on the AIO host or a workstation
-  connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
-  $ bash setup_nexus.sh <AIO_ROOT>
-    AIO_ROOT: path to AIO folder where environment files are
-EOF
-  echo "All parameters not provided"
-  exit 1
-fi
-
-WORK_DIR=$(pwd)
-export AIO_ROOT=$1
-source $AIO_ROOT/acumos_env.sh
-source $AIO_ROOT/utils.sh
+set -x
 trap 'fail' ERR
-cd $AIO_ROOT/nexus
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ..; pwd -P)"; fi
+source $AIO_ROOT/utils.sh
+source $AIO_ROOT/acumos_env.sh
 clean_nexus
 setup_nexus
 cd $WORK_DIR

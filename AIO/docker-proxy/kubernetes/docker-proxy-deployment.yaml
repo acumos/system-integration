@@ -56,7 +56,7 @@ spec:
         - name: ACUMOS_AUTH_URL
           value: "http://onboarding-service:8090/onboarding-app/v2/auth/"
         - name: ACUMOS_CDS_URL
-          value: "http://cds-service:8000/ccds"
+          value: "http://<ACUMOS_CDS_HOST>:<ACUMOS_CDS_PORT>/ccds"
         - name: ACUMOS_CDS_USER
           value: "<ACUMOS_CDS_USER>"
         - name: ACUMOS_CDS_PASSWORD
