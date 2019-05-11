@@ -35,7 +35,7 @@
 #   - Persistent volume pre-arranged and identified for PV-dependent components
 #     in acumos_env.sh. tools/setup_pv.sh may be used for this
 #   - the User running this script must have been added to the "docker" group
-#     $ sudo usermod <user> -G docker
+#     $ sudo usermod <user> -aG docker
 #   - AIO prerequisites setup by sudo user via setup_prereqs.sh
 #
 # Usage:
@@ -60,14 +60,14 @@ function clean_env() {
     bash $AIO_ROOT/docker_compose.sh $AIO_ROOT down
   else
     delete_namespace $ACUMOS_NAMESPACE
-    pvs=$(kubectl get pv | awk '/Released/{print $1}')
+    pvs=$($k8s_cmd get pv | awk '/Released/{print $1}')
     # Workaround for PVs getting stuck in "released" or "failed"
     for pv in $pvs ; do
-      kubectl patch pv $pv --type json -p '[{ "op": "remove", "path": "/spec/claimRef" }]'
+      $k8s_cmd patch pv $pv --type json -p '[{ "op": "remove", "path": "/spec/claimRef" }]'
     done
-    pvs=$(kubectl get pv | awk '/Failed/{print $1}')
+    pvs=$($k8s_cmd get pv | awk '/Failed/{print $1}')
     for pv in $pvs ; do
-      kubectl patch pv $pv --type json -p '[{ "op": "remove", "path": "/spec/claimRef" }]'
+      $k8s_cmd patch pv $pv --type json -p '[{ "op": "remove", "path": "/spec/claimRef" }]'
     done
   fi
 }
@@ -95,6 +95,10 @@ function setup_acumos() {
     docker_login https://nexus3.acumos.org:10003
     docker_login https://nexus3.acumos.org:10002
 
+    log "Prepare the sv-scanning config volume"
+    rm -rf /mnt/$ACUMOS_NAMESPACE/sv/*
+    cp -r kubernetes/configmap/sv-scanning/* /mnt/$ACUMOS_NAMESPACE/sv/.
+
     log "Deploy Acumos core docker-based components"
     bash $AIO_ROOT/docker_compose.sh $AIO_ROOT up -d --build
     bash $AIO_ROOT/docker-proxy/setup_docker_proxy.sh $AIO_ROOT
@@ -107,6 +111,14 @@ function setup_acumos() {
     cp kubernetes/service/* deploy/.
     cp kubernetes/deployment/* deploy/.
     cp kubernetes/rbac/* deploy/.
+
+    log "Create the sv-scanning configmaps"
+    $k8s_cmd create configmap -n $ACUMOS_NAMESPACE sv-scanning-scripts \
+      --from-file=kubernetes/configmap/sv-scanning/scripts
+    $k8s_cmd create configmap -n $ACUMOS_NAMESPACE sv-scanning-licenses \
+      --from-file=kubernetes/configmap/sv-scanning/licenses
+    $k8s_cmd create configmap -n $ACUMOS_NAMESPACE sv-scanning-rules \
+      --from-file=kubernetes/configmap/sv-scanning/rules
 
     log "Set variable values in k8s templates"
     replace_env deploy
@@ -132,13 +144,6 @@ function setup_acumos() {
     for app in $apps; do
       wait_running $app $ACUMOS_NAMESPACE
     done
-
-    # TODO: Skip juputerhub for openshift - some unknown issues
-    if [[ "$K8S_DIST" == "generic" ]]; then
-      log "Deploy jupyterhub"
-      bash $AIO_ROOT/../charts/jupyterhub/setup_jupyterhub.sh \
-        $ACUMOS_NAMESPACE $ACUMOS_ONBOARDING_TOKENMODE
-    fi
   fi
 }
 
@@ -147,7 +152,7 @@ function setup_federation() {
   log "Checking for 'self' peer entry for $ACUMOS_DOMAIN"
   # Have to use $ACUMOS_HOST vs $ACUMOS_DOMAIN as for some reason that does not
   # work in cloud VMs
-  local cdsapi="https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/peer"
+  local cdsapi="https://$ACUMOS_HOST/ccds/peer"
   local creds="$ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD"
   wait_until_success 30 "curl -k -u $creds -k $cdsapi"
   local jsonout="/tmp/$(uuidgen)"
@@ -197,6 +202,7 @@ update_env DEPLOY_RESULT "" force
 update_env FAIL_REASON "" force
 set_k8s_env
 
+update_env ACUMOS_JWT_KEY $(uuidgen)
 update_env ACUMOS_CDS_PASSWORD $(uuidgen)
 update_env ACUMOS_NEXUS_RO_USER_PASSWORD $(uuidgen)
 update_env ACUMOS_NEXUS_RW_USER_PASSWORD $(uuidgen)
@@ -236,7 +242,13 @@ fi
 source acumos_env.sh
 setup_acumos
 
-bash $AIO_ROOT/kong/setup_kong.sh $AIO_ROOT
+if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
+  bash $AIO_ROOT/ingress/setup_ingress.sh $AIO_ROOT
+  echo "Portal: https://$ACUMOS_DOMAIN" >acumos.url
+else
+  bash $AIO_ROOT/kong/setup_kong.sh $AIO_ROOT
+  echo "Portal: https://$ACUMOS_DOMAIN" >acumos.url
+fi
 
 if [[ "$ACUMOS_DEPLOY_NEXUS" == "true" && "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
   bash $AIO_ROOT/nexus/setup_nexus.sh $AIO_ROOT
@@ -255,8 +267,12 @@ fi
 if [[ "$ACUMOS_DEPLOY_ELK_METRICBEAT" == "true" ]]; then
   bash $AIO_ROOT/beats/setup_beats.sh $AIO_ROOT metricbeat
 fi
-cd $WORK_DIR
 
+if [[ "$ACUMOS_DEPLOY_MLWB" == "true" ]]; then
+  bash $AIO_ROOT/mlwb/setup_mlwb.sh $AIO_ROOT
+fi
+
+cd $WORK_DIR
 set +x
 
 sedi "s/DEPLOY_RESULT=.*/DEPLOY_RESULT=success/" acumos_env.sh
@@ -265,13 +281,14 @@ log "Deploy is complete."
 echo "You can access the Acumos portal and other services at the URLs below,"
 echo "assuming hostname \"$ACUMOS_DOMAIN\" is resolvable from your workstation:"
 
-cat <<EOF >acumos.url
-Portal: https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT
-Common Data Service: https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/swagger-ui.html
-Kibana: http://$ACUMOS_ELK_DOMAIN:$ACUMOS_ELK_KIBANA_PORT/app/kibana
-Nexus: http://$ACUMOS_NEXUS_DOMAIN:$ACUMOS_NEXUS_API_PORT
+cat <<EOF >>acumos.url
+Common Data Service Swagger UI: https://$ACUMOS_DOMAIN/ccds/swagger-ui.html
+Portal Swagger UI: https://$ACUMOS_DOMAIN/api/swagger-ui.html
+Onboarding Service Swagger UI: https://$ACUMOS_DOMAIN/onboarding-app/swagger-ui.html
+Kibana: http://$ACUMOS_ELK_HOST_IP:$ACUMOS_ELK_KIBANA_PORT/app/kibana
+Nexus: http://$ACUMOS_HOST_IP:$ACUMOS_NEXUS_API_PORT
 EOF
 if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-  echo "Mariadb Admin: http://$ACUMOS_DOMAIN:$ACUMOS_MARIADB_ADMINER_PORT" >>acumos.url
+  echo "Mariadb Admin: http://$ACUMOS_HOST_IP:$ACUMOS_MARIADB_ADMINER_PORT" >>acumos.url
 fi
 cat acumos.url
