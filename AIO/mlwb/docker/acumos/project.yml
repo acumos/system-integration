@@ -1,0 +1,87 @@
+version: '3.2'
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+services:
+  mlwb-project-service:
+    image: ${MLWB_PROJECT_SERVICE_IMAGE}
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "server": {
+          "port": 9088
+        },
+        "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
+        "resultsetSize": 2000,
+        "cmndatasvc": {
+          "endpointurl": "http://${ACUMOS_DOMAIN}:8000/ccds",
+          "user": "${ACUMOS_CDS_USER}",
+          "pwd": "${ACUMOS_CDS_PASSWORD}"
+        },
+        "jwt" : {
+          "secretkey": "${ACUMOS_JWT_KEY}"
+        }
+      }'
+    ports:
+      - ${MLWB_PROJECT_SERVICE_PORT}:9090
+    volumes:
+      - type: bind
+        source: /mnt/${ACUMOS_NAMESPACE}/logs
+        target: /maven/logs
+    logging:
+        driver: json-file
+    restart: on-failure
+
+  mlwb-project-webcomponent-service:
+    image: ${MLWB_PROJECT_WEBCOMPONENT_IMAGE}
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ENVIRONMENT: "deploy"
+      projectmSURL: "http://mlwb-project-service:9088/mlWorkbench/v1/project"
+      notebookmSURL: "http://mlwb-notebook-service:9089/mlWorkbench/v1/notebook"
+      pipelinemSURL: "http://mlwb-pipeline-service:9090/mlWorkbench/v1/pipeline"
+      projectWikiURL : "https://wiki.acumos.org/display/TRAIN"
+      notebookWikiURL : "https://wiki.acumos.org/display/TRAIN"
+      pipelineWikiURL : "https://wiki.acumos.org/display/TRAIN"
+      pipelineFlag : "false"
+    ports:
+      - ${MLWB_PROJECT_WEBCOMPONENT_PORT}:9084
+    volumes:
+      - type: bind
+        source: /mnt/${ACUMOS_NAMESPACE}/logs
+        target: /maven/logs
+    logging:
+        driver: json-file
+    restart: on-failure
+
+  mlwb-project-catalog-webcomponent-service:
+    image: ${MLWB_PROJECT_CATALOG_WEBCOMPONENT_IMAGE}
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ENVIRONMENT: "deploy"
+      projectmSURL: "http://mlwb-project-service:9088/mlWorkbench/v1/project"
+      notebookmSURL: "http://mlwb-notebook-service:9089/mlWorkbench/v1/notebook"
+      pipelinemSURL: "http://mlwb-pipeline-service:9090/mlWorkbench/v1/pipeline"
+      projectWikiURL: "https://wiki.acumos.org/display/TRAIN"
+    ports:
+      - ${MLWB_PROJECT_CATALOG_WEBCOMPONENT_PORT}:9085
+    volumes:
+      - type: bind
+        source: /mnt/${ACUMOS_NAMESPACE}/logs
+        target: /maven/logs
+    logging:
+        driver: json-file
+    restart: on-failure

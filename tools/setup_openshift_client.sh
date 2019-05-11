@@ -26,29 +26,15 @@
 # - Ubuntu Xenial/Bionic or Centos 7 workstation
 # - Openshift cluster setup, with key-based SSH access from workstation
 #
-#. Usage: on the workstation
-#. $ bash setup_openshift_client.sh <master> <username> [namespace]
-#.   master: IP of the OpenShift cluster master
-#.   username: username on the server where the master was installed (this is
-#.     the user who setup the cluster, and for which key-based SSH is setup)
-#.   namespace: optional namespace to set for the logged-in user context
-
-trap 'fail' ERR
-
-function fail() {
-  log "$1"
-  exit 1
-}
-
-function log() {
-  set +x
-  fname=$(caller 0 | awk '{print $2}')
-  fline=$(caller 0 | awk '{print $1}')
-  echo; echo "$fname:$fline ($(date)) $1"
-  set -x
-}
+# Usage: on the workstation
+# $ bash setup_openshift_client.sh <master> <username> [namespace]
+#   master: IP of the OpenShift cluster master
+#   username: username on the server where the master was installed (this is
+#     the user who setup the cluster, and for which key-based SSH is setup)
+#   namespace: optional namespace to set for the logged-in user context
 
 function get_dist() {
+  trap 'fail' ERR
   if [[ $(bash --version | grep -c redhat-linux) -gt 0 ]]; then
     dist=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
   elif [[ $(bash --version | grep -c pc-linux) -gt 0 ]]; then
@@ -63,6 +49,7 @@ function get_dist() {
 }
 
 setup_client() {
+  trap 'fail' ERR
   get_dist
   if [[ "$(which oc)" == "" ]];then
     if [[ "$dist" == "ubuntu" || "$dist" == "centos" ]]; then
@@ -98,10 +85,30 @@ setup_client() {
   oc config use-context $master-$namespace
 }
 
+if [[ $# -lt 3 ]]; then
+  cat <<'EOF'
+Usage:
+ Usage: on the workstation
+ $ bash setup_openshift_client.sh <master> <username> [namespace]
+   master: IP of the OpenShift cluster master
+   username: username on the server where the master was installed (this is
+     the user who setup the cluster, and for which key-based SSH is setup)
+   namespace: optional namespace to set for the logged-in user context
+EOF
+  echo "All parameters not provided"
+  exit 1
+fi
+
+set -x
+trap 'fail' ERR
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../AIO; pwd -P)"; fi
+source $AIO_ROOT/utils.sh
 master=$1
 username=$2
 namespace=$3
-if [[ "$3" != "" ]]; then ns="--namespace=$3"; fi
+ns="--namespace=$namespace"
 setup_client
 
 log "All done!"

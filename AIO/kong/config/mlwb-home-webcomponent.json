@@ -1,0 +1,15 @@
+{
+  "strip_uri": true,
+  "name": "mlwb-home-webcomponent",
+  "http_if_terminated": false,
+  "https_only": true,
+  "upstream_url": "http://mlwb-home-webcomponent-service:9082",
+  "uris": [
+    "/mlwb-home-webcomponent"
+ ,
+  "preserve_host": false,
+  "upstream_connect_timeout": 60000,
+  "upstream_read_timeout": 60000,
+  "upstream_send_timeout": 60000,
+  "retries": 5
+}
