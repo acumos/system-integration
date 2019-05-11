@@ -24,83 +24,117 @@ services:
         image: ${SECURITY_VERIFICATION_IMAGE}
         environment:
             ACUMOS_ADMIN_USER: "admin"
-            ACUMOS_CDS_HOST: "cds-service"
-            ACUMOS_CDS_PORT: "8000"
+            ACUMOS_CDS_HOST: "${ACUMOS_CDS_HOST}"
+            ACUMOS_CDS_PORT: "${ACUMOS_CDS_PORT}"
             ACUMOS_CDS_USER: "${ACUMOS_CDS_USER}"
             ACUMOS_CDS_PASSWORD: "${ACUMOS_CDS_PASSWORD}"
             ACUMOS_NEXUS_HOST: "${ACUMOS_NEXUS_HOST}"
             ACUMOS_NEXUS_API_PORT: "${ACUMOS_NEXUS_API_PORT}"
             ACUMOS_NEXUS_MAVEN_REPO: "${ACUMOS_NEXUS_MAVEN_REPO}"
-            SPRING_APPLICATION_JSON: "{
-              \"server\" : {
-                 \"port\" : 9082
+            SPRING_APPLICATION_JSON: '{
+              "server" : {
+                 "port" : 9082
               },
-              \"cdms\": {
-              \"client\": {
-                \"url\": \"http://cds-service:8000/ccds\",
-                \"username\": \"${ACUMOS_CDS_USER}\",
-                \"password\": \"${ACUMOS_CDS_PASSWORD}\",
-                \"host\": \"cds-service\",
-                \"port\": \"8000\"
-              }
-              },
-              \"nexus\": {
-                \"groupId\": \"com.artifact\",
-                \"client\": {
-                  \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/${ACUMOS_NEXUS_MAVEN_REPO_PATH}/${ACUMOS_NEXUS_MAVEN_REPO}/\",
-                  \"proxy\": \"\",
-                  \"password\": \"${ACUMOS_NEXUS_RW_USER_PASSWORD}\",
-                  \"username\": \"${ACUMOS_NEXUS_RW_USER}\",
-                  \"groupId\": \"com.artifact\",
-                  \"host\": \"${ACUMOS_NEXUS_HOST}\",
-                  \"port\": \"${ACUMOS_NEXUS_API_PORT}\",
-                  \"maven_repo\": \"${ACUMOS_NEXUS_MAVEN_REPO}\"
+              "cdms": {
+                "client": {
+                  "url": "http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds",
+                  "username": "${ACUMOS_CDS_USER}",
+                  "password": "${ACUMOS_CDS_PASSWORD}"
                 }
               },
-              \"siteConfig\": \"{ \\\"verification\\\": {
-                \\\"externalScan\\\": \\\"false\\\",
-                \\\"allowedLicense\\\": [
-                  { \\\"type\\\": \\\"SPDX\\\", \\\"value\\\": \\\"Apache-2.0\\\" },
-                  { \\\"type\\\": \\\"SPDX\\\", \\\"value\\\": \\\"CC-BY-4.0\\\" },
-                  { \\\"type\\\": \\\"SPDX\\\", \\\"value\\\": \\\"BSD-3-Clause\\\" },
-                  { \\\"type\\\": \\\"VendorA\\\", \\\"value\\\": \\\"VendorA-OSS\\\" },
-                  { \\\"type\\\": \\\"CompanyB\\\", \\\"value\\\": \\\"CompanyB-Proprietary\\\" }
-                ],
-                \\\"licenseScan\\\": {
-                  \\\"created\\\": \\\"true\\\",
-                  \\\"updated\\\": \\\"true\\\",
-                  \\\"deploy\\\": \\\"false\\\",
-                  \\\"download\\\": \\\"false\\\",
-                  \\\"share\\\": \\\"false\\\",
-                  \\\"publishCompany\\\": \\\"false\\\",
-                  \\\"publishPublic\\\": \\\"false\\\"
-                },
-                \\\"securityScan\\\": {
-                  \\\"created\\\": \\\"true\\\",
-                  \\\"updated\\\": \\\"true\\\",
-                  \\\"deploy\\\": \\\"false\\\",
-                  \\\"download\\\": \\\"false\\\",
-                  \\\"share\\\": \\\"false\\\",
-                  \\\"publishCompany\\\": \\\"false\\\",
-                  \\\"publishPublic\\\": \\\"false\\\"
-                },
-                \\\"licenseVerify\\\": {
-                  \\\"deploy\\\": \\\"true\\\",
-                  \\\"download\\\": \\\"true\\\",
-                  \\\"share\\\": \\\"false\\\",
-                  \\\"publishCompany\\\": \\\"true\\\",
-                  \\\"publishPublic\\\": \\\"true\\\"
-                },
-                \\\"securityVerify\\\": {
-                  \\\"deploy\\\": \\\"true\\\",
-                  \\\"download\\\": \\\"true\\\",
-                  \\\"share\\\": \\\"false\\\",
-                  \\\"publishCompany\\\": \\\"true\\\",
-                  \\\"publishPublic\\\": \\\"true\\\"
+              "nexus": {
+                "client": {
+                  "url": "http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/${ACUMOS_NEXUS_MAVEN_REPO_PATH}/${ACUMOS_NEXUS_MAVEN_REPO}/",
+                  "proxy": "",
+                  "password": "${ACUMOS_NEXUS_RW_USER_PASSWORD}",
+                  "username": "${ACUMOS_NEXUS_RW_USER}",
+                  "groupId": "com.artifact"
                 }
-                }\"
-              }
-            }"
+              },
+              "siteConfig": "{ \"verification\": {
+                  \"externalScan\": \"false\",
+                  \"allowedLicense\": [
+                    { \"type\": \"SPDX\", \"value\": \"Apache-2.0\" },
+                    { \"type\": \"SPDX\", \"value\": \"CC-BY-4.0\" },
+                    { \"type\": \"SPDX\", \"value\": \"BSD-3-Clause\" },
+                    { \"type\": \"VendorA\", \"value\": \"Vendor-A-OSS\" },
+                    { \"type\": \"CompanyB\", \"value\": \"Company-B-Proprietary\" }
+                  ],
+                  \"compatibleLicenses\":[
+                    { \"name\":\"Apache-2.0\", \"compatible\":[
+                        { \"name\":\"CC-BY-4.0\" },
+                        { \"name\":\"Apache-2.0\" },
+                        { \"name\":\"BSD-3-Clause\" },
+                        { \"name\":\"MIT-License\" }
+                      ]
+                    },
+                    { \"name\":\"BSD-3-Clause\", \"compatible\":[
+                        { \"name\":\"CC-BY-4.0\" },
+                        { \"name\":\"Apache-2.0\" },
+                        { \"name\":\"BSD-3-Clause\" },
+                        { \"name\":\"MIT-License\" }
+                      ]
+                    },
+                    { \"name\":\"MIT-License\", \"compatible\":[
+                        { \"name\":\"CC-BY-4.0\" },
+                        { \"name\":\"Apache-2.0\" },
+                        { \"name\":\"BSD-3-Clause\" },
+                        { \"name\":\"MIT-License\" }
+                      ]
+                    },
+                    { \"name\":\"Vendor-A-OSS\", \"compatible\":[
+                        { \"name\":\"Vendor-A-OSS\" },
+                        { \"name\":\"CC-BY-4.0\" },
+                        { \"name\":\"Apache-2.0\" },
+                        { \"name\":\"BSD-3-Clause\" },
+                        { \"name\":\"MIT-License\" }
+                      ]
+                    },
+                    { \"name\":\"Company-B-Proprietary\", \"compatible\":[
+                        { \"name\":\"Company-B-Proprietary\" },
+                        { \"name\":\"CC-BY-4.0\" },
+                        { \"name\":\"Apache-2.0\" },
+                        { \"name\":\"BSD-3-Clause\" },
+                        { \"name\":\"MIT-License\" }
+                      ]
+                    }
+                  ],
+                  \"licenseScan\": {
+                    \"created\": \"true\",
+                    \"updated\": \"true\",
+                    \"deploy\": \"false\",
+                    \"download\": \"false\",
+                    \"share\": \"false\",
+                    \"publishCompany\": \"false\",
+                    \"publishPublic\": \"false\"
+                  },
+                  \"securityScan\": {
+                    \"created\": \"true\",
+                    \"updated\": \"true\",
+                    \"deploy\": \"false\",
+                    \"download\": \"false\",
+                    \"share\": \"false\",
+                    \"publishCompany\": \"false\",
+                    \"publishPublic\": \"false\"
+                  },
+                  \"licenseVerify\": {
+                    \"deploy\": \"true\",
+                    \"download\": \"true\",
+                    \"share\": \"false\",
+                    \"publishCompany\": \"true\",
+                    \"publishPublic\": \"true\"
+                  },
+                  \"securityVerify\": {
+                    \"deploy\": \"true\",
+                    \"download\": \"true\",
+                    \"share\": \"false\",
+                    \"publishCompany\": \"true\",
+                    \"publishPublic\": \"true\"
+                  }
+                }
+              }"
+            }'
+        entrypoint: /bin/bash /maven/conf/scripts/start.sh
         expose:
             - 9082
         ports:
@@ -109,6 +143,9 @@ services:
             - type: bind
               source: /mnt/${ACUMOS_NAMESPACE}/logs
               target: /maven/logs
+            - type: bind
+              source: /mnt/${ACUMOS_NAMESPACE}/sv
+              target: /maven/conf
         logging:
             driver: json-file
         extra_hosts:
