@@ -41,15 +41,15 @@ export ACUMOS_RELEASE=nexus3.acumos.org:10002
 # https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_1904301100
 # Core components
 export AZURE_CLIENT_IMAGE=$ACUMOS_STAGING/acumos-azure-client:2.0.13
-export PORTAL_BE_IMAGE=$ACUMOS_STAGING/acumos-portal-be:2.2.10
-export PORTAL_FE_IMAGE=$ACUMOS_STAGING/acumos-portal-fe:2.2.10
+export PORTAL_BE_IMAGE=$ACUMOS_STAGING/acumos-portal-be:2.2.12
+export PORTAL_FE_IMAGE=$ACUMOS_STAGING/acumos-portal-fe:2.2.12
 export COMMON_DATASERVICE_IMAGE=$ACUMOS_STAGING/common-dataservice:2.2.2
 export DESIGNSTUDIO_IMAGE=$ACUMOS_STAGING/ds-compositionengine:2.0.8
 export FEDERATION_IMAGE=$ACUMOS_STAGING/federation-gateway:2.2.0
 export KUBERNETES_CLIENT_IMAGE=$ACUMOS_STAGING/kubernetes-client:2.0.10
 export MICROSERVICE_GENERATION_IMAGE=$ACUMOS_STAGING/microservice-generation:2.10.0
 export ONBOARDING_IMAGE=$ACUMOS_STAGING/onboarding-app:2.12.0
-export SECURITY_VERIFICATION_IMAGE=$ACUMOS_SNAPSHOT/security-verification:0.0.13-SNAPSHOT
+export SECURITY_VERIFICATION_IMAGE=$ACUMOS_STAGING/security-verification:0.0.17
 export OPENSTACK_CLIENT_IMAGE=$ACUMOS_STAGING/openstack-client:2.0.10
 export MLWB_PROJECT_SERVICE_IMAGE=$ACUMOS_STAGING/project-service:1.0.0
 export MLWB_NOTEBOOK_SERVICE_IMAGE=$ACUMOS_STAGING/notebook-service:1.0.0
@@ -121,13 +121,15 @@ export HTTP_PROXY=""
 export HTTPS_PROXY=""
 
 # Component options
-export ACUMOS_ADMIN_EMAIL='acumos@example.com'
+export ACUMOS_ADMIN=admin
+export ACUMOS_ADMIN_EMAIL=acumos@example.com
 export ACUMOS_CDS_PREVIOUS_VERSION=
 export ACUMOS_CDS_NODEPORT=30800
 export ACUMOS_CDS_VERSION=2.2
 export ACUMOS_CDS_DB='acumos_cds'
 export ACUMOS_CDS_USER=ccds_client
 export ACUMOS_CDS_PASSWORD=
+export ACUMOS_JWT_KEY=
 export ACUMOS_DOCKER_PROXY_HOST=$ACUMOS_DOMAIN
 export ACUMOS_DOCKER_PROXY_PORT=30883
 export ACUMOS_DOCKER_PROXY_USERNAME=

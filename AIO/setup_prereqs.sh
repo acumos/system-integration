@@ -276,7 +276,6 @@ function prepare_nexus() {
 
 function prepare_elk() {
   trap 'fail' ERR
-
   if [[ "$ACUMOS_DEPLOY_ELK" == "true" ]]; then
     source $AIO_ROOT/../charts/elk-stack/setup_elk_env.sh
     cp elk_env.sh $AIO_ROOT/../charts/elk-stack/.
@@ -285,6 +284,15 @@ function prepare_elk() {
     fi
     reset_pv elasticsearch-data $ACUMOS_ELK_NAMESPACE \
       $ACUMOS_ELASTICSEARCH_DATA_PV_SIZE "1000:1000"
+  fi
+}
+
+function prepare_mlwb() {
+  trap 'fail' ERR
+  if [[ "$ACUMOS_DEPLOY_MLWB" == "true" ]]; then
+    source $AIO_ROOT/mlwb/mlwb_env.sh
+    reset_pv nifi-registry $ACUMOS_NAMESPACE \
+      $MLWB_NIFI_REGISTRY_PV_SIZE "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
   fi
 }
 
@@ -364,6 +372,7 @@ prepare_acumos
 prepare_docker_engine
 prepare_kong
 prepare_nexus
+prepare_mlwb
 
 mkdir -p $AIO_ROOT/../../acumos/env $AIO_ROOT/../../acumos/certs $AIO_ROOT/../../acumos/logs
 cp $AIO_ROOT/*_env.sh $AIO_ROOT/../../acumos/env/.
