@@ -92,6 +92,7 @@ spec:
                     },
                     "logstash": {
                       "host": "<ACUMOS_ELK_HOST>",
+                      "ip": "<ACUMOS_ELK_HOST_IP>",
                       "port": "<ACUMOS_ELK_LOGSTASH_PORT>"
                     }
                   }'
