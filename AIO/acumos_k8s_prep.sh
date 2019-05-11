@@ -115,8 +115,13 @@ else
   sudo apt-get purge -y docker-ce docker docker-engine docker.io
 fi
 sudo iptables -F && sudo iptables -t nat -F && sudo iptables -t mangle -F && sudo iptables -X
+if [[ $(which docker) ]]; then docker system prune -a -f; fi
 if [[ ! $(sudo rm -rf /mnt/$ACUMOS_NAMESPACE/docker) ]]; then
   echo "Warning: all docker data could not be deleted"
+  if [[ "$K8S_DIST" == "openshift" ]]; then
+    # Retrying this can resolve issues with resources under OpenShift deploys
+    bash cleanup.sh
+  fi
 fi
 sudo rm -rf /mnt/$ACUMOS_NAMESPACE/*
 
