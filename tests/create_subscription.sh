@@ -23,33 +23,45 @@
 # - All hostnames/FQDNs specified for peers must be DNS-resolvable on all hosts
 #   (entries in /etc/hosts or in an actual DNS server)
 # - jq installed on the host where this script is being run
+# - Federation service on the peer is exposed at port 30984 (AIO default)
+#   (modify this script if another port is used)
 #
 # Usage:
 # $ bash create_subscription.sh <env> <admin> <peer> <accessType> <scopeType>
-#                               <refreshInterval> <modelTypeCode>
+#                               <modelTypeCode> <refreshInterval> <cert> <key>
 #   env: path to local platform environment file acumos_env.sh
 #   admin: name of Admin role user on the local platform
 #   peer: hostname or FQDN of the peer platform
 #   accessType: PB|OR|PR (public|company|private)
 #   scopeType: RF|FL (RF: references only | FL: all data)
-#   refreshInterval: time in minutes
 #   modelTypeCode: '*' | individual value or subset of CL,DS,DT,PR,RG
 #     CL “Classification” | DS “Data Sources” | DT “Data Transformer”
 #     PR “Prediction” | RG “Regression”
+#   refreshInterval: time in minutes
+#   cert: client certificate for the local platform
+#   key: private key for the local platform
 #
 # See the "Common Data Service Requirements" for details on the codes above
+#
+# To cleanup all subscriptions:
+# i=0; while [[ $(curl -k -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X DELETE https://$ACUMOS_DOMAIN/ccds/peer/sub/$i | jq -r '.status') != 400 ]]; do i=$((i+1)); done
 
 function fail() {
-  log "$1"
+  reason="$1"
+  fname=$(caller 0 | awk '{print $2}')
+  fline=$(caller 0 | awk '{print $1}')
+  if [[ "$1" == "" ]]; then reason="unknown failure at $fname $fline"; fi
+  log "$reason"
   exit 1
 }
 
 function log() {
+  setx=${-//[^x]/}
   set +x
   fname=$(caller 0 | awk '{print $2}')
   fline=$(caller 0 | awk '{print $1}')
   echo; echo "$fname:$fline ($(date)) $1"
-  set -x
+  if [[ -n "$setx" ]]; then set -x; else set +x; fi
 }
 
 function find_user() {
@@ -89,31 +101,32 @@ function find_peer() {
 
 function create_subscription() {
   trap 'fail' ERR
+  local jsonout="/tmp/$(uuidgen)"
+  curl -v -k -o $jsonout --cert $cert --key $key https://$ACUMOS_DOMAIN:30984/catalogs
+  cats=$(jq -r '.content | length' $jsonout)
+  log DEBUG "$cats catalogs found: "
+  cat $jsonout
+  j=0
+  atc=""
+  while [[ $j -le $cats && "$atc" != "$accessType" ]] ; do
+    cid=$(jq -r ".content[$j].catalogId" $jsonout)
+    atc=$(jq -r ".content[$j].accessTypeCode" $jsonout)
+    j=$((j+1))
+  done
+  rm $jsonout
+  if [[ $j -gt $cats ]]; then
+    fail "Access type $accessType not found in catalogs"
+  fi
+
   local jsonin="/tmp/$(uuidgen)"
-  if [[ "$modelTypeCode" == *","* ]]; then
-    typeCode=$(echo '[\"'$modelTypeCode'\"]' | sed 's/,/\\\",\\\"/g')
-    cat <<EOF >$jsonin
-{
-"accessType": "$accessType",
-"peerId": "$peerId",
-"scopeType": "$scopeType",
-"refreshInterval": $refreshInterval,
-"selector": "{ \"modelTypeCode\": $typeCode }",
-"userId": "$userId"
-}
-EOF
-  else
   cat <<EOF >$jsonin
 {
-"accessType": "$accessType",
 "peerId": "$peerId",
-"scopeType": "$scopeType",
 "refreshInterval": $refreshInterval,
-"selector": "{ \"modelTypeCode\": \"$typeCode\" }",
+"selector": "{ \"catalogId\": \"$cid\" }",
 "userId": "$userId"
 }
 EOF
-  fi
   cat $jsonin
   local jsonout="/tmp/$(uuidgen)"
   curl -s -k -o $jsonout -u $creds -X POST $cds/peer/sub \
@@ -131,20 +144,22 @@ EOF
 }
 
 set -x
-if [[ $# -lt 7 ]]; then
+if [[ $# -lt 9 ]]; then
   cat <<'EOF'
 Usage:
   $ bash create_subscription.sh <env> <admin> <peer> <accessType> <scopeType>
-                                <refreshInterval> <modelTypeCode>
+                                <modelTypeCode> <refreshInterval> <cert> <key>
     env: path to local platform environment file acumos_env.sh
     admin: name of Admin role user on the local platform
-    peer: hostname or FQDN of the peer platform
+    peer: hostname or FQDN of the peer Federation service
     accessType: PB|OR|PR (public|company|private)
     scopeType: RF|FL (RF: references only | FL: all data)
-    refreshInterval: time in minutes
     modelTypeCode: '*' | individual value or subset of CL,DS,DT,PR,RG
       CL “Classification” | DS “Data Sources” | DT “Data Transformer”
       PR “Prediction” | RG “Regression”
+    refreshInterval: time in minutes
+    cert: client certificate for the local platform
+    key: private key for the local platform
 EOF
   echo "All parameters not provided"
   exit 1
@@ -157,13 +172,14 @@ admin=$2
 peer=$3
 accessType=$4
 scopeType=$5
-refreshInterval=$6
-modelTypeCode=$7
-
+modelTypeCode=$6
+refreshInterval=$7
+cert=$8
+key=$9
 set +x
 source $env
 set -x
-cds="https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT/ccds"
+cds="https://$ACUMOS_DOMAIN/ccds"
 creds="$ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD"
 find_peer
 if [[ "$peerId" == "" ]]; then

@@ -27,22 +27,22 @@ version: '3.2'
 # will connect to the docker repository (using the extrernal port #)
 
 services:
-   nexus-service:
-       image: sonatype/nexus3:3.9.0
-       environment:
-           log_level: "DEBUG"
-       ports:
-           - ${ACUMOS_NEXUS_API_PORT}:8081
-           - ${ACUMOS_DOCKER_MODEL_PORT}:${ACUMOS_DOCKER_MODEL_PORT}
-       volumes:
-           - type: bind
-             source: /mnt/${ACUMOS_NAMESPACE}/logs
-             target: /maven/logs
-           - type: bind
-             source: /mnt/${ACUMOS_NAMESPACE}/nexus-data
-             target: /nexus-data
-       logging:
-           driver: json-file
-       extra_hosts:
-           - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
-       restart: on-failure
+  nexus-service:
+    image: sonatype/nexus3:3.9.0
+    environment:
+      log_level: "DEBUG"
+    ports:
+      - ${ACUMOS_NEXUS_API_PORT}:8081
+      - ${ACUMOS_DOCKER_MODEL_PORT}:${ACUMOS_DOCKER_MODEL_PORT}
+    volumes:
+      - type: bind
+        source: /mnt/${ACUMOS_NAMESPACE}/logs
+        target: /maven/logs
+      - type: bind
+        source: /mnt/${ACUMOS_NAMESPACE}/nexus-data
+        target: /nexus-data
+    logging:
+      driver: json-file
+    extra_hosts:
+      - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
+    restart: on-failure

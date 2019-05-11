@@ -22,28 +22,10 @@
 # Prerequisites:
 # - Centos 7 server
 #
-#. Usage: on the node to become the master
-#. $ bash setup_openshift.sh "[oc|ansible] [nodes]"
-#.   oc|ansible: install via "oc cluster up" or via ansible playbook
-#.   nodes: quoted, space-separated list of k8s worker nodes. If no nodes are
-#.          specified a single all-in-one cluster will be installed
-
-set -x
-
-trap 'fail' ERR
-
-function fail() {
-  log "$1"
-  exit 1
-}
-
-function log() {
-  set +x
-  fname=$(caller 0 | awk '{print $2}')
-  fline=$(caller 0 | awk '{print $1}')
-  echo; echo "$fname:$fline ($(date)) $1"
-  set -x
-}
+# Usage: on the node to become the master
+# $ bash setup_openshift.sh "[nodes]"
+#   nodes: quoted, space-separated list of k8s worker nodes. If no nodes are
+#          specified a single all-in-one cluster will be installed
 
 function setup_prereqs() {
   log "Create prerequisite setup script"
@@ -100,37 +82,16 @@ EOF
   sudo yum install -y patch
   sudo yum install -y httpd-tools
 
-  if [[ "$method" == "oc" ]]; then
-    log "Download the OpenShift binaries from GitHub"
-    wget https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz
-    tar -xf openshift-origin-client-tools-*.tar.gz
-    cd openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit
-    if [[ -e /usr/bin/kubectl ]]; then sudo rm /usr/bin/kubectl; fi
-    if [[ -e /usr/bin/oc ]]; then sudo rm /usr/bin/oc; fi
-    sudo mv kubectl oc /usr/bin/.
-
-    log "Bring up the all-in-one cluster"
-    # Add --public-hostname="$(hostname)" so you can browse the console!
-    sudo /usr/bin/oc cluster up --public-hostname="$(hostname)"
-  else
-    fail "ansible option not working yet"
-    # Due to
-    # https://github.com/openshift/openshift-ansible/issues/8399#issuecomment-413582800
-    # https://github.com/openshift/origin/issues/20653
-    log "Clone latest ansible github release"
-    if [[ -e openshift-ansible ]]; then rm -rf openshift-ansible; fi
-    git clone https://github.com/openshift/openshift-ansible
-    cd openshift-ansible
-    git checkout v3.11.0
-
-    log "Prepare inventory file"
-    # Per https://docs.okd.io/latest/install/configuring_inventory_file.html
-    sed -i -- "$ a [OSEv3:vars]\nopenshift_master_dynamic_provisioning_enabled=True" inventory/hosts.localhost
-
-    log "Run ansible playbook"
-    ansible-playbook -i inventory/hosts.localhost playbooks/prerequisites.yml
-    ansible-playbook -i inventory/hosts.localhost playbooks/deploy_cluster.yml
-  fi
+  log "Download the OpenShift binaries from GitHub"
+  wget https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz
+  tar -xf openshift-origin-client-tools-*.tar.gz
+  cd openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit
+  if [[ -e /usr/bin/kubectl ]]; then sudo rm /usr/bin/kubectl; fi
+  if [[ -e /usr/bin/oc ]]; then sudo rm /usr/bin/oc; fi
+  sudo mv kubectl oc /usr/bin/.
+  log "Bring up the all-in-one cluster"
+  # Add --public-hostname="$(hostname)" so you can browse the console!
+  sudo /usr/bin/oc cluster up --public-hostname="$(hostname)"
 
   # Copy the kube config created as root due to use of sudo
   # TODO: option to set ansible_ssh_user in inventory file to avoid root use
@@ -156,12 +117,13 @@ EOF
   echo "you can now run setup_client.sh on that machine to setup remote access"
 }
 
-method="$1"
-if [[ "$method" == "" ]]; then
-  method="oc"
-fi
-workers="$2"
-
+set -x
+trap 'fail' ERR
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+export AIO_ROOT="$(cd ../AIO; pwd -P)"
+source $AIO_ROOT/utils.sh
+cd $WORK_DIR
+workers="$1"
 setup_prereqs
 setup_master
-set +x
