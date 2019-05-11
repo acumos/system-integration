@@ -45,16 +45,14 @@
 # - Add ingress controller and drop use of NodePort
 # - Fix issues in upstream chart (templates/initialization-configmap.yaml)
 
-set -x
-
 function mariadb_fail() {
   set +x
   trap - ERR
   reason="$1"
   if [[ "$1" == "" ]]; then reason="unknown failure at $fname $fline"; fi
   log "$reason"
-  sedi 's/DEPLOY_RESULT=.*/DEPLOY_RESULT=fail/' mariadb_env.sh
-  sedi "s~FAIL_REASON=.*~FAIL_REASON=$reason~" mariadb_env.sh
+  sed -i -- 's/DEPLOY_RESULT=.*/DEPLOY_RESULT=fail/' mariadb_env.sh
+  sed -i -- "s~FAIL_REASON=.*~FAIL_REASON=$reason~" mariadb_env.sh
   exit 1
 }
 
@@ -63,13 +61,20 @@ function mariadb_customize_values() {
   rm -rf /tmp/charts
   git clone https://github.com/helm/charts.git /tmp/charts
   cd /tmp/charts/stable/mariadb
-  sedi 's/type: ClusterIP/type: NodePort/' values.yaml
-  sedi 's/# nodePort:/nodePort:/' values.yaml
-  sedi 's/#   master: 30001/   master: 30001/' values.yaml
-  sedi "s/  password:\$/  password: $ACUMOS_MARIADB_PASSWORD/" values.yaml
-  sedi "s/  password:\$/  password: $ACUMOS_MARIADB_USER_PASSWORD/" values.yaml
-  sedi "s/  user:/  user: $ACUMOS_MARIADB_USER/" values.yaml
-  sedi "s/  name: my_database/  name: $ACUMOS_CDS_DB/" values.yaml
+  # mariadb 10.2+ breaks insertion of rows with non-default values.
+  # Set sql_mode="" (remove the default strict mode as of 10.2)
+  # See https://mariadb.com/kb/en/library/sql-mode/
+  # If this fails to work at some point, checkout known working version
+  # git checkout c4cc463af34266b703d4e952f100fb6051d2ee76
+  # Commit https://github.com/helm/charts/commit/85a033f50d6027fa8113c3e93c2c0a6723ab426a#diff-f1be10c8c772fb7b13251e5510c3044e
+  sed -i -- '/    \[mysqld\]/a\ \ \ \ sql_mode=""' values.yaml
+  sed -i -- 's/type: ClusterIP/type: NodePort/' values.yaml
+  sed -i -- 's/# nodePort:/nodePort:/' values.yaml
+  sed -i -- 's/#   master: 30001/   master: 30001/' values.yaml
+  sed -i -- "s/  password:\$/  password: $ACUMOS_MARIADB_PASSWORD/" values.yaml
+  sed -i -- "s/  password:\$/  password: $ACUMOS_MARIADB_USER_PASSWORD/" values.yaml
+  sed -i -- "s/  user:/  user: $ACUMOS_MARIADB_USER/" values.yaml
+  sed -i -- "s/  name: my_database/  name: $ACUMOS_CDS_DB/" values.yaml
 }
 
 function mariadb_customize_sql() {
@@ -192,6 +197,7 @@ EOF
   exit 1
 fi
 
+set -x
 WORK_DIR=$(pwd)
 export AIO_ROOT=$1
 export ACUMOS_MARIADB_HOST=$2
@@ -213,5 +219,5 @@ mariadb_setup
 cd $(dirname "$0")
 # Prevent ACUMOS_CDS_VERSION in mariadb-env fron overriding acumos_env.sh,
 # since it may be updated later by acumos_env.sh
-sedi "s/ACUMOS_CDS_VERSION=/#ACUMOS_CDS_VERSION=/" mariadb_env.sh
+sed -i -- "s/ACUMOS_CDS_VERSION=/#ACUMOS_CDS_VERSION=/" mariadb_env.sh
 cd $WORK_DIR

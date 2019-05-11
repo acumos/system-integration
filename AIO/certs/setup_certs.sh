@@ -114,6 +114,12 @@ authorityKeyIdentifier=keyid,issuer' $name.cnf
     -out $name-keystore.p12 \
     -passout pass:$KEYSTORE_PASSWORD
 
+  log "Create JKS format keystore with server cert"
+  keytool -importkeystore -srckeystore $name-keystore.p12 \
+    -srcstorepass $KEYSTORE_PASSWORD -srcstoretype pkcs12 \
+    -destkeystore $name-keystore.jks -deststoretype jks \
+    -storepass $KEYSTORE_PASSWORD -noprompt
+
   log "Create JKS format truststore with CA cert"
   if [[ -e $name-truststore.jks ]]; then rm $name-truststore.jks; fi
   TRUSTSTORE_PASSWORD=$(uuidgen)
