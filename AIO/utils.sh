@@ -2,7 +2,7 @@
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
-# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# Copyright (C) 2017-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
 # ===================================================================================
 # This Acumos software file is distributed by AT&T and Tech Mahindra
 # under the Apache License, Version 2.0 (the "License");
@@ -22,39 +22,38 @@
 #
 # Prerequisites:
 # - Ubuntu Xenial or Centos 7 server
-# - acumos_env.sh customized for this platform, as by oneclick_deploy.sh
 #
-# Usage: intended to be called from oneclick_deploy.sh and other scripts via
+# Usage: intended to be called from other scripts via
 # - source $AIO_ROOT/utils.sh
 #
-
-if [[ "$K8S_DIST" == "openshift" ]]; then k8s_cmd=oc
-else k8s_cmd=kubectl
-fi
 
 function fail() {
   set +x
   trap - ERR
   cd $AIO_ROOT
   reason="$1"
+  fname=$(caller 0 | awk '{print $2}')
+  fline=$(caller 0 | awk '{print $1}')
   if [[ "$1" == "" ]]; then reason="unknown failure at $fname $fline"; fi
-  if [[ -e $AIO_ROOT/acumos_env.sh ]]; then
-    sedi "s/DEPLOY_RESULT=.*/DEPLOY_RESULT=fail/" acumos_env.sh
-    sedi "s/FAIL_REASON=.*/FAIL_REASON=\"$reason\"/" acumos_env.sh
-  fi
+  cat <<EOF >status.sh
+DEPLOY_RESULT=fail
+FAIL_REASON="$reason"
+EOF
   log "$reason"
   exit 1
 }
 
 function log() {
+  setx=${-//[^x]/}
   set +x
   fname=$(caller 0 | awk '{print $2}')
   fline=$(caller 0 | awk '{print $1}')
   echo; echo "$fname:$fline ($(date)) $1"
-  set -x
+  if [[ -n "$setx" ]]; then set -x; else set +x; fi
 }
 
 set_k8s_env() {
+  trap 'fail' ERR
   # Variations on objects between generic and openshift k8s
   if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
     if [[ "$K8S_DIST" == "openshift" ]]; then
@@ -71,21 +70,44 @@ function sedi () {
     sed --version >/dev/null 2>&1 && sed -i -- "$@" || sed -i "" "$@"
 }
 
+function cleanup_snapshot_images() {
+  trap 'fail' ERR
+  if [[ "$ACUMOS_DELETE_SNAPSHOTS" == "true" ]]; then
+    log "Cleanup snapshot docker images"
+    if [[ "$HOSTNAME" == "$ACUMOS_HOST" ]]; then
+      cs=$(docker images --filter=reference='*/*:*-SNAPSHOT' --format '{{.ID}}')
+      for c in $cs; do
+        docker image rm -f $c
+      done
+    else
+      ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+        $ACUMOS_HOST_USER@$ACUMOS_DOMAIN <<'EOF'
+cs=$(docker images --filter=reference='*/*:*-SNAPSHOT' --format '{{.ID}}')
+for c in $cs; do
+  docker image rm -f $c
+done
+EOF
+    fi
+  fi
+}
+
 function docker_login() {
+  trap 'fail' ERR
   wait_until_success 30 \
     "docker login $1 -u $ACUMOS_PROJECT_NEXUS_USERNAME -p $ACUMOS_PROJECT_NEXUS_PASSWORD"
 }
 
 function create_acumos_registry_secret() {
+  trap 'fail' ERR
   local namespace=$1
   log "Login to LF Nexus Docker repos, for Acumos project images"
   docker_login https://nexus3.acumos.org:10004
   docker_login https://nexus3.acumos.org:10003
   docker_login https://nexus3.acumos.org:10002
 
-  if [[ $($k8s_cmd get secret -n $namespace acumos-registry) ]]; then
+  if [[ $(kubectl get secret -n $namespace acumos-registry) ]]; then
     log "Deleting k8s secret acumos-registry, prior to recreating it"
-    $k8s_cmd delete secret -n $namespace acumos-registry
+    kubectl delete secret -n $namespace acumos-registry
   fi
 
   log "Create k8s secret for image pulling from docker"
@@ -106,10 +128,11 @@ data:
 type: kubernetes.io/dockerconfigjson
 EOF
 
-  $k8s_cmd create -f acumos-registry.yaml
+  kubectl create -f acumos-registry.yaml
 }
 
 function create_namespace() {
+  trap 'fail' ERR
   local namespace=$1
   if [[ ! $($k8s_cmd get $k8s_nstype $namespace) ]]; then
     log "Creating $k8s_nstype $namespace"
@@ -144,13 +167,14 @@ function delete_namespace() {
 }
 
 function setup_pvc() {
+  trap 'fail' ERR
   local pvc=$1
   local namespace=$2
   local size=$3
   local name=pvc-${namespace}-$pvc
   trap 'fail' ERR
 
-  if [[ "$($k8s_cmd get pvc -n $namespace pvc-$namespace-$pvc)" == "" ]]; then
+  if [[ "$(kubectl get pvc -n $namespace pvc-$namespace-$pvc)" == "" ]]; then
     log "Creating PVC $name"
     # Add volumeName: to ensure the PVC selects a specific volume as data
     # may be pre-configured there
@@ -170,8 +194,8 @@ spec:
   volumeName: "pv-$namespace-$pvc"
 EOF
 
-    $k8s_cmd create -n $namespace -f $tmp
-    $k8s_cmd get pvc -n $namespace $name
+    kubectl create -n $namespace -f $tmp
+    kubectl get pvc -n $namespace $name
     rm $tmp
   else
     log "$namespace PVC pvc-$namespace-$pvc alrteady exists"
@@ -183,9 +207,9 @@ function delete_pvc() {
   local pvc=$1
   local namespace=$2
   local name=pvc-${namespace}-$pvc
-  if [[ "$($k8s_cmd get pvc -n $namespace $name)" != "" ]]; then
-    $k8s_cmd delete pvc -n $namespace $name
-    while $k8s_cmd get pvc -n $namespace $name ; do
+  if [[ "$(kubectl get pvc -n $namespace $name)" != "" ]]; then
+    kubectl delete pvc -n $namespace $name
+    while kubectl get pvc -n $namespace $name ; do
      log "Waiting for $namespace PVC $name to be deleted"
       sleep 10
     done
@@ -193,6 +217,7 @@ function delete_pvc() {
 }
 
 function reset_pv() {
+  trap 'fail' ERR
   log "Remove any existing PV data for $1"
   delete_pv $1 $2
   log "Setup the $1 PV"
@@ -205,12 +230,13 @@ function setup_pv() {
   local namespace=$2
   local size=$3
   local owner=$4
+  local label=$5
   local path=/mnt/$namespace/$1
   local name=pv-${namespace}-$pv
   if [[ ! -e /mnt/$namespace ]]; then
     log "Creating /mnt/$namespace as PV root folder"
     sudo mkdir /mnt/$namespace
-    sudo chown $ACUMOS_HOST_USER:$ACUMOS_HOST_USER /mnt/$namespace
+    sudo chown $owner:$owner /mnt/$namespace
   fi
   if [[ ! -e $path ]]; then
     sudo mkdir -p $path
@@ -229,6 +255,8 @@ kind: PersistentVolume
 apiVersion: v1
 metadata:
   name: $name
+  labels:
+    $label
 spec:
   storageClassName: $namespace
   capacity:
@@ -240,8 +268,9 @@ spec:
     path: "$path"
 EOF
 
-    $k8s_cmd create -f $tmp
-    $k8s_cmd get pv $name
+    cat $tmp
+    kubectl create -f $tmp
+    kubectl describe pv $name
   fi
 }
 
@@ -252,11 +281,15 @@ function delete_pv() {
   local path=/mnt/$namespace/$1
   local name=pv-${namespace}-$pv
   if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
-    if [[ "$($k8s_cmd get pv $name)" != "" ]]; then
-      $k8s_cmd delete pv $name
-      while $k8s_cmd get pv $name ; do
+    if [[ "$(kubectl get pv $name)" != "" ]]; then
+      kubectl delete pv $name
+      while kubectl get pv $name ; do
        log "Waiting for PV $name to be deleted"
-        sleep 10
+       sleep 10
+       # Workaround for PVs getting stuck in "released" or "failed"
+       if [[ $(kubectl get pv $name | grep -e 'Failed' -e 'Released') ]]; then
+         kubectl patch pv $name --type json -p '[{ "op": "remove", "path": "/spec/claimRef" }]'
+       fi
       done
     fi
   fi
@@ -302,34 +335,34 @@ function wait_until_success() {
 }
 
 function check_running() {
+  trap 'fail' ERR
   # Returns status
   local app=$1
-  local namespace=$2
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-    cs=$(docker ps -a | awk "/$app/{print \$1}")
-    status="Running"
-    for c in $cs; do
-      if [[ $(docker ps -f id=$c | grep -c " Up ") -eq 0 ]]; then
-        status="Not yet Up"
-      fi
-    done
+    if [[ "$(docker ps -f name=$app --format='{{json .Status}}')" == *Up* ]]; then
+      status="Running"
+    else
+      status="Not yet Up"
+    fi
   else
     # TODO: handle case with multiple pods per app
-    status=$($k8s_cmd get pods -n $namespace -l app=$app -o json | jq -r '.items[0].status.phase')
+    local namespace=$2
+    status=$(kubectl get pods -n $namespace -l app=$app -o json | jq -r '.items[0].status.phase')
   fi
   log "$app status is $status"
 }
 
 function inspect_pods_for_app() {
+  trap 'fail' ERR
   local app=$1
   local namespace=$2
-  local pods=$($k8s_cmd get pods -n $namespace -l app=$app -o json)
+  local pods=$(kubectl get pods -n $namespace -l app=$app -o json)
   local np=$(echo $pods | jq '.items | length')
   local i=0
   local pod
   while [[ $i -lt $np ]]; do
     pod=$(echo $pods | jq -r ".items[$i].metadata.name")
-    $k8s_cmd get pods -n $namespace $pod
+    kubectl get pods -n $namespace $pod
     kubectl describe pods -n $namespace $pod
     nc=$(echo $pods | jq ".items[$i].spec.containers | length")
     local j=0
@@ -376,7 +409,7 @@ function start_service() {
   trap 'fail' ERR
   local name=$(grep "name: " -m1 $1 | sed 's/^.*name: //')
   log "Creating service $name"
-  $k8s_cmd create -f $1
+  kubectl create -f $1
 }
 
 function stop_service() {
@@ -384,10 +417,10 @@ function stop_service() {
   local app
   if [[ -e $1 ]]; then
     app=$(grep "app: " -m1 $1 | sed 's/^.*app: //')
-    if [[ $($k8s_cmd get svc -n $ACUMOS_NAMESPACE -l app=$app) ]]; then
+    if [[ $(kubectl get svc -n $ACUMOS_NAMESPACE -l app=$app) ]]; then
       log "Stop service for $app"
-      $k8s_cmd delete service -n $ACUMOS_NAMESPACE $app-service
-      wait_until_notfound "$k8s_cmd get svc -n $ACUMOS_NAMESPACE" $app
+      kubectl delete service -n $ACUMOS_NAMESPACE $app-service
+      wait_until_notfound "kubectl get svc -n $ACUMOS_NAMESPACE" $app
     else
       log "Service not found for $app"
     fi
@@ -398,7 +431,7 @@ function start_deployment() {
   trap 'fail' ERR
   local name=$(grep "name: " -m1 $1 | sed 's/^.*name: //')
   log "Creating deployment $name"
-  $k8s_cmd create -f $1
+  kubectl create -f $1
 }
 
 function stop_deployment() {
@@ -407,10 +440,10 @@ function stop_deployment() {
   if [[ -e $1 ]]; then
     app=$(grep "app: " -m1 $1 | sed 's/^.*app: //')
     # Note any related PV and PVC are not deleted
-    if [[ $($k8s_cmd get deployment -n $ACUMOS_NAMESPACE -l app=$app) ]]; then
+    if [[ $(kubectl get deployment -n $ACUMOS_NAMESPACE -l app=$app) ]]; then
       log "Stop deployment for $app"
-      $k8s_cmd delete deployment -n $ACUMOS_NAMESPACE $app
-      wait_until_notfound "$k8s_cmd get pods -n $ACUMOS_NAMESPACE" $app
+      kubectl delete deployment -n $ACUMOS_NAMESPACE $app
+      wait_until_notfound "kubectl get pods -n $ACUMOS_NAMESPACE" $app
     else
       log "Deployment not found for $app"
     fi
@@ -418,31 +451,41 @@ function stop_deployment() {
 }
 
 function wait_completed() {
+  trap 'fail' ERR
   local job=$1
   local status
   log "Waiting for job $job to be Completed"
-  status=$($k8s_cmd get job -n $ACUMOS_NAMESPACE -o json $job | jq -r '.status.conditions[0].type')
+  status=$(kubectl get job -n $ACUMOS_NAMESPACE -o json $job | jq -r '.status.conditions[0].type')
   while [[ "$status" != "Complete" ]]; do
-    $k8s_cmd get pods -n $ACUMOS_NAMESPACE
+    kubectl get pods -n $ACUMOS_NAMESPACE
     log "Job $job status is $status ... waiting 10 seconds"
     sleep 10
-    status=$($k8s_cmd get job -n $ACUMOS_NAMESPACE -o json $job | jq -r '.status.conditions[0].type')
+    status=$(kubectl get job -n $ACUMOS_NAMESPACE -o json $job | jq -r '.status.conditions[0].type')
   done
 }
 
 function stop_job() {
   trap 'fail' ERR
   local job=$1
-  if [[ $($k8s_cmd get job -n $ACUMOS_NAMESPACE $job) ]]; then
+  if [[ $(kubectl get job -n $ACUMOS_NAMESPACE $job) ]]; then
     log "Stop job $job"
-    $k8s_cmd delete job -n $ACUMOS_NAMESPACE $job
-    wait_until_notfound "$k8s_cmd get pods -n $ACUMOS_NAMESPACE" $job
+    kubectl delete job -n $ACUMOS_NAMESPACE $job
+    wait_until_notfound "kubectl get pods -n $ACUMOS_NAMESPACE" $job
   else
     log "Job $job not found"
   fi
 }
 
+function export_env() {
+  trap 'fail' ERR
+  val=$(grep "$1=" $AIO_ROOT/acumos_env.sh | cut -d '=' -f 2) && true
+  if [[ "$val" != "" ]]; then
+    export $1=$val
+  fi
+}
+
 function update_env() {
+  trap 'fail' ERR
   # Reuse existing values if set
   if [[ "${!1}" == "" || "$3" == "force" ]]; then
     export $1=$2
@@ -460,6 +503,7 @@ function replace_env() {
   else files="$1/*.yaml"; fi
   vars=$(grep -Rho '<[^<.]*>' $files | sed 's/<//' | sed 's/>//' | sort | uniq)
   for f in $files; do
+    echo "Replacing env variables in $f"
     for v in $vars ; do
       eval vv=\$$v
       sedi "s~<$v>~$vv~g" $f
@@ -514,10 +558,11 @@ function save_logs() {
 }
 
 function find_user() {
+  trap 'fail' ERR
   log "Find user $1"
   local tmp="/tmp/$(uuidgen)"
   curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    -k https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/user
+    -k https://$ACUMOS_HOST/ccds/user
   users=$(jq -r '.content | length' $tmp)
   i=0; userId=""
   # Disable trap as not finding the user will trigger ERR
@@ -533,6 +578,7 @@ function find_user() {
 }
 
 function get_host_info() {
+  trap 'fail' ERR
   if [[ $(bash --version | grep -c redhat-linux) -gt 0 ]]; then
     HOST_OS=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
     HOST_OS_VER=$(grep -m 1 'VERSION_ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
@@ -547,14 +593,43 @@ function get_host_info() {
   fi
 }
 
+function verify_ubuntu_or_centos() {
+  trap 'fail' ERR
+  if [[ $(bash --version | grep -c redhat-linux) -gt 0 ]]; then
+    HOST_OS=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+    HOST_OS_VER=$(grep -m 1 'VERSION_ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+  elif [[ $(bash --version | grep -c pc-linux) -gt 0 ]]; then
+    HOST_OS=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+    HOST_OS_VER=$(grep -m 1 'VERSION_ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+  else
+    fail "Sorry, only Ubuntu or Centos is supported."
+  fi
+
+  if [[ "$HOST_OS" == "centos" ]]; then
+    export K8S_DIST=openshift
+    k8s_cmd=oc
+    k8s_nstype=project
+  else
+    export K8S_DIST=generic
+    k8s_cmd=kubectl
+    k8s_nstype=namespace
+  fi
+}
+
 function get_host_ip() {
+  trap 'fail' ERR
   log "Determining host IP address for $1"
   if [[ $(host $1 | grep -c 'not found') -eq 0 ]]; then
     HOST_IP=$(host $1 | head -1 | cut -d ' ' -f 4)
-  elif [[ $(grep -c -E   " $1( |$)" /etc/hosts) -gt 0 ]]; then
+  elif [[ $(grep -c -E " $1( |$)" /etc/hosts) -gt 0 ]]; then
     HOST_IP=$(grep -E "$1( |$)" /etc/hosts | cut -d ' ' -f 1)
   else
     log "Please ensure $1 is resolvable thru DNS or hosts file"
     fail "IP address of $1 cannot be determined."
   fi
 }
+
+if [[ "$AIO_ROOT" == "" ]]; then
+   export AIO_ROOT=$( cd "$(dirname ${BASH_SOURCE[0]})" ; pwd -P )
+fi
+sedi "s~AIO_ROOT=.*~AIO_ROOT=$AIO_ROOT~g" $AIO_ROOT/acumos_env.sh

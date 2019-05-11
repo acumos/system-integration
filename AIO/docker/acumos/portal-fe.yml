@@ -22,51 +22,56 @@ services:
    portal-fe-service:
        image: ${PORTAL_FE_IMAGE}
        environment:
-           SPRING_APPLICATION_JSON: "{
-               \"server\": {
-                    \"port\": 8085
+           SPRING_APPLICATION_JSON: '{
+               "server": {
+                    "port": 8085
                 },
-               \"zuul\": {
-                   \"routes\": {
-                      \"api\": {
-                        \"url\": \"http://portal-be-service:8083\"
+               "zuul": {
+                   "routes": {
+                      "api": {
+                        "url": "http://portal-be-service:8083"
                       },
-                      \"dsce\": {
-                        \"url\": \"http://dsce-service:8088\"
+                      "dsce": {
+                        "url": "http://dsce-service:8088"
                       },
-                      \"cmnt\": {
-                        \"url\": \"http://delete-me\"
+                      "cmnt": {
+                        "url": "http://delete-me"
                       },
-                      \"azure\": {
-                        \"url\": \"http://azure-client-service:9081\"
+                      "workbench" : {
+                        "path" : "/workbench/**",
+                        "url" : "http://mlwb-home-webcomponent-service:9082",
+			                   "sensitiveHeaders" : ""
                       },
-                      \"openstack\" : {
-                        \"path\": \"/openstack/**\",
-                        \"url\": \"http://openstack-client-service:8007\",
-                        \"stripPrefix\": \"false\",
-                        \"sensitiveHeaders\": \"\"
+                      "azure": {
+                        "url": "http://azure-client-service:9081"
                       },
-                      \"package\": {
-                        \"path\": \"/package/**\",
-                        \"url\": \"http://kubernetes-client-service:8082\",
-                        \"stripPrefix\": \"true\",
-                        \"sensitiveHeaders\": \"\"
+                      "openstack" : {
+                        "path": "/openstack/**",
+                        "url": "http://openstack-client-service:8007",
+                        "stripPrefix": "false",
+                        "sensitiveHeaders": ""
+                      },
+                      "package": {
+                        "path": "/package/**",
+                        "url": "http://kubernetes-client-service:8082",
+                        "stripPrefix": "true",
+                        "sensitiveHeaders": ""
                         }
                    },
-                    \"host\": {
-                      \"connect-timeout-millis\": 300000,
-                      \"socket-timeout-millis\": 300000
+                    "host": {
+                      "connect-timeout-millis": 300000,
+                      "socket-timeout-millis": 300000
                    }
                },
-               \"spring\": {
-                  \"servlet\": {
-                     \"multipart\": {
-                        \"max-file-size\": -1,
-                        \"max-request-size\": -1
+               "spring": {
+                  "servlet": {
+                     "multipart": {
+                        "max-file-size": -1,
+                        "max-request-size": -1
                      }
                   }
                }
-           }"
+           }'
        expose:
            - 8085
        volumes:

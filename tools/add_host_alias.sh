@@ -17,7 +17,7 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# What this is: Utility to add a host alias to an Acumos core component, e.g.
+# What this is: Utility to add a host alias to an Acumos component, e.g.
 # for hostnames/FQDNs that are not resolvable through DNS.
 # Prerequisites:
 # - Acumos AIO platform deployed, with access to the saved environment files
@@ -26,26 +26,12 @@
 #   on the Acumos host
 #
 # Usage:
-# $ bash add_host_alias.sh <env> <name> <app>
-#   env: path to local platform environment file acumos_env.sh
+# $ bash add_host_alias.sh <name> <app> <component>
 #   name: hostname/FQDN to add
 #   app: Acumos component app, from deployment template.metadata.labels.app
+#   namespace: (optional) the namespace to use for k8s deployments
+#   component: (optional) match template.metadata.labels.component
 #
-
-function fail() {
-  reason="$1"
-  if [[ "$1" == "" ]]; then reason="unknown failure at $fname $fline"; fi
-  log "$reason"
-  exit 1
-}
-
-function log() {
-  set +x
-  fname=$(caller 0 | awk '{print $2}')
-  fline=$(caller 0 | awk '{print $1}')
-  echo; echo "$fname:$fline ($(date)) $1"
-  set -x
-}
 
 function add_host_alias() {
   trap 'fail' ERR
@@ -59,7 +45,7 @@ function add_host_alias() {
     fail "IP address of $name cannot be determined."
   fi
 
-  if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
+  if [[ "$namespace" != "" ]]; then
     log "Patch the running deployment for $app, to restart it with the changes"
     tmp="/tmp/$(uuidgen)"
     cat <<EOF >$tmp
@@ -71,7 +57,9 @@ spec:
         hostnames:
         - "$name"
 EOF
-    kubectl patch deployment -n $ACUMOS_NAMESPACE $app --patch "$(cat $tmp)"
+    if [[ "$component" != "" ]]; then c="-l component=$component"; fi
+    dep=$(kubectl get deployment -n $namespace -l app=$app $c -o json | jq -r ".items[0].metadata.name")
+    kubectl patch deployment -n $namespace $dep --patch "$(cat $tmp)"
     rm $tmp
   else
     c=$(docker ps -a | awk "/$app/{print \$1}")
@@ -79,16 +67,29 @@ EOF
   fi
 }
 
+if [[ $# -lt 3 ]]; then
+  cat <<'EOF'
+Usage:
+  $ bash add_host_alias.sh <name> <app> <component>
+    name: hostname/FQDN to add
+    app: Acumos component app, from deployment template.metadata.labels.app
+    namespace: (optional) the namespace to use for k8s deployments
+    component: (optional) match template.metadata.labels.component
+EOF
+  echo "All parameters not provided"
+  exit 1
+fi
+
 set -x
 trap 'fail' ERR
-
-env=$1
-name=$2
-app=$3
-
 WORK_DIR=$(pwd)
-set +x
-source $env
-set -x
+cd $(dirname "$0")
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../AIO; pwd -P)"; fi
+source $AIO_ROOT/utils.sh
+source $AIO_ROOT/acumos_env.sh
+name=$1
+app=$2
+namespace=$3
+component=$4
 add_host_alias
 cd $WORK_DIR

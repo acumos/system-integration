@@ -40,16 +40,21 @@
 # See the "Common Data Service Requirements" for details on the codes above
 
 function fail() {
-  log "$1"
+  reason="$1"
+  fname=$(caller 0 | awk '{print $2}')
+  fline=$(caller 0 | awk '{print $1}')
+  if [[ "$1" == "" ]]; then reason="unknown failure at $fname $fline"; fi
+  log "$reason"
   exit 1
 }
 
 function log() {
+  setx=${-//[^x]/}
   set +x
   fname=$(caller 0 | awk '{print $2}')
   fline=$(caller 0 | awk '{print $1}')
   echo; echo "$fname:$fline ($(date)) $1"
-  set -x
+  if [[ -n "$setx" ]]; then set -x; else set +x; fi
 }
 
 function find_user() {
@@ -163,7 +168,7 @@ modelTypeCode=$7
 set +x
 source $env
 set -x
-cds="https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT/ccds"
+cds="https://$ACUMOS_DOMAIN/ccds"
 creds="$ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD"
 find_peer
 if [[ "$peerId" == "" ]]; then

@@ -39,20 +39,21 @@
 #
 
 function fail() {
-  set +x
-  trap - ERR
   reason="$1"
+  fname=$(caller 0 | awk '{print $2}')
+  fline=$(caller 0 | awk '{print $1}')
   if [[ "$1" == "" ]]; then reason="unknown failure at $fname $fline"; fi
   log "$reason"
   exit 1
 }
 
 function log() {
+  setx=${-//[^x]/}
   set +x
   fname=$(caller 0 | awk '{print $2}')
   fline=$(caller 0 | awk '{print $1}')
   echo; echo "$fname:$fline ($(date)) $1"
-  set -x
+  if [[ -n "$setx" ]]; then set -x; else set +x; fi
 }
 
 function peer_test() {
