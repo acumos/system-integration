@@ -68,7 +68,7 @@ spec:
                       "nexusproxy": "",
                       "nexuspassword": "<ACUMOS_NEXUS_RW_USER_PASSWORD>",
                       "nexususername": "<ACUMOS_NEXUS_RW_USER>",
-                      "nexusgroupid": "com.artifact"
+                      "nexusgroupid": "<ACUMOS_NEXUS_GROUP>"
                     },
                     "cmndatasvc": {
                       "cmndatasvcendpoinurl": "http://cds-service:8000/ccds",

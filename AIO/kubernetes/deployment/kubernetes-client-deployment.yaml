@@ -73,7 +73,7 @@ spec:
                       "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/<ACUMOS_NEXUS_MAVEN_REPO_PATH>/<ACUMOS_NEXUS_MAVEN_REPO>/",
                       "password": "<ACUMOS_NEXUS_RW_USER_PASSWORD>",
                       "username": "<ACUMOS_NEXUS_RW_USER>",
-                      "groupid": "com.artifact"
+                      "groupid": "<ACUMOS_NEXUS_GROUP>"
                     },
                     "cmndatasvc": {
                       "cmndatasvcendpointurl": "http://cds-service:8000/ccds",
@@ -92,6 +92,7 @@ spec:
                     },
                     "logstash": {
                       "host": "<ACUMOS_ELK_HOST>",
+                      "ip": "<ACUMOS_ELK_HOST_IP>",
                       "port": "<ACUMOS_ELK_LOGSTASH_PORT>"
                     }
                   }'

@@ -101,7 +101,7 @@ spec:
                       "nexusproxy": "NA",
                       "password": "<ACUMOS_NEXUS_RW_USER_PASSWORD>",
                       "username": "<ACUMOS_NEXUS_RW_USER>",
-                      "groupId": "com.artifact"
+                      "groupId": "<ACUMOS_NEXUS_GROUP>"
                     },
                     "cmndatasvc": {
                       "cmndatasvcendpoinurl": "http://cds-service:8000/ccds",
