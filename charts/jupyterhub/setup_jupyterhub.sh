@@ -18,69 +18,129 @@
 # ===============LICENSE_END=========================================================
 #
 # What this is: script to setup JupyterHub as a service of the Acumos platform
-# NOTE: experimental use only; does not yet include Acumos user authentication.
 #
 # Prerequisites:
 # - kubernetes cluster installed
 # - PVs setup for jupyterhub data, e.g. via the setup_pv.sh script from the
 #   Acumos training repo
-# - helm installed under the k8s cluster
+# - helm installed under the k8s cluster, e.g. via
+#   wget https://storage.googleapis.com/kubernetes-helm/helm-v2.12.3-linux-amd64.tar.gz
+#   gzip -d helm-v2.12.3-linux-amd64.tar.gz
+#   tar -xvf helm-v2.12.3-linux-amd64.tar
+#   sudo cp linux-amd64/helm /usr/local/sbin/.
+#   helm init
 # - kubectl and helm installed on the user's workstation
 # - user workstation setup to use a k8s profile for the target k8s cluster
 #   e.g. using the Acumos kubernetes-client repo tools
 #   $ bash kubernetes-client/deploy/private/setup_kubectl.sh k8smaster ubuntu acumos
+# - Key-based SSH access to the Acumos host, for updating docker images
 #
-# Usage: on the user's workstation
-# $ bash setup-jupytyerhub.sh <namespace> <token_mode>
-#   namespace: namespace to deploy under
-#   token_mode: value of ACUMOS_ONBOARDING_TOKENMODE for the Acumos platform
+# Usage: on the installing user's workstation or on the target host
+# $ bash setup-jupytyerhub.sh <NAMESPACE> <ACUMOS_DOMAIN>
+#   <ACUMOS_ONBOARDING_TOKENMODE> [standalone] [JUPYTERHUB_DOMAIN]
+#   [CERT] [CERT_KEY]
+#
+#   NAMESPACE: namespace under which to deploy JupyterHub
+#   ACUMOS_DOMAIN: domain name of the Acumos platform (ingress controller)
+#   ACUMOS_ONBOARDING_TOKENMODE: tokenmode set in the Acumos platform
+#   standalone: (optional) setup a standalone JupyterHub instance
+#   JUPYTERHUB_DOMAIN: (optional) domain name to use for the standalone instance
+#
+#   (optional) For standalone deployment, add these parameters to use pre-created
+#   certificates for the jupyterhub ingress controller, and place the files in
+#   system-integration/charts/jupyterhub/certs
+#   CERT: filename of certificate
+#   CERT_KEY: filename of certificate key
+#
+#     Setting up a standalone JupyterHub requires a dedicated host, on which:
+#       - a single-node Kubernetes cluster will be created
+#       - an NGINX ingress controller will be created, using self-signed certs or
+#         certs as specified, and set to serve requests at the optionally
+#         specified domain "JUPYTERHUB_DOMAIN" or the hostname (default)
 #
 # To release a failed PV:
 # kubectl patch pv/pv-5 --type json -p '[{ "op": "remove", "path": "/spec/claimRef" }]'
 
-function fail() {
-  log "$1"
-  exit 1
+function standalone_prep() {
+  trap 'fail' ERR
+  if [[ $(helm delete --purge jupyterhub) ]]; then
+    log "Helm release jupyterhub deleted"
+  fi
+
+  ings=$(kubectl get ingress -n $NAMESPACE | awk '/-ingress/{print $1}')
+  for ing in $ings; do
+    if [[ $(kubectl delete ingress -n $NAMESPACE $ing) ]]; then
+      log "Ingress $ing deleted"
+    fi
+  done
+
+  log "Delete pods and PVCs for Jupyter SingleUser containers (not cleaned up by Helm)"
+  if [[ $(kubectl get pod -n $NAMESPACE -o json | jq ".items | length") -gt 0 ]]; then
+    pods=$(kubectl get pod -n $NAMESPACE | awk '/jupyter/{print $1}')
+    for pod in $pods; do
+      kubectl delete pod -n $NAMESPACE $pod
+    done
+  fi
+  if [[ $(kubectl get pvc -n $NAMESPACE -o json | jq ".items | length") -gt 0 ]]; then
+    pvcs=$(kubectl get pvc -n $NAMESPACE | awk '/claim/{print $1}')
+    for pvc in $pvcs; do
+      kubectl delete pvc -n $NAMESPACE $pvc
+    done
+  fi
+
+  log "Create PVs for JupyterHub and Jupyter SingleUser containers"
+  bash $AIO_ROOT/../tools/setup_pv.sh clean $HOSTNAME $USER jupyterhub-hub \
+    /mnt/$NAMESPACE 1Gi
+    bash $AIO_ROOT/../tools/setup_pv.sh setup $HOSTNAME $USER jupyterhub-hub \
+      /mnt/$NAMESPACE 1Gi
+  pvs="01 02 03 04 05"
+  for pv in $pvs; do
+    bash $AIO_ROOT/../tools/setup_pv.sh clean $HOSTNAME $USER jupyterhub-user-$pv \
+      /mnt/$NAMESPACE 10Gi
+    bash $AIO_ROOT/../tools/setup_pv.sh setup $HOSTNAME $USER jupyterhub-user-$pv \
+      /mnt/$NAMESPACE 10Gi
+  done
+
+  if [[ "$JUPYTERHUB_DOMAIN" == "" ]]; then JUPYTERHUB_DOMAIN=$(hostname); fi
+  cd certs
+  if [[ "$CERT" == "" ]]; then
+    bash $AIO_ROOT/certs/setup_certs.sh jupyterhub $JUPYTERHUB_DOMAIN
+    source cert_env.sh
+    CERT=$(pwd)/jupyterhub.crt
+    CERT_KEY=$(pwd)/jupyterhub.key
+  else
+    CERT=$(pwd)/$CERT
+    CERT_KEY=$(pwd)/$CERT_KEY
+  fi
+  cd ..
+  HOST_IP=$(/sbin/ip route get 8.8.8.8 | head -1 | sed 's/^.*src //' | awk '{print $1}')
+  bash ../ingress/setup_ingress_controller.sh $NAMESPACE $HOST_IP $CERT $CERT_KEY
 }
 
-function log() {
-  set +x
-  fname=$(caller 0 | awk '{print $2}')
-  fline=$(caller 0 | awk '{print $1}')
-  echo; echo "$fname:$fline ($(date)) $1"
-  set -x
-}
-
-function prereqs() {
- log "Setup prerequisites"
- # Per https://z2jh.jupyter.org/en/latest/setup-jupyterhub.html
- if [[ ! $(which helm) ]]; then
-   # Install a helm client per https://github.com/helm/helm/releases"
-   wget https://storage.googleapis.com/kubernetes-helm/helm-v2.12.3-linux-amd64.tar.gz
-   gzip -d helm-v2.12.3-linux-amd64.tar.gz
-   tar -xvf helm-v2.12.3-linux-amd64.tar
-   sudo cp linux-amd64/helm /usr/local/sbin/.
- fi
-
- log "Initialize helm"
- helm init
+function clean() {
+  trap 'fail' ERR
+  if [[ $(helm delete --purge jupyterhub) ]]; then
+    log "Helm release jupyterhub deleted"
+  fi
+  if [[ $(kubectl delete ingress -n $NAMESPACE jupyterhub-ingress) ]]; then
+    log "Ingress jupyterhub-ingress deleted"
+  fi
 }
 
 function setup() {
-  if [[ "$(helm list jupyterhub)" != "" ]]; then
-    log "Delete/purge current jupyterhub service"
-    helm delete --purge jupyterhub
-  fi
+  trap 'fail' ERR
+
   log "Setup jupyterhub"
+
   log "Add jupyterhub repo to helm"
   helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
   helm repo update
 
-  log "Customize jupyterhub config.yaml with secretToken, turn off user \
-persistent storage, add selectable notebook environments"
+  log "Customize jupyterhub config.yaml"
   # Get the latest image tag at:
   # https://hub.docker.com/r/jupyter/<nbtype>-notebook/tags/
-  tag=latest
+  # Using the last build with python 3.6, since the Acumos library requires <3.7
+  tag=9e8682c9ea54
   secret=$(openssl rand -hex 32)
   # https://zero-to-jupyterhub.readthedocs.io/en/latest/user-storage.html
   # https://zero-to-jupyterhub.readthedocs.io/en/stable/user-environment.html
@@ -88,53 +148,75 @@ persistent storage, add selectable notebook environments"
   cat <<EOF >$tmp
 proxy:
   secretToken: "$secret"
+  type: ClusterIP
 hub:
-  extraConfig: |
-    c.Spawner.cmd = ['jupyter-labhub']
-#    c.KubeSpawner.profile_list = [
-#        {
-#            "display_name": "Minimal environment",
-#            "kubespawner_override": {
-#                "image": "jupyter/minimal-notebook:$tag"
-#            }
-#        }, {
-#            "display_name": "R environment",
-#            "kubespawner_override": {
-#                "image": "jupyter/r-notebook:$tag"
-#            }
-#            "display_name": "Scipy environment",
-#            "kubespawner_override": {
-#                "image": "jupyter/scipy-notebook:$tag"
-#            }
-#        }, {
-#            "display_name": "Tensorflow environment",
-#            "kubespawner_override": {
-#            }
-#        }, {
-#            "display_name": "Datascience environment",
-#            "kubespawner_override": {
-#                "image": "jupyter/datascience-notebook:$tag"
-#            }
-#        }, {
-#            "display_name": "Pyspark environment",
-#            "kubespawner_override": {
-#                "image": "jupyter/pyspark-notebook:$tag"
-#            }
-#        }, {
-#            "display_name": "All-spark environment",
-#            "kubespawner_override": {
-#                "image": "jupyter/all-spark-notebook:$tag"
-#            }
-#        }
-#    ]
+  extraConfig:
+    acumos: |
+      from traitlets import Unicode
+      from jupyterhub.auth import Authenticator
+      import json
+      import requests
+      import os, sys
+      from tornado import gen
+      class AcumosAuthenticator(Authenticator):
+        @gen.coroutine
+        def authenticate(self, handler, data):
+          if "$JUPYTERHUB_DOMAIN" == "$ACUMOS_DOMAIN" :
+            auth_url = "http://onboarding-service:8090/onboarding-app/v2/auth"
+          else:
+            auth_url = "https://$ACUMOS_DOMAIN/onboarding-app/v2/auth"
+          username = data['username']
+          data = { "request_body": {"username": username, "password": data['password']}}
+          data_json = json.dumps(data)
+          headers = {'Content-type': 'application/json'}
+          response = requests.post(auth_url, data=data_json, headers=headers, verify=False)
+          if response.status_code == 200 :
+            return username
+          else:
+            return None
+      c.JupyterHub.authenticator_class = AcumosAuthenticator
+      c.Spawner.cmd = ['jupyter-labhub']
+      c.KubeSpawner.profile_list = [
+        { "display_name": "Minimal environment",
+          "kubespawner_override": {
+            "image": "jupyter/minimal-notebook:$tag"
+          }
+        },
+        { "display_name": "R environment",
+          "kubespawner_override": {
+            "image": "jupyter/r-notebook:$tag"
+          }
+        },
+        { "display_name": "Scipy environment",
+          "kubespawner_override": {
+            "image": "jupyter/scipy-notebook:$tag"
+          }
+        },
+        { "display_name": "Tensorflow environment",
+          "kubespawner_override": {}
+        },
+        { "display_name": "Datascience environment",
+          "kubespawner_override": {
+            "image": "jupyter/datascience-notebook:$tag"
+          }
+        },
+        { "display_name": "Pyspark environment",
+          "kubespawner_override": {
+            "image": "jupyter/pyspark-notebook:$tag"
+          }
+        },
+        { "display_name": "All-spark environment",
+          "kubespawner_override": {
+            "image": "jupyter/all-spark-notebook:$tag"
+          }
+        }
+      ]
 singleuser:
   extraEnv:
     ACUMOS_ONBOARDING_TOKENMODE: $ACUMOS_ONBOARDING_TOKENMODE
     ACUMOS_ONBOARDING_CLIPUSHURL: "http://onboarding-service:8090/onboarding-app/v2/models"
     ACUMOS_ONBOARDING_CLIAUTHURL: "http://onboarding-service:8090/onboarding-app/v2/auth"
   defaultUrl: "/lab"
-  storage:
-    type: none
   image:
     name: jupyter/tensorflow-notebook
     tag: $tag
@@ -174,23 +256,110 @@ EOF
   log "Install jupyterhub"
   RELEASE=jupyterhub
 
-  if [[ ! $(helm upgrade --install $RELEASE jupyterhub/jupyterhub --namespace $namespace --version=v0.7.0-beta.1 --values $tmp) ]]; then
-    fail "Jupyterhub install via Helm failed"
-  fi
+  log "Pre-pulling notebook images to avoid timeout on Jupyterhub install via Helm"
+  images="jupyter/minimal-notebook jupyter/r-notebook jupyter/scipy-notebook \
+    jupyter/tensorflow-notebook jupyter/datascience-notebook \
+    jupyter/pyspark-notebook jupyter/all-spark-notebook"
+  for image in $images; do
+    if [[ "$HOSTNAME" == "$ACUMOS_HOST" ]]; then
+      docker pull $image:$tag
+    else
+      ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+        $ACUMOS_HOST_USER@$ACUMOS_DOMAIN docker pull $image:$tag
+    fi
+  done
+  log "Attempting to deplpy Jupyterhub via Helm"
+  helm upgrade --install $RELEASE jupyterhub/jupyterhub --namespace $NAMESPACE --version=v0.8.2 --values $tmp
   rm $tmp
 
+  log "Setup ingress for Jupyterhub"
+  cat <<EOF >jupyterhub-ingress.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: $NAMESPACE
+  name: jupyterhub-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  tls:
+  - hosts:
+    - $JUPYTERHUB_DOMAIN
+    secretName: ingress-cert
+  rules:
+  - host: $JUPYTERHUB_DOMAIN
+    http:
+      paths:
+      - path: "/hub/"
+        backend:
+          serviceName: hub
+          servicePort: 8081
+      - path: "/user/"
+        backend:
+          serviceName: proxy-public
+          servicePort: 80
+EOF
+
+  if [[ ! $(kubectl create -f jupyterhub-ingress.yaml) ]]; then
+    fail "Setup ingress for Jupyterhub failed"
+  fi
+
+  log "Patch deplpoyment to resolve Acumos domain in case not registered in DNS"
+  bash $AIO_ROOT/../tools/add_host_alias.sh $ACUMOS_DOMAIN jupyterhub $NAMESPACE hub
+
   log "Deploy is complete!"
-  cluster=$(kubectl config get-contexts \
-    $(kubectl config view | awk '/current-context/{print $2}') \
-    | awk '/\*/{print $3}')
-  server=$(kubectl config view \
-    -o jsonpath="{.clusters[?(@.name == \"$cluster\")].cluster.server}" \
-    | cut -d '/' -f 3 | cut -d ':' -f 1)
-  nodePort=$(kubectl get svc -n $namespace -o json proxy-public | jq  '.spec.ports[0].nodePort')
-  echo "Access jupyterhub at http://$server:$nodePort"
+  echo "Access jupyterhub at https://$JUPYTERHUB_DOMAIN/hub/"
 }
 
-namespace=$1
-ACUMOS_ONBOARDING_TOKENMODE=$2
-prereqs
+if [[ $# -lt 3 ]]; then
+  cat <<'EOF'
+Usage: on the installing user's workstation or on the target host
+$ bash setup-jupytyerhub.sh <NAMESPACE> <ACUMOS_DOMAIN>
+   <ACUMOS_ONBOARDING_TOKENMODE> [standalone] [JUPYTERHUB_DOMAIN] [CERT] [CERT_KEY]
+
+   NAMESPACE: namespace under which to deploy JupyterHub
+   ACUMOS_DOMAIN: domain name of the Acumos platform (ingress controller)
+   ACUMOS_ONBOARDING_TOKENMODE: tokenmode set in the Acumos platform
+   standalone: (optional) setup a standalone JupyterHub instance
+   JUPYTERHUB_DOMAIN: (optional) domain name to use for the standalone instance
+
+   (optional) For standalone deployment, add these parameters to use pre-created
+   certificates for the jupyterhub ingress controller, and place the files in
+   system-integration/charts/jupyterhub/certs
+   CERT: filename of certificate
+   CERT_KEY: filename of certificate key
+
+     Setting up a standalone JupyterHub requires a dedicated host, on which:
+       - a single-node Kubernetes cluster will be created
+       - an NGINX ingress controller will be created, using self-signed certs or
+         certs as specified, and set to serve requests at the optionally
+         specified domain "JUPYTERHUB_DOMAIN" or the hostname (default)
+EOF
+  log "All parameters not provided"
+  exit 1
+fi
+
+set -x
+trap 'fail' ERR
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
+source $AIO_ROOT/utils.sh
+source $AIO_ROOT/mlwb/mlwb_env.sh
+NAMESPACE=$1
+ACUMOS_DOMAIN=$2
+ACUMOS_ONBOARDING_TOKENMODE=$3
+STANDALONE=$4
+export DEPLOYED_UNDER=k8s
+export K8S_DIST=generic
+if [[ "$STANDALONE" == "standalone" ]]; then
+  JUPYTERHUB_DOMAIN=$5
+  CERT=$6
+  CERT_KEY=$7
+  standalone_prep
+else
+  JUPYTERHUB_DOMAIN=$ACUMOS_DOMAIN
+fi
+clean
 setup
+cd $WORK_DIR

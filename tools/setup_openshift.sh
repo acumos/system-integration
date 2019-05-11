@@ -22,28 +22,11 @@
 # Prerequisites:
 # - Centos 7 server
 #
-#. Usage: on the node to become the master
-#. $ bash setup_openshift.sh "[oc|ansible] [nodes]"
-#.   oc|ansible: install via "oc cluster up" or via ansible playbook
-#.   nodes: quoted, space-separated list of k8s worker nodes. If no nodes are
-#.          specified a single all-in-one cluster will be installed
-
-set -x
-
-trap 'fail' ERR
-
-function fail() {
-  log "$1"
-  exit 1
-}
-
-function log() {
-  set +x
-  fname=$(caller 0 | awk '{print $2}')
-  fline=$(caller 0 | awk '{print $1}')
-  echo; echo "$fname:$fline ($(date)) $1"
-  set -x
-}
+# Usage: on the node to become the master
+# $ bash setup_openshift.sh <oc|ansible> "[nodes]"
+#   oc|ansible: install via "oc cluster up" or via ansible playbook
+#   nodes: quoted, space-separated list of k8s worker nodes. If no nodes are
+#          specified a single all-in-one cluster will be installed
 
 function setup_prereqs() {
   log "Create prerequisite setup script"
@@ -156,6 +139,24 @@ EOF
   echo "you can now run setup_client.sh on that machine to setup remote access"
 }
 
+if [[ $# -lt 1 ]]; then
+  cat <<'EOF'
+Usage: on the node to become the master
+ $ bash setup_openshift.sh <oc|ansible> "[nodes]"
+   oc|ansible: install via "oc cluster up" or via ansible playbook
+   nodes: quoted, space-separated list of k8s worker nodes. If no nodes are
+          specified a single all-in-one cluster will be installed
+EOF
+  echo "All parameters not provided"
+  exit 1
+fi
+
+set -x
+trap 'fail' ERR
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../AIO; pwd -P)"; fi
+source $AIO_ROOT/utils.sh
 method="$1"
 if [[ "$method" == "" ]]; then
   method="oc"
@@ -164,4 +165,4 @@ workers="$2"
 
 setup_prereqs
 setup_master
-set +x
+cd $WORK_DIR

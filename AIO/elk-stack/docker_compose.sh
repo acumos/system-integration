@@ -23,16 +23,14 @@
 # then invokes docker-compose with the command-line arguments.
 #
 # Usage:
-# $ bash docker_compose.sh <AIO_ROOT> [options]
-#   AIO_ROOT: path to AIO folder where environment files are
-#   options: optional parameters to docker-compose.
+# $ bash docker_compose.sh <options>
+#   options: parameters to docker-compose.
 #
 
 if [[ $# -lt 1 ]]; then
   cat <<'EOF'
 Usage:
-$ bash docker_compose.sh <AIO_ROOT> [options]
-  AIO_ROOT: path to AIO folder where environment files are
+$ bash docker_compose.sh <options>
   options: optional parameters to docker-compose.
 EOF
   echo "All parameters not provided"
@@ -41,15 +39,16 @@ fi
 
 set -x
 WORK_DIR=$(pwd)
-export AIO_ROOT=$1
-source $AIO_ROOT/acumos_env.sh
 cd $(dirname "$0")
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ..; pwd -P)"; fi
+source $AIO_ROOT/utils.sh
+source $AIO_ROOT/acumos_env.sh
 opts=""
 files=$(ls docker/acumos)
 for file in $files ; do
  opts="$opts acumos/$file"
 done
-cmd="$2 $3 $4 $5"
+cmd="$1 $2 $3 $4 $5"
 cd docker
 docker-compose -f $opts $cmd
 cd $WORK_DIR

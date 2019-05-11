@@ -40,19 +40,6 @@
 # https://github.com/prometheus/haproxy_exporter
 # https://github.com/prometheus/collectd_exporter
 
-trap 'fail' ERR
-
-function fail() {
-  log "$1"
-  exit 1
-}
-
-function log() {
-  f=$(caller 0 | awk '{print $2}')
-  l=$(caller 0 | awk '{print $1}')
-  echo; echo "$f:$l ($(date)) $1"
-}
-
 function setup_prereqs() {
 	log "Setup prerequisites"
   if [[ "$dist" == "ubuntu" ]]; then
@@ -145,19 +132,8 @@ EOF
   fi
 }
 
-function wait_until_notfound() {
-  cmd="$1"
-  what="$2"
-  log "Waiting until $what is missing from output of \"$cmd\""
-  result=$($cmd)
-  while [[ $(echo $result | grep -c "$what") -gt 0 ]]; do
-    log "Waiting 10 seconds"
-    sleep 10
-    result=$($cmd)
-  done
-}
-
 function clean() {
+  trap 'fail' ERR
   log "Removing Grafana"
   helm delete --purge gf
   wait_until_notfound "kubectl get pods -n default" grafana
@@ -167,7 +143,12 @@ function clean() {
   wait_until_notfound "kubectl get pods -n default" prometheus
 }
 
-export WORK_DIR=$(pwd)
+set -x
+trap 'fail' ERR
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../AIO; pwd -P)"; fi
+source $AIO_ROOT/utils.sh
 dist=$(grep -m 1 'ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
 distver=$(grep -m 1 'VERSION_ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
 host_ip=$(/sbin/ip route get 8.8.8.8 | head -1 | sed 's/^.*src //' | awk '{print $1}')

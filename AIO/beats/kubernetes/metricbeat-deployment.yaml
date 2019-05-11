@@ -63,7 +63,7 @@ spec:
           value: "acumos-aio"
         ports:
         - containerPort: 8098
-        command: ['metricbeat', '-e', '-strict.perms=false', '-system.hostfs=/hostfs']
+#        command: ['metricbeat', '-e', '-strict.perms=false', '-system.hostfs=/hostfs']
         volumeMounts:
         - mountPath: /hostfs/proc
           name: proc
@@ -79,8 +79,10 @@ spec:
           readOnly: false
         - mountPath: /var/run/docker.sock
           name: sock
-        - name: conf-volume
+        - name: metricbeat-config
           mountPath: /usr/share/metricbeat
+        - name: metricbeat-modules
+          mountPath: /usr/share/metricbeat/modules.d
 # Per https://github.com/elastic/beats/issues/8253
         securityContext:
           privileged: true
@@ -101,9 +103,12 @@ spec:
       - name: sock
         hostPath:
           path: /var/run/docker.sock
-      - name: conf-volume
+      - name: metricbeat-config
         configMap:
-          name: metricbeat
+          name: metricbeat-config
+      - name: metricbeat-modules
+        configMap:
+          name: metricbeat-modules
       hostAliases:
       - ip: "<ACUMOS_ELK_HOST_IP>"
         hostnames:
