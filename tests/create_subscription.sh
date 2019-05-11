@@ -163,7 +163,7 @@ modelTypeCode=$7
 set +x
 source $env
 set -x
-cds="https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT/ccds"
+cds="https://$ACUMOS_DOMAIN/ccds"
 creds="$ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD"
 find_peer
 if [[ "$peerId" == "" ]]; then

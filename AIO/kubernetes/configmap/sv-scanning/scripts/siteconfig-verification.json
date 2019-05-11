@@ -1,0 +1,96 @@
+{
+  "externalScan":"false",
+  "allowedLicense":[
+    {
+      "type":"SPDX",
+      "name":"Apache-2.0"
+    },
+    {
+      "type":"SPDX",
+      "name":"CC-BY-4.0"
+    },
+    {
+      "type":"SPDX",
+      "name":"BSD-3-Clause"
+    },
+    {
+      "type":"Vendor-A",
+      "name":"Vendor-A-OSS"
+    },
+    {
+      "type":"Company-B",
+      "name":"Company-B-Proprietary"
+    }
+  ],
+  "compatibleLicenses":[
+    { "name":"Apache-2.0", "compatible":[
+        { "name":"CC-BY-4.0" },
+        { "name":"Apache-2.0" },
+        { "name":"BSD-3-Clause" },
+        { "name":"MIT-License" }
+      ]
+    },
+    { "name":"BSD-3-Clause", "compatible":[
+        { "name":"CC-BY-4.0" },
+        { "name":"Apache-2.0" },
+        { "name":"BSD-3-Clause" },
+        { "name":"MIT-License" }
+      ]
+    },
+    { "name":"MIT-License", "compatible":[
+        { "name":"CC-BY-4.0" },
+        { "name":"Apache-2.0" },
+        { "name":"BSD-3-Clause" },
+        { "name":"MIT-License" }
+      ]
+    },
+    { "name":"Vendor-A-OSS", "compatible":[
+        { "name":"Vendor-A-OSS" },
+        { "name":"CC-BY-4.0" },
+        { "name":"Apache-2.0" },
+        { "name":"BSD-3-Clause" },
+        { "name":"MIT-License" }
+      ]
+    },
+    { "name":"Company-B-Proprietary", "compatible":[
+        { "name":"Company-B-Proprietary" },
+        { "name":"CC-BY-4.0" },
+        { "name":"Apache-2.0" },
+        { "name":"BSD-3-Clause" },
+        { "name":"MIT-License" }
+      ]
+    }
+  ],
+  "licenseScan":{
+    "created":"true",
+    "updated":"true",
+    "deploy":"true",
+    "download":"true",
+    "share":"true",
+    "publishCompany":"true",
+    "publishPublic":"true"
+  },
+  "securityScan":{
+    "created":"true",
+    "updated":"true",
+    "deploy":"false",
+    "download":"false",
+    "share":"false",
+    "publishCompany":"false",
+    "publishPublic":"false"
+  },
+  "licenseVerify":{
+    "deploy":"true",
+    "download":"true",
+    "share":"true",
+    "publishCompany":"true",
+    "publishPublic":"true"
+  },
+  "securityVerify":{
+    "deploy":"true",
+    "download":"true",
+    "share":"false",
+    "publishCompany":"true",
+    "publishPublic":"true"
+  }
+}
