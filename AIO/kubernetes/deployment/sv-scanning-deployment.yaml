@@ -89,8 +89,8 @@ spec:
                 "maven_repo": "<ACUMOS_NEXUS_MAVEN_REPO>"
                 }
             },
-            "siteConfig": "{
-              \"verification\": {
+            "siteConfig": {
+              "verification": "{
                 \"externalScan\": \"false\",
                 \"allowedLicense\": [
                   { \"type\": \"SPDX\", \"value\": \"Apache-2.0\" },
@@ -131,9 +131,15 @@ spec:
                   \"publishCompany\": \"true\",
                   \"publishPublic\": \"true\"
                 }
-              }
-            }"
+              }"
+            }
           }'
+        command: ['/bin/bash', '-c']
+        args:
+        - set -x;
+          cd /maven;
+          bash scan/setup_verification_site_config.sh $ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD $ACUMOS_ADMIN_USER;
+          java -jar security-verification-service-*.jar;
         ports:
         - containerPort: 9082
         volumeMounts:
