@@ -42,21 +42,6 @@
 #
 # see the config file with 'kubectl -n kube-system get cm kubeadm-config -oyaml'
 
-set -x
-
-trap 'fail' ERR
-
-function fail() {
-  log "$1"
-  exit 1
-}
-
-function log() {
-  fname=$(caller 0 | awk '{print $2}')
-  fline=$(caller 0 | awk '{print $1}')
-  echo; echo "$fname:$fline ($(date)) $1"
-}
-
 function setup_prereqs() {
   log "Create prerequisite setup script"
   cat <<'EOG' >~/prereqs.sh
@@ -71,15 +56,15 @@ function wait_dpkg() {
     sleep 1
   done
 }
-dist=$(grep -m 1 'ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
-distver=$(grep -m 1 'VERSION_ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+HOST_OS=$(grep -m 1 'ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+HOST_OS_VER=$(grep -m 1 'VERSION_ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
 if [[ $(grep -c $HOSTNAME /etc/hosts) -eq 0 ]]; then
   echo; echo "prereqs.sh: ($(date)) Add $HOSTNAME to /etc/hosts"
   # have to add "/sbin" to path of IP command for centos
   echo "$(/sbin/ip route get 8.8.8.8 | head -1 | sed 's/^.*src //' | awk '{print $1}') $HOSTNAME" \
     | sudo tee -a /etc/hosts
 fi
-if [[ "$dist" == "ubuntu" ]]; then
+if [[ "$HOST_OS" == "ubuntu" ]]; then
   # Per https://kubernetes.io/docs/setup/independent/install-kubeadm/
   echo; echo "prereqs.sh: ($(date)) Basic prerequisites"
   wait_dpkg; sudo apt-get update
@@ -241,7 +226,13 @@ function setup_k8s_master() {
   log "Allow pod scheduling on master (nodeSelector will be used to limit them)"
   kubectl taint node $HOSTNAME node-role.kubernetes.io/master:NoSchedule-
   # Added for v1.13.0 since calico pods would not start
-  kubectl taint node $HOSTNAME node.kubernetes.io/not-ready:NoSchedule-
+  tries=30
+  try=1
+  while ! kubectl taint node $HOSTNAME node.kubernetes.io/not-ready:NoSchedule- ; do
+    log "Unable to remove not-ready taint from master; try $try of $tries"
+    sleep 10
+    try=$((try+1))
+  done
 
   # Deploy pod network
   log "Deploy calico as CNI"
@@ -366,9 +357,14 @@ EOF
   log "Cluster is ready (all nodes in 'kubectl get nodes' show as 'Ready')."
 }
 
-dist=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
-hostip=$(/sbin/ip route get 8.8.8.8 | head -1 | sed 's/^.*src //' | awk '{print $1}')
-
+set -x
+trap 'fail' ERR
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+export AIO_ROOT="$(cd ../AIO; pwd -P)"
+source $AIO_ROOT/utils.sh
+cd $WORK_DIR
+verify_ubuntu_or_centos
 setup_prereqs
 
 if ! $(curl -v -k https://localhost:6443/version); then
@@ -380,4 +376,5 @@ if [[ ! -z "$1" ]]; then
 fi
 
 log "Setup is complete."
-log "The kubernetes dashboard is at https://$hostip:32767"
+HOST_IP=$(/sbin/ip route get 8.8.8.8 | head -1 | sed 's/^.*src //' | awk '{print $1}')
+log "The kubernetes dashboard is at https://$HOST_IP:32767"

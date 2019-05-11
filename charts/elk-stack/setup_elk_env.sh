@@ -41,7 +41,14 @@ if [[ -e elk_env.sh ]]; then source elk_env.sh; fi
 export ACUMOS_ELK_NAMESPACE="${ACUMOS_ELK_NAMESPACE:-acumos-elk}"
 export ACUMOS_ELK_DOMAIN="${ACUMOS_ELK_DOMAIN:-$ACUMOS_DOMAIN}"
 export ACUMOS_ELK_HOST="${ACUMOS_ELK_HOST:-$ACUMOS_HOST}"
-export ACUMOS_ELK_HOST_IP="${ACUMOS_ELK_HOST_IP:-$ACUMOS_HOST_IP}"
+
+if [[ $(host $ACUMOS_ELK_HOST | grep -c 'not found') -eq 0 ]]; then
+  export ACUMOS_ELK_HOST_IP=$(host $ACUMOS_ELK_HOST | head -1 | cut -d ' ' -f 4)
+elif [[ $(grep -c -E " $ACUMOS_ELK_HOST( |$)" /etc/hosts) -gt 0 ]]; then
+  export ACUMOS_ELK_HOST_IP=$(grep -E "$ACUMOS_ELK_HOST( |$)" /etc/hosts | cut -d ' ' -f 1)
+else
+  fail "Please ensure host $ACUMOS_ELK_HOST is resolvable thru DNS or hosts file"
+fi
 
 # External component options
 export HTTP_PROXY="${HTTP_PROXY:-}"
@@ -58,7 +65,7 @@ export ACUMOS_ELK_ELASTICSEARCH_PORT="${ACUMOS_ELK_ELASTICSEARCH_PORT:-30930}"
 export ACUMOS_ELK_ELASTICSEARCH_INDEX_PORT="${ACUMOS_ELK_ELASTICSEARCH_INDEX_PORT:-30920}"
 export ACUMOS_ELK_LOGSTASH_PORT="${ACUMOS_ELK_LOGSTASH_PORT:-30500}"
 export ACUMOS_ELK_KIBANA_PORT="${ACUMOS_ELK_KIBANA_PORT:-30561}"
-export ACUMOS_ELK_ES_JAVA_HEAP_MIN_SIZE="${ACUMOS_ELK_ES_JAVA_HEAP_MIN_SIZE:-1g}"
+export ACUMOS_ELK_ES_JAVA_HEAP_MIN_SIZE="${ACUMOS_ELK_ES_JAVA_HEAP_MIN_SIZE:-2g}"
 export ACUMOS_ELK_ES_JAVA_HEAP_MAX_SIZE="${ACUMOS_ELK_ES_JAVA_HEAP_MAX_SIZE:-2g}"
 export ACUMOS_ELK_LS_JAVA_HEAP_MIN_SIZE="${ACUMOS_ELK_LS_JAVA_HEAP_MIN_SIZE:-1g}"
 export ACUMOS_ELK_LS_JAVA_HEAP_MAX_SIZE="${ACUMOS_ELK_LS_JAVA_HEAP_MAX_SIZE:-2g}"

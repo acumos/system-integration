@@ -17,4 +17,5 @@
 # ===============LICENSE_END=========================================================
 # https://github.com/elastic/beats-docker
 FROM docker.elastic.co/beats/metricbeat:6.2.4
+COPY module.d /usr/share/metricbeat/modules.d
 COPY config/metricbeat.yml /usr/share/metricbeat/metricbeat.yml
