@@ -460,6 +460,7 @@ function replace_env() {
   else files="$1/*.yaml"; fi
   vars=$(grep -Rho '<[^<.]*>' $files | sed 's/<//' | sed 's/>//' | sort | uniq)
   for f in $files; do
+    echo "Replacing env variables in $f"
     for v in $vars ; do
       eval vv=\$$v
       sedi "s~<$v>~$vv~g" $f

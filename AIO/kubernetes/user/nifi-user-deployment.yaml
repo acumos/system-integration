@@ -57,7 +57,7 @@ spec:
           value: "<ACUMOS_KONG_PROXY_SSL_PORT>"
         # /opt/nifi/scripts/secure.sh requires KEYSTORE_PATH
         - name: KEYSTORE_PATH
-          value: "/conf/certs/<ACUMOS_KEYSTORE>"
+          value: "/conf/certs/<ACUMOS_KEYSTORE_P12>"
         - name: KEYSTORE_TYPE
           value: "PKCS12"
         - name: KEYSTORE_PASSWORD
