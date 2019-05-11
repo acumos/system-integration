@@ -19,91 +19,96 @@ version: '3.2'
 
 # docker-compose for onboarding-app
 services:
-   onboarding-service:
-       image: ${ONBOARDING_IMAGE}
-       environment:
-          SPRING_APPLICATION_JSON: "{
-               \"server\":{
-                   \"port\": 8090,
-                   \"servlet\": {
-                      \"context-path\": \"/onboarding-app\"
-                   }
-                },
-               \"docker\": {
-                   \"host\": \"${ACUMOS_DOCKER_API_HOST}\",
-                   \"port\": ${ACUMOS_DOCKER_API_PORT},
-                   \"config\": \"/docker_host/.docker\",
-                   \"registry\":{
-                       \"url\": \"http://${ACUMOS_DOCKER_REGISTRY_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/\",
-                       \"username\": \"${ACUMOS_DOCKER_REGISTRY_USER}\",
-                       \"password\": \"${ACUMOS_DOCKER_REGISTRY_PASSWORD}\",
-                       \"email\": \"${ACUMOS_ADMIN_EMAIL}\"
-                   },
-                   \"tls\": {
-                       \"verify\": \"false\"
-                   },
-                   \"api\": {
-                       \"version\": \"1.23\"
-                   },
-                   \"imagetag\": {
-                       \"prefix\": \"${ACUMOS_DOCKER_REGISTRY_HOST}:${ACUMOS_DOCKER_MODEL_PORT}\"
-                   },
-                   \"max_total_connections\": \"1\",
-                   \"max_per_route_connections\": \"1\"
-               },
-               \"http_proxy\": \"${HTTP_PROXY}\",
-               \"nexus\": {
-                   \"nexusEndPointURL\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/${ACUMOS_NEXUS_MAVEN_REPO_PATH}/${ACUMOS_NEXUS_MAVEN_REPO}/\",
-                   \"nexusUserName\": \"${ACUMOS_NEXUS_RW_USER}\",
-                   \"nexusPassword\": \"${ACUMOS_NEXUS_RW_USER_PASSWORD}\",
-                   \"nexusproxy\": \"\",
-                   \"nexusGroupId\": \"com.artifact\"
-               },
-               \"cmndatasvc\": {
-                   \"cmnDataSvcEndPoinURL\": \"http://cds-service:8000/ccds\",
-                   \"cmnDataSvcUser\": \"${ACUMOS_CDS_USER}\",
-                   \"cmnDataSvcPwd\": \"${ACUMOS_CDS_PASSWORD}\"
-               },
-               \"mktPlace\": {
-                   \"mktPlaceEndPointURL\": \"http://portal-be-service:8083\"
-               },
-               \"microService\": {
-                   \"microServiceEndPointURL\": \"http://msg-service:8336/microservice-generation\",
-                   \"microServiceAsyncFlag\": \"false\"
-               },
-               \"requirements\": {
-                   \"extraIndexURL\": \"${PYTHON_EXTRAINDEX}\",
-                   \"trustedHost\": \"${PYTHON_EXTRAINDEX_HOST}\"
-               },
-               \"base_image\": {
-                   \"rimage\": \"${ONBOARDING_BASE_IMAGE}\",
-                   \"dockerusername\": \"${ACUMOS_PROJECT_NEXUS_USERNAME}\",
-                   \"dockerpassword\": \"${ACUMOS_PROJECT_NEXUS_PASSWORD}\"
-               },
-               \"tosca\": {
-                   \"OutputFolder\": \"/tmp/\",
-                   \"GeneratorEndPointURL\": \"http://delete-me/model_create\"
-               },
-               \"spring\": {
-                   \"servlet\": {
-                       \"multipart\": {
-                           \"max-file-size\": \"1024MB\",
-                           \"max-request-size\": \"1024MB\"
-                       }
-                   }
+  onboarding-service:
+    image: ${ONBOARDING_IMAGE}
+    environment:
+     SPRING_APPLICATION_JSON: '{
+       "logging": {
+         "level": {
+           "root": "INFO"
+         }
+       },
+       "server":{
+           "port": 8090,
+           "servlet": {
+              "context-path": "/onboarding-app"
+           }
+        },
+       "docker": {
+           "host": "${ACUMOS_DOCKER_API_HOST}",
+           "port": ${ACUMOS_DOCKER_API_PORT},
+           "config": "/docker_host/.docker",
+           "registry":{
+               "url": "http://${ACUMOS_DOCKER_REGISTRY_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/",
+               "username": "${ACUMOS_DOCKER_REGISTRY_USER}",
+               "password": "${ACUMOS_DOCKER_REGISTRY_PASSWORD}",
+               "email": "${ACUMOS_ADMIN_EMAIL}"
+           },
+           "tls": {
+               "verify": "false"
+           },
+           "api": {
+               "version": "1.23"
+           },
+           "imagetag": {
+               "prefix": "${ACUMOS_DOCKER_REGISTRY_HOST}:${ACUMOS_DOCKER_MODEL_PORT}"
+           },
+           "max_total_connections": "1",
+           "max_per_route_connections": "1"
+       },
+       "http_proxy": "\"${HTTP_PROXY}\"",
+       "nexus": {
+           "nexusEndPointURL": "http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/${ACUMOS_NEXUS_MAVEN_REPO_PATH}/${ACUMOS_NEXUS_MAVEN_REPO}/",
+           "nexusUserName": "${ACUMOS_NEXUS_RW_USER}",
+           "nexusPassword": "${ACUMOS_NEXUS_RW_USER_PASSWORD}",
+           "nexusproxy": "",
+           "nexusGroupId": "${ACUMOS_NEXUS_GROUP}"
+       },
+       "cmndatasvc": {
+           "cmnDataSvcEndPoinURL": "http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds",
+           "cmnDataSvcUser": "${ACUMOS_CDS_USER}",
+           "cmnDataSvcPwd": "${ACUMOS_CDS_PASSWORD}"
+       },
+       "mktPlace": {
+           "mktPlaceEndPointURL": "http://portal-be-service:8083"
+       },
+       "microService": {
+           "microServiceEndPointURL": "http://msg-service:8336/microservice-generation",
+           "microServiceAsyncFlag": "true"
+       },
+       "requirements": {
+           "extraIndexURL": "${PYTHON_EXTRAINDEX}",
+           "trustedHost": "${PYTHON_EXTRAINDEX_HOST}"
+       },
+       "base_image": {
+           "rimage": "${ONBOARDING_BASE_IMAGE}",
+           "dockerusername": "${ACUMOS_PROJECT_NEXUS_USERNAME}",
+           "dockerpassword": "${ACUMOS_PROJECT_NEXUS_PASSWORD}"
+       },
+       "tosca": {
+           "OutputFolder": "/tmp/",
+           "GeneratorEndPointURL": "http://delete-me/model_create"
+       },
+       "spring": {
+           "servlet": {
+               "multipart": {
+                   "max-file-size": "1024MB",
+                   "max-request-size": "1024MB"
                }
-       }"
-       expose:
-           - 8090
-       volumes:
-           - type: bind
-             source: /mnt/${ACUMOS_NAMESPACE}/logs
-             target: /maven/logs
-           - type: bind
-             source: /mnt/${ACUMOS_NAMESPACE}/output
-             target: /temp/
-       logging:
-           driver: json-file
-       extra_hosts:
-           - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
-       restart: on-failure
+           }
+       }
+     }'
+    expose:
+      - 8090
+    volumes:
+      - type: bind
+        source: /mnt/${ACUMOS_NAMESPACE}/logs
+        target: /maven/logs
+      - type: bind
+        source: /mnt/${ACUMOS_NAMESPACE}/output
+        target: /temp/
+    logging:
+      driver: json-file
+    extra_hosts:
+      - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
+    restart: on-failure

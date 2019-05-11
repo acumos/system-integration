@@ -27,25 +27,13 @@
 # For docker-based deployments, run this script on the AIO host.
 # For k8s-based deployment, run this script on the AIO host or a workstation
 # connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
-# $ bash setup_elk.sh <AIO_ROOT>
-#   AIO_ROOT: path to AIO folder where environment files are
+# $ bash setup_elk.sh
 #
 
 # First define utils that will overridden below
 
-function elk_fail() {
-  set +x
-  trap - ERR
-  reason="$1"
-  if [[ "$1" == "" ]]; then reason="unknown failure at $fname $fline"; fi
-  log "$reason"
-  sedi 's/DEPLOY_RESULT=.*/DEPLOY_RESULT=fail/' $AIO_ROOT/elk_env.sh
-  sedi "s~FAIL_REASON=.*~FAIL_REASON=$reason~" $AIO_ROOT/elk_env.sh
-  exit 1
-}
-
 function build_images() {
-  trap 'elk_fail' ERR
+  trap 'fail' ERR
 
   log "Prepare ELK stack component configs for AIO deploy"
   if [[ -d platform-oam ]]; then rm -rf platform-oam; fi
@@ -70,24 +58,23 @@ function build_images() {
   log "Building local acumos-logstash image"
   cd ../logstash
   cp -r ../platform-oam/elk-stack/logstash/config .
-  cp -r ../platform-oam/elk-stack/logstash/pipeline .
   docker build -t acumos-logstash .
   cd ..
 }
 
 function setup_elk() {
-  trap 'elk_fail' ERR
+  trap 'fail' ERR
   local WORK_DIR=$(pwd)
   # acumos_env.sh will call elk_env.sh as setup by setup_prereqs.sh
   if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
     cd $AIO_ROOT/../charts/elk-stack
     cp $AIO_ROOT/elk_env.sh .
-    bash setup_elk.sh $AIO_ROOT $K8S_DIST
+    bash setup_elk.sh $ACUMOS_ELK_DOMAIN $K8S_DIST
   else
     log "Stop any existing docker based components for elk-stack"
-    bash docker_compose.sh $AIO_ROOT down
+    bash docker_compose.sh down
     build_images
-    bash docker_compose.sh $AIO_ROOT up -d --build --force-recreate
+    bash docker_compose.sh up -d --build --force-recreate
   fi
 
   log "Wait for all elk-stack pods to be Running"
@@ -100,24 +87,12 @@ function setup_elk() {
   cd $WORK_DIR
 }
 
-if [[ $# -lt 1 ]]; then
-  cat <<'EOF'
-Usage:
-  For docker-based deployments, run this script on the AIO host.
-  For k8s-based deployment, run this script on the AIO host or a workstation
-  connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
-  $ bash setup_elk.sh <AIO_ROOT>
-    AIO_ROOT: path to AIO folder where environment files are
-EOF
-  echo "All parameters not provided"
-  exit 1
-fi
-
-WORK_DIR=$(pwd)
-export AIO_ROOT=$1
-source $AIO_ROOT/acumos_env.sh
-source $AIO_ROOT/utils.sh
+set -x
 trap 'fail' ERR
-cd $AIO_ROOT/elk-stack
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ..; pwd -P)"; fi
+source $AIO_ROOT/utils.sh
+source $AIO_ROOT/acumos_env.sh
 setup_elk
 cd $WORK_DIR
