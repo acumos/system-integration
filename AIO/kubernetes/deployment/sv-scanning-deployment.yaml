@@ -65,7 +65,7 @@ spec:
         - name: SPRING_APPLICATION_JSON
           value: '{
             "server" : {
-                   "port" : 9082
+              "port" : 9082
             },
             "cdms": {
               "client": {
@@ -77,73 +77,50 @@ spec:
               }
             },
             "nexus": {
-              "groupId": "com.artifact",
               "client": {
                 "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/<ACUMOS_NEXUS_MAVEN_REPO_PATH>/<ACUMOS_NEXUS_MAVEN_REPO>/",
                 "proxy": "",
-                "pwd": "<ACUMOS_NEXUS_RW_USER_PASSWORD>",
+                "password": "<ACUMOS_NEXUS_RW_USER_PASSWORD>",
                 "username": "<ACUMOS_NEXUS_RW_USER>",
-                "groupId": "com.artifact",
-                "host": "<ACUMOS_NEXUS_HOST>",
-                "port": "<ACUMOS_NEXUS_API_PORT>",
-                "maven_repo": "<ACUMOS_NEXUS_MAVEN_REPO>"
-                }
-            },
-            "siteConfig": "{
-              \"verification\": {
-                \"externalScan\": \"false\",
-                \"allowedLicense\": [
-                  { \"type\": \"SPDX\", \"value\": \"Apache-2.0\" },
-                  { \"type\": \"SPDX\", \"value\": \"CC-BY-4.0\" },
-                  { \"type\": \"SPDX\", \"value\": \"BSD-3-Clause\" },
-                  { \"type\": \"VendorA\", \"value\": \"VendorA-OSS\" },
-                  { \"type\": \"CompanyB\", \"value\": \"CompanyB-Proprietary\" }
-                ],
-                \"licenseScan\": {
-                  \"created\": \"true\",
-                  \"updated\": \"true\",
-                  \"deploy\": \"false\",
-                  \"download\": \"false\",
-                  \"share\": \"false\",
-                  \"publishCompany\": \"false\",
-                  \"publishPublic\": \"false\"
-                },
-                \"securityScan\": {
-                  \"created\": \"true\",
-                  \"updated\": \"true\",
-                  \"deploy\": \"false\",
-                  \"download\": \"false\",
-                  \"share\": \"false\",
-                  \"publishCompany\": \"false\",
-                  \"publishPublic\": \"false\"
-                },
-                \"licenseVerify\": {
-                  \"deploy\": \"true\",
-                  \"download\": \"true\",
-                  \"share\": \"false\",
-                  \"publishCompany\": \"true\",
-                  \"publishPublic\": \"true\"
-                },
-                \"securityVerify\": {
-                  \"deploy\": \"true\",
-                  \"download\": \"true\",
-                  \"share\": \"false\",
-                  \"publishCompany\": \"true\",
-                  \"publishPublic\": \"true\"
-                }
+                "groupId": "com.artifact"
               }
-            }"
+            }
           }'
+        command: ["/bin/bash", "-c"]
+        args:
+        - set -x;
+          cd /maven/scan;
+          cp /maven/conf/licenses/* scancode-toolkit-3.0.2/src/licensedcode/data/licenses/.;
+          cp /maven/conf/rules/* scancode-toolkit-3.0.2/src/licensedcode/data/rules/.;
+          cp /maven/conf/scripts/* .;
+          bash setup_verification_site_config.sh http://$ACUMOS_CDS_HOST:$ACUMOS_CDS_PORT $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD $ACUMOS_ADMIN_USER;
+          cd /maven;
+          java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /maven/security-verification-service-*.jar;
         ports:
         - containerPort: 9082
         volumeMounts:
         - mountPath: /maven/logs
           name: logs
+        - mountPath: /maven/conf/scripts
+          name: scripts
+        - mountPath: /maven/conf/licenses
+          name: licenses
+        - mountPath: /maven/conf/rules
+          name: rules
       restartPolicy: Always
       volumes:
       - name: logs
         persistentVolumeClaim:
           claimName: pvc-<ACUMOS_NAMESPACE>-logs
+      - name: scripts
+        configMap:
+          name: sv-scanning-scripts
+      - name: licenses
+        configMap:
+          name: sv-scanning-licenses
+      - name: rules
+        configMap:
+          name: sv-scanning-rules
       hostAliases:
       - ip: "<ACUMOS_HOST_IP>"
         hostnames:
