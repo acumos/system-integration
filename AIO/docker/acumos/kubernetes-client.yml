@@ -20,65 +20,74 @@ version: '3.2'
 # docker-compose for Acumos logging component kubernetes-client-service
 #
 services:
-   kubernetes-client-service:
-       image: ${KUBERNETES_CLIENT_IMAGE}
-       environment:
-           log_level: "DEBUG"
-           SPRING_APPLICATION_JSON: "{
-              \"kube\" : {
-                \"incrementPort\": \"8556\",
-                \"singleModelPort\": \"8556\",
-                \"incrementPort\": \"8557\",
-                \"folderPath\": \"/maven/home\",
-                \"singleNodePort\": \"30333\",
-                \"singleTargetPort\": \"3330\",
-                \"dataBrokerModelPort\": \"8556\",
-                \"dataBrokerNodePort\": \"30556\",
-                \"dataBrokerTargetPort\": \"8556\",
-                \"mlTargetPort\": \"3330\",
-                \"nginxImageName\": \"nginx\",
-                \"nexusEndPointURL\": \"http://localhost:80\"
-              },
-              \"dockerproxy\": {
-                \"host\": \"${ACUMOS_DOCKER_PROXY_HOST}\",
-                \"port\": \"${ACUMOS_DOCKER_PROXY_PORT}\"
-              },
-              \"blueprint\": {
-                \"ImageName\": \"${BLUEPRINT_ORCHESTRATOR_IMAGE}\",
-                \"name\": \"blueprint-orchestrator\",
-                \"nodePort\": \"30555\",
-                \"port\": \"8555\"
-              },
-              \"nexus\": {
-                \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/${ACUMOS_NEXUS_MAVEN_REPO_PATH}/${ACUMOS_NEXUS_MAVEN_REPO}/\",
-                \"password\": \"${ACUMOS_NEXUS_RW_USER_PASSWORD}\",
-                \"username\": \"${ACUMOS_NEXUS_RW_USER}\",
-                \"groupid\": \"com.artifact\"
-              },
-              \"cmndatasvc\": {
-                \"cmndatasvcendpointurl\": \"http://cds-service:8000/ccds\",
-                \"cmndatasvcuser\": \"${ACUMOS_CDS_USER}\",
-                \"cmndatasvcpwd\": \"${ACUMOS_CDS_PASSWORD}\"
-              },
-              \"probe\": {
-                \"probeImageName\": \"${PROTO_VIEWER_IMAGE}\",
-                \"probeImagePORT\": \"5006\",
-                \"probeModelPort\": \"5006\",
-                \"probeNodePort\": \"30800\",
-                \"probeTargetPort\": \"5006\",
-                \"probeApiPort\": \"5006\",
-                \"probeExternalPort\": \"30800\",
-                \"probeSchemaPort\": \"80\"
-              }
-           }"
-       expose:
-           - 8082
-       volumes:
-           - type: bind
-             source: /mnt/${ACUMOS_NAMESPACE}/logs
-             target: /maven/logs
-       logging:
-           driver: json-file
-       extra_hosts:
-           - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
-       restart: on-failure
+  kubernetes-client-service:
+    image: ${KUBERNETES_CLIENT_IMAGE}
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "logging": {
+          "level": {
+            "root": "${ACUMOS_LOG_LEVEL}"
+          }
+        },
+        "kube" : {
+          "incrementPort": "8556",
+          "singleModelPort": "8556",
+          "incrementPort": "8557",
+          "folderPath": "/maven/home",
+          "singleNodePort": "30333",
+          "singleTargetPort": "3330",
+          "dataBrokerModelPort": "8556",
+          "dataBrokerNodePort": "30556",
+          "dataBrokerTargetPort": "8556",
+          "mlTargetPort": "3330",
+          "nginxImageName": "nginx",
+          "nexusEndPointURL": "http://localhost:80"
+        },
+        "dockerproxy": {
+          "host": "${ACUMOS_DOCKER_PROXY_HOST}",
+          "port": "${ACUMOS_DOCKER_PROXY_PORT}"
+        },
+        "blueprint": {
+          "ImageName": "${BLUEPRINT_ORCHESTRATOR_IMAGE}",
+          "name": "blueprint-orchestrator",
+          "nodePort": "30555",
+          "port": "8555"
+        },
+        "nexus": {
+          "url": "http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/${ACUMOS_NEXUS_MAVEN_REPO_PATH}/${ACUMOS_NEXUS_MAVEN_REPO}/",
+          "password": "${ACUMOS_NEXUS_RW_USER_PASSWORD}",
+          "username": "${ACUMOS_NEXUS_RW_USER}",
+          "groupid": "${ACUMOS_NEXUS_GROUP}"
+        },
+        "cmndatasvc": {
+          "cmndatasvcendpointurl": "http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds",
+          "cmndatasvcuser": "${ACUMOS_CDS_USER}",
+          "cmndatasvcpwd": "${ACUMOS_CDS_PASSWORD}"
+        },
+        "probe": {
+          "probeImageName": "${PROTO_VIEWER_IMAGE}",
+          "probeImagePORT": "5006",
+          "probeModelPort": "5006",
+          "probeNodePort": "30800",
+          "probeTargetPort": "5006",
+          "probeApiPort": "5006",
+          "probeExternalPort": "30800",
+          "probeSchemaPort": "80"
+        },
+        "logstash": {
+          "host": "${ACUMOS_ELK_HOST}",
+          "ip": "${ACUMOS_ELK_HOST_IP}",
+          "port": "${ACUMOS_ELK_LOGSTASH_PORT}"
+        }
+      }'
+    expose:
+      - 8082
+    volumes:
+      - type: bind
+        source: /mnt/${ACUMOS_NAMESPACE}/logs
+        target: /maven/logs
+    logging:
+      driver: json-file
+    extra_hosts:
+      - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
+    restart: on-failure
