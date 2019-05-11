@@ -69,6 +69,11 @@ services:
                 \"probeApiPort\": \"5006\",
                 \"probeExternalPort\": \"30800\",
                 \"probeSchemaPort\": \"80\"
+              },
+              \"logstash\": {
+                \"host\": \"${ACUMOS_ELK_HOST}\",
+                \"ip\": \"${ACUMOS_ELK_HOST_IP}\",
+                \"port\": \"${ACUMOS_ELK_LOGSTASH_PORT}\"
               }
            }"
        expose:

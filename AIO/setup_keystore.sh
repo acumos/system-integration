@@ -74,7 +74,7 @@ function setup_keystore() {
       kubectl delete configmap -n $ACUMOS_NAMESPACE acumos-store
     fi
     kubectl create configmap -n $ACUMOS_NAMESPACE acumos-store \
-      --from-file=certs/$ACUMOS_KEYSTORE,certs/$ACUMOS_TRUSTSTORE
+      --from-file=certs/$ACUMOS_KEYSTORE_P12,certs/$ACUMOS_TRUSTSTORE
   fi
 }
 

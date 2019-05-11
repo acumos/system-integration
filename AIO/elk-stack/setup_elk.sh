@@ -70,7 +70,6 @@ function build_images() {
   log "Building local acumos-logstash image"
   cd ../logstash
   cp -r ../platform-oam/elk-stack/logstash/config .
-  cp -r ../platform-oam/elk-stack/logstash/pipeline .
   docker build -t acumos-logstash .
   cd ..
 }
