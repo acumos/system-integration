@@ -47,7 +47,7 @@ function setup_keystore() {
   else
     log "Creating new certs in certs subfolder"
     cd certs
-    bash setup_certs.sh $AIO_ROOT $ACUMOS_CERT_PREFIX $ACUMOS_DOMAIN
+    bash setup_certs.sh $ACUMOS_CERT_PREFIX $ACUMOS_DOMAIN
     cd ..
   fi
 
@@ -69,21 +69,20 @@ function setup_keystore() {
   else
     log "Create kubernetes configmap to hold the keystore and truststore"
     # See use in deployment templates for portal-be and federation
-    if [[ $(kubectl get configmap -n $ACUMOS_NAMESPACE acumos-store) ]]; then
+    if [[ $(kubectl get configmap -n $ACUMOS_NAMESPACE acumos-certs) ]]; then
       log "Delete existing acumos-certs configmap in case cert changes were made"
-      kubectl delete configmap -n $ACUMOS_NAMESPACE acumos-store
+      kubectl delete configmap -n $ACUMOS_NAMESPACE acumos-certs
     fi
-    kubectl create configmap -n $ACUMOS_NAMESPACE acumos-store \
-      --from-file=certs/$ACUMOS_KEYSTORE,certs/$ACUMOS_TRUSTSTORE
+    kubectl create configmap -n $ACUMOS_NAMESPACE acumos-certs \
+      --from-file=certs/$ACUMOS_KEYSTORE_P12,certs/$ACUMOS_TRUSTSTORE,certs/$ACUMOS_CA_CERT,certs/$ACUMOS_CERT
   fi
 }
 
 set -x
+trap 'fail' ERR
 WORK_DIR=$(pwd)
 cd $(dirname "$0")
-source acumos_env.sh
-export AIO_ROOT=$(pwd)
 source utils.sh
-trap 'fail' ERR
+source acumos_env.sh
 setup_keystore
 cd $WORK_DIR

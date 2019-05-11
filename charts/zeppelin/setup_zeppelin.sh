@@ -98,6 +98,7 @@ function setup() {
   sedi 's/ClusterIP/NodePort/' templates/svc.yaml
 
   log "Install the zepellin helm chart"
+  helm repo update
   helm upgrade --install zeppelin --namespace $namespace .
 
   log "Wait for zeppelin to be running"
