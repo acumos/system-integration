@@ -170,6 +170,9 @@ services:
                     },
                     \"jwt\": {
                       \"auth\": {
+                        \"secret\": {
+                          \"key\": \"${ACUMOS_JWT_KEY}\"
+                        },
                         \"timeout\": \"80000000\"
                       }
                     },
