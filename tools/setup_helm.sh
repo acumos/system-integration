@@ -29,22 +29,11 @@
 # $ bash setup_helm.sh
 #
 
-function fail() {
-  log "$1"
-  exit 1
-}
-
-function log() {
-  fname=$(caller 0 | awk '{print $2}')
-  fline=$(caller 0 | awk '{print $1}')
-  echo; echo "$fname:$fline ($(date)) $1"
-}
-
 function setup_helm() {
   trap 'fail' ERR
   log "Setup helm"
   # Install Helm
-  if [[ $(which oc) ]]; then
+  if [[ "$K8S_DIST" == "openshift" ]]; then
     # Per https://blog.openshift.com/getting-started-helm-openshift/
     log "Install the Helm client locally"
     curl -s https://storage.googleapis.com/kubernetes-helm/helm-v2.12.3-linux-amd64.tar.gz | tar xz
@@ -118,6 +107,13 @@ function setup_helm() {
   # e.g. helm install stable/dokuwiki
 }
 
+set -x
 trap 'fail' ERR
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+export AIO_ROOT="$(cd ../AIO; pwd -P)"
+source $AIO_ROOT/utils.sh
+cd $WORK_DIR
+verify_ubuntu_or_centos
 setup_helm
 log "Setup is complete."
