@@ -46,6 +46,10 @@ spec:
         securityContext:
           privileged: true
         env:
+        - name: LOG_LEVEL
+          value: "<ACUMOS_LOG_LEVEL>"
+        - name: JAVA_OPTS
+          value: "-Xmx512m -Xms256m"
         - name: ACUMOS_ADMIN_USER
           value: "admin"
         - name: ACUMOS_CDS_HOST
@@ -64,8 +68,13 @@ spec:
           value: "<ACUMOS_NEXUS_MAVEN_REPO>"
         - name: SPRING_APPLICATION_JSON
           value: '{
+            "logging": {
+              "level": {
+                "root": "<ACUMOS_LOG_LEVEL>"
+              }
+            },
             "server" : {
-                   "port" : 9082
+              "port" : 9082
             },
             "cdms": {
               "client": {
@@ -77,27 +86,61 @@ spec:
               }
             },
             "nexus": {
-              "groupId": "com.artifact",
               "client": {
                 "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/<ACUMOS_NEXUS_MAVEN_REPO_PATH>/<ACUMOS_NEXUS_MAVEN_REPO>/",
                 "proxy": "",
-                "pwd": "<ACUMOS_NEXUS_RW_USER_PASSWORD>",
+                "password": "<ACUMOS_NEXUS_RW_USER_PASSWORD>",
                 "username": "<ACUMOS_NEXUS_RW_USER>",
-                "groupId": "com.artifact",
-                "host": "<ACUMOS_NEXUS_HOST>",
-                "port": "<ACUMOS_NEXUS_API_PORT>",
-                "maven_repo": "<ACUMOS_NEXUS_MAVEN_REPO>"
-                }
+                "groupId": "<ACUMOS_NEXUS_GROUP>"
+              }
             },
-            "siteConfig": "{
-              \"verification\": {
+            "siteConfig": "{ \"verification\": {
                 \"externalScan\": \"false\",
                 \"allowedLicense\": [
                   { \"type\": \"SPDX\", \"value\": \"Apache-2.0\" },
                   { \"type\": \"SPDX\", \"value\": \"CC-BY-4.0\" },
                   { \"type\": \"SPDX\", \"value\": \"BSD-3-Clause\" },
-                  { \"type\": \"VendorA\", \"value\": \"VendorA-OSS\" },
-                  { \"type\": \"CompanyB\", \"value\": \"CompanyB-Proprietary\" }
+                  { \"type\": \"VendorA\", \"value\": \"Vendor-A-OSS\" },
+                  { \"type\": \"CompanyB\", \"value\": \"Company-B-Proprietary\" }
+                ],
+                \"compatibleLicenses\":[
+                  { \"name\":\"Apache-2.0\", \"compatible\":[
+                      { \"name\":\"CC-BY-4.0\" },
+                      { \"name\":\"Apache-2.0\" },
+                      { \"name\":\"BSD-3-Clause\" },
+                      { \"name\":\"MIT-License\" }
+                    ]
+                  },
+                  { \"name\":\"BSD-3-Clause\", \"compatible\":[
+                      { \"name\":\"CC-BY-4.0\" },
+                      { \"name\":\"Apache-2.0\" },
+                      { \"name\":\"BSD-3-Clause\" },
+                      { \"name\":\"MIT-License\" }
+                    ]
+                  },
+                  { \"name\":\"MIT-License\", \"compatible\":[
+                      { \"name\":\"CC-BY-4.0\" },
+                      { \"name\":\"Apache-2.0\" },
+                      { \"name\":\"BSD-3-Clause\" },
+                      { \"name\":\"MIT-License\" }
+                    ]
+                  },
+                  { \"name\":\"Vendor-A-OSS\", \"compatible\":[
+                      { \"name\":\"Vendor-A-OSS\" },
+                      { \"name\":\"CC-BY-4.0\" },
+                      { \"name\":\"Apache-2.0\" },
+                      { \"name\":\"BSD-3-Clause\" },
+                      { \"name\":\"MIT-License\" }
+                    ]
+                  },
+                  { \"name\":\"Company-B-Proprietary\", \"compatible\":[
+                      { \"name\":\"Company-B-Proprietary\" },
+                      { \"name\":\"CC-BY-4.0\" },
+                      { \"name\":\"Apache-2.0\" },
+                      { \"name\":\"BSD-3-Clause\" },
+                      { \"name\":\"MIT-License\" }
+                    ]
+                  }
                 ],
                 \"licenseScan\": {
                   \"created\": \"true\",
@@ -134,16 +177,32 @@ spec:
               }
             }"
           }'
+        command: ["/bin/bash", "/maven/conf/scripts/start.sh"]
         ports:
         - containerPort: 9082
         volumeMounts:
         - mountPath: /maven/logs
           name: logs
+        - mountPath: /maven/conf/scripts
+          name: scripts
+        - mountPath: /maven/conf/licenses
+          name: licenses
+        - mountPath: /maven/conf/rules
+          name: rules
       restartPolicy: Always
       volumes:
       - name: logs
         persistentVolumeClaim:
           claimName: pvc-<ACUMOS_NAMESPACE>-logs
+      - name: scripts
+        configMap:
+          name: sv-scanning-scripts
+      - name: licenses
+        configMap:
+          name: sv-scanning-licenses
+      - name: rules
+        configMap:
+          name: sv-scanning-rules
       hostAliases:
       - ip: "<ACUMOS_HOST_IP>"
         hostnames:
