@@ -1,0 +1,183 @@
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: mlwb-project
+  labels:
+    app: mlwb-project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlwb-project
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mlwb-project
+    spec:
+      imagePullSecrets:
+      - name: acumos-registry
+      containers:
+      - name: mlwb-project
+        image: <MLWB_PROJECT_SERVICE_IMAGE>
+        env:
+        - name: SPRING_APPLICATION_JSON
+          value: '{
+            "server": {
+              "port": 9088
+            },
+            "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
+            "resultsetSize": 2000,
+            "cmndatasvc": {
+              "cmndatasvcendpointurl": "http://cds-service:8000/ccds",
+              "cmndatasvcuser": "<ACUMOS_CDS_USER>",
+              "cmndatasvcpwd": "<ACUMOS_CDS_PASSWORD>"
+            },
+            "jwt" : {
+              "secretkey": "<ACUMOS_JWT_KEY>"
+            }
+          }'
+        ports:
+        - containerPort: 9088
+        volumeMounts:
+        - mountPath: /maven/logs
+          name: logs
+      restartPolicy: Always
+      volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+      hostAliases:
+      - ip: "<ACUMOS_HOST_IP>"
+        hostnames:
+        - "<ACUMOS_HOST>"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: mlwb-project-webcomponent
+  labels:
+    app: mlwb-project-webcomponent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlwb-project-webcomponent
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mlwb-project-webcomponent
+    spec:
+      imagePullSecrets:
+      - name: acumos-registry
+      containers:
+      - name: mlwb-project-webcomponent
+        image: <MLWB_PROJECT_WEBCOMPONENT_IMAGE>
+        env:
+        - name: ES_JAVA_OPTS
+          value: "-Xmx256m -Xms256m"
+        - name: ENVIRONMENT
+          value: "deploy"
+        - name: projectmSURL
+          value: "http://mlwb-project-service/mlWorkbench/v1/project"
+        - name: notebookmSURL
+          value: "https://<ACUMOS_DOMAIN>:<ACUMOS_KONG_PROXY_SSL_PORT>/mlwb-notebook/mlWorkbench/v1/notebook"
+        - name: pipelinemSURL
+          value: "https://<ACUMOS_DOMAIN>:<ACUMOS_KONG_PROXY_SSL_PORT>/mlwb-pipeline/mlWorkbench/v1/pipeline"
+        - name: projectWikiURL
+          value: "https://wiki.acumos.org/display/TRAIN"
+        - name: notebookWikiURL
+          value: "https://wiki.acumos.org/display/TRAIN"
+        - name: pipelineWikiURL
+          value: "https://wiki.acumos.org/display/TRAIN"
+        - name: pipelineFlag
+          value: "false"
+        ports:
+        - containerPort: 9084
+        volumeMounts:
+        - mountPath: /maven/logs
+          name: logs
+      restartPolicy: Always
+      volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+      hostAliases:
+      - ip: "<ACUMOS_HOST_IP>"
+        hostnames:
+        - "<ACUMOS_HOST>"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: mlwb-project-catalog-webcomponent
+  labels:
+    app: mlwb-project-catalog-webcomponent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlwb-project-catalog-webcomponent
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mlwb-project-catalog-webcomponent
+    spec:
+      imagePullSecrets:
+      - name: acumos-registry
+      containers:
+      - name: mlwb-project-catalog-webcomponent
+        image: <MLWB_PROJECT_CATALOG_WEBCOMPONENT_IMAGE>
+        env:
+        - name: ES_JAVA_OPTS
+          value: "-Xmx256m -Xms256m"
+        - name: ENVIRONMENT
+          value: "deploy"
+        - name: projectmSURL
+          value: "http://mlwb-project-service:9088/mlWorkbench/v1/project"
+        - name: notebookmSURL
+          value: "http://mlwb-notebook-service:9089/mlWorkbench/v1/notebook"
+        - name: pipelinemSURL
+          value: "http://mlwb-pipeline-service:9090/mlWorkbench/v1/pipeline"
+        - name: notebookWikiURL
+          value: "https://wiki.acumos.org/display/TRAIN"
+        ports:
+        - containerPort: 9085
+        volumeMounts:
+        - mountPath: /maven/logs
+          name: logs
+      restartPolicy: Always
+      volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+      hostAliases:
+      - ip: "<ACUMOS_HOST_IP>"
+        hostnames:
+        - "<ACUMOS_HOST>"

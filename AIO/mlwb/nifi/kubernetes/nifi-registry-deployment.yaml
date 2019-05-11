@@ -44,19 +44,19 @@ spec:
         - name: AUTH
           value: "tls"
         - name: KEYSTORE_PATH
-          value: "/opt/nifi-registry/certs/<ACUMOS_KEYSTORE>"
+          value: "/opt/nifi-registry/certs/nifi-keystore.p12"
         - name: KEYSTORE_TYPE
           value: "PKCS12"
         - name: KEYSTORE_PASSWORD
-          value: "<ACUMOS_KEYSTORE_PASSWORD>"
+          value: "<KEYSTORE_PASSWORD>"
         - name: KEY_PASSWORD
-          value: "<ACUMOS_CERT_KEY_PASSWORD>"
+          value: "<CERT_KEY_PASSWORD>"
         - name: TRUSTSTORE_PATH
-          value: "/opt/nifi-registry/certs/<ACUMOS_TRUSTSTORE>"
+          value: "/opt/nifi-registry/certs/nifi-truststore.jks"
         - name: TRUSTSTORE_TYPE
           value: "JKS"
         - name: TRUSTSTORE_PASSWORD
-          value: "<ACUMOS_TRUSTSTORE_PASSWORD>"
+          value: "<TRUSTSTORE_PASSWORD>"
         - name: INITIAL_ADMIN_IDENTITY
           value: 'CN=acumos, OU=acumos'
         command: ['/bin/bash', '-c']
@@ -83,21 +83,22 @@ spec:
           cat conf/nifi-registry.properties;
           sed -i -- "s~prop_replace 'nifi.registry.web.http~#prop_replace 'nifi.registry.web.http~g" ../scripts/start.sh;
           cat ../scripts/start.sh;
-          sleep 3600;
-#          ../scripts/start.sh;
+          ../scripts/start.sh;
         ports:
         - containerPort: 8443
         volumeMounts:
         - mountPath: /opt/nifi-registry/nifi-registry-0.3.0/logs/
           name: logs
-        - mountPath: /conf/certs
-          name: certs-volume
+        - mountPath: /conf/certs/
+          name: nifi-certs
       restartPolicy: Always
       volumes:
+      - name: nifi-registry
+        persistentVolumeClaim:
+          claimName: pvc-<ACUMOS_NAMESPACE>-nifi-registry
       - name: logs
         persistentVolumeClaim:
           claimName: pvc-<ACUMOS_NAMESPACE>-logs
-      - name: certs-volume
-        configMap:
-          name: acumos-store
-          defaultMode: 0744
+      - name: nifi-certs
+        secret:
+          secretName: nifi-certs
