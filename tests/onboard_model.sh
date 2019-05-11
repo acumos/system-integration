@@ -35,19 +35,22 @@
 #.   insecure: optional flag allowing onboarding to insecure server (installed
 #.      with self-signed server cert, as needed for test platforms)
 
-trap 'fail' ERR
-
 function fail() {
-  log "$1"
-  cd $WORK_DIR
-  rm $json
+  reason="$1"
+  fname=$(caller 0 | awk '{print $2}')
+  fline=$(caller 0 | awk '{print $1}')
+  if [[ "$1" == "" ]]; then reason="unknown failure at $fname $fline"; fi
+  log "$reason"
   exit 1
 }
 
 function log() {
-  f=$(caller 0 | awk '{print $2}')
-  l=$(caller 0 | awk '{print $1}')
-  echo; echo "$f:$l ($(date)) $1"
+  setx=${-//[^x]/}
+  set +x
+  fname=$(caller 0 | awk '{print $2}')
+  fline=$(caller 0 | awk '{print $1}')
+  echo; echo "$fname:$fline ($(date)) $1"
+  if [[ -n "$setx" ]]; then set -x; else set +x; fi
 }
 
 function onboard() {
@@ -93,8 +96,7 @@ function onboard() {
     log "Onboarding $model failed at host $host"
     cat $json
   else
-    status=$(jq -r '.status' $json)
-    if [[ "$status" != "ERROR" ]]; then
+    if [[ "$(jq -r '.status' $json)" == "SUCCESS" ]]; then
       log "Onboarding $model succeeded at host $host"
     else
       log "Onboarding $model failed at host $host"
@@ -103,6 +105,7 @@ function onboard() {
   fi
 }
 
+trap 'fail' ERR
 if [[ "$#" -lt 4 ]]; then
   echo "All required parameters not provided"
   if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then grep '#\.' $0; fi
