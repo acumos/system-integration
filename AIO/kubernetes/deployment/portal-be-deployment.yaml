@@ -46,173 +46,219 @@ spec:
         env:
         - name: SPRING_APPLICATION_JSON
           value: '{
-                    "server": {
-                      "port": 8083,
-                      "contextPath": "/"
-                    },
-                    "docker": {
-                      "host": "<ACUMOS_DOCKER_API_HOST>",
-                      "port": "<ACUMOS_DOCKER_API_PORT>",
-                      "registry": {
-                        "url": "http://<ACUMOS_DOCKER_REGISTRY_HOST>:<ACUMOS_DOCKER_MODEL_PORT>/",
-                        "username": "<ACUMOS_DOCKER_REGISTRY_USER>",
-                        "password": "<ACUMOS_DOCKER_REGISTRY_PASSWORD>",
-                        "email": "<ACUMOS_ADMIN_EMAIL>"
-                      },
-                      "imagetag": {
-                        "prefix": "<ACUMOS_DOCKER_IMAGETAG_PREFIX>"
-                      }
-                    },
-                    "nexus": {
-                      "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/<ACUMOS_NEXUS_MAVEN_REPO_PATH>/<ACUMOS_NEXUS_MAVEN_REPO>/",
-                      "proxy": "",
-                      "password": "<ACUMOS_NEXUS_RW_USER_PASSWORD>",
-                      "username": "<ACUMOS_NEXUS_RW_USER>",
-                      "groupid": "com.artifact"
-                    },
-                    "cdms": {
-                      "client": {
-                        "url": "http://cds-service:8000/ccds",
-                        "username": "<ACUMOS_CDS_USER>",
-                        "password": "<ACUMOS_CDS_PASSWORD>"
-                      }
-                    },
-                    "qanda": {
-                      "url": "https://stackoverflow.com"
-                    },
-                    "doc": {
-                      "url": "https://wiki.acumos.org"
-                    },
-                    "onboarding": {
-                      "push": {
-                        "model": {
-                          "url": "http://onboarding-service:8090/onboarding-app/v2/models",
-                          "dcae_url": "http://onboarding-service:8090/onboarding-app/v2/dcae_models"
-                        }
-                      },
-                      "cliPushUrl": "<ACUMOS_ONBOARDING_CLIPUSHURL>",
-                      "cliAuthUrl": "<ACUMOS_ONBOARDING_CLIAUTHURL>",
-                      "tokenmode": "<ACUMOS_ONBOARDING_TOKENMODE>"
-                    },
-                    "model": {
-                      "storage": {
-                        "folder": {
-                          "name": "/acumosWebOnboarding"
-                        }
-                      }
-                    },
-                    "portal": {
-                      "feature": {
-                        "publishSelfRequestEnabled": "false",
-                        "validateModel": "false",
-                        "email_service": "",
-                        "cas_enabled": "false",
-                        "download_bufferSize": 8,
-                        "signup_enabled": "true",
-                        "verifyAccount": "false",
-                        "verifyToken": {
-                          "exp_time": 24
-                        },
-                        "cloud_enabled": "[{\"cloudEnabled\": \"true\", \"cloudName\": \"azure\", \"cloudDisplayText\": \"Microsoft Azure\", \"imageUrl\": \"/images/deploy-cloud/microsoft_azure.png\" },{ \"cloudEnabled\": \"true\", \"cloudName\": \"rackspace\", \"cloudDisplayText\": \"Rackspace\", \"imageUrl\": \"/images/deploy-cloud/rackspace.png\" },{ \"cloudEnabled\": \"false\",  \"cloudName\": \"gcp\", \"cloudDisplayText\": \"Google Cloud Platform\", \"imageUrl\": \"/images/deploy-cloud/google_cloud_platform.png\" },{ \"cloudEnabled\": \"true\",  \"cloudName\": \"deploylocal\", \"cloudDisplayText\": \"Deploy To Local\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_local.png\" },{ \"cloudEnabled\": \"false\", \"cloudName\": \"whitebox\", \"cloudDisplayText\": \"Deploy To White Box\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_whitebox.png\" }]",
-                        "sv": {
-                          "enabled": "true",
-                          "api": "http://sv-scanning-service:9082/scan"
-                        }
-                      },
-                      "submitValidation": {
-                        "api": "http://validation-client-service:9603/status/v1.0/tasks"
-                      },
-                      "dashboard": {
-                        "url": "http://<ACUMOS_ELK_DOMAIN>:<ACUMOS_ELK_KIBANA_PORT>"
-                      },
-                      "mailjet": {
-                        "api": {
-                          "key": "replace-as-needed"
-                        },
-                        "secret": {
-                          "key": "replace-as-needed"
-                        },
-                        "address": {
-                          "from": "<ACUMOS_ADMIN_EMAIL>"
-                        }
-                      },
-                      "ui": {
-                        "server": {
-                          "address": "http://notused.com"
-                        }
-                      }
-                    },
-                    "spring": {
-                      "mail" : {
-                        "host" : "Provide the hostname",
-                        "port" : 25,
-                        "username" : "username",
-                        "password" : "password",
-                        "debug" : "true",
-                        "smtp" : {
-                          "starttls" : {
-                            "enable" : "true"
-                          },
-                          "auth" : "false"
-                        },
-                        "transport" : {
-                          "protocol" : "smtp"
-                        },
-                        "template" : {
-                          "folder" : {
-                            "path" : "/fmtemplates/"
-                          }
-                        }
-                      },
-                      "servlet": {
-                        "multipart": {
-                          "max-file-size": "1024MB",
-                          "max-request-size": "1024MB"
-                        }
-                      }
-                    },
-                    "client": {
-                      "ssl": {
-                        "key-store": "/app/certs/<ACUMOS_KEYSTORE>",
-                        "key-store-password": "<ACUMOS_KEYSTORE_PASSWORD>",
-                        "key-store-type": "PKCS12",
-                        "key-password": "<ACUMOS_CERT_KEY_PASSWORD>",
-                        "trust-store": "/app/certs/<ACUMOS_TRUSTSTORE>",
-                        "trust-store-password": "<ACUMOS_TRUSTSTORE_PASSWORD>"
-                      }
-                    },
-                    "gateway": {
-                      "url": "https://<ACUMOS_FEDERATION_HOST>:<ACUMOS_FEDERATION_LOCAL_PORT>"
-                    },
-                    "dcae": {
-                      "model": {
-                        "name": {
-                          "prefix": "ONAP"
-                        }
-                      }
-                    },
-                    "jwt": {
-                      "auth": {
-                        "timeout": "80000000"
-                      }
-                    },
-                    "cas": {
-                      "service": {
-                        "validate": {
-                          "url": "https://identity.linuxfoundation.org/cas/serviceValidate"
-                        }
-                      }
-                    },
-                    "document": {
-                      "size": "<ACUMOS_PORTAL_DOCUMENT_MAX_SIZE>"
-                    },
-                    "jupyter" : {
-                      "url" : "http://<ACUMOS_DOMAIN>/"
-                    },
-                    "image": {
-                      "size": "<ACUMOS_PORTAL_IMAGE_MAX_SIZE>"
-                    }
-                  }'
+            "logging": {
+              "level": {
+                "root": "INFO"
+              }
+            },
+            "server": {
+              "port": 8083,
+              "contextPath": "/"
+            },
+            "docker": {
+              "host": "<ACUMOS_DOCKER_API_HOST>",
+              "port": "<ACUMOS_DOCKER_API_PORT>",
+              "registry": {
+                "url": "http://<ACUMOS_DOCKER_REGISTRY_HOST>:<ACUMOS_DOCKER_MODEL_PORT>/",
+                "username": "<ACUMOS_DOCKER_REGISTRY_USER>",
+                "password": "<ACUMOS_DOCKER_REGISTRY_PASSWORD>",
+                "email": "<ACUMOS_ADMIN_EMAIL>"
+              },
+              "imagetag": {
+                "prefix": "<ACUMOS_DOCKER_IMAGETAG_PREFIX>"
+              }
+            },
+            "nexus": {
+              "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/<ACUMOS_NEXUS_MAVEN_REPO_PATH>/<ACUMOS_NEXUS_MAVEN_REPO>/",
+              "proxy": "",
+              "password": "<ACUMOS_NEXUS_RW_USER_PASSWORD>",
+              "username": "<ACUMOS_NEXUS_RW_USER>",
+              "groupid": "<ACUMOS_NEXUS_GROUP>"
+            },
+            "cdms": {
+              "client": {
+                "url": "http://<ACUMOS_CDS_HOST>:<ACUMOS_CDS_PORT>/ccds",
+                "username": "<ACUMOS_CDS_USER>",
+                "password": "<ACUMOS_CDS_PASSWORD>"
+              }
+            },
+            "qanda": {
+              "url": "https://stackoverflow.com"
+            },
+            "microservice" : {
+              "url" : "http://msg-service:8336/microservice-generation/v2/generateMicroservice"
+            },
+            "doc": {
+              "url": "https://wiki.acumos.org"
+            },
+            "onboarding": {
+              "push": {
+                "model": {
+                  "url": "http://onboarding-service:8090/onboarding-app/v2/models",
+                  "dcae_url": "http://onboarding-service:8090/onboarding-app/v2/dcae_models"
+                }
+              },
+              "cliPushUrl": "<ACUMOS_ONBOARDING_CLIPUSHURL>",
+              "cliAuthUrl": "<ACUMOS_ONBOARDING_CLIAUTHURL>",
+              "tokenmode": "<ACUMOS_ONBOARDING_TOKENMODE>"
+            },
+            "model": {
+              "storage": {
+                "folder": {
+                  "name": "/acumosWebOnboarding"
+                }
+              }
+            },
+            "portal": {
+              "feature": {
+                "publishSelfRequestEnabled": "<ACUMOS_PORTAL_PUBLISH_SELF_REQUEST_ENABLED>",
+                "enablePublication": "<ACUMOS_PORTAL_ENABLE_PUBLICATION>",
+                "validateModel": "false",
+                "email_service": "<ACUMOS_EMAIL_SERVICE>",
+                "cas_enabled": "<ACUMOS_CAS_ENABLE>",
+                "download_bufferSize": 8,
+                "signup_enabled": "true",
+                "verifyAccount": "<ACUMOS_VERIFY_ACCOUNT>",
+                "verifyToken": {
+                  "exp_time": <ACUMOS_TOKEN_EXP_TIME>
+                },
+                "sv": {
+                  "enabled": "<ACUMOS_ENABLE_SECURITY_VERIFICATION>",
+                  "api": "http://sv-scanning-service:9082/scan"
+                },
+                "menu": "[
+                  {\"name\": \" ML Learning Path\",
+                   \"url\": \"\",
+                   \"imagePath\": \"/images/sidebar-icons/ML_learning_path_selected.png\" }]",
+                "cloud_enabled": "[
+                  { \"cloudEnabled\": \"true\", \"cloudName\": \"azure\",
+                    \"cloudDisplayText\": \"Microsoft Azure\",
+                    \"imageUrl\": \"/images/deploy-cloud/microsoft_azure.png\" },
+                  { \"cloudEnabled\": \"true\", \"cloudName\": \"rackspace\",
+                    \"cloudDisplayText\": \"Rackspace\",
+                    \"imageUrl\": \"/images/deploy-cloud/rackspace.png\" },
+                  { \"cloudEnabled\": \"false\", \"cloudName\": \"gcp\",
+                    \"cloudDisplayText\": \"Google Cloud Platform\",
+                    \"imageUrl\": \"/images/deploy-cloud/google_cloud_platform.png\" },
+                  { \"cloudEnabled\": \"true\",  \"cloudName\": \"deploylocal\",
+                    \"cloudDisplayText\": \"Deploy To Local\",
+                    \"imageUrl\": \"/images/deploy-cloud/deploy_to_local.png\" },
+                  { \"cloudEnabled\": \"false\", \"cloudName\": \"whitebox\",
+                    \"cloudDisplayText\": \"Deploy To White Box\",
+                    \"imageUrl\": \"/images/deploy-cloud/deploy_to_whitebox.png\" }]"
+                },
+              "ui": {
+                "server": {
+                  "address": "https://<ACUMOS_DOMAIN>"
+                }
+              },
+              "submitValidation": {
+                "api": "http://validation-client-service:9603/status/v1.0/tasks"
+              },
+              "dashboard": {
+                "url": "http://<ACUMOS_ELK_DOMAIN}:<ACUMOS_ELK_KIBANA_PORT>"
+              },
+              "mailjet": {
+                "api": {
+                  "key": "<ACUMOS_MAILJET_API_KEY>"
+                },
+                "secret": {
+                  "key": "<ACUMOS_MAILJET_SECRET_KEY>"
+                },
+                "address": {
+                  "from": "<ACUMOS_MAILJET_ADMIN_EMAIL>"
+                }
+              }
+            },
+            "spring": {
+              "mail": {
+                "host" : "<ACUMOS_SPRING_MAIL_SERVICE_DOMAIN>",
+                "port" : <ACUMOS_SPRING_MAIL_SERVICE_PORT>,
+                "username" : "<ACUMOS_SPRING_MAIL_USERNAME>",
+                "password" : "<ACUMOS_SPRING_MAIL_PASSWORD>",
+                "debug" : "true",
+                "smtp" : {
+                  "starttls" : {
+                    "enable" : "<ACUMOS_SPRING_MAIL_STARTTLS>"
+                  },
+                  "auth" : "<ACUMOS_SPRING_MAIL_AUTH>"
+                },
+                "transport": {
+                  "protocol": "<ACUMOS_SPRING_MAIL_PROTOCOL>"
+                },
+                "template": {
+                  "folder": {
+                    "path": "/fmtemplates/"
+                  }
+                }
+              },
+              "servlet": {
+                "multipart": {
+                  "max-file-size": "1024MB",
+                  "max-request-size": "1024MB"
+                }
+              }
+            },
+            "client": {
+              "ssl": {
+                "key-store": "/app/certs/<ACUMOS_KEYSTORE_P12>",
+                "key-store-password": "<ACUMOS_KEYSTORE_PASSWORD>",
+                "key-store-type": "PKCS12",
+                "key-password": "<ACUMOS_CERT_KEY_PASSWORD>",
+                "trust-store": "/app/certs/<ACUMOS_TRUSTSTORE>",
+                "trust-store-password": "<ACUMOS_TRUSTSTORE_PASSWORD>"
+              }
+            },
+            "gateway": {
+              "url": "https://<ACUMOS_FEDERATION_HOST>:<ACUMOS_FEDERATION_LOCAL_PORT>"
+            },
+            "dcae": {
+              "model": {
+                "name": {
+                  "prefix": "ONAP"
+                }
+              }
+            },
+            "jwt": {
+              "auth": {
+                "secret": {
+                  "key": "<ACUMOS_JWT_KEY>"
+                },
+                "timeout": "80000000"
+              }
+            },
+            "cas": {
+              "service": {
+                "validate": {
+                  "url": "https://identity.linuxfoundation.org/cas/serviceValidate"
+                }
+              }
+            },
+            "logging": {
+              "level":  {
+                "org":   {
+                  "acumos": {
+                    "securityverification": "INFO",
+                    "portal": "INFO"
+                  }
+                }
+              }
+            },
+            "document": {
+              "size": "<ACUMOS_PORTAL_DOCUMENT_MAX_SIZE>"
+            },
+            "jupyter": {
+              "url": "https://<ACUMOS_DOMAIN>/hub/"
+            },
+            "kubernetes": {
+               "doc": {
+                  "url": "https://docs.acumos.org/"
+               }
+            },
+            "image": {
+              "size": "<ACUMOS_PORTAL_IMAGE_MAX_SIZE>"
+            }
+          }'
         ports:
         - containerPort: 8083
         volumeMounts:
@@ -227,7 +273,7 @@ spec:
           claimName: pvc-<ACUMOS_NAMESPACE>-logs
       - name: certs-volume
         configMap:
-          name: acumos-store
+          name: acumos-certs
       hostAliases:
       - ip: "<ACUMOS_HOST_IP>"
         hostnames:

@@ -48,64 +48,69 @@ spec:
         env:
         - name: SPRING_APPLICATION_JSON
           value: '{
-                    "federation": {
-                      "instance": "gateway",
-                      "instance.name": "aio",
-                      "operator": "<ACUMOS_OPERATOR_ID>",
-                      "address": "0.0.0.0",
-                      "server": {
-                        "port": 9084
-                      },
-                      "ssl": {
-                        "key-store": "/app/certs/<ACUMOS_KEYSTORE>",
-                        "key-store-password": "<ACUMOS_KEYSTORE_PASSWORD>",
-                        "key-store-type": "PKCS12",
-                        "key-password": "<ACUMOS_CERT_KEY_PASSWORD>",
-                        "trust-store": "/app/certs/<ACUMOS_TRUSTSTORE>",
-                        "trust-store-password": "<ACUMOS_TRUSTSTORE_PASSWORD>"
-                      }
-                    },
-                    "docker": {
-                      "host": "tcp://<ACUMOS_DOCKER_API_HOST>:<ACUMOS_DOCKER_API_PORT>",
-                      "registryURL": "http://<ACUMOS_DOCKER_REGISTRY_HOST>:<ACUMOS_DOCKER_MODEL_PORT>/",
-                      "registryUsername": "<ACUMOS_NEXUS_RW_USER>",
-                      "registryPassword": "<ACUMOS_NEXUS_RW_USER_PASSWORD>",
-                      "registryEmail": "<ACUMOS_ADMIN_EMAIL>"
-                    },
-                    "local": {
-                      "address": "0.0.0.0",
-                      "server": {
-                        "port": "9011"
-                      },
-                      "ssl": {
-                        "key-store": "/app/certs/<ACUMOS_KEYSTORE>",
-                        "key-store-password": "<ACUMOS_KEYSTORE_PASSWORD>",
-                        "key-store-type": "PKCS12",
-                        "key-password": "<ACUMOS_CERT_KEY_PASSWORD>",
-                        "trust-store": "/app/certs/<ACUMOS_TRUSTSTORE>",
-                        "trust-store-password": "<ACUMOS_TRUSTSTORE_PASSWORD>"
-                      }
-                    },
-                    "nexus": {
-                      "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/<ACUMOS_NEXUS_MAVEN_REPO_PATH>/<ACUMOS_NEXUS_MAVEN_REPO>/",
-                      "proxy": "",
-                      "password": "<ACUMOS_NEXUS_RW_USER_PASSWORD>",
-                      "username": "<ACUMOS_NEXUS_RW_USER>",
-                      "groupid": "org.acumos"
-                    },
-                    "peer": {
-                      "jobchecker": {
-                        "interval": 300
-                      }
-                    },
-                    "cdms": {
-                      "client": {
-                        "url": "http://cds-service:8000/ccds",
-                        "username": "<ACUMOS_CDS_USER>",
-                        "password": "<ACUMOS_CDS_PASSWORD>"
-                      }
-                    }
-                  }'
+            "logging": {
+              "level": {
+                "root": "INFO"
+              }
+            },
+            "federation": {
+              "instance": "gateway",
+              "instance.name": "aio",
+              "operator": "<ACUMOS_OPERATOR_ID>",
+              "address": "0.0.0.0",
+              "server": {
+                "port": 9084
+              },
+              "ssl": {
+                "key-store": "/app/certs/<ACUMOS_KEYSTORE_P12>",
+                "key-store-password": "<ACUMOS_KEYSTORE_PASSWORD>",
+                "key-store-type": "PKCS12",
+                "key-password": "<ACUMOS_CERT_KEY_PASSWORD>",
+                "trust-store": "/app/certs/<ACUMOS_TRUSTSTORE>",
+                "trust-store-password": "<ACUMOS_TRUSTSTORE_PASSWORD>"
+              }
+            },
+            "docker": {
+              "host": "tcp://<ACUMOS_DOCKER_API_HOST>:<ACUMOS_DOCKER_API_PORT>",
+              "registryURL": "http://<ACUMOS_DOCKER_REGISTRY_HOST>:<ACUMOS_DOCKER_MODEL_PORT>/",
+              "registryUsername": "<ACUMOS_NEXUS_RW_USER>",
+              "registryPassword": "<ACUMOS_NEXUS_RW_USER_PASSWORD>",
+              "registryEmail": "<ACUMOS_ADMIN_EMAIL>"
+            },
+            "local": {
+              "address": "0.0.0.0",
+              "server": {
+                "port": "9011"
+              },
+              "ssl": {
+                "key-store": "/app/certs/<ACUMOS_KEYSTORE_P12>",
+                "key-store-password": "<ACUMOS_KEYSTORE_PASSWORD>",
+                "key-store-type": "PKCS12",
+                "key-password": "<ACUMOS_CERT_KEY_PASSWORD>",
+                "trust-store": "/app/certs/<ACUMOS_TRUSTSTORE>",
+                "trust-store-password": "<ACUMOS_TRUSTSTORE_PASSWORD>"
+              }
+            },
+            "nexus": {
+              "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/<ACUMOS_NEXUS_MAVEN_REPO_PATH>/<ACUMOS_NEXUS_MAVEN_REPO>/",
+              "proxy": "",
+              "password": "<ACUMOS_NEXUS_RW_USER_PASSWORD>",
+              "username": "<ACUMOS_NEXUS_RW_USER>",
+              "groupid": "<ACUMOS_NEXUS_GROUP>"
+            },
+            "peer": {
+              "jobchecker": {
+                "interval": 300
+              }
+            },
+            "cdms": {
+              "client": {
+                "url": "http://<ACUMOS_CDS_HOST>:<ACUMOS_CDS_PORT>/ccds",
+                "username": "<ACUMOS_CDS_USER>",
+                "password": "<ACUMOS_CDS_PASSWORD>"
+              }
+            }
+          }'
         ports:
         - containerPort: 9084
         - containerPort: 9011
@@ -121,7 +126,7 @@ spec:
           claimName: pvc-<ACUMOS_NAMESPACE>-logs
       - name: certs-volume
         configMap:
-          name: acumos-store
+          name: acumos-certs
       hostAliases:
       - ip: "<ACUMOS_HOST_IP>"
         hostnames:
