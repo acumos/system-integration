@@ -46,30 +46,35 @@ spec:
         env:
         - name: SPRING_APPLICATION_JSON
           value: '{
-                    "server": {
-                      "port": 8000
-                    },
-                    "spring": {
-                      "datasource": {
-                        "jdbc-url": "jdbc:mariadb://<ACUMOS_MARIADB_HOST>:<ACUMOS_MARIADB_PORT>/<ACUMOS_CDS_DB>?useLegacyDatetimeCode=false&useSSL=false",
-                        "username": "<ACUMOS_MARIADB_USER>",
-                        "password": "<ACUMOS_MARIADB_USER_PASSWORD>"
-                      },
-                      "jpa": {
-                        "database-platform": "org.hibernate.dialect.MariaDB102Dialect",
-                        "hibernate": {
-                          "ddl-auto": "validate"
-                        },
-                        "show-sql" : false
-                      },
-                      "security": {
-                        "user": {
-                          "name": "<ACUMOS_CDS_USER>",
-                          "password": "<ACUMOS_CDS_PASSWORD>"
-                        }
-                      }
-                    }
-                 }'
+            "logging": {
+              "level": {
+                "root": "INFO"
+              }
+            },
+            "server": {
+              "port": 8000
+            },
+            "spring": {
+              "datasource": {
+                "jdbc-url": "jdbc:mariadb://<ACUMOS_MARIADB_HOST>:<ACUMOS_MARIADB_PORT>/<ACUMOS_CDS_DB>?useLegacyDatetimeCode=false&useSSL=false",
+                "username": "<ACUMOS_MARIADB_USER>",
+                "password": "<ACUMOS_MARIADB_USER_PASSWORD>"
+              },
+              "jpa": {
+                "database-platform": "org.hibernate.dialect.MariaDB102Dialect",
+                "hibernate": {
+                  "ddl-auto": "validate"
+                },
+                "show-sql" : false
+              },
+              "security": {
+                "user": {
+                  "name": "<ACUMOS_CDS_USER>",
+                  "password": "<ACUMOS_CDS_PASSWORD>"
+                }
+              }
+            }
+          }'
         ports:
         - containerPort: 8000
         volumeMounts:

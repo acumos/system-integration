@@ -19,42 +19,47 @@ version: '3.2'
 
 # docker-compose for common-data-svc
 services:
-   cds-service:
-       image: ${COMMON_DATASERVICE_IMAGE}
-       environment:
-           SPRING_APPLICATION_JSON: "{
-                \"server\": {
-                    \"port\": 8000
+  cds-service:
+    image: ${COMMON_DATASERVICE_IMAGE}
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "logging": {
+          "level": {
+            "root": "INFO"
+          }
+        },
+        "server": {
+          "port": 8000
+        },
+        "spring": {
+            "datasource": {
+                "jdbc-url": "jdbc:mariadb://${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_PORT}/${ACUMOS_CDS_DB}?useLegacyDatetimeCode=false&useSSL=false",
+                "username": "${ACUMOS_MARIADB_USER}",
+                "password": "${ACUMOS_MARIADB_USER_PASSWORD}"
+            },
+            "jpa": {
+                "database-platform": "org.hibernate.dialect.MariaDB102Dialect",
+                "hibernate": {
+                    "ddl-auto": "validate"
                 },
-                \"spring\": {
-                    \"datasource\": {
-                        \"jdbc-url\": \"jdbc:mariadb://${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_PORT}/${ACUMOS_CDS_DB}?useLegacyDatetimeCode=false&useSSL=false\",
-                        \"username\": \"${ACUMOS_MARIADB_USER}\",
-                        \"password\": \"${ACUMOS_MARIADB_USER_PASSWORD}\"
-                    },
-                    \"jpa\": {
-                        \"database-platform\": \"org.hibernate.dialect.MariaDB102Dialect\",
-                        \"hibernate\": {
-                            \"ddl-auto\": \"validate\"
-                        },
-                       \"show-sql\" : false
-                    },
-                    \"security\": {
-                        \"user\": {
-                            \"name\"    : \"${ACUMOS_CDS_USER}\",
-                            \"password\": \"${ACUMOS_CDS_PASSWORD}\"
-                        }
-                    }
-                 }
-           }"
-       ports:
-         - "${ACUMOS_CDS_NODEPORT}:8000"
-       volumes:
-           - type: bind
-             source: /mnt/${ACUMOS_NAMESPACE}/logs
-             target: /maven/logs
-       logging:
-           driver: json-file
-       extra_hosts:
-           - "${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_HOST_IP}"
-       restart: on-failure
+               "show-sql" : false
+            },
+            "security": {
+                "user": {
+                    "name"    : "${ACUMOS_CDS_USER}",
+                    "password": "${ACUMOS_CDS_PASSWORD}"
+                }
+            }
+         }
+      }'
+    ports:
+      - "${ACUMOS_CDS_NODEPORT}:8000"
+    volumes:
+      - type: bind
+        source: /mnt/${ACUMOS_NAMESPACE}/logs
+        target: /maven/logs
+    logging:
+      driver: json-file
+    extra_hosts:
+      - "${ACUMOS_MARIADB_HOST}:${ACUMOS_MARIADB_HOST_IP}"
+    restart: on-failure
