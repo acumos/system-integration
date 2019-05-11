@@ -23,8 +23,7 @@
 # then invokes docker-compose with the command-line arguments.
 #
 # Usage:
-# $ bash docker_compose.sh <AIO_ROOT> <beat> [options]
-#   AIO_ROOT: path to AIO folder where environment files are
+# $ bash docker_compose.sh <beat> [options]
 #   beat: filebeat|metricbeat
 #   options: optional parameters to docker-compose.
 #
@@ -32,8 +31,7 @@
 if [[ $# -lt 2 ]]; then
   cat <<'EOF'
 Usage:
-$ bash docker_compose.sh <AIO_ROOT> <beat> [options]
-  AIO_ROOT: path to AIO folder where environment files are
+$ bash docker_compose.sh <beat> [options]
   beat: filebeat|metricbeat
   options: optional parameters to docker-compose.
 EOF
@@ -43,9 +41,11 @@ fi
 
 set -x
 WORK_DIR=$(pwd)
-export AIO_ROOT=$1
+cd $(dirname "$0")
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ..; pwd -P)"; fi
+source $AIO_ROOT/utils.sh
 source $AIO_ROOT/acumos_env.sh
-cd $(dirname "$0")/docker
-cmd="$3 $4 $5 $6"
-docker-compose -f acumos/$2.yml $cmd
+cd docker
+cmd="$2 $3 $4 $5 $6"
+docker-compose -f acumos/$1.yml $cmd
 cd $WORK_DIR
