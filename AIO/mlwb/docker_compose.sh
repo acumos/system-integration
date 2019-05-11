@@ -1,4 +1,4 @@
-apiVersion: v1
+#!/bin/bash
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -16,22 +16,41 @@ apiVersion: v1
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
+#
+# What this is:
+# Deployment script for the Acumos MLWB service under docker.
+# Sets environment variables needed by docker-compose in all-in-one environment
+# then invokes docker-compose with the command-line arguments.
+#
+# Usage:
+# $ bash docker_compose.sh <AIO_ROOT> [options]
+#   AIO_ROOT: path to AIO folder where environment files are
+#   options: optional parameters to docker-compose.
+#
 
-# What this is: kubernetes template for Acumos portal-fe service
-# How to use:
+if [[ $# -lt 1 ]]; then
+  cat <<'EOF'
+Usage:
+$ bash docker_compose.sh <AIO_ROOT> [options]
+  AIO_ROOT: path to AIO folder where environment files are
+  options: optional parameters to docker-compose.
+EOF
+  echo "All parameters not provided"
+  exit 1
+fi
 
-kind: Service
-metadata:
-  namespace: <ACUMOS_NAMESPACE>
-  name: kong-service
-  labels:
-    app: kong
-spec:
-  selector:
-    app: kong
-  type: NodePort
-  ports:
-  - name: kong-proxy-ssl-port
-    nodePort: <ACUMOS_KONG_PROXY_SSL_PORT>
-    port: 8443
-    targetPort: 8443
+set -x
+WORK_DIR=$(pwd)
+export AIO_ROOT=$1
+source $AIO_ROOT/acumos_env.sh
+cd $(dirname "$0")
+source mlwb_env.sh
+opts=""
+files=$(ls docker/acumos)
+for file in $files ; do
+ opts="$opts -f acumos/$file"
+done
+cmd="$2 $3 $4 $5"
+cd docker
+docker-compose $opts $cmd
+cd $WORK_DIR

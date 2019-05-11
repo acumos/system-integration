@@ -460,6 +460,7 @@ function replace_env() {
   else files="$1/*.yaml"; fi
   vars=$(grep -Rho '<[^<.]*>' $files | sed 's/<//' | sed 's/>//' | sort | uniq)
   for f in $files; do
+    echo "Replacing env variables in $f"
     for v in $vars ; do
       eval vv=\$$v
       sedi "s~<$v>~$vv~g" $f
@@ -517,7 +518,7 @@ function find_user() {
   log "Find user $1"
   local tmp="/tmp/$(uuidgen)"
   curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    -k https://$ACUMOS_HOST:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/user
+    -k https://$ACUMOS_HOST/ccds/user
   users=$(jq -r '.content | length' $tmp)
   i=0; userId=""
   # Disable trap as not finding the user will trigger ERR

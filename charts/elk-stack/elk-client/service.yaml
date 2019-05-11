@@ -1,8 +1,7 @@
-apiVersion: v1
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
-# Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
 # ===================================================================================
 # This Acumos software file is distributed by AT&T and Tech Mahindra
 # under the Apache License, Version 2.0 (the "License");
@@ -16,21 +15,23 @@ apiVersion: v1
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
-#
-# What this is: kubernetes template for Acumos Nifi Registry service
-
+apiVersion: v1
 kind: Service
 metadata:
-  namespace: <ACUMOS_NAMESPACE>
-  name: nifi-registry-service
+  name: elasticsearch
+  namespace: "{{ .Values.namespace }}"
   labels:
-    app: nifi-registry
+    app: elasticsearch
 spec:
-  selector:
-    app: nifi-registry
   type: NodePort
   ports:
-  - name: nifi-registry-port
-    nodePort: <ACUMOS_NIFI_REGISTRY_PORT>
-    port: 8443
-    targetPort: 8443
+    - name: elasticsearch-port
+      nodePort: {{ .Values.elasticsearch.port }}
+      port: 9300
+      targetPort: 9300
+    - name: elasticsearch-index-port
+      nodePort: {{ .Values.elasticsearch.indexPort }}
+      port: 9200
+      targetPort: 9200
+  selector:
+    app: elasticsearch
