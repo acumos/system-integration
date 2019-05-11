@@ -17,36 +17,23 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-#. What this is: script to setup kubectl access to a k8s cluster
-#.
-#. Prerequisites:
-#. - Ubuntu Xenial/Bionic, Centos 7, MacOS 10.11-14, or Windows 7/10 x64 workstation
-#. - Privilege to install software on your workstation (or get it installed
-#.   prior to running this script)
-#. - k8s cluster installed and accessible via key-based SSH
-#. - for software installations, setup the shell env variables for
-#.   http_proxy and https_proxy, per your work location requirements
-#. - For Windows, git bash or equivalent installed and used to run this script
-#.
-#. Usage: on the workstation,
-#. $ bash setup_kubectl.sh <server> <user> <namespace>
-#.   server: IP address or hostname of k8s master node
-#.   user: user of k8s master node
-#.   namespace: namespace to use
-#.
-
-trap 'fail' ERR
-
-function fail() {
-  log "$1"
-  exit 1
-}
-
-function log() {
-  fname=$(caller 0 | awk '{print $2}')
-  fline=$(caller 0 | awk '{print $1}')
-  echo; echo "$fname:$fline ($(date)) $1"
-}
+# What this is: script to setup kubectl access to a k8s cluster
+#
+# Prerequisites:
+# - Ubuntu Xenial/Bionic, Centos 7, MacOS 10.11-14, or Windows 7/10 x64 workstation
+# - Privilege to install software on your workstation (or get it installed
+#   prior to running this script)
+# - k8s cluster installed and accessible via key-based SSH
+# - for software installations, setup the shell env variables for
+#   http_proxy and https_proxy, per your work location requirements
+# - For Windows, git bash or equivalent installed and used to run this script
+#
+# Usage: on the workstation,
+# $ bash setup_kubectl.sh <server> <user> <namespace>
+#   server: IP address or hostname of k8s master node
+#   user: user of k8s master node
+#   namespace: namespace to use
+#
 
 function get_dist() {
   if [[ $(bash --version | grep -c -e redhat-linux -e pc-linux) -gt 0 ]]; then
@@ -117,11 +104,32 @@ EOF
   fi
 }
 
-export WORK_DIR=$(pwd)
+if [[ $# -lt 3 ]]; then
+  cat <<'EOF'
+Usage:
+  Usage: on the workstation,
+  $ bash setup_kubectl.sh <server> <user> <namespace>
+    server: IP address or hostname of k8s master node
+    user: user of k8s master node
+    namespace: namespace to use
+EOF
+  echo "All parameters not provided"
+  exit 1
+fi
+
+set -x
+trap 'fail' ERR
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../AIO; pwd -P)"; fi
+source $AIO_ROOT/utils.sh
 server=$1
 user=$2
 namespace=$3
 setup_prereqs
+
+kubectl config delete-cluster $server && true
+kubectl config delete-context $server-$namespace && true
 
 ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $user@$server kubectl config view
 APISERVER=$(ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
@@ -129,16 +137,19 @@ APISERVER=$(ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
 if [[ "$APISERVER" == "" ]]; then
   fail "Unable to retrieve API server URL"
 fi
+log "APISERVER=$APISERVER"
 SECRET=$(ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $user@$server \
   kubectl get secrets | grep -m1 ^default-token | cut -f1 -d ' ')
 if [[ "$SECRET" == "" ]]; then
   fail "Unable to retrieve default-token secret"
 fi
+log "SECRET=$SECRET"
 TOKEN=$(ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $user@$server \
   kubectl describe secret $SECRET | grep -E '^token' | cut -f2 -d':' | tr -d " ")
 if [[ "$TOKEN" == "" ]]; then
   fail "Unable to retrieve token"
 fi
+log "TOKEN=$TOKEN"
 curl $APISERVER/api --header "Authorization: Bearer $TOKEN" --insecure
 
 kubectl config set-cluster $server --server=$APISERVER \
@@ -148,10 +159,10 @@ kubectl config set-context $server-$namespace --cluster=$server \
 kubectl config set-credentials $user --token=$TOKEN
 kubectl config use-context $server-$namespace
 
-if [[ $(kubectl get pods --all-namespaces | grep -c kube-system) -gt 0 ]]; then
+if [[ $(kubectl get namespaces | grep -c kube-system) -gt 0 ]]; then
   log "Setup is complete!"
 else
-  fail "Setup failed - unable to retrieve pods"
+  fail "Setup failed"
 fi
 
 cd $WORK_DIR

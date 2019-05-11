@@ -26,23 +26,6 @@
 # - bash setup_docker.sh
 #
 
-set -x
-
-function fail() {
-  log "$1"
-  exit 1
-}
-
-trap 'fail' ERR
-
-function log() {
-  set +x
-  fname=$(caller 0 | awk '{print $2}')
-  fline=$(caller 0 | awk '{print $1}')
-  echo; echo "$fname:$fline ($(date)) $1"
-  set -x
-}
-
 function wait_dpkg() {
   # TODO: workaround for "E: Could not get lock /var/lib/dpkg/lock - open (11: Resource temporarily unavailable)"
   echo; echo "waiting for dpkg to be unlocked"
@@ -52,6 +35,7 @@ function wait_dpkg() {
 }
 
 setup() {
+  trap 'fail' ERR
   if [[ "$HOST_OS" == "ubuntu" ]]; then
     # Per https://kubernetes.io/docs/setup/independent/install-kubeadm/
     log "Install latest docker.ce"
@@ -93,6 +77,12 @@ setup() {
   sudo chmod +x /usr/local/bin/docker-compose
 }
 
-export HOST_OS=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
-export HOST_OS_VER=$(grep -m 1 'VERSION_ID=' /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
+set -x
+trap 'fail' ERR
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../AIO; pwd -P)"; fi
+source $AIO_ROOT/utils.sh
+verify_ubuntu_or_centos
 setup
+cd $WORK_DIR

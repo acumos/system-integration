@@ -17,17 +17,14 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# What this is: script to setup the mariadb for Acumos, under docker or k8s
+# What this is: script to setup the mariadb for Acumos, under docker
 #
 # Prerequisites:
 # - Acumos core components through oneclick_deploy.sh
 #
 # Usage:
 # For docker-based deployments, run this script on the AIO host.
-# For k8s-based deployment, run this script on the AIO host or a workstation
-# connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
-# $ bash setup_mariadb.sh <AIO_ROOT>
-#   AIO_ROOT: path to AIO folder where environment files are
+# $ bash setup_mariadb.sh
 #
 # NOTE: Redeploying MariaDB with an existing DB is not yet supported
 #
@@ -42,10 +39,12 @@ function clean_mariadb() {
 }
 
 function setup_mariadb() {
+  trap 'fail' ERR
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     bash docker_compose.sh AIO_ROOT up -d --build --force-recreate
     wait_running mariadb-service
   else
+    create_namespace $ACUMOS_MARIADB_NAMESPACE
     log "Setup the mariadb-data PVC"
     setup_pvc mariadb-data $ACUMOS_MARIADB_NAMESPACE $MARIADB_DATA_PV_SIZE
 
@@ -71,26 +70,13 @@ function setup_mariadb() {
   done
 }
 
-
-if [[ $# -lt 1 ]]; then
-  cat <<'EOF'
-Usage:
-  For docker-based deployments, run this script on the AIO host.
-  For k8s-based deployment, run this script on the AIO host or a workstation
-  connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
-  $ bash setup_mariadb.sh <AIO_ROOT>
-    AIO_ROOT: path to AIO folder where environment files are
-EOF
-  echo "All parameters not provided"
-  exit 1
-fi
-
-WORK_DIR=$(pwd)
-export AIO_ROOT=$1
-source $AIO_ROOT/acumos_env.sh
-source $AIO_ROOT/utils.sh
+set -x
 trap 'fail' ERR
-cd $AIO_ROOT/mariadb
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ..; pwd -P)"; fi
+source $AIO_ROOT/utils.sh
+source $AIO_ROOT/acumos_env.sh
 clean_mariadb
 setup_mariadb
 cd $WORK_DIR

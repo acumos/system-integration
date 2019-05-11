@@ -28,11 +28,11 @@
 #   See setup_mariadb_env.sh for the default values.
 #
 # Usage: from the k8s master or a host setup use kubectl/helm remotely
-# $ bash setup_mariadb.sh <AIO_ROOT> <mariadb_host> <k8s_dist>
-#   AIO_ROOT: path to AIO folder where environment files are
+# $ bash setup_mariadb.sh <mariadb_host> <k8s_dist> [prep]
 #   mariadb_host: hostname or FQDN of mariadb service. Must be resolvable locally
 #     or thru DNS. Can be the hostname of the k8s master node.
 #   k8s_dist: kubernetes distribtion (generic|openshift)
+#   prep: (optional) run prerequisite setup steps (requires sudo)
 #
 # - To use a MariaDB service deployed with this script for an Acumos platform,
 #   use the variables saved in mariadb_env.sh to configure the platform, e.g.
@@ -45,35 +45,29 @@
 # - Add ingress controller and drop use of NodePort
 # - Fix issues in upstream chart (templates/initialization-configmap.yaml)
 
-set -x
-
-function mariadb_fail() {
-  set +x
-  trap - ERR
-  reason="$1"
-  if [[ "$1" == "" ]]; then reason="unknown failure at $fname $fline"; fi
-  log "$reason"
-  sedi 's/DEPLOY_RESULT=.*/DEPLOY_RESULT=fail/' mariadb_env.sh
-  sedi "s~FAIL_REASON=.*~FAIL_REASON=$reason~" mariadb_env.sh
-  exit 1
-}
-
 function mariadb_customize_values() {
-  trap 'mariadb_fail' ERR
+  trap 'fail' ERR
   rm -rf /tmp/charts
   git clone https://github.com/helm/charts.git /tmp/charts
   cd /tmp/charts/stable/mariadb
-  sedi 's/type: ClusterIP/type: NodePort/' values.yaml
-  sedi 's/# nodePort:/nodePort:/' values.yaml
-  sedi 's/#   master: 30001/   master: 30001/' values.yaml
-  sedi "s/  password:\$/  password: $ACUMOS_MARIADB_PASSWORD/" values.yaml
-  sedi "s/  password:\$/  password: $ACUMOS_MARIADB_USER_PASSWORD/" values.yaml
-  sedi "s/  user:/  user: $ACUMOS_MARIADB_USER/" values.yaml
-  sedi "s/  name: my_database/  name: $ACUMOS_CDS_DB/" values.yaml
+  # mariadb 10.2+ breaks insertion of rows with non-default values.
+  # Set sql_mode="" (remove the default strict mode as of 10.2)
+  # See https://mariadb.com/kb/en/library/sql-mode/
+  # If this fails to work at some point, checkout known working version
+  # git checkout c4cc463af34266b703d4e952f100fb6051d2ee76
+  # Commit https://github.com/helm/charts/commit/85a033f50d6027fa8113c3e93c2c0a6723ab426a#diff-f1be10c8c772fb7b13251e5510c3044e
+  sed -i -- '/    \[mysqld\]/a\ \ \ \ sql_mode=""' values.yaml
+  sed -i -- 's/type: ClusterIP/type: NodePort/' values.yaml
+  sed -i -- 's/# nodePort:/nodePort:/' values.yaml
+  sed -i -- 's/#   master: 30001/   master: 30001/' values.yaml
+  sed -i -- "s/  password:\$/  password: $ACUMOS_MARIADB_PASSWORD/" values.yaml
+  sed -i -- "s/  password:\$/  password: $ACUMOS_MARIADB_USER_PASSWORD/" values.yaml
+  sed -i -- "s/  user:/  user: $ACUMOS_MARIADB_USER/" values.yaml
+  sed -i -- "s/  name: my_database/  name: $ACUMOS_CDS_DB/" values.yaml
 }
 
 function mariadb_customize_sql() {
-  trap 'mariadb_fail' ERR
+  trap 'fail' ERR
   cd /tmp/charts/stable/mariadb
   # Issue bug to https://github.com/helm/charts/tree/master/stable/mariadb
   sed -i -- 's/{{ template "master.fullname" . }}/mariadb/' \
@@ -81,7 +75,7 @@ function mariadb_customize_sql() {
 }
 
 function mariadb_deploy_chart() {
-  trap 'mariadb_fail' ERR
+  trap 'fail' ERR
   if [[ ! $(helm upgrade --install mariadb --namespace $ACUMOS_MARIADB_NAMESPACE --values $WORK_DIR/values.yaml $1) ]]; then
     echo "MariaDB install via Helm failed"
     exit 1
@@ -89,19 +83,29 @@ function mariadb_deploy_chart() {
 }
 
 function mariadb_clean() {
-  trap 'mariadb_fail' ERR
+  trap 'fail' ERR
   if [[ $(helm list mariadb) ]]; then
     helm delete --purge mariadb
+    log "Helm release mariadb deleted"
   fi
   delete_namespace $ACUMOS_MARIADB_NAMESPACE
   # The PVC sometimes takes longer to be deleted than the namespace, probably
   # due to PV datta recycle operations; this can block later re-creation...
   delete_pvc mariadb-data $ACUMOS_MARIADB_NAMESPACE
+
+  if [[ "$prep" == "prep" ]]; then
+    reset_pv mariadb-data $ACUMOS_MARIADB_NAMESPACE \
+      $MARIADB_DATA_PV_SIZE "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
+  fi
 }
 
 function mariadb_setup() {
-  trap 'mariadb_fail' ERR
+  trap 'fail' ERR
   local WORK_DIR=$(pwd)
+
+  if [[ "$prep" == "prep" ]]; then
+    bash $AIO_ROOT/../tools/setup_mariadb_client.sh
+  fi
 
   log "Create the values.yaml input for the Helm chart"
   # have to break out hierarchial values for master... does not work as a.b.c
@@ -176,29 +180,34 @@ EOF
   # CDS 2.2 added portal assets (images) to the DDL so we can't use a configmap
   # anymore (DDL > 1MB)
   bash $AIO_ROOT/setup_acumosdb.sh
+  update_env ACUMOS_SETUP_DB false force
 }
 
-
-if [[ $# -lt 3 ]]; then
+if [[ $# -lt 2 ]]; then
   cat <<'EOF'
 Usage: from the k8s master or a host setup use kubectl/helm remotely
-  $ bash setup_mariadb.sh <AIO_ROOT> <mariadb_host> <k8s_dist>
-    AIO_ROOT: path to AIO folder where environment files are
+  $ bash setup_mariadb.sh <mariadb_host> <k8s_dist>
     mariadb_host: hostname or FQDN of mariadb service. Must be resolvable locally
       or thru DNS. Can be the hostname of the k8s master node.
     k8s_dist: kubernetes distribtion (generic|openshift)
+    prep: (optional) run prerequisite setup steps (requires sudo)
 EOF
   echo "All parameters not provided"
   exit 1
 fi
 
+set -x
 WORK_DIR=$(pwd)
-export AIO_ROOT=$1
-export ACUMOS_MARIADB_HOST=$2
-export DEPLOYED_UNDER=k8s
-export K8S_DIST=$3
-source $AIO_ROOT/utils.sh
 cd $(dirname "$0")
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
+source $AIO_ROOT/utils.sh
+source $AIO_ROOT/acumos_env.sh
+export ACUMOS_MARIADB_HOST=$1
+get_host_ip $ACUMOS_MARIADB_HOST
+export ACUMOS_MARIADB_HOST_IP=$HOST_IP
+export DEPLOYED_UNDER=k8s
+export K8S_DIST=$2
+export prep=$3
 
 if [[ -e mariadb_env.sh ]]; then
   log "Using prepared mariadb_env.sh for customized environment values"
@@ -208,10 +217,11 @@ fi
 set_k8s_env
 
 source setup_mariadb_env.sh
+# Prevent ACUMOS_CDS_VERSION in mariadb-env fron overriding acumos_env.sh,
+# since it may be updated later by acumos_env.sh
+sed -i -- "s/ACUMOS_CDS_VERSION=/#ACUMOS_CDS_VERSION=/" mariadb_env.sh
+cp mariadb_env.sh $AIO_ROOT/.
 mariadb_clean
 mariadb_setup
 cd $(dirname "$0")
-# Prevent ACUMOS_CDS_VERSION in mariadb-env fron overriding acumos_env.sh,
-# since it may be updated later by acumos_env.sh
-sedi "s/ACUMOS_CDS_VERSION=/#ACUMOS_CDS_VERSION=/" mariadb_env.sh
 cd $WORK_DIR

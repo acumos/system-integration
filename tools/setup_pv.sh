@@ -36,19 +36,6 @@
 #   storageClassName: storageClassName to assign
 #
 
-trap 'fail' ERR
-
-function fail() {
-  log "$1"
-  exit 1
-}
-
-function log() {
-  fname=$(caller 0 | awk '{print $2}')
-  fline=$(caller 0 | awk '{print $1}')
-  echo; echo "$fname:$fline ($(date)) $1"
-}
-
 function run_tmp() {
   trap 'fail' ERR
   if [[ "$master" != "$HOSTNAME"* ]]; then
@@ -108,7 +95,28 @@ EOF
   run_tmp
 }
 
-export WORK_DIR=$(pwd)
+if [[ $# -lt 6 ]]; then
+  cat <<'EOF'
+ $ bash setup_pv.sh <setup|clean> <master> <username> <name> <path> <size> [storageClassName]
+   setup|clean: setup or remove (including host files)
+   master: IP address or hostname of k8s master node
+   username: username on the server where the master was installed (this is
+     the user who setup the cluster, and for which key-based SSH is setup)
+   name: name of the PV, e.g. "pv-001"
+   path: path of the host folder where 'name' should be created (if not existing)
+   size: size in Gi to allocate to the PV
+   storageClassName: storageClassName to assign
+EOF
+  echo "All parameters not provided"
+  exit 1
+fi
+
+set -x
+trap 'fail' ERR
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../AIO; pwd -P)"; fi
+source $AIO_ROOT/utils.sh
 action=$1
 master=$2
 username=$3

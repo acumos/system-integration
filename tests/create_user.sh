@@ -35,27 +35,32 @@
 #.   firstName: first name
 #.   lastName: last name
 #.   emailId: email address
-#.   role: optional role to set for the user (e.g. "admin")
+#.   role: optional role to set for the user (e.g. "Admin")
 #
 
 function fail() {
   reason="$1"
+  fname=$(caller 0 | awk '{print $2}')
+  fline=$(caller 0 | awk '{print $1}')
   if [[ "$1" == "" ]]; then reason="unknown failure at $fname $fline"; fi
   log "$reason"
   exit 1
 }
 
 function log() {
+  setx=${-//[^x]/}
+  set +x
   fname=$(caller 0 | awk '{print $2}')
   fline=$(caller 0 | awk '{print $1}')
   echo; echo "$fname:$fline ($(date)) $1"
+  if [[ -n "$setx" ]]; then set -x; else set +x; fi
 }
 
 function find_user() {
   log "Find user $1"
   local tmp="/tmp/$(uuidgen)"
   curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    -k https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/user
+    -k https://$ACUMOS_DOMAIN/ccds/user
   cat $tmp
   users=$(jq -r '.content | length' $tmp)
   i=0; userId=""
@@ -84,7 +89,7 @@ function register_user() {
 }
 EOF
   local jsonout="/tmp/$(uuidgen)"
-  local apiurl="https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT/api/users/register"
+  local apiurl="https://$ACUMOS_DOMAIN/api/users/register"
   curl -k -s -o $jsonout -X POST $apiurl \
     -H "Content-Type: application/json" -d @$jsoninp
   cat $jsonout
@@ -108,7 +113,7 @@ function find_role() {
   local tmp="/tmp/$(uuidgen)"
   log "Finding role name $1"
   curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    -k https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/role
+    -k https://$ACUMOS_DOMAIN/ccds/role
   cat $tmp
   roles=$(jq -r '.content | length' $tmp)
   i=0; roleId=""
@@ -127,7 +132,7 @@ function create_role() {
   log "Create role name $1"
   local tmp="/tmp/$(uuidgen)"
   curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST \
-  -k https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/role \
+  -k https://$ACUMOS_DOMAIN/ccds/role \
     -H "accept: */*" -H "Content-Type: application/json" \
     -d "{\"name\": \"$1\", \"active\": true}"
   cat $tmp
@@ -145,7 +150,7 @@ function assign_role() {
   log "Assign roleId $2 to userId $1"
   local tmp="/tmp/$(uuidgen)"
   curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST \
-    -k https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/user/$1/role/$2
+    -k https://$ACUMOS_DOMAIN/ccds/user/$1/role/$2
   status=$(jq -r '.status' $tmp)
   if [[ $status -ne 200 ]]; then
     cat $tmp
@@ -175,7 +180,7 @@ function setup_user() {
   fi
   log "Resulting user account record"
   curl -s -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    -k https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/user/$userId
+    -k https://$ACUMOS_DOMAIN/ccds/user/$userId
 }
 
 set -x

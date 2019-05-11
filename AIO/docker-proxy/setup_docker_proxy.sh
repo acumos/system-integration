@@ -28,11 +28,11 @@
 # For docker-based deployments, run this script on the AIO host.
 # For k8s-based deployment, run this script on the AIO host or a workstation
 # connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
-# $ bash setup_docker_proxy.sh <AIO_ROOT>
-#   AIO_ROOT: path to AIO folder where environment files are
+# $ bash setup_docker_proxy.sh
 #
 
 function clean_docker_proxy() {
+  trap 'fail' ERR
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     log "Stop any existing docker based components for docker-proxy"
     cs=$(docker ps -a | awk '/docker-proxy/{print $1}')
@@ -50,6 +50,7 @@ function clean_docker_proxy() {
     stop_service deploy/docker-proxy-service.yaml
     stop_deployment deploy/docker-proxy-deployment.yaml
   fi
+  cleanup_snapshot_images
 }
 
 setup_docker_proxy() {
@@ -69,15 +70,15 @@ setup_docker_proxy() {
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     log "Build the local acumos-docker-proxy image"
     docker build -t acumos-docker-proxy .
-    bash docker_compose.sh $AIO_ROOT up -d --build --force-recreate
+    bash docker_compose.sh up -d --build --force-recreate
   else
     log "Create kubernetes configmap for docker-proxy"
     # See use in docker-proxy deployment template
-    if [[ $($k8s_cmd get configmap -n $ACUMOS_NAMESPACE docker-proxy) ]]; then
+    if [[ $(kubectl get configmap -n $ACUMOS_NAMESPACE docker-proxy) ]]; then
       log "Delete existing docker-proxy configmap"
-      $k8s_cmd delete configmap -n $ACUMOS_NAMESPACE docker-proxy
+      kubectl delete configmap -n $ACUMOS_NAMESPACE docker-proxy
     fi
-    $k8s_cmd create configmap -n $ACUMOS_NAMESPACE docker-proxy \
+    kubectl create configmap -n $ACUMOS_NAMESPACE docker-proxy \
       --from-file=auth/nginx.conf,auth/domain.key,auth/domain.crt,auth/acumos_auth.py
 
     log "Deploy the k8s based components for docker-proxy"
@@ -88,28 +89,15 @@ setup_docker_proxy() {
     start_deployment deploy/docker-proxy-deployment.yaml
     wait_running docker-proxy $ACUMOS_NAMESPACE
   fi
-
 }
 
-if [[ $# -lt 1 ]]; then
-  cat <<'EOF'
-Usage:
-  For docker-based deployments, run this script on the AIO host.
-  For k8s-based deployment, run this script on the AIO host or a workstation
-  connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
-  $ bash setup_docker_proxy.sh <AIO_ROOT>
-    AIO_ROOT: path to AIO folder where environment files are
-EOF
-  echo "All parameters not provided"
-  exit 1
-fi
-
-WORK_DIR=$(pwd)
-export AIO_ROOT=$1
-source $AIO_ROOT/acumos_env.sh
-source $AIO_ROOT/utils.sh
+set -x
 trap 'fail' ERR
-cd $AIO_ROOT/docker-proxy
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ..; pwd -P)"; fi
+source $AIO_ROOT/utils.sh
+source $AIO_ROOT/acumos_env.sh
 clean_docker_proxy
 setup_docker_proxy
 cd $WORK_DIR
