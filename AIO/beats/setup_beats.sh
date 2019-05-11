@@ -111,15 +111,15 @@ function setup_beat() {
   fi
 }
 
-if [[ $# -lt 2 ]]; then
+if [[ $# -lt 1 ]]; then
   cat <<'EOF'
 Usage:
   For docker-based deployments, run this script on the AIO host.
   For k8s-based deployment, run this script on the AIO host or a workstation
   connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
-  $ bash setup_beats.sh <AIO_ROOT> <beat>
+  $ bash setup_beats.sh <AIO_ROOT> [beat]
     AIO_ROOT: path to AIO folder where environment files are
-    beat: filebeat|metricbeat
+    beat: filebeat|metricbeat (optional: default is to deploy both)
 EOF
   echo "All parameters not provided"
   exit 1
@@ -132,7 +132,11 @@ source $AIO_ROOT/utils.sh
 trap 'fail' ERR
 cd $AIO_ROOT/beats
 source beats_env.sh
-beat=$2
-clean_beat
-setup_beat
+if [[ "$2" == "" ]]; then beats="filebeat metricbeat"
+else beats=$2
+fi
+for beat in $beats; do
+  clean_beat
+  setup_beat
+done
 cd $WORK_DIR

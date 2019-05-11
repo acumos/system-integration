@@ -1,0 +1,9 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: namespace-admin
+rules:
+- apiGroups: [""]
+  resources: ["services", "deployments", "pods", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]

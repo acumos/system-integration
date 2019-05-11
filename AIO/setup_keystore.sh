@@ -69,12 +69,12 @@ function setup_keystore() {
   else
     log "Create kubernetes configmap to hold the keystore and truststore"
     # See use in deployment templates for portal-be and federation
-    if [[ $(kubectl get configmap -n $ACUMOS_NAMESPACE acumos-store) ]]; then
+    if [[ $(kubectl get configmap -n $ACUMOS_NAMESPACE acumos-certs) ]]; then
       log "Delete existing acumos-certs configmap in case cert changes were made"
-      kubectl delete configmap -n $ACUMOS_NAMESPACE acumos-store
+      kubectl delete configmap -n $ACUMOS_NAMESPACE acumos-certs
     fi
-    kubectl create configmap -n $ACUMOS_NAMESPACE acumos-store \
-      --from-file=certs/$ACUMOS_KEYSTORE,certs/$ACUMOS_TRUSTSTORE
+    kubectl create configmap -n $ACUMOS_NAMESPACE acumos-certs \
+      --from-file=certs/$ACUMOS_KEYSTORE_P12,certs/$ACUMOS_TRUSTSTORE,certs/$ACUMOS_CA_CERT,certs/$ACUMOS_CERT
   fi
 }
 

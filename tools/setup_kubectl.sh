@@ -35,8 +35,6 @@
 #.   namespace: namespace to use
 #.
 
-trap 'fail' ERR
-
 function fail() {
   log "$1"
   exit 1
@@ -123,22 +121,28 @@ user=$2
 namespace=$3
 setup_prereqs
 
+kubectl config delete-cluster $server && true
+kubectl config delete-context $server-$namespace && true
+
 ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $user@$server kubectl config view
 APISERVER=$(ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
   $user@$server kubectl config view | grep -m1 server | cut -f 2- -d ":" | tr -d " ")
 if [[ "$APISERVER" == "" ]]; then
   fail "Unable to retrieve API server URL"
 fi
+log "APISERVER=$APISERVER"
 SECRET=$(ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $user@$server \
   kubectl get secrets | grep -m1 ^default-token | cut -f1 -d ' ')
 if [[ "$SECRET" == "" ]]; then
   fail "Unable to retrieve default-token secret"
 fi
+log "SECRET=$SECRET"
 TOKEN=$(ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $user@$server \
   kubectl describe secret $SECRET | grep -E '^token' | cut -f2 -d':' | tr -d " ")
 if [[ "$TOKEN" == "" ]]; then
   fail "Unable to retrieve token"
 fi
+log "TOKEN=$TOKEN"
 curl $APISERVER/api --header "Authorization: Bearer $TOKEN" --insecure
 
 kubectl config set-cluster $server --server=$APISERVER \
@@ -148,10 +152,10 @@ kubectl config set-context $server-$namespace --cluster=$server \
 kubectl config set-credentials $user --token=$TOKEN
 kubectl config use-context $server-$namespace
 
-if [[ $(kubectl get pods --all-namespaces | grep -c kube-system) -gt 0 ]]; then
+if [[ $(kubectl get namespaces | grep -c kube-system) -gt 0 ]]; then
   log "Setup is complete!"
 else
-  fail "Setup failed - unable to retrieve pods"
+  fail "Setup failed"
 fi
 
 cd $WORK_DIR

@@ -1,0 +1,195 @@
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: mlwb-notebook
+  labels:
+    app: mlwb-notebook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlwb-notebook
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mlwb-notebook
+    spec:
+      imagePullSecrets:
+      - name: acumos-registry
+      containers:
+      - name: mlwb-notebook
+        image: <MLWB_NOTEBOOK_SERVICE_IMAGE>
+        env:
+        - name: SPRING_APPLICATION_JSON
+          value: '{
+            "server": {
+              "port": 9089
+            },
+            "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
+            "resultsetSize": 2000,
+            "outputFolder": "/tmp",
+            "cmndatasvc": {
+              "endpointurl": "http://cds-service:8000/ccds",
+              "user": "<ACUMOS_CDS_USER>",
+              "pwd": "<ACUMOS_CDS_PASSWORD>"
+            },
+            "projectservice": {
+              "url": "http://mlwb-project-service:9088/mlWorkbench/v1/project"
+            },
+            "jupyterhub": {
+              "url": "https://<ACUMOS_DOMAIN>:443/hub/",
+              "token":"8942750ecaea4262ad3d3c3e2c54a98c",
+              "storepass": "changeit"
+            },
+            "jupyternotebook": {
+              "url": "https://<ACUMOS_DOMAIN>:443/hub/"
+            },
+            "jwt" : {
+              "secretkey": "<ACUMOS_JWT_KEY>"
+            }
+          }'
+        command: ["/bin/bash", "-c"]
+        args:
+        - cd maven;
+          keytool -importkeystore -srckeystore certs/<ACUMOS_KEYSTORE_P12> -srcstorepass <ACUMOS_KEYSTORE_PASSWORD> -srcstoretype PKCS12 -destkeystore $JAVA_HOME/jre/lib/security/cacerts -deststorepass changeit -deststoretype JKS -noprompt;
+          java -Xms128m -Xmx512m -Djava.security.egd=file:/dev/./urandom -jar notebook-service*.jar;
+        ports:
+        - containerPort: 9089
+        volumeMounts:
+        - mountPath: /maven/logs
+          name: logs
+        - mountPath: /maven/certs
+          name: certs-volume
+      restartPolicy: Always
+      volumes:
+      - name: certs-volume
+        configMap:
+          name: acumos-certs
+      - name: logs
+        persistentVolumeClaim:
+          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+      hostAliases:
+      - ip: "<ACUMOS_HOST_IP>"
+        hostnames:
+        - "<ACUMOS_DOMAIN>"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: mlwb-notebook-webcomponent
+  labels:
+    app: mlwb-notebook-webcomponent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlwb-notebook-webcomponent
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mlwb-notebook-webcomponent
+    spec:
+      imagePullSecrets:
+      - name: acumos-registry
+      containers:
+      - name: mlwb-notebook-webcomponent
+        image: <MLWB_NOTEBOOK_WEBCOMPONENT_IMAGE>
+        env:
+        - name: ES_JAVA_OPTS
+          value: "-Xmx256m -Xms256m"
+        - name: ENVIRONMENT
+          value: "deploy"
+        - name: notebookmSURL
+          value: "http://mlwb-notebook-service:9089/mlWorkbench/v1/notebook"
+        - name: notebookWikiURL
+          value: "https://wiki.acumos.org/display/TRAIN"
+        ports:
+        - containerPort: 9086
+        volumeMounts:
+        - mountPath: /maven/logs
+          name: logs
+      restartPolicy: Always
+      volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+      hostAliases:
+      - ip: "<ACUMOS_HOST_IP>"
+        hostnames:
+        - "<ACUMOS_HOST>"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: mlwb-notebook-catalog-webcomponent
+  labels:
+    app: mlwb-notebook-catalog-webcomponent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlwb-notebook-catalog-webcomponent
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mlwb-notebook-catalog-webcomponent
+    spec:
+      imagePullSecrets:
+      - name: acumos-registry
+      containers:
+      - name: mlwb-notebook-catalog-webcomponent
+        image: <MLWB_NOTEBOOK_CATALOG_WEBCOMPONENT_IMAGE>
+        env:
+        - name: ES_JAVA_OPTS
+          value: "-Xmx256m -Xms256m"
+        - name: ENVIRONMENT
+          value: "deploy"
+        - name: projectmSURL
+          value: "http://mlwb-project-service:9088/mlWorkbench/v1/project"
+        - name: notebookmSURL
+          value: "http://mlwb-notebook-service:9089/mlWorkbench/v1/notebook"
+        - name: pipelinemSURL
+          value: "http://mlwb-pipeline-service:9090/mlWorkbench/v1/pipeline"
+        - name: notebookWikiURL
+          value: "https://wiki.acumos.org/display/TRAIN"
+        ports:
+        - containerPort: 9087
+        volumeMounts:
+        - mountPath: /maven/logs
+          name: logs
+      restartPolicy: Always
+      volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+      hostAliases:
+      - ip: "<ACUMOS_HOST_IP>"
+        hostnames:
+        - "<ACUMOS_HOST>"
