@@ -19,80 +19,85 @@ version: '3.2'
 
 # docker-compose for federation-gateway
 services:
-   federation-service:
-       image: ${FEDERATION_IMAGE}
-       environment:
-           SPRING_APPLICATION_JSON: "{
-               \"federation\": {
-                    \"instance\": \"gateway\",
-                    \"instance.name\": \"aio\",
-                    \"operator\": \"${ACUMOS_OPERATOR_ID}\",
-                    \"address\": \"0.0.0.0\",
-                    \"server\": {
-                       \"port\": 9084
-                    },
-                    \"ssl\": {
-                       \"key-store\": \"/app/certs/${ACUMOS_KEYSTORE}\",
-                       \"key-store-password\": \"${ACUMOS_KEYSTORE_PASSWORD}\",
-                       \"key-store-type\": \"PKCS12\",
-                       \"key-password\": \"${ACUMOS_CERT_KEY_PASSWORD}\",
-                       \"trust-store\": \"/app/certs/${ACUMOS_TRUSTSTORE}\",
-                       \"trust-store-password\": \"${ACUMOS_TRUSTSTORE_PASSWORD}\"
-                    }
-                },
-                \"docker\": {
-                   \"host\": \"tcp://${ACUMOS_DOCKER_API_HOST}:${ACUMOS_DOCKER_API_PORT}\",
-                   \"registryURL\": \"http://${ACUMOS_DOCKER_REGISTRY_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/\",
-                   \"registryUsername\": \"${ACUMOS_DOCKER_REGISTRY_USER}\",
-                   \"registryPassword\": \"${ACUMOS_DOCKER_REGISTRY_PASSWORD}\",
-                   \"registryEmail\": \"${ACUMOS_ADMIN_EMAIL}\"
-                },
-                \"local\": {
-                   \"address\": \"0.0.0.0\",
-                   \"server\": {
-                      \"port\": 9011
-                   },
-                   \"ssl\": {
-                      \"key-store\": \"/app/certs/${ACUMOS_KEYSTORE}\",
-                      \"key-store-password\": \"${ACUMOS_KEYSTORE_PASSWORD}\",
-                      \"key-store-type\": \"PKCS12\",
-                      \"key-password\": \"${ACUMOS_CERT_KEY_PASSWORD}\",
-                      \"trust-store\": \"/app/certs/${ACUMOS_TRUSTSTORE}\",
-                      \"trust-store-password\": \"${ACUMOS_TRUSTSTORE_PASSWORD}\"
-                   }
-                },
-                \"nexus\": {
-                   \"url\": \"http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/${ACUMOS_NEXUS_MAVEN_REPO_PATH}/${ACUMOS_NEXUS_MAVEN_REPO}/\",
-                   \"proxy\": \"\",
-                   \"password\": \"${ACUMOS_NEXUS_RW_USER_PASSWORD}\",
-                   \"username\": \"${ACUMOS_NEXUS_RW_USER}\",
-                   \"groupid\": \"org.acumos\"
-                },
-                \"peer\": {
-                    \"jobchecker\": {
-                        \"interval\": 300
-                    }
-                },
-                \"cdms\": {
-                  \"client\": {
-                     \"url\": \"http://cds-service:8000/ccds\",
-                     \"username\": \"${ACUMOS_CDS_USER}\",
-                     \"password\": \"${ACUMOS_CDS_PASSWORD}\"
-                  }
-               }
-           }"
-       ports:
-           - ${ACUMOS_FEDERATION_LOCAL_PORT}:9011
-           - ${ACUMOS_FEDERATION_PORT}:9084
-       volumes:
-           - type: bind
-             source: /mnt/${ACUMOS_NAMESPACE}/logs
-             target: /maven/logs
-           - type: bind
-             source: /mnt/${ACUMOS_NAMESPACE}/certs
-             target: /app/certs
-       logging:
-           driver: json-file
-       extra_hosts:
-           - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
-       restart: on-failure
+  federation-service:
+    image: ${FEDERATION_IMAGE}
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "logging": {
+          "level": {
+            "root": "${ACUMOS_LOG_LEVEL}"
+          }
+        },
+        "federation": {
+             "instance": "gateway",
+             "instance.name": "aio",
+             "operator": "${ACUMOS_OPERATOR_ID}",
+             "address": "0.0.0.0",
+             "server": {
+                "port": 9084
+             },
+             "ssl": {
+                "key-store": "/app/certs/${ACUMOS_KEYSTORE_P12}",
+                "key-store-password": "${ACUMOS_KEYSTORE_PASSWORD}",
+                "key-store-type": "PKCS12",
+                "key-password": "${ACUMOS_CERT_KEY_PASSWORD}",
+                "trust-store": "/app/certs/${ACUMOS_TRUSTSTORE}",
+                "trust-store-password": "${ACUMOS_TRUSTSTORE_PASSWORD}"
+             }
+        },
+        "docker": {
+          "host": "tcp://${ACUMOS_DOCKER_API_HOST}:${ACUMOS_DOCKER_API_PORT}",
+          "registryURL": "http://${ACUMOS_DOCKER_REGISTRY_HOST}:${ACUMOS_DOCKER_MODEL_PORT}/",
+          "registryUsername": "${ACUMOS_DOCKER_REGISTRY_USER}",
+          "registryPassword": "${ACUMOS_DOCKER_REGISTRY_PASSWORD}",
+          "registryEmail": "${ACUMOS_ADMIN_EMAIL}"
+        },
+        "local": {
+          "address": "0.0.0.0",
+          "server": {
+             "port": 9011
+          },
+          "ssl": {
+             "key-store": "/app/certs/${ACUMOS_KEYSTORE_P12}",
+             "key-store-password": "${ACUMOS_KEYSTORE_PASSWORD}",
+             "key-store-type": "PKCS12",
+             "key-password": "${ACUMOS_CERT_KEY_PASSWORD}",
+             "trust-store": "/app/certs/${ACUMOS_TRUSTSTORE}",
+             "trust-store-password": "${ACUMOS_TRUSTSTORE_PASSWORD}"
+          }
+        },
+        "nexus": {
+          "url": "http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/${ACUMOS_NEXUS_MAVEN_REPO_PATH}/${ACUMOS_NEXUS_MAVEN_REPO}/",
+          "proxy": "",
+          "password": "${ACUMOS_NEXUS_RW_USER_PASSWORD}",
+          "username": "${ACUMOS_NEXUS_RW_USER}",
+          "groupid": "<ACUMOS_NEXUS_GROUP>"
+        },
+        "peer": {
+          "jobchecker": {
+            "interval": 300
+          }
+        },
+        "cdms": {
+          "client": {
+            "url": "http://${ACUMOS_CDS_HOST}:${ACUMOS_CDS_PORT}/ccds",
+            "username": "${ACUMOS_CDS_USER}",
+            "password": "${ACUMOS_CDS_PASSWORD}"
+          }
+        }
+      }'
+    ports:
+      - ${ACUMOS_FEDERATION_LOCAL_PORT}:9011
+      - ${ACUMOS_FEDERATION_PORT}:9084
+    volumes:
+      - type: bind
+        source: /mnt/${ACUMOS_NAMESPACE}/logs
+        target: /maven/logs
+      - type: bind
+        source: /mnt/${ACUMOS_NAMESPACE}/certs
+        target: /app/certs
+    logging:
+      driver: json-file
+    extra_hosts:
+      - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
+    restart: on-failure

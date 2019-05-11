@@ -44,77 +44,80 @@ spec:
       - name: azure-client
         image: <AZURE_CLIENT_IMAGE>
         env:
-        - name: log_level
-          value: "DEBUG"
         - name: SPRING_APPLICATION_JSON
           value: '{
-                    "server": {
-                      "port": 9081
-                    },
-                    "docker": {
-                      "containerNamePrefix": "E6E-NSG",
-                      "host": "<ACUMOS_DOCKER_API_HOST>",
-                      "port": "<ACUMOS_DOCKER_API_PORT>",
-                      "dockerVMUserName": "<ACUMOS_DEPLOYED_VM_USER>",
-                      "dockerVMPassword": "<ACUMOS_DEPLOYED_VM_PASSWORD>",
-                      "replaceChar": "^",
-                      "ignordoller": "TRUE",
-                      "solutionPort": "<ACUMOS_DEPLOYED_SOLUTION_PORT>",
-                      "subnet": "Acumos-OAM-vsubnet",
-                      "vnet": "Acumos-OAM-vnet",
-                      "sleepTimeFirst": "30000",
-                      "sleepTimeSecond": "50000",
-                      "nexusRegistyUserName": "<ACUMOS_PROJECT_NEXUS_USERNAME>",
-                      "nexusRegistyPwd": "<ACUMOS_PROJECT_NEXUS_PASSWORD>",
-                      "nexusRegistyName": "nexus3.acumos.org",
-                      "otherRegistyName": "<ACUMOS_NEXUS_HOST>",
-                      "nginxMapFolder": "/home/artifacts",
-                      "nginxWebFolder": "/usr/share/nginx/html",
-                      "nginxImageName": "nginx:latest",
-                      "nginxInternalPort": "80",
-                      "kubernetesClientUrl":"http://kubernetes-client-service:8082/getSolutionZip",
-                      "exposeDataBrokerPort": "<ACUMOS_DATA_BROKER_PORT>",
-                      "internalDataBrokerPort": "<ACUMOS_DATA_BROKER_INTERNAL_PORT>",
-                      "registry": {
-                        "bluePrint": {
-                          "username": "<ACUMOS_NEXUS_RW_USER>",
-                          "password": "<ACUMOS_NEXUS_RW_USER_PASSWORD>"
-                        },
-                        "probe": {
-                          "username": "<ACUMOS_NEXUS_RW_USER>",
-                          "password": "<ACUMOS_NEXUS_RW_USER_PASSWORD>"
-                        },
-                        "networkgroupName": "acumos-nsg",
-                        "port": "80",
-                        "name": "<ACUMOS_DOCKER_REGISTRY_HOST>:<ACUMOS_DOCKER_MODEL_PORT>",
-                        "url": "http://<ACUMOS_DOCKER_REGISTRY_HOST>:<ACUMOS_DOCKER_MODEL_PORT>/",
-                        "username": "<ACUMOS_DOCKER_REGISTRY_USER>",
-                        "password": "<ACUMOS_DOCKER_REGISTRY_PASSWORD>"
-                      }
-                    },
-                    "blueprint": {
-                      "ImageName": "<BLUEPRINT_ORCHESTRATOR_IMAGE>",
-                      "name": "blueprint-orchestrator"
-                    },
-                    "nexus": {
-                      "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/<ACUMOS_NEXUS_MAVEN_REPO_PATH>/<ACUMOS_NEXUS_MAVEN_REPO>/",
-                      "nexusproxy": "NA",
-                      "password": "<ACUMOS_NEXUS_RW_USER_PASSWORD>",
-                      "username": "<ACUMOS_NEXUS_RW_USER>",
-                      "groupId": "com.artifact"
-                    },
-                    "cmndatasvc": {
-                      "cmndatasvcendpoinurl": "http://cds-service:8000/ccds",
-                      "cmndatasvcuser": "<ACUMOS_CDS_USER>",
-                      "cmndatasvcpwd": "<ACUMOS_CDS_PASSWORD>"
-                    },
-                    "probe": {
-                      "ImageName": "<PROTO_VIEWER_IMAGE>",
-                      "name": "proto_viewer",
-                      "internalPort": "<ACUMOS_PROBE_PORT>",
-                      "probeNexusEndPoint": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/<ACUMOS_NEXUS_MAVEN_REPO_PATH>/<ACUMOS_NEXUS_MAVEN_REPO>"
-                    }
-                  }'
+            "logging": {
+              "level": {
+                "root": "<ACUMOS_LOG_LEVEL>"
+              }
+            },
+            "server": {
+              "port": 9081
+            },
+            "docker": {
+              "containerNamePrefix": "E6E-NSG",
+              "host": "<ACUMOS_DOCKER_API_HOST>",
+              "port": "<ACUMOS_DOCKER_API_PORT>",
+              "dockerVMUserName": "<ACUMOS_DEPLOYED_VM_USER>",
+              "dockerVMPassword": "<ACUMOS_DEPLOYED_VM_PASSWORD>",
+              "replaceChar": "^",
+              "ignordoller": "TRUE",
+              "solutionPort": "<ACUMOS_DEPLOYED_SOLUTION_PORT>",
+              "subnet": "Acumos-OAM-vsubnet",
+              "vnet": "Acumos-OAM-vnet",
+              "sleepTimeFirst": "30000",
+              "sleepTimeSecond": "50000",
+              "nexusRegistyUserName": "<ACUMOS_PROJECT_NEXUS_USERNAME>",
+              "nexusRegistyPwd": "<ACUMOS_PROJECT_NEXUS_PASSWORD>",
+              "nexusRegistyName": "nexus3.acumos.org",
+              "otherRegistyName": "<ACUMOS_NEXUS_HOST>",
+              "nginxMapFolder": "/home/artifacts",
+              "nginxWebFolder": "/usr/share/nginx/html",
+              "nginxImageName": "nginx:latest",
+              "nginxInternalPort": "80",
+              "kubernetesClientUrl":"http://kubernetes-client-service:8082/getSolutionZip",
+              "exposeDataBrokerPort": "<ACUMOS_DATA_BROKER_PORT>",
+              "internalDataBrokerPort": "<ACUMOS_DATA_BROKER_INTERNAL_PORT>",
+              "registry": {
+                "bluePrint": {
+                  "username": "<ACUMOS_NEXUS_RW_USER>",
+                  "password": "<ACUMOS_NEXUS_RW_USER_PASSWORD>"
+                },
+                "probe": {
+                  "username": "<ACUMOS_NEXUS_RW_USER>",
+                  "password": "<ACUMOS_NEXUS_RW_USER_PASSWORD>"
+                },
+                "networkgroupName": "acumos-nsg",
+                "port": "80",
+                "name": "<ACUMOS_DOCKER_REGISTRY_HOST>:<ACUMOS_DOCKER_MODEL_PORT>",
+                "url": "http://<ACUMOS_DOCKER_REGISTRY_HOST>:<ACUMOS_DOCKER_MODEL_PORT>/",
+                "username": "<ACUMOS_DOCKER_REGISTRY_USER>",
+                "password": "<ACUMOS_DOCKER_REGISTRY_PASSWORD>"
+              }
+            },
+            "blueprint": {
+              "ImageName": "<BLUEPRINT_ORCHESTRATOR_IMAGE>",
+              "name": "blueprint-orchestrator"
+            },
+            "nexus": {
+              "url": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/<ACUMOS_NEXUS_MAVEN_REPO_PATH>/<ACUMOS_NEXUS_MAVEN_REPO>/",
+              "nexusproxy": "NA",
+              "password": "<ACUMOS_NEXUS_RW_USER_PASSWORD>",
+              "username": "<ACUMOS_NEXUS_RW_USER>",
+              "groupId": "<ACUMOS_NEXUS_GROUP>"
+            },
+            "cmndatasvc": {
+              "cmndatasvcendpoinurl": "http://<ACUMOS_CDS_HOST>:<ACUMOS_CDS_PORT>/ccds",
+              "cmndatasvcuser": "<ACUMOS_CDS_USER>",
+              "cmndatasvcpwd": "<ACUMOS_CDS_PASSWORD>"
+            },
+            "probe": {
+              "ImageName": "<PROTO_VIEWER_IMAGE>",
+              "name": "proto_viewer",
+              "internalPort": "<ACUMOS_PROBE_PORT>",
+              "probeNexusEndPoint": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/<ACUMOS_NEXUS_MAVEN_REPO_PATH>/<ACUMOS_NEXUS_MAVEN_REPO>"
+            }
+          }'
         ports:
         - containerPort: 9081
         volumeMounts:

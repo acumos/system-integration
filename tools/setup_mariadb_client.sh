@@ -28,21 +28,11 @@
 # - acumos_env.sh and mariadb_env.sh created and saved in the AIO_ROOT folder
 #
 # Usage:
-# $ bash setup_mariadb_.sh <AIO_ROOT>
-#   AIO_ROOT: path to AIO folder where environment files are
+# $ bash setup_mariadb_client.sh
 #
 
-function setup_mariadb_client_fail() {
-  set +x
-  trap - ERR
-  reason="$1"
-  if [[ "$1" == "" ]]; then reason="unknown failure at $fname $fline"; fi
-  log "$reason"
-  exit 1
-}
-
 function wait_dpkg() {
-  trap 'setup_mariadb_client_fail' ERR
+  trap 'fail' ERR
   # TODO: workaround for "E: Could not get lock /var/lib/dpkg/lock - open (11: Resource temporarily unavailable)"
   log "waiting for dpkg to be unlocked"
   while sudo fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do
@@ -51,7 +41,7 @@ function wait_dpkg() {
 }
 
 setup_mariadb_client() {
-  trap 'setup_mariadb_client_fail' ERR
+  trap 'fail' ERR
   get_host_info
 
   log "Installing MariaDB client $ACUMOS_MARIADB_VERSION"
@@ -92,6 +82,11 @@ EOF
   fi
 }
 
-source $1/acumos_env.sh
-source $1/utils.sh
+set -x
+trap 'fail' ERR
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+export AIO_ROOT="$(cd ../AIO; pwd -P)"
+source $AIO_ROOT/utils.sh
+source $AIO_ROOT/acumos_env.sh
 setup_mariadb_client
