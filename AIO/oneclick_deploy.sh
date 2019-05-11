@@ -132,13 +132,6 @@ function setup_acumos() {
     for app in $apps; do
       wait_running $app $ACUMOS_NAMESPACE
     done
-
-    # TODO: Skip juputerhub for openshift - some unknown issues
-    if [[ "$K8S_DIST" == "generic" ]]; then
-      log "Deploy jupyterhub"
-      bash $AIO_ROOT/../charts/jupyterhub/setup_jupyterhub.sh \
-        $ACUMOS_NAMESPACE $ACUMOS_ONBOARDING_TOKENMODE
-    fi
   fi
 }
 
@@ -197,6 +190,7 @@ update_env DEPLOY_RESULT "" force
 update_env FAIL_REASON "" force
 set_k8s_env
 
+update_env ACUMOS_JWT_KEY $(uuidgen)
 update_env ACUMOS_CDS_PASSWORD $(uuidgen)
 update_env ACUMOS_NEXUS_RO_USER_PASSWORD $(uuidgen)
 update_env ACUMOS_NEXUS_RW_USER_PASSWORD $(uuidgen)
@@ -255,8 +249,12 @@ fi
 if [[ "$ACUMOS_DEPLOY_ELK_METRICBEAT" == "true" ]]; then
   bash $AIO_ROOT/beats/setup_beats.sh $AIO_ROOT metricbeat
 fi
-cd $WORK_DIR
 
+#if [[ "$ACUMOS_DEPLOY_MLWB" == "true" ]]; then
+#  bash $AIO_ROOT/mlwb/setup_mlwb.sh $AIO_ROOT
+#fi
+
+cd $WORK_DIR
 set +x
 
 sedi "s/DEPLOY_RESULT=.*/DEPLOY_RESULT=success/" acumos_env.sh
