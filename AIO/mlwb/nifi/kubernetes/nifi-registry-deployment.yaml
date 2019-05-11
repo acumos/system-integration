@@ -1,0 +1,138 @@
+apiVersion: apps/v1
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+# What this is: kubernetes template for Acumos Nifi Registry deployment
+
+kind: Deployment
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: nifi-registry
+  labels:
+    app: nifi-registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nifi-registry
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: nifi-registry
+    spec:
+      containers:
+      - name: apache
+        image: "httpd:2.4"
+#        command: ['/bin/bash', '-c']
+#        args:
+#        - sleep 3600;
+#          httpd-foreground;
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /usr/local/apache2/conf/httpd.conf
+          name: apache-configmap
+          subPath: httpd.conf
+        - mountPath: /usr/local/apache2/conf/extra/local.conf
+          name: apache-configmap
+          subPath: local.conf
+        - mountPath: /opt/sslkey
+          name: nifi-certs
+        resources:
+          limits:
+            cpu: "0.5"
+            memory: "500Mi"
+          requests:
+            cpu: "0.5"
+            memory: "500Mi"
+      - name: nifi-registry
+        image: apache/nifi-registry:0.3.0
+        env:
+        - name: AUTH
+          value: "tls"
+        - name: KEYSTORE_PATH
+          value: "/opt/nifi-registry/certs/nifi-keystore.p12"
+        - name: KEYSTORE_TYPE
+          value: "PKCS12"
+        - name: KEYSTORE_PASSWORD
+          value: "<MLWB_NIFI_KEYSTORE_PASSWORD>"
+        - name: TRUSTSTORE_PATH
+          value: "/opt/nifi-registry/certs/nifi-truststore.jks"
+        - name: TRUSTSTORE_TYPE
+          value: "JKS"
+        - name: TRUSTSTORE_PASSWORD
+          value: "<MLWB_NIFI_TRUSTSTORE_PASSWORD>"
+        - name: INITIAL_ADMIN_IDENTITY
+          value: "<MLWB_NIFI_REGISTRY_INITIAL_ADMIN>"
+        command: ['/bin/bash', '-c']
+        args:
+        - set -x;
+          mkdir /opt/nifi-registry/certs/;
+          cp /conf/certs/* /opt/nifi-registry/certs/.;
+          chmod 744 /opt/nifi-registry/certs/*;
+          ls -lat /opt/nifi-registry/certs;
+          keytool -list -keystore $$KEYSTORE_PATH -storetype JKS -storepass $$KEYSTORE_PASSWORD;
+          sed -i -- "s~nifi.registry.security.needClientAuth=.*~nifi.registry.security.needClientAuth=true~" conf/nifi-registry.properties;
+          sed -i -- "s~nifi.registry.security.keystore=.*~nifi.registry.security.keystore=$$KEYSTORE_PATH~" conf/nifi-registry.properties;
+          sed -i -- "s~nifi.registry.security.keystoreType=.*~nifi.registry.security.keystoreType=$$KEYSTORE_TYPE~" conf/nifi-registry.properties;
+          sed -i -- "s~nifi.registry.security.keystorePasswd=.*~nifi.registry.security.keystorePasswd=$$KEYSTORE_PASSWORD~" conf/nifi-registry.properties;
+          sed -i -- "s~nifi.registry.security.truststore=.*~nifi.registry.security.truststore=$$TRUSTSTORE_PATH~" conf/nifi-registry.properties;
+          sed -i -- "s~nifi.registry.security.truststoreType=.*~nifi.registry.security.truststoreType=$$TRUSTSTORE_TYPE~" conf/nifi-registry.properties;
+          sed -i -- "s~nifi.registry.security.truststorePasswd=.*~nifi.registry.security.truststorePasswd=$$TRUSTSTORE_PASSWORD~" conf/nifi-registry.properties;
+          sed -i -- "s~nifi.registry.web.https.host=.*~nifi.registry.web.https.host=0.0.0.0~" conf/nifi-registry.properties;
+          sed -i -- "s~nifi.registry.web.https.port=.*~nifi.registry.web.https.port=8443~" conf/nifi-registry.properties;
+          sed -i -- "s~nifi.registry.web.http.host=.*~nifi.registry.web.http.host=~" conf/nifi-registry.properties;
+          sed -i -- "s~nifi.registry.web.http.port=.*~nifi.registry.web.http.port=~" conf/nifi-registry.properties;
+          sed -i -- "s~nifi.remote.input.http.enabled=.*~nifi.remote.input.http.enabled=~" conf/nifi-registry.properties;
+          sed -i -- "s~\"Initial User Identity 1\"><~\"Initial User Identity 1\">$$INITIAL_ADMIN_IDENTITY<~g" conf/authorizers.xml;
+          sed -i -- "s~\"Initial Admin Identity\"><~\"Initial Admin Identity\">$$INITIAL_ADMIN_IDENTITY<~g" conf/authorizers.xml;
+          sed -i -- "s~\"NiFi Identity 1\"><~\"NiFi Identity 1\">$$INITIAL_ADMIN_IDENTITY<~g" conf/authorizers.xml;
+          sed -i -- "s~# nifi.registry.security.identity.mapping.pattern.dn~ nifi.registry.security.identity.mapping.pattern.dn~" conf/nifi-registry.properties;
+          sed -i -- "s~# nifi.registry.security.identity.mapping.value.dn=\$1@\$2~ nifi.registry.security.identity.mapping.value.dn=\$1~" conf/nifi-registry.properties;
+          echo "authorizers.xml:";
+          cat conf/authorizers.xml;
+          echo "nifi-registry.properties:";
+          cat conf/nifi-registry.properties;
+          sed -i -- "s~prop_replace 'nifi.registry.web.http~#prop_replace 'nifi.registry.web.http~g" ../scripts/start.sh;
+          sed -i -- 's~. "${scripts_dir}/secure.sh"~#. "${scripts_dir}/secure.sh"~g' ../scripts/start.sh;
+          cat ../scripts/start.sh;
+         ../scripts/start.sh;
+        ports:
+        - containerPort: 8443
+        volumeMounts:
+        - mountPath: /opt/nifi-registry/nifi-registry-0.3.0/logs/
+          name: logs
+        - mountPath: /conf/certs/
+          name: nifi-certs
+      restartPolicy: Always
+      volumes:
+      - name: apache-configmap
+        configMap:
+          name: nifi-registry-apache-configmap
+      - name: nifi-registry
+        persistentVolumeClaim:
+          claimName: pvc-<ACUMOS_NAMESPACE>-nifi-registry
+      - name: logs
+        persistentVolumeClaim:
+          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+      - name: nifi-certs
+        secret:
+          secretName: nifi-certs-registry

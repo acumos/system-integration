@@ -17,7 +17,7 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-#. What this is: script to setup the kong proxy for Acumos, under docker or k8s
+# What this is: script to setup the kong proxy for Acumos, under docker
 #
 # Prerequisites:
 # - Acumos core components through oneclick_deploy.sh
@@ -32,32 +32,12 @@
 
 function clean_kong() {
   trap 'fail' ERR
-  if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-    log "Stop any existing docker based components for kong-service"
-    cs=$(docker ps -a | awk '/kong/{print $1}')
-    for c in $cs; do
-      docker stop $c
-      docker rm $c
-    done
-  else
-    log "Remove job kong-configure if running"
-    stop_job kong-configure
-    log "Stop any existing k8s based components for kong-service"
-    if [[ ! -e deploy/kong-service.yaml ]]; then
-      mkdir -p deploy
-      cp -r kubernetes/* deploy/.
-      replace_env deploy
-    fi
-    stop_service deploy/kong-admin-service.yaml
-    stop_service deploy/kong-service.yaml
-    stop_deployment deploy/kong-deployment.yaml
-    log "Remove PVC for kong-service"
-    delete_pvc kong-db $ACUMOS_NAMESPACE
-    log "Remove configmap kong-config"
-    if [[ $($k8s_cmd get configmap -n $ACUMOS_NAMESPACE kong-config) ]]; then
-      $k8s_cmd delete configmap -n $ACUMOS_NAMESPACE kong-config
-    fi
-  fi
+  log "Stop any existing docker based components for kong-service"
+  cs=$(docker ps -a | awk '/kong/{print $1}')
+  for c in $cs; do
+    docker stop $c
+    docker rm $c
+  done
 }
 
 function setup_kong() {
@@ -67,32 +47,11 @@ function setup_kong() {
   cp ../certs/$ACUMOS_CERT config/.
   cp ../certs/$ACUMOS_CERT_KEY config/.
 
-  if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-    log "Build the local configure-kong image"
-    docker build -t kong-configure .
-    log "Deploy the docker based components for kong"
-    bash docker_compose.sh $AIO_ROOT up -d --build --force-recreate
-    wait_running kong-service
-  else
-    log "Setup the kong-db PVC"
-    setup_pvc kong-db $ACUMOS_NAMESPACE $KONG_DB_PV_SIZE
-
-    log "Deploy the k8s based components for kong"
-    mkdir -p deploy
-    cp -r kubernetes/* deploy/.
-    replace_env deploy
-    start_service deploy/kong-admin-service.yaml
-    start_service deploy/kong-service.yaml
-    start_deployment deploy/kong-deployment.yaml
-    wait_running kong $ACUMOS_NAMESPACE
-
-    log "Create the kong-config configmap"
-    $k8s_cmd create configmap -n $ACUMOS_NAMESPACE kong-config --from-file=config
-
-    log "Create the kong-configure job"
-    $k8s_cmd create -f deploy/kong-configure-job.yaml
-    wait_completed kong-configure
-  fi
+  log "Build the local configure-kong image"
+  docker build -t kong-configure .
+  log "Deploy the docker based components for kong"
+  bash docker_compose.sh $AIO_ROOT up -d --build --force-recreate
+  wait_running kong-service
 }
 
 if [[ $# -lt 1 ]]; then

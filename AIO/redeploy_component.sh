@@ -61,8 +61,8 @@ function tail_logs() {
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     docker logs -f $(docker ps -a | awk "/$app/{print \$1}")
   else
-    pod=$(kubectl get pods -n $namespace -l app=$app | awk "/$app-/{print \$1}")
-    kubectl logs -f -n $namespace $pod $container
+    pod=$($k8s_cmd get pods -n $namespace -l app=$app | awk "/$app-/{print \$1}")
+    $k8s_cmd logs -f -n $namespace $pod $container
   fi
 }
 
@@ -75,6 +75,11 @@ function redeploy_core_component() {
       # add '&& true' since 'down' will trap an error due to detecting that
       # 'network acumos_default id ... has active endpoints' (irrelevant)
       docker-compose -f acumos/$yaml down && true
+      if [[ "$app" == "sv-scanning-service" ]]; then
+        log "Prepare the sv-scanning config volume"
+        rm -rf /mnt/$ACUMOS_NAMESPACE/sv/*
+        cp -r $AIO_ROOT/kubernetes/configmap/sv-scanning/* /mnt/$ACUMOS_NAMESPACE/sv/.
+      fi
       docker-compose -f acumos/$yaml up -d --build
     else
       fail "$app not found in $AIO_ROOT/docker/acumos"
@@ -84,13 +89,26 @@ function redeploy_core_component() {
       yaml=$(basename $(grep -l "app: $app" kubernetes/service/*))
       if [[ ! -e deploy ]]; then mkdir deploy; fi
       cp kubernetes/service/$yaml deploy/.
-      replace_env deploy
+      replace_env deploy/$yaml
       stop_service deploy/$yaml
       start_service deploy/$yaml
       yaml=$(basename $(grep -l "app: $app" kubernetes/deployment/*))
       cp kubernetes/deployment/$yaml deploy/.
-      replace_env deploy
+      replace_env deploy/$yaml
       stop_deployment deploy/$yaml
+      if [[ "$app" == "sv-scanning" ]]; then
+        trap - ERR
+        $k8s_cmd delete configmap -n $ACUMOS_NAMESPACE sv-scanning-scripts
+        $k8s_cmd delete configmap -n $ACUMOS_NAMESPACE sv-scanning-licenses
+        $k8s_cmd delete configmap -n $ACUMOS_NAMESPACE sv-scanning-rules
+        trap 'fail' ERR
+        $k8s_cmd create configmap -n $ACUMOS_NAMESPACE sv-scanning-scripts \
+          --from-file=kubernetes/configmap/sv-scanning/scripts
+        $k8s_cmd create configmap -n $ACUMOS_NAMESPACE sv-scanning-licenses \
+          --from-file=kubernetes/configmap/sv-scanning/licenses
+        $k8s_cmd create configmap -n $ACUMOS_NAMESPACE sv-scanning-rules \
+          --from-file=kubernetes/configmap/sv-scanning/rules
+      fi
       start_deployment deploy/$yaml
       wait_running $app $ACUMOS_NAMESPACE
     else
