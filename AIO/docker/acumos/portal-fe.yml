@@ -19,62 +19,72 @@ version: '3.2'
 
 # docker-compose for portal-fe
 services:
-   portal-fe-service:
-       image: ${PORTAL_FE_IMAGE}
-       environment:
-           SPRING_APPLICATION_JSON: "{
-               \"server\": {
-                    \"port\": 8085
-                },
-               \"zuul\": {
-                   \"routes\": {
-                      \"api\": {
-                        \"url\": \"http://portal-be-service:8083\"
-                      },
-                      \"dsce\": {
-                        \"url\": \"http://dsce-service:8088\"
-                      },
-                      \"cmnt\": {
-                        \"url\": \"http://delete-me\"
-                      },
-                      \"azure\": {
-                        \"url\": \"http://azure-client-service:9081\"
-                      },
-                      \"openstack\" : {
-                        \"path\": \"/openstack/**\",
-                        \"url\": \"http://openstack-client-service:8007\",
-                        \"stripPrefix\": \"false\",
-                        \"sensitiveHeaders\": \"\"
-                      },
-                      \"package\": {
-                        \"path\": \"/package/**\",
-                        \"url\": \"http://kubernetes-client-service:8082\",
-                        \"stripPrefix\": \"true\",
-                        \"sensitiveHeaders\": \"\"
-                        }
-                   },
-                    \"host\": {
-                      \"connect-timeout-millis\": 300000,
-                      \"socket-timeout-millis\": 300000
-                   }
-               },
-               \"spring\": {
-                  \"servlet\": {
-                     \"multipart\": {
-                        \"max-file-size\": -1,
-                        \"max-request-size\": -1
-                     }
-                  }
+  portal-fe-service:
+    image: ${PORTAL_FE_IMAGE}
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "logging": {
+          "level": {
+          "root": "${ACUMOS_LOG_LEVEL}"
+          }
+        },
+        "server": {
+           "port": 8085
+         },
+        "zuul": {
+          "routes": {
+             "api": {
+               "url": "http://portal-be-service:8083"
+             },
+             "dsce": {
+               "url": "http://dsce-service:8088"
+             },
+             "cmnt": {
+               "url": "http://delete-me"
+             },
+             "workbench" : {
+               "path" : "/workbench/**",
+               "url" : "http://mlwb-home-webcomponent-service:9082",
+			         "sensitiveHeaders" : ""
+             },
+             "azure": {
+               "url": "http://azure-client-service:9081"
+             },
+             "openstack" : {
+               "path": "/openstack/**",
+               "url": "http://openstack-client-service:8007",
+               "stripPrefix": "false",
+               "sensitiveHeaders": ""
+             },
+             "package": {
+               "path": "/package/**",
+               "url": "http://kubernetes-client-service:8082",
+               "stripPrefix": "true",
+               "sensitiveHeaders": ""
                }
-           }"
-       expose:
-           - 8085
-       volumes:
-           - type: bind
-             source: /mnt/${ACUMOS_NAMESPACE}/logs
-             target: /maven/logs
-       logging:
-           driver: json-file
-       extra_hosts:
-           - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
-       restart: on-failure
+          },
+           "host": {
+             "connect-timeout-millis": 300000,
+             "socket-timeout-millis": 300000
+          }
+        },
+        "spring": {
+           "servlet": {
+            "multipart": {
+               "max-file-size": -1,
+               "max-request-size": -1
+            }
+          }
+        }
+      }'
+    expose:
+      - 8085
+    volumes:
+      - type: bind
+        source: /mnt/${ACUMOS_NAMESPACE}/logs
+        target: /maven/logs
+    logging:
+      driver: json-file
+    extra_hosts:
+      - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
+    restart: on-failure

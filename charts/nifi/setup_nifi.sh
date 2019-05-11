@@ -58,7 +58,7 @@
 # NiFi registry 0.3.0
 #   - located as nifi-registry-service
 #
-# Registry location is manually set by the user 
+# Registry location is manually set by the user
 #
 # Useful commands
 # kubectl describe pods -n $namespace nifi-0
