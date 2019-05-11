@@ -38,28 +38,19 @@ export ACUMOS_STAGING=nexus3.acumos.org:10004
 export ACUMOS_RELEASE=nexus3.acumos.org:10002
 
 # Images per Boreas release assembly
-# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_1904301100
+# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_1905141030
 # Core components
-export AZURE_CLIENT_IMAGE=$ACUMOS_STAGING/acumos-azure-client:2.0.13
-export PORTAL_BE_IMAGE=$ACUMOS_STAGING/acumos-portal-be:2.2.10
-export PORTAL_FE_IMAGE=$ACUMOS_STAGING/acumos-portal-fe:2.2.10
-export COMMON_DATASERVICE_IMAGE=$ACUMOS_STAGING/common-dataservice:2.2.2
-export DESIGNSTUDIO_IMAGE=$ACUMOS_STAGING/ds-compositionengine:2.0.8
+export AZURE_CLIENT_IMAGE=$ACUMOS_STAGING/acumos-azure-client:2.0.15
+export PORTAL_BE_IMAGE=$ACUMOS_STAGING/acumos-portal-be:2.2.16
+export PORTAL_FE_IMAGE=$ACUMOS_STAGING/acumos-portal-fe:2.2.16
+export COMMON_DATASERVICE_IMAGE=$ACUMOS_STAGING/common-dataservice:2.2.4
+export DESIGNSTUDIO_IMAGE=$ACUMOS_STAGING/ds-compositionengine:2.1.0
 export FEDERATION_IMAGE=$ACUMOS_STAGING/federation-gateway:2.2.0
-export KUBERNETES_CLIENT_IMAGE=$ACUMOS_STAGING/kubernetes-client:2.0.10
-export MICROSERVICE_GENERATION_IMAGE=$ACUMOS_STAGING/microservice-generation:2.10.0
-export ONBOARDING_IMAGE=$ACUMOS_STAGING/onboarding-app:2.12.0
-export SECURITY_VERIFICATION_IMAGE=$ACUMOS_SNAPSHOT/security-verification:0.0.13-SNAPSHOT
+export KUBERNETES_CLIENT_IMAGE=$ACUMOS_STAGING/kubernetes-client:2.0.11
+export MICROSERVICE_GENERATION_IMAGE=$ACUMOS_STAGING/microservice-generation:2.12.0
+export ONBOARDING_IMAGE=$ACUMOS_STAGING/onboarding-app:2.14.0
+export SECURITY_VERIFICATION_IMAGE=$ACUMOS_SNAPSHOT/security-verification:0.0.21-SNAPSHOT
 export OPENSTACK_CLIENT_IMAGE=$ACUMOS_STAGING/openstack-client:2.0.10
-export MLWB_PROJECT_SERVICE_IMAGE=$ACUMOS_STAGING/project-service:1.0.0
-export MLWB_NOTEBOOK_SERVICE_IMAGE=$ACUMOS_STAGING/notebook-service:1.0.0
-export MLWB_PIPELINE_SERVICE_IMAGE=$ACUMOS_STAGING/pipeline-service:1.0.0
-export MLWB_DASHBOARD_IMAGE=$ACUMOS_STAGING/Dashboard-webcomponent:1.0.2
-export MLWB_HOME_IMAGE=$ACUMOS_STAGING/home-webcomponent:1.0.2
-export MLWB_NOTEBOOK_CATALOG_IMAGE=$ACUMOS_STAGING/notebook-catalog-webcomponent:1.0.2
-export MLWB_WEBCOMPONENT_IMAGE=$ACUMOS_STAGING/webcomponent:1.0.2
-export MLWB_PROJECT_IMAGE=$ACUMOS_STAGING/project-webcomponent:1.0.2
-export MLWB_CATALOG_IMAGE=$ACUMOS_STAGING/project-catalog-webcomponent:1.0.2
 
 # Model-execution-components
 export DATABROKER_SQLBROKER_IMAGE=$ACUMOS_RELEASE/sqldatabroker:1.2.0
@@ -116,18 +107,23 @@ export ACUMOS_NEXUS_DOCKER_REPO=docker_model_maven
 export ACUMOS_DOCKER_REGISTRY_HOST=$ACUMOS_NEXUS_HOST
 export ACUMOS_DOCKER_MODEL_PORT=30882
 export ACUMOS_DOCKER_IMAGETAG_PREFIX=nexus:$ACUMOS_DOCKER_MODEL_PORT
-export ACUMOS_KONG_PROXY_SSL_PORT=30443
+export ACUMOS_KONG_PROXY_SSL_PORT=443
+export ACUMOS_INGRESS_MAX_REQUEST_SIZE=1000m
 export HTTP_PROXY=""
 export HTTPS_PROXY=""
 
 # Component options
-export ACUMOS_ADMIN_EMAIL='acumos@example.com'
+export ACUMOS_ADMIN=admin
+export ACUMOS_ADMIN_EMAIL=acumos@example.com
 export ACUMOS_CDS_PREVIOUS_VERSION=
+export ACUMOS_CDS_HOST=cds-service
+export ACUMOS_CDS_PORT=8000
 export ACUMOS_CDS_NODEPORT=30800
 export ACUMOS_CDS_VERSION=2.2
 export ACUMOS_CDS_DB='acumos_cds'
 export ACUMOS_CDS_USER=ccds_client
 export ACUMOS_CDS_PASSWORD=
+export ACUMOS_JWT_KEY=
 export ACUMOS_DOCKER_PROXY_HOST=$ACUMOS_DOMAIN
 export ACUMOS_DOCKER_PROXY_PORT=30883
 export ACUMOS_DOCKER_PROXY_USERNAME=
@@ -135,29 +131,28 @@ export ACUMOS_DOCKER_PROXY_PASSWORD=
 export ACUMOS_FEDERATION_HOST=$ACUMOS_DOMAIN
 export ACUMOS_FEDERATION_LOCAL_PORT=30985
 export ACUMOS_FEDERATION_PORT=30984
+export ACUMOS_ONBOARDING_TOKENMODE=jwtToken
+export ACUMOS_ONBOARDING_CLIPUSHURL="https://${ACUMOS_DOMAIN}/onboarding-app/v2/models"
+export ACUMOS_ONBOARDING_CLIAUTHURL="https://${ACUMOS_DOMAIN}/onboarding-app/v2/auth"
+export ACUMOS_OPERATOR_ID=acumos-aio
+export ACUMOS_PORTAL_DOCUMENT_MAX_SIZE=100000000
+export ACUMOS_PORTAL_IMAGE_MAX_SIZE=1000KB
+export ACUMOS_SECURITY_VERIFICATION_PORT=30982
+export PYTHON_EXTRAINDEX=
+export PYTHON_EXTRAINDEX_HOST=
+
+# Core platform certificate options
 export ACUMOS_CERT_PREFIX=acumos
 export ACUMOS_CA_CERT=${ACUMOS_CERT_PREFIX}-ca.crt
 export ACUMOS_CERT=${ACUMOS_CERT_PREFIX}.crt
 export ACUMOS_CERT_KEY=${ACUMOS_CERT_PREFIX}.key
 export ACUMOS_CERT_KEY_PASSWORD=
-export ACUMOS_KEYSTORE=${ACUMOS_CERT_PREFIX}-keystore.p12
+export ACUMOS_KEYSTORE_P12=${ACUMOS_CERT_PREFIX}-keystore.p12
+export ACUMOS_KEYSTORE_JKS=${ACUMOS_CERT_PREFIX}-keystore.jks
 export ACUMOS_KEYSTORE_PASSWORD=
 export ACUMOS_TRUSTSTORE=${ACUMOS_CERT_PREFIX}-truststore.jks
 export ACUMOS_TRUSTSTORE_PASSWORD=
-export ACUMOS_ONBOARDING_TOKENMODE=jwtToken
-export ACUMOS_ONBOARDING_CLIPUSHURL="https://${ACUMOS_DOMAIN}:${ACUMOS_KONG_PROXY_SSL_PORT}/onboarding-app/v2/models"
-export ACUMOS_ONBOARDING_CLIAUTHURL="https://${ACUMOS_DOMAIN}:${ACUMOS_KONG_PROXY_SSL_PORT}/onboarding-app/v2/auth"
-export ACUMOS_OPERATOR_ID=acumos-aio
-export ACUMOS_PORTAL_DOCUMENT_MAX_SIZE=100000000
-export ACUMOS_PORTAL_IMAGE_MAX_SIZE=1000KB
-export ACUMOS_SECURITY_VERIFICATION_PORT=30982
-export ACUMOS_NIFI_REGISTRY_PORT=31443
-export PYTHON_EXTRAINDEX=
-export PYTHON_EXTRAINDEX_HOST=
-
-# Acumos ELK component options
-source $AIO_ROOT/../charts/elk-stack/setup_elk_env.sh
-
+if [[ -e $AIO_ROOT/certs/cert_env.sh ]]; then source $AIO_ROOT/certs/cert_env.sh; fi
 
 # Acumos model deployment options
 export ACUMOS_DATA_BROKER_INTERNAL_PORT=8080
@@ -183,6 +178,6 @@ export KONG_DB_PV_SIZE=10Mi
 export NEXUS_DATA_PV_NAME="pv-$ACUMOS_NAMESPACE-nexus-data"
 export NEXUS_DATA_PV_SIZE=10Gi
 
+# Supplemental component options
 if [[ -e $AIO_ROOT/mariadb_env.sh ]]; then source $AIO_ROOT/mariadb_env.sh; fi
 if [[ -e $AIO_ROOT/elk_env.sh ]]; then source $AIO_ROOT/elk_env.sh; fi
-if [[ -e $AIO_ROOT/certs/cert_env.sh ]]; then source $AIO_ROOT/certs/cert_env.sh; fi

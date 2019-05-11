@@ -60,6 +60,11 @@ spec:
                         "cmnt": {
                           "url": "http://delete-me"
                         },
+                        "workbench" : {
+                          "path" : "/workbench/**",
+                          "url" : "http://mlwb-home-webcomponent-service:9082",
+			                    "sensitiveHeaders" : ""
+                        },
                         "azure": {
                           "url": "http://azure-client-service:9081"
                         },

@@ -1,0 +1,65 @@
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: mlwb-notebook-service
+  labels:
+    app: mlwb-notebook
+spec:
+  selector:
+    app: mlwb-notebook
+  type: ClusterIP
+  ports:
+  - name: service-port
+    port: 9089
+    targetPort: 9089
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: mlwb-notebook-webcomponent-service
+  labels:
+    app: mlwb-notebook-webcomponent
+spec:
+  selector:
+    app: mlwb-notebook-webcomponent
+  type: ClusterIP
+  ports:
+  - name: service-port
+    port: 9086
+    targetPort: 9086
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: mlwb-notebook-catalog-webcomponent-service
+  labels:
+    app: mlwb-notebook-catalog-webcomponent
+spec:
+  selector:
+    app: mlwb-notebook-catalog-webcomponent
+  type: ClusterIP
+  ports:
+  - name: service-port
+    port: 9087
+    targetPort: 9087

@@ -93,8 +93,7 @@ function onboard() {
     log "Onboarding $model failed at host $host"
     cat $json
   else
-    status=$(jq -r '.status' $json)
-    if [[ "$status" != "ERROR" ]]; then
+    if [[ "$(jq -r '.status' $json)" == "SUCCESS" ]]; then
       log "Onboarding $model succeeded at host $host"
     else
       log "Onboarding $model failed at host $host"
