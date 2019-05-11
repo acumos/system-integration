@@ -22,8 +22,7 @@
 # Prerequisites:
 #
 # Usage:
-# $ bash setup_certs.sh <AIO_ROOT> <name> <subject-name> ["alt-names"] ["alt-ips"]
-#   AIO_ROOT: path to AIO folder where environment files are
+# $ bash setup_certs.sh <name> <subject-name> ["alt-names"] ["alt-ips"]
 #   name: name prefix to use in the generated files (e.g. acumos)
 #   subject-name: primary domain name to associate
 #   alt-names: quoted, space-delimited set of alternate names
@@ -114,6 +113,12 @@ authorityKeyIdentifier=keyid,issuer' $name.cnf
     -out $name-keystore.p12 \
     -passout pass:$KEYSTORE_PASSWORD
 
+  log "Create JKS format keystore with server cert"
+  keytool -importkeystore -srckeystore $name-keystore.p12 \
+    -srcstorepass $KEYSTORE_PASSWORD -srcstoretype pkcs12 \
+    -destkeystore $name-keystore.jks -deststoretype jks \
+    -storepass $KEYSTORE_PASSWORD -noprompt
+
   log "Create JKS format truststore with CA cert"
   if [[ -e $name-truststore.jks ]]; then rm $name-truststore.jks; fi
   TRUSTSTORE_PASSWORD=$(uuidgen)
@@ -125,11 +130,10 @@ authorityKeyIdentifier=keyid,issuer' $name.cnf
     -storepass $TRUSTSTORE_PASSWORD -noprompt
 }
 
-if [[ $# -lt 3 ]]; then
+if [[ $# -lt 2 ]]; then
   cat <<'EOF'
 Usage:
-  $ bash setup_certs.sh <AIO_ROOT> <name> <subject-name> ["alt-names"] ["alt-ips"]
-    AIO_ROOT: path to AIO folder where environment files are
+  $ bash setup_certs.sh <name> <subject-name> ["alt-names"] ["alt-ips"]
     name: name prefix to use in the generated files (e.g. acumos)
     subject-name: primary domain name to associate
     alt-names: quoted, space-delimited set of alternate names
@@ -140,14 +144,17 @@ EOF
 fi
 
 set -x
-WORK_DIR=$(pwd)
-export AIO_ROOT=$1
-source $AIO_ROOT/utils.sh
 trap 'fail' ERR
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ..; pwd -P)"; fi
+cd $WORK_DIR
+source $AIO_ROOT/utils.sh
+source $AIO_ROOT/acumos_env.sh
 export HOST_OS=$(grep --m 1 ID /etc/os-release | awk -F '=' '{print $2}' | sed 's/"//g')
-name=$2
-sn=$3
-san=$4
-saip=$5
+name=$1
+sn=$2
+san=$3
+saip=$4
 setup_certs
 cd $WORK_DIR

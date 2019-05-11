@@ -25,7 +25,7 @@ clusterName: "k8-cluster-elk"
 
 elasticsearch:
   image:
-    repository: "<ACUMOS_STAGING>/acumos-elasticsearch"
+    repository: "<ACUMOS_RELEASE>/acumos-elasticsearch"
     tag: "2.2.2"
     pullPolicy: "IfNotPresent"
 
@@ -52,7 +52,7 @@ elasticsearch:
 
 logstash:
   image:
-    repository: "<ACUMOS_STAGING>/acumos-logstash"
+    repository: "<ACUMOS_RELEASE>/acumos-logstash"
     tag: "2.2.2"
     pullPolicy: "IfNotPresent"
   port: "<ACUMOS_ELK_LOGSTASH_PORT>"
@@ -63,7 +63,7 @@ logstash:
 
 kibana:
   image:
-    repository: "<ACUMOS_STAGING>/acumos-kibana"
+    repository: "<ACUMOS_RELEASE>/acumos-kibana"
     tag: "2.2.2"
     pullPolicy: "IfNotPresent"
   port: "<ACUMOS_ELK_KIBANA_PORT>"
