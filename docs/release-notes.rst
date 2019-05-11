@@ -27,6 +27,52 @@ System Integration Release Notes
 All-in-One (OneClick Deploy)
 ............................
 
+---------------------------
+Version 2.3.0, 11 July 2019
+---------------------------
+
+This release completes the Boreas maintenance release, to the extent that open
+issues and work in progress have been completed.
+
+* `4374: Integrate MLWB components <https://gerrit.acumos.org/r/#/c/system-integration/+/4374/>`_
+
+  * Delivers Jira items
+
+    * `ACUMOS-2194: Integrate Jupyter notebook with Acumos Portal <https://jira.acumos.org/browse/ACUMOS-2194>`_
+    * `ACUMOS-2491: Integrate Nifi with Acumos Portal <https://jira.acumos.org/browse/ACUMOS-2491>`_
+    * `ACUMOS-2714: Deploy security-verification component <https://jira.acumos.org/browse/ACUMOS-2714>`_
+    * `ACUMOS-2715: Support Helm use in Openshift deployments <https://jira.acumos.org/browse/ACUMOS-2715>`_
+    * `ACUMOS-2714: Deploy security-verification component <https://jira.acumos.org/browse/ACUMOS-2714>`_
+    * `ACUMOS-2715: Support Helm use in Openshift deployments <https://jira.acumos.org/browse/ACUMOS-2715>`_
+    * `ACUMOS-2716: Add option for docker-on-host to address Azure-k8s issues <https://jira.acumos.org/browse/ACUMOS-2716>`_
+    * `ACUMOS-2717: Update to weekly assembly Acumos_1904021700 <https://jira.acumos.org/browse/ACUMOS-2717>`_
+    * `ACUMOS-2718: Add input parameter check and usage help to scripts <https://jira.acumos.org/browse/ACUMOS-2718>`_
+    * `ACUMOS-2721: Add scripts enabling redeployment of specific components <https://jira.acumos.org/browse/ACUMOS-2721>`_
+    * `ACUMOS-2871: Update to weekly assembly Acumos_1904301100 <https://jira.acumos.org/browse/ACUMOS-2871>`_
+
+  * Additionally delivers enhancements
+
+    * Images per Boreas release assembly
+    * more complete parameterization of templates
+    * configuration of mail service
+    * general refactoring and updates for design consistency/reliability
+    * improve support for cluster-externally deployed components
+    * align ELK-stack and beats deployment with azure-k8s templates etc
+    * add log level option for all springboot components
+    * add user to docker group
+    * add option to cleanup/re-pull docker images on component redeploy
+    * replace kong with nginx ingress controller for k8s
+    * fix lack of delete privilege for Nexus RW user
+    * enable artifact overwrite ("redeploy") in Nexus
+    * customize catalog names to avoid conflict between Acumos platforms
+    * add ELK-client deployment
+    * update demo Jupyter notebook
+    * add tests/delete_user.sh
+    * add tests/license_scan.sh
+    * update test scripts for new catalog based publication design
+    * add tools/setup_k8s_stack.sh
+    * add tools/trust_cert.sh
+
 ----------------------------
 Version 2.2.0, 23 April 2019
 ----------------------------
