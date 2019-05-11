@@ -28,7 +28,7 @@
 #   (entries in /etc/hosts or in an actual DNS server)
 # - User running this script has:
 #   - Installed docker per system-integration/tools/setup_docker.sh
-#   - Added themselves to the docker group (sudo usermod -G docker $USER)
+#   - Added themselves to the docker group (sudo usermod -aG docker $USER)
 #   - Logged out and back in, to activate docker group membership
 # - If deploying in preparation for use by a non-sudo user
 #   - Created the user account (sudo useradd -m <user>)
@@ -40,7 +40,7 @@
 #   under: docker|k8s; install prereqs for docker or k8s based deployment
 #   domain: FQDN of platform
 #   user: user that will be completing Acumos platform setup via
-#         oneclick_deploy.sh (if installing for yousrself, use $USER)
+#         oneclick_deploy.sh (if installing for yourself, use $USER)
 #   k8s_dist: k8s distribution (generic|openshift), required for k8s deployment
 #
 
@@ -60,7 +60,7 @@ function setup_prereqs() {
   if [[ $(host $ACUMOS_DOMAIN | grep -c 'not found') -gt 0 ]]; then
     if [[ $(grep -c -E " $ACUMOS_DOMAIN( |$)" /etc/hosts) -eq 0 ]]; then
       log "Add $ACUMOS_DOMAIN to /etc/hosts"
-      echo "$ACUMOS_DOMAIN $ACUMOS_HOST_IP" | sudo tee -a /etc/hosts
+      echo "$ACUMOS_HOST_IP $ACUMOS_DOMAIN" | sudo tee -a /etc/hosts
     fi
   fi
 
@@ -90,6 +90,7 @@ function setup_prereqs() {
 
   log "Setup Acumos data home at /mnt/$ACUMOS_NAMESPACE"
   sudo mkdir -p /mnt/$ACUMOS_NAMESPACE
+  sudo chown $ACUMOS_HOST_USER:$ACUMOS_HOST_USER /mnt/$ACUMOS_NAMESPACE
 }
 
 setup_keystore() {
@@ -109,7 +110,7 @@ setup_keystore() {
       log "Create /mnt/$ACUMOS_NAMESPACE/certs as cert storage folder"
       sudo mkdir -p /mnt/$ACUMOS_NAMESPACE/certs
       # Have to set user and group to allow pod access to PVs
-      sudo chown $ACUMOS_HOST_USER:$ACUMOS_HOST_USER /mnt/$ACUMOS_NAMESPACE
+      sudo chown $ACUMOS_HOST_USER:$ACUMOS_HOST_USER /mnt/$ACUMOS_NAMESPACE/certs
     fi
     if [[ "$(ls certs/* | grep -v '\.sh')" != "" ]]; then
       sudo cp $(ls certs/* | grep -v '\.sh') /mnt/$ACUMOS_NAMESPACE/certs/.
@@ -220,10 +221,8 @@ function prepare_mariadb() {
       delete_namespace $ACUMOS_MARIADB_NAMESPACE
       delete_pvc $ACUMOS_MARIADB_NAMESPACE $MARIADB_DATA_PVC_NAME
     else
-      bash mariadb/docker_compose.sh $AIO_ROOT down
+      bash mariadb/docker_compose.sh down
     fi
-    log "Remove any existing PV data for mariadb-service"
-    delete_pv mariadb-data $ACUMOS_MARIADB_NAMESPACE
     log "Setup the mariadb-data PV"
     reset_pv mariadb-data $ACUMOS_MARIADB_NAMESPACE \
       $MARIADB_DATA_PV_SIZE "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
@@ -236,22 +235,26 @@ function prepare_mariadb() {
 
 function prepare_acumos() {
   trap 'fail' ERR
-  if [[ $($k8s_cmd delete $k8s_nstype $ACUMOS_NAMESPACE) ]]; then
-    # Deleting namespace deletes all services, deployments, PVCs, ...
-    # including core components, kong, nexus, and beats
-    while $k8s_cmd get $k8s_nstype $ACUMOS_NAMESPACE; do
-      log "Waiting 10 seconds for namespace $ACUMOS_NAMESPACE to be deleted"
-      sleep 10
-    done
+  if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
+    if [[ $($k8s_cmd delete $k8s_nstype $ACUMOS_NAMESPACE) ]]; then
+      # Deleting namespace deletes all services, deployments, PVCs, ...
+      # including core components, kong, nexus, and beats
+      while $k8s_cmd get $k8s_nstype $ACUMOS_NAMESPACE; do
+        log "Waiting 10 seconds for namespace $ACUMOS_NAMESPACE to be deleted"
+        sleep 10
+      done
+    fi
   fi
 
   reset_pv logs $ACUMOS_NAMESPACE $ACUMOS_LOGS_PV_SIZE \
     "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
-
-  if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-    reset_pv certs $ACUMOS_NAMESPACE $ACUMOS_CERTS_PV_SIZE \
-      "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
+  reset_pv certs $ACUMOS_NAMESPACE $ACUMOS_CERTS_PV_SIZE \
+    "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
+  log "Prepare the sv-scanning configmap folder"
+  if [[ ! -e /mnt/$ACUMOS_NAMESPACE/sv ]]; then
+    sudo mkdir /mnt/$ACUMOS_NAMESPACE/sv
   fi
+  sudo chown $ACUMOS_HOST_USER:$ACUMOS_HOST_USER /mnt/$ACUMOS_NAMESPACE/sv
 }
 
 function prepare_docker_engine() {
@@ -276,15 +279,34 @@ function prepare_nexus() {
 
 function prepare_elk() {
   trap 'fail' ERR
-
   if [[ "$ACUMOS_DEPLOY_ELK" == "true" ]]; then
     source $AIO_ROOT/../charts/elk-stack/setup_elk_env.sh
     cp elk_env.sh $AIO_ROOT/../charts/elk-stack/.
     if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
       delete_namespace $ACUMOS_ELK_NAMESPACE
+      if [[ ! $(kubectl get pv elasticsearch-data) ]]; then
+        setup_pv elasticsearch-data $ACUMOS_ELK_NAMESPACE \
+          $ACUMOS_ELASTICSEARCH_DATA_PV_SIZE "1000:1000"
+      fi
+    else
+      setup_pv elasticsearch-data $ACUMOS_ELK_NAMESPACE \
+        $ACUMOS_ELASTICSEARCH_DATA_PV_SIZE "1000:1000"
     fi
-    reset_pv elasticsearch-data $ACUMOS_ELK_NAMESPACE \
-      $ACUMOS_ELASTICSEARCH_DATA_PV_SIZE "1000:1000"
+  fi
+}
+
+function prepare_mlwb() {
+  trap 'fail' ERR
+  if [[ "$ACUMOS_DEPLOY_MLWB" == "true" ]]; then
+    source $AIO_ROOT/mlwb/mlwb_env.sh
+    if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
+      reset_pv nifi-registry $ACUMOS_NAMESPACE \
+        $MLWB_NIFI_REGISTRY_PV_SIZE "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
+    else
+      # For docker, jupyterhub-certs is accessed via a host-mapped volume
+      reset_pv jupyterhub-certs $ACUMOS_NAMESPACE \
+        10Mi "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
+    fi
   fi
 }
 
@@ -303,13 +325,11 @@ function prepare_env() {
   ACUMOS_HOST_IP=$(/sbin/ip route get 8.8.8.8 | head -1 | sed 's/^.*src //' | awk '{print $1}')
   update_env ACUMOS_HOST_IP $ACUMOS_HOST_IP force
 
-  get_host_info
   update_env ACUMOS_HOST_OS $HOST_OS
   update_env ACUMOS_HOST_OS_VER $HOST_OS_VER
   source $AIO_ROOT/acumos_env.sh
 }
 
-set -x
 if [[ $# -lt 3 ]]; then
   cat <<'EOF'
 Usage:
@@ -318,18 +338,20 @@ Usage:
     under: docker|k8s; install prereqs for docker or k8s based deployment
     domain: FQDN of platform
     user: user that will be completing Acumos platform setup via
-          oneclick_deploy.sh (if installing for yousrself, use $USER)
+          oneclick_deploy.sh (if installing for yourself, use $USER)
     k8s_dist: k8s distribution (generic|openshift), required for k8s deployment
 EOF
   echo "All parameters not provided"
   exit 1
 fi
 
-AIO_ROOT=$(dirname "$0")
-sed -i -- "s~AIO_ROOT=.*~AIO_ROOT=$AIO_ROOT~g" acumos_env.sh
-source acumos_env.sh
-source utils.sh
+set -x
 trap 'fail' ERR
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+source utils.sh
+source acumos_env.sh
+verify_ubuntu_or_centos
 
 prepare_env $1 $2 $3 $4
 setup_prereqs
@@ -355,15 +377,13 @@ fi
 
 prepare_mariadb
 prepare_elk
-bash $AIO_ROOT/../tools/setup_mariadb_client.sh $AIO_ROOT
+bash $AIO_ROOT/../tools/setup_mariadb_client.sh
 setup_keystore
-if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
-  delete_namespace $ACUMOS_NAMESPACE
-fi
 prepare_acumos
 prepare_docker_engine
 prepare_kong
 prepare_nexus
+prepare_mlwb
 
 mkdir -p $AIO_ROOT/../../acumos/env $AIO_ROOT/../../acumos/certs $AIO_ROOT/../../acumos/logs
 cp $AIO_ROOT/*_env.sh $AIO_ROOT/../../acumos/env/.

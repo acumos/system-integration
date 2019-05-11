@@ -22,36 +22,9 @@
 # Prerequisites:
 # - Acumos AIO platform deployed
 # - Access to system-integration clone, as updated during the install process
+# - Key-based SSH access to the Acumos host, for updating docker images
 #
 # Usage: see below
-
-set -x
-if [[ $# -lt 1 ]]; then
-  cat <<'EOF'
-Usage:
-  For docker-based deployments run this script on the AIO install host.
-  For k8s-based deployments run this script on the AIO install host or on
-  a workstation configured for remote use of kubectl/oc, e.g. as setup by
-  system-integration/tools/setup_kubectl.sh or
-  system-integration/tools/setup_openshift_client.sh
-
-  $ bash redeploy_component.sh <component>
-    component: name of the component. For core components (those under
-    AIO/docker/acumos or AIO/kubernetes/deployment), this is the name of the
-    docker "service" or the k8s "app" value from the deployment template.
-    Any modificationa to acumos_env.sh or the deployment template will be
-    applied, using the templates in the applicable source folder.
-    Other components can be redeployed by the names: metricbeat, filebeat,
-    docker-proxy, elk-stack, kong, docker-dind (under k8s only).
-    Note: mariadb and nexus are not supported at this time as redeploying them
-    alone may reset/corrupt platform data (support is planned).
-
-    If redeployment is successful, the script will tail the component's logs.
-    Hit ctrl-c to stop tailing the logs.
-EOF
-  echo "All parameters not provided"
-  exit 1
-fi
 
 function tail_logs() {
   # Optionally specify a specific container, for a multi-container pod
@@ -69,12 +42,26 @@ function tail_logs() {
 function redeploy_core_component() {
   trap 'fail' ERR
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
+    app="$app-service"
     if [[ "$(grep -l " $app:" docker/acumos/*)" != "" ]]; then
       yaml=$(basename $(grep -l " $app:" docker/acumos/*))
       cd docker
       # add '&& true' since 'down' will trap an error due to detecting that
       # 'network acumos_default id ... has active endpoints' (irrelevant)
+      log "Bring the $app service down"
       docker-compose -f acumos/$yaml down && true
+      if [[ "$app" == "sv-scanning-service" ]]; then
+        log "Prepare the sv-scanning config volume"
+        rm -rf /mnt/$ACUMOS_NAMESPACE/sv/*
+        cp -r $AIO_ROOT/kubernetes/configmap/sv-scanning/* /mnt/$ACUMOS_NAMESPACE/sv/.
+      fi
+      if [[ "$image" != "" ]]; then
+        image=$(docker image list | awk "/$image/{print \$3}")
+        if [[ "$image" != "" ]]; then
+          docker image rm $image
+        fi
+      fi
+      log "Bring the $app service back up"
       docker-compose -f acumos/$yaml up -d --build
     else
       fail "$app not found in $AIO_ROOT/docker/acumos"
@@ -84,65 +71,116 @@ function redeploy_core_component() {
       yaml=$(basename $(grep -l "app: $app" kubernetes/service/*))
       if [[ ! -e deploy ]]; then mkdir deploy; fi
       cp kubernetes/service/$yaml deploy/.
-      replace_env deploy
+      replace_env deploy/$yaml
+      log "Bring the $app service down"
       stop_service deploy/$yaml
+      log "Bring the $app service back up"
       start_service deploy/$yaml
       yaml=$(basename $(grep -l "app: $app" kubernetes/deployment/*))
       cp kubernetes/deployment/$yaml deploy/.
-      replace_env deploy
+      replace_env deploy/$yaml
+      log "Bring the $app deployment down"
       stop_deployment deploy/$yaml
+      cleanup_snapshot_images
+      if [[ "$app" == "sv-scanning" ]]; then
+        trap - ERR
+        kubectl delete configmap -n $ACUMOS_NAMESPACE sv-scanning-scripts
+        kubectl delete configmap -n $ACUMOS_NAMESPACE sv-scanning-licenses
+        kubectl delete configmap -n $ACUMOS_NAMESPACE sv-scanning-rules
+        trap 'fail' ERR
+        kubectl create configmap -n $ACUMOS_NAMESPACE sv-scanning-scripts \
+          --from-file=kubernetes/configmap/sv-scanning/scripts
+        kubectl create configmap -n $ACUMOS_NAMESPACE sv-scanning-licenses \
+          --from-file=kubernetes/configmap/sv-scanning/licenses
+        kubectl create configmap -n $ACUMOS_NAMESPACE sv-scanning-rules \
+          --from-file=kubernetes/configmap/sv-scanning/rules
+      fi
+      log "Bring the $app deployment back up"
       start_deployment deploy/$yaml
       wait_running $app $ACUMOS_NAMESPACE
     else
       fail "$app not found in $AIO_ROOT/kubernetes/deployment"
     fi
   fi
-  tail_logs $ACUMOS_NAMESPACE $app
 }
 
-app=$1
+if [[ $# -lt 1 ]]; then
+  cat <<'EOF'
+Usage:
+  For docker-based deployments run this script on the AIO install host.
+  For k8s-based deployments run this script on the AIO install host or on
+  a workstation configured for remote use of kubectl/oc, e.g. as setup by
+  system-integration/tools/setup_kubectl.sh or
+  system-integration/tools/setup_openshift_client.sh
+
+  $ bash redeploy_component.sh <component> [image=<image>] [tail]
+    component: name of the component. For core components (those under
+    AIO/docker/acumos or AIO/kubernetes/deployment), this is the name of the
+    docker "service" or the k8s "app" value from the deployment template.
+    Any modificationa to acumos_env.sh or the deployment template will be
+    applied, using the templates in the applicable source folder.
+    Other components can be redeployed by the names: metricbeat, filebeat,
+    docker-proxy, elk-stack, kong, docker-dind (under k8s only).
+    Note: mariadb and nexus are not supported at this time as redeploying them
+    alone may reset/corrupt platform data (support is planned).
+    image=<image>: (optional) docker image to cleanup; this should be a string that
+      can uniquely identify the images to be cleaned up when the component
+      is down. Useful mostly for forcing re-pull of snapshot images.
+      Example: 'security-verification' will delete all images with that string
+      in the image reference.
+    tail: (optional) after deployment, tail the logs.
+EOF
+  echo "All parameters not provided"
+  exit 1
+fi
+
+set -x
+trap 'fail' ERR
 WORK_DIR=$(pwd)
 cd $(dirname "$0")
-source acumos_env.sh
-export AIO_ROOT=$(pwd)
 source utils.sh
-
-function fail() {
-  log "$1"
-  cd $WORK_DIR
-  exit 1
-}
+source acumos_env.sh
+app=$1
+ps="$2 $3"
+for p in $ps; do
+  if [[ "$p" == *"image="* ]]; then
+    image=$(echo $p | cut -d '=' -f 2)
+  elif [[ "$p" == "tail" ]]; then
+    tail=true
+  fi
+done
 
 case "$app" in
   metricbeat)
-    bash $AIO_ROOT/beats/setup_beats.sh $AIO_ROOT metricbeat
-    tail_logs acumos metricbeat
+    bash $AIO_ROOT/beats/setup_beats.sh metricbeat
+    [ "$tail" == "true" ] && tail_logs $ACUMOS_NAMESPACE metricbeat
     ;;
   filebeat)
-    bash $AIO_ROOT/beats/setup_beats.sh $AIO_ROOT filebeat
-    tail_logs acumos metricbeat
+    bash $AIO_ROOT/beats/setup_beats.sh filebeat
+    [ "$tail" == "true" ] && tail_logs $ACUMOS_NAMESPACE metricbeat
     ;;
   docker-dind)
     if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
-      bash $AIO_ROOT/docker-engine/setup_docker_engine.sh $AIO_ROOT
+      bash $AIO_ROOT/docker-engine/setup_docker_engine.sh
     else
       fail "Redeploying the host-based docker-engine is not supported"
     fi
-    tail_logs acumos docker-dind docker-daemon
+    [ "$tail" == "true" ] && tail_logs acumos docker-dind docker-daemon
     ;;
   docker-proxy)
-    bash $AIO_ROOT/docker-proxy/setup_docker_proxy.sh $AIO_ROOT
-    tail_logs acumos docker-proxy
+    bash $AIO_ROOT/docker-proxy/setup_docker_proxy.sh
+    [ "$tail" == "true" ] && tail_logs $ACUMOS_NAMESPACE docker-proxy
     ;;
   elk-stack)
-    bash $AIO_ROOT/elk-stack/setup_elk.sh $AIO_ROOT
-    tail_logs acumos-elk logstash
+    bash $AIO_ROOT/elk-stack/setup_elk.sh
+    [ "$tail" == "true" ] && tail_logs $ACUMOS_ELK_NAMESPACE logstash
     ;;
   kong)
-    bash $AIO_ROOT/kong/setup_kong.sh $AIO_ROOT
-    tail_logs acumos kong kong
+    bash $AIO_ROOT/kong/setup_kong.sh
+    [ "$tail" == "true" ] && tail_logs $ACUMOS_NAMESPACE kong kong
     ;;
   *)
     redeploy_core_component
+    [ "$tail" == "true" ] && tail_logs $ACUMOS_NAMESPACE $app
 esac
 cd $WORK_DIR

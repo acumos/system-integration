@@ -17,35 +17,28 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# What this is: Utility to add a host alias to an Acumos core component, e.g.
+# What this is: Utility to add a host alias to an Acumos component, e.g.
 # for hostnames/FQDNs that are not resolvable through DNS.
 # Prerequisites:
 # - Acumos AIO platform deployed, with access to the saved environment files
+# - Run this script from the system-integration/tools folder on the Acumos host
 # - Hostname/FQDN must be resolvable on the host where this script is run
-# - For updating docker-based platforms, run this script from the AIO folder
-#   on the Acumos host
 #
 # Usage:
-# $ bash add_host_alias.sh <env> <name> <app>
-#   env: path to local platform environment file acumos_env.sh
-#   name: hostname/FQDN to add
-#   app: Acumos component app, from deployment template.metadata.labels.app
+#   To update a docker-compose deployed component
+#   $ bash add_host_alias.sh docker <name> <template>
+#     name: hostname/FQDN to add
+#     template: Full path to the template file
 #
-
-function fail() {
-  reason="$1"
-  if [[ "$1" == "" ]]; then reason="unknown failure at $fname $fline"; fi
-  log "$reason"
-  exit 1
-}
-
-function log() {
-  set +x
-  fname=$(caller 0 | awk '{print $2}')
-  fline=$(caller 0 | awk '{print $1}')
-  echo; echo "$fname:$fline ($(date)) $1"
-  set -x
-}
+#   To update a k8s-based component:
+#   $ bash add_host_alias.sh k8s <name> <namespace> <template|app> [component]
+#     name: hostname/FQDN to add
+#     namespace: k8s namespace
+#     template|app: For type 'template', the full path to the template file.
+#       For 'deployment', the Acumos component 'app' from
+#       deployment template.metadata.labels.app
+#     component: (optional) match template.metadata.labels.component
+#
 
 function add_host_alias() {
   trap 'fail' ERR
@@ -59,10 +52,26 @@ function add_host_alias() {
     fail "IP address of $name cannot be determined."
   fi
 
-  if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
-    log "Patch the running deployment for $app, to restart it with the changes"
+  if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
+    if [[ $(grep -c "\"$name:$ip\"" $template) -eq 0 ]]; then
+      n="$(grep -m 1 '^\( *\)restart:' $template | sed 's/restart:.*//')"
+      if [[ $(grep -c "extra_hosts:" $template) -eq 0 ]]; then
+        sed -i -- "/restart:.*/a\\${n}extra_hosts:\n$n\ \ - \"$name:$ip\"" $template
+      else
+        sed -i -- "/extra_hosts:/a\\${n}\ \ - \"$name:$ip\"" $template
+      fi
+      cd $(dirname $template)
+      cd ..
+      trap - ERR
+      docker-compose -f acumos/$(basename -- "$template") up -d --build
+      trap 'fail' ERR
+      wait_running $appname $namespace
+    fi
+  else
     tmp="/tmp/$(uuidgen)"
-    cat <<EOF >$tmp
+    if [[ "$(echo $app | grep '\.yaml')" == "" ]]; then
+      log "Patch the running deployment for $app, to restart it with the changes"
+      cat <<EOF >$tmp
 spec:
   template:
     spec:
@@ -71,24 +80,68 @@ spec:
         hostnames:
         - "$name"
 EOF
-    kubectl patch deployment -n $ACUMOS_NAMESPACE $app --patch "$(cat $tmp)"
-    rm $tmp
-  else
-    c=$(docker ps -a | awk "/$app/{print \$1}")
-    docker exec $c /bin/sh -c "echo \"$ip $name\" >>/etc/hosts"
+      if [[ "$component" != "" ]]; then c="-l component=$component"; fi
+      dep=$(kubectl get deployment -n $namespace -l app=$app $c -o json | jq -r ".items[0].metadata.name")
+      kubectl patch deployment -n $namespace $dep --patch "$(cat $tmp)"
+      rm $tmp
+    else
+      if [[ $(grep -c "\- \"$name\"" $app) -eq 0 ]]; then
+        n="$(grep -m 1 '^\( *\)restartPolicy:' $app | sed 's/restartPolicy:.*//')"
+        if [[ $(grep -c "hostAliases:" $app) -eq 0 ]]; then
+          sed -i -- "/restartPolicy:.*/a\\${n}hostAliases:\n$n- ip: \"$ip\"\n$n\ \ hostnames:\n$n\ \ - \"$name\"" $app
+        else
+          sed -i -- "/hostAliases:.*/a\\${n}- ip: \"$ip\"\n$n\ \ hostnames:\n$n\ \ - \"$name\"" $app
+        fi
+        if [[ "$app" == *"/AIO/kubernetes/deployment/"* ]]; then
+          cp $app $AIO_ROOT/deploy/.
+          app=$AIO_ROOT/deploy/$(basename $app)
+        fi
+        replace_env $app
+        kubectl delete -f $app
+        kubectl create -f $app
+        appname=$(grep -m 1 'app: ' $app | awk '{print $2}')
+        wait_running $appname $namespace
+      fi
+    fi
   fi
 }
 
+if [[ $# -lt 3 ]]; then
+  cat <<'EOF'
+To update a docker-compose deployed component
+   $ bash add_host_alias.sh docker <name> <template>
+     name: hostname/FQDN to add
+     template: Full path to the template file
+
+To update a k8s-based component:
+   $ bash add_host_alias.sh k8s <name> <namespace> <template|app> [component]
+     name: hostname/FQDN to add
+     namespace: k8s namespace
+     template|app: For type 'template', the full path to the template file.
+       For 'deployment', the Acumos component 'app' from
+       deployment template.metadata.labels.app
+     component: (optional) match template.metadata.labels.component
+EOF
+  echo "All parameters not provided"
+  exit 1
+fi
+
 set -x
 trap 'fail' ERR
-
-env=$1
-name=$2
-app=$3
-
 WORK_DIR=$(pwd)
-set +x
-source $env
-set -x
+cd $(dirname "$0")
+export AIO_ROOT="$(cd ../AIO; pwd -P)"
+source $AIO_ROOT/utils.sh
+source $AIO_ROOT/acumos_env.sh
+type=$1
+if [[ "$type" == "docker" ]]; then
+  name=$2
+  template=$3
+else
+  name=$2
+  app=$3
+  namespace=$4
+  component=$5
+fi
 add_host_alias
 cd $WORK_DIR

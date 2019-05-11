@@ -36,22 +36,25 @@
 
 function fail() {
   reason="$1"
+  fname=$(caller 0 | awk '{print $2}')
+  fline=$(caller 0 | awk '{print $1}')
   if [[ "$1" == "" ]]; then reason="unknown failure at $fname $fline"; fi
   log "$reason"
   exit 1
 }
 
 function log() {
+  setx=${-//[^x]/}
   set +x
   fname=$(caller 0 | awk '{print $2}')
   fline=$(caller 0 | awk '{print $1}')
   echo; echo "$fname:$fline ($(date)) $1"
-  set -x
+  if [[ -n "$setx" ]]; then set -x; else set +x; fi
 }
 
 function setup_peer() {
   trap 'fail' ERR
-  local cdsapi="https://$ACUMOS_DOMAIN:$ACUMOS_KONG_PROXY_SSL_PORT/ccds/peer"
+  local cdsapi="https://$ACUMOS_DOMAIN/ccds/peer"
   local creds="$ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD"
   local peers=$(curl -s -u $creds -k $cdsapi)
   local np=$(echo $peers | jq '.content | length')
