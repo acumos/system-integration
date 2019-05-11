@@ -129,16 +129,19 @@ APISERVER=$(ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
 if [[ "$APISERVER" == "" ]]; then
   fail "Unable to retrieve API server URL"
 fi
+log "APISERVER=$APISERVER"
 SECRET=$(ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $user@$server \
   kubectl get secrets | grep -m1 ^default-token | cut -f1 -d ' ')
 if [[ "$SECRET" == "" ]]; then
   fail "Unable to retrieve default-token secret"
 fi
+log "SECRET=$SECRET"
 TOKEN=$(ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $user@$server \
   kubectl describe secret $SECRET | grep -E '^token' | cut -f2 -d':' | tr -d " ")
 if [[ "$TOKEN" == "" ]]; then
   fail "Unable to retrieve token"
 fi
+log "TOKEN=$TOKEN"
 curl $APISERVER/api --header "Authorization: Bearer $TOKEN" --insecure
 
 kubectl config set-cluster $server --server=$APISERVER \

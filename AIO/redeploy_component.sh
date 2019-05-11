@@ -75,6 +75,7 @@ function redeploy_core_component() {
       # add '&& true' since 'down' will trap an error due to detecting that
       # 'network acumos_default id ... has active endpoints' (irrelevant)
       docker-compose -f acumos/$yaml down && true
+#      docker system prune -a -f
       docker-compose -f acumos/$yaml up -d --build
     else
       fail "$app not found in $AIO_ROOT/docker/acumos"
@@ -91,6 +92,7 @@ function redeploy_core_component() {
       cp kubernetes/deployment/$yaml deploy/.
       replace_env deploy
       stop_deployment deploy/$yaml
+#      docker system prune -a -f
       start_deployment deploy/$yaml
       wait_running $app $ACUMOS_NAMESPACE
     else
