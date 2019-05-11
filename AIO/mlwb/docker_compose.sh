@@ -1,4 +1,4 @@
-apiVersion: batch/v1
+#!/bin/bash
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -16,37 +16,41 @@ apiVersion: batch/v1
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
+#
+# What this is:
+# Deployment script for the Acumos MLWB service under docker.
+# Sets environment variables needed by docker-compose in all-in-one environment
+# then invokes docker-compose with the command-line arguments.
+#
+# Usage:
+# $ bash docker_compose.sh <AIO_ROOT> [options]
+#   AIO_ROOT: path to AIO folder where environment files are
+#   options: optional parameters to docker-compose.
+#
 
-# What this is: kubernetes template for Acumos kong deployment
-# How to use:
+if [[ $# -lt 1 ]]; then
+  cat <<'EOF'
+Usage:
+$ bash docker_compose.sh <AIO_ROOT> [options]
+  AIO_ROOT: path to AIO folder where environment files are
+  options: optional parameters to docker-compose.
+EOF
+  echo "All parameters not provided"
+  exit 1
+fi
 
-kind: Job
-metadata:
-  namespace: <ACUMOS_NAMESPACE>
-  name: kong-configure
-spec:
-  template:
-    spec:
-      containers:
-      - name: kong-configure
-        image: buildpack-deps:bionic-curl
-        env:
-        - name: KONG_ADMIN_HOST
-          value: "kong-admin-service"
-        - name: KONG_ADMIN_PORT
-          value: "8001"
-        - name: ACUMOS_DOMAIN
-          value: <ACUMOS_DOMAIN>
-        - name: ACUMOS_CERT
-          value: <ACUMOS_CERT>
-        - name: ACUMOS_CERT_KEY
-          value: <ACUMOS_CERT_KEY>
-        volumeMounts:
-        - mountPath: /var/acumos/config
-          name: kong-config
-        command: ['/bin/bash', '/var/acumos/config/configure_kong.sh']
-      restartPolicy: Never
-      volumes:
-      - name: kong-config
-        configMap:
-          name: kong-config
+set -x
+WORK_DIR=$(pwd)
+export AIO_ROOT=$1
+source $AIO_ROOT/acumos_env.sh
+cd $(dirname "$0")
+source mlwb_env.sh
+opts=""
+files=$(ls docker/acumos)
+for file in $files ; do
+ opts="$opts -f acumos/$file"
+done
+cmd="$2 $3 $4 $5"
+cd docker
+docker-compose $opts $cmd
+cd $WORK_DIR

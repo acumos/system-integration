@@ -150,7 +150,7 @@ services:
                     },
                     \"client\": {
                       \"ssl\": {
-                        \"key-store\": \"/app/certs/${ACUMOS_KEYSTORE}\",
+                        \"key-store\": \"/app/certs/${ACUMOS_KEYSTORE_P12}\",
                         \"key-store-password\": \"${ACUMOS_KEYSTORE_PASSWORD}\",
                         \"key-store-type\": \"PKCS12\",
                         \"key-password\": \"${ACUMOS_CERT_KEY_PASSWORD}\",
@@ -170,6 +170,9 @@ services:
                     },
                     \"jwt\": {
                       \"auth\": {
+                        \"secret\": {
+                          \"key\": \"${ACUMOS_JWT_KEY}\"
+                        },
                         \"timeout\": \"80000000\"
                       }
                     },
@@ -190,6 +193,24 @@ services:
                       \"size\": \"${ACUMOS_PORTAL_IMAGE_MAX_SIZE}\"
                     }
            }"
+       command: >
+         /bin/bash -c "
+            cd /maven;
+            apt-get update;
+            apt-get install -y wget;
+            wget https://nexus.acumos.org/content/repositories/snapshots/org/acumos/security-verification/security-verification-client/0.0.17-SNAPSHOT/security-verification-client-0.0.17-20190516.135207-5.jar;
+            rm security-verification-client-0.0.16.jar;
+            mv security-verification-client-0.0.17-20190516.135207-5.jar security-verification-client-0.0.16.jar;
+            mv acumos-portal-be-2.2.12.jar acumos-portal-be-2.2.12.jar-bak;
+            cd /maven;
+            apt-get install -y software-properties-common;
+            add-apt-repository ppa:openjdk-r/ppa;
+            apt-get install -y gpg;
+            apt-get update;
+            apt-get install -y openjdk-8-jdk;
+            jar c0vfm acumos-portal-be-2.2.12.jar META-INF/MANIFEST.MF META-INF BOOT-INF org;
+            java -Xms512m -Xmx1024m -Djava.security.egd=file:/dev/./urandom -jar acumos-portal-be-2.2.12.jar;
+           "
        expose:
            - 8083
        volumes:
