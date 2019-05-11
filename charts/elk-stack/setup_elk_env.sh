@@ -41,7 +41,14 @@ if [[ -e elk_env.sh ]]; then source elk_env.sh; fi
 export ACUMOS_ELK_NAMESPACE="${ACUMOS_ELK_NAMESPACE:-acumos-elk}"
 export ACUMOS_ELK_DOMAIN="${ACUMOS_ELK_DOMAIN:-$ACUMOS_DOMAIN}"
 export ACUMOS_ELK_HOST="${ACUMOS_ELK_HOST:-$ACUMOS_HOST}"
-export ACUMOS_ELK_HOST_IP="${ACUMOS_ELK_HOST_IP:-$ACUMOS_HOST_IP}"
+
+if [[ $(host $ACUMOS_ELK_HOST | grep -c 'not found') -eq 0 ]]; then
+  export ACUMOS_ELK_HOST_IP=$(host $ACUMOS_ELK_HOST | head -1 | cut -d ' ' -f 4)
+elif [[ $(grep -c -E " $ACUMOS_ELK_HOST( |$)" /etc/hosts) -gt 0 ]]; then
+  export ACUMOS_ELK_HOST_IP=$(grep -E "$ACUMOS_ELK_HOST( |$)" /etc/hosts | cut -d ' ' -f 1)
+else
+  fail "Please ensure host $ACUMOS_ELK_HOST is resolvable thru DNS or hosts file"
+fi
 
 # External component options
 export HTTP_PROXY="${HTTP_PROXY:-}"

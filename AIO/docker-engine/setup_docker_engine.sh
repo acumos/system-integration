@@ -26,8 +26,7 @@
 #
 # Usage:
 # For docker-based deployments, run this script on the AIO host.
-# $ bash setup_docker_engine.sh <AIO_ROOT>
-#   AIO_ROOT: path to AIO folder where environment files are
+# $ bash setup_docker_engine.sh
 #
 
 function clean_docker_engine() {
@@ -59,25 +58,13 @@ function setup_docker_engine() {
   wait_running docker-dind $ACUMOS_NAMESPACE
 }
 
-if [[ $# -lt 1 ]]; then
-  cat <<'EOF'
-Usage:
-  For docker-based deployments, run this script on the AIO host.
-  For k8s-based deployment, run this script on the AIO host or a workstation
-  connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
-  $ bash setup_docker_engine.sh <AIO_ROOT>
-    AIO_ROOT: path to AIO folder where environment files are
-EOF
-  echo "All parameters not provided"
-  exit 1
-fi
-
-WORK_DIR=$(pwd)
-export AIO_ROOT=$1
-source $AIO_ROOT/acumos_env.sh
-source $AIO_ROOT/utils.sh
+set -x
 trap 'fail' ERR
-cd $AIO_ROOT/docker-engine
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ..; pwd -P)"; fi
+source $AIO_ROOT/utils.sh
+source $AIO_ROOT/acumos_env.sh
 clean_docker_engine
 setup_docker_engine
 cd $WORK_DIR
