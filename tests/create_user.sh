@@ -35,7 +35,7 @@
 #.   firstName: first name
 #.   lastName: last name
 #.   emailId: email address
-#.   role: optional role to set for the user (e.g. "admin")
+#.   role: optional role to set for the user (e.g. "Admin")
 #
 
 function fail() {
