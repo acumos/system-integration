@@ -60,7 +60,7 @@ function setup_prereqs() {
   if [[ $(host $ACUMOS_DOMAIN | grep -c 'not found') -gt 0 ]]; then
     if [[ $(grep -c -E " $ACUMOS_DOMAIN( |$)" /etc/hosts) -eq 0 ]]; then
       log "Add $ACUMOS_DOMAIN to /etc/hosts"
-      echo "$ACUMOS_DOMAIN $ACUMOS_HOST_IP" | sudo tee -a /etc/hosts
+      echo "$ACUMOS_HOST_IP $ACUMOS_DOMAIN" | sudo tee -a /etc/hosts
     fi
   fi
 
