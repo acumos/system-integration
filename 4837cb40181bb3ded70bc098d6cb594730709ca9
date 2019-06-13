@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e98f7460_069a5d43",
+        "filename": "AIO/acumos_env.sh",
+        "patchSetId": 33
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 290
+      },
+      "writtenOn": "2019-06-13T21:47:59Z",
+      "side": 1,
+      "message": "will test once portal is released. Staging can be overridden many times.",
+      "revId": "4837cb40181bb3ded70bc098d6cb594730709ca9",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df5a3c2b_5a38609b",
+        "filename": "AIO/acumos_env.sh",
+        "patchSetId": 33
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 290
+      },
+      "writtenOn": "2019-06-13T21:47:59Z",
+      "side": 1,
+      "message": "will test once portal is released. Staging can be overridden many times.",
+      "revId": "4837cb40181bb3ded70bc098d6cb594730709ca9",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
