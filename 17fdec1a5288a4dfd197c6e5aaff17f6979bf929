@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "397d85a0_ba1ac289",
+        "filename": "AIO/kubernetes/deployment/federation-deployment.yaml",
+        "patchSetId": 38
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 290
+      },
+      "writtenOn": "2019-06-21T18:27:52Z",
+      "side": 1,
+      "message": "We need to remove http:// from this path",
+      "revId": "17fdec1a5288a4dfd197c6e5aaff17f6979bf929",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
