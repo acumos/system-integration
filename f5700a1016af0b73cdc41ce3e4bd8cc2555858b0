@@ -51,6 +51,24 @@
       "revId": "f5700a1016af0b73cdc41ce3e4bd8cc2555858b0",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a6961e94_638c670f",
+        "filename": "AIO/kubernetes/deployment/sv-scanning-deployment.yaml",
+        "patchSetId": 40
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2019-06-26T17:14:18Z",
+      "side": 0,
+      "message": "ok, maybe we still need it. Not sure why the change had no effect in my env, but the same hostname is likely used by other component references, so I will add it back.",
+      "parentUuid": "f682348d_dec1e7c4",
+      "revId": "f5700a1016af0b73cdc41ce3e4bd8cc2555858b0",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
