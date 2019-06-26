@@ -16,6 +16,23 @@
       "revId": "f5700a1016af0b73cdc41ce3e4bd8cc2555858b0",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "83f14bb8_7b557da4",
+        "filename": "AIO/kubernetes/deployment/sv-scanning-deployment.yaml",
+        "patchSetId": 40
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 290
+      },
+      "writtenOn": "2019-06-26T07:19:01Z",
+      "side": 0,
+      "message": "was this removed as an accident?",
+      "revId": "f5700a1016af0b73cdc41ce3e4bd8cc2555858b0",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
