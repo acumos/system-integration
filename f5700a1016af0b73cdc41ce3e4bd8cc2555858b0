@@ -33,6 +33,24 @@
       "revId": "f5700a1016af0b73cdc41ce3e4bd8cc2555858b0",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f682348d_dec1e7c4",
+        "filename": "AIO/kubernetes/deployment/sv-scanning-deployment.yaml",
+        "patchSetId": 40
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2019-06-26T17:09:55Z",
+      "side": 0,
+      "message": "no, it turned out to be superfluous for SV, so no need to have it there. I am trying to eliminate cruft in the runup to release",
+      "parentUuid": "83f14bb8_7b557da4",
+      "revId": "f5700a1016af0b73cdc41ce3e4bd8cc2555858b0",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
