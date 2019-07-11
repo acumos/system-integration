@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "39cb7940_d363d622",
+        "filename": "AIO/mlwb/setup_mlwb.sh",
+        "patchSetId": 39
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 291
+      },
+      "writtenOn": "2019-07-11T18:10:05Z",
+      "side": 1,
+      "message": "This copy step fails the charts/jupyterhub/certs folder is not available",
+      "revId": "8b84a655d68da543d2661b966c92e5f63d02cef7",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
