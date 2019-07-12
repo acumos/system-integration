@@ -20,14 +20,13 @@
 ==================
 System Integration
 ==================
- 
+
 .. toctree::
        :maxdepth: 2
- 
+
        release-notes
        user-guide
-       k8s-deployment
        oneclick-deploy/index
-       
- 
+
+
 * :ref:`search`
