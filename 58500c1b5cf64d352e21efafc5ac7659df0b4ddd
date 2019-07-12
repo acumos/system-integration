@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d76d9f9e_a5216f08",
+        "filename": "AIO/acumos_env.sh",
+        "patchSetId": 60
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 290
+      },
+      "writtenOn": "2019-07-12T02:27:35Z",
+      "side": 1,
+      "message": "remove pls",
+      "revId": "58500c1b5cf64d352e21efafc5ac7659df0b4ddd",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d5751fcd_24e70c78",
+        "filename": "AIO/ingress/templates/k8s-client-ingress.yaml",
+        "patchSetId": 60
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 290
+      },
+      "writtenOn": "2019-07-12T02:27:35Z",
+      "side": 1,
+      "message": "I don\u0027t think there is an equivalent setup for kong / docker proxy",
+      "revId": "58500c1b5cf64d352e21efafc5ac7659df0b4ddd",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "200dfed9_c3be0a52",
+        "filename": "AIO/ingress/templates/k8s-client-ingress.yaml",
+        "patchSetId": 60
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 290
+      },
+      "writtenOn": "2019-07-12T02:27:35Z",
+      "side": 1,
+      "message": "this is not doing anything.. there is no end point for getSolutionZip",
+      "revId": "58500c1b5cf64d352e21efafc5ac7659df0b4ddd",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d4f357ae_276eb2e4",
+        "filename": "AIO/ingress/templates/portal-ingress.yaml",
+        "patchSetId": 60
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 290
+      },
+      "writtenOn": "2019-07-12T02:27:35Z",
+      "side": 1,
+      "message": "this delegates to zuul in portal front end -- - could we remove zuul and just use ingress for all? Remove the spring boot dependency for portal fe.",
+      "revId": "58500c1b5cf64d352e21efafc5ac7659df0b4ddd",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
