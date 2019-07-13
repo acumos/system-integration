@@ -62,8 +62,10 @@ NOTICE:
 * by default, the Acumos platform is deployed with service exposure options
   typical for development environments. Production environments and especially
   public environments will need additional planning and restrictions on exposed
-  services, that otherwise could expose your host to security risks. FOR TEST
-  PURPOSES ONLY
+  services, that otherwise could expose your host to security risks. See
+  `Security Considerations`_ for recommendations on what/how to lock down as
+  needed, for exposure of an AIO-based Acumos platform outside development/test
+  environments.
 
 Docker Based Deployment
 -----------------------
@@ -199,10 +201,12 @@ URLs to access the various platform services. You can also view the file
 
    Portal: https://acumos.example.com
    Common Data Service Swagger UI: https://acumos.example.com/ccds/swagger-ui.html
+   - if you have issues with using the CDS swagger over HTTPS, try the HTTP link
+     http://$ACUMOS_DOMAIN:$ACUMOS_CDS_NODEPORT/ccds/swagger-ui.htm
    Portal Swagger UI: https://acumos.example.com/api/swagger-ui.html
    Onboarding Service Swagger UI: https://acumos.example.com/onboarding-app/swagger-ui.html
-   Kibana: http://<IP address of acumos.example.com>:30561/app/kibana
-   Nexus: http://<IP address of acumos.example.com>:30881
+   Kibana: http://acumos.example.com:30561/app/kibana
+   Nexus: http://acumos.example.com:30881
 
 By default, the platform is not configured to require email confirmation of
 new accounts, so you can create a new account directly on the Portal home. To
@@ -919,3 +923,86 @@ Logs Location
 Logs are easily accessible on the AIO host under /mnt/<ACUMOS_NAMESPACE>/logs
 directory ('<ACUMOS_NAMESPACE>' is by default 'acumos'). That directory is
 mounted by most Acumos components as their log directory.
+
+Security Considerations
+=======================
+
+As noted in `Introduction`_, the AIO deployment approach includes various
+development/test environment-enabling aspects, that for a more "production" or
+publicly-exposed deployment, should be reconsidered and as needed, locked down.
+
+For k8s-based platforms, some of these aspects are related to work-in-progress
+on more fully supporting platform exposure through ingress controllers. An
+ingress controller is a convenient place to apply subnet-based restrictions on
+service access. See the
+`NGINX ingress annotations guide for whitelist-source-range <https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#whitelist-source-range>`_
+for more information. Following are the services exposed in the Acumos platform
+that can be access-controlled using a whitelist-source-range source annotation,
+by updating the related ingress template:
+
+.. csv-table::
+    :header: "Service", "Recommendation", "Ingress template"
+    :widths: 30, 30, 40
+    :align: left
+
+    "CDS (Common Data Service)", "Admin access only", "AIO/ingress/templates/cds-ingress.yaml"
+    "NiFi Registry", "Admin access only", "AIO/mlwb/nifi/kubernetes/ingress-registry.yaml"
+    "NiFi User", "User access (required)", "AIO/mlwb/nifi/templates/ingress.yaml"
+    "JupyterHub (Hub and User)", "User access (required)", "See note below"
+    "Kubernetes client", "User access (required)", "AIO/ingress/templates/k8s-client-ingress.yaml"
+    "Onboarding", "User access (required)", "AIO/ingress/templates/onboarding-ingress.yaml"
+    "Portal", "User access (required)", "AIO/ingress/templates/portal-ingress.yaml"
+    "MLWB Dashboard", "User access (required)", "AIO/mlwb/kubernetes/mlwb-dashboard-webcomponent-ingress.yaml"
+    "MLWB Home", "User access (required)", "AIO/mlwb/kubernetes/mlwb-home-webcomponent-ingress.yaml"
+    "MLWB Notebook", "User access (required)", "AIO/mlwb/kubernetes/mlwb-notebook-webcomponent-ingress.yaml"
+    "MLWB Notebook Catalog", "User access (required)", "AIO/mlwb/kubernetes/mlwb-notebook-catalog-webcomponent-ingress.yaml"
+    "MLWB Pipeline", "User access (required)", "AIO/mlwb/kubernetes/mlwb-pipeline-webcomponent-ingress.yaml"
+    "MLWB Pipeline Catalog", "User access (required)", "AIO/mlwb/kubernetes/mlwb-pipeline-catalog-webcomponent-ingress.yaml"
+    "MLWB Project", "User access (required)", "AIO/mlwb/kubernetes/mlwb-project-webcomponent-ingress.yaml"
+    "MLWB Project Catalog", "User access (required)", "AIO/mlwb/kubernetes/mlwb-project-catalog-webcomponent-ingress.yaml"
+..
+
+Notes on the table above:
+
+* JupyterHub ingress rules are currently created by the deployment script
+  in charts/jupyterhub/setup_jupytyerhub.sh.
+
+For other components, k8s nodeports are currently used for primary access or
+supplementatl access. Note that if possible, these services will be migrated to
+access via the ingress controller, early in the next release. However, in many
+cases these services may be provided as shared application services, and
+deployed outside the Acumos platform. The AIO toolset supports that as an option,
+which eliminates any concern about exposing these services as part of an Acumos
+platform:
+
+.. csv-table::
+    :header: "Service", "NodePort (default)", "Rational for NodePort Use", "Security Recommendation"
+    :widths: 20, 10, 30, 40
+    :align: left
+
+    "CDS (Common Data Service)", "30800", "Alternative swagger UI (see note)", "Apply firewall rule if needed"
+    "Docker Proxy", "30883", "Ingress rule is WIP (see note)", "Leave open (required)"
+    "Federation (peer access)", "30984", "Ingress rule is WIP (see note)", "Leave open (required)"
+    "Federation (local access)", "30985", "Ingress rule is WIP (see note)", "Leave open (required)"
+    "Nexus (Maven)", "30881", "Admin access to Nexus UI (see note)", "Apply firewall rule if needed, or use external service"
+    "Nexus (Docker)", "30882", "Admin access to Nexus Docker Registry (see note)", "Apply firewall rule if needed, or use external service"
+    "JupyterHub", "(dynamic ports)", "Access to the Jupyter proxy (see note)", "Apply firewall rule if needed"
+    "Security Verification (SV) Scanning Service", "30982", "Admin access to the SV service (see note)", "Apply firewall rule if needed"
+..
+
+Notes on the table above:
+
+* The CDS NodePort addresses current issues (under investigation) with access to
+  the CDS swagger UI via HTTPS thru the ingress controller
+* The Docker Proxy NodePort is currently required because an ingress rule for
+  it has not been implemented/tested. An update will be published as soon as this
+  has been done.
+* Ingress support fort Federation NodePort is a WIP, like Docker Proxy. Use of a
+  context path is hypothetically possible since peer configuration allows the
+  use of a context path when defining the peer API endpoint; this just needs to
+  be implemented/tested, and documented.  An update will be published as soon as
+  this has been done.
+* Configuraton of JupyterHub to avoid NodePort use is a WIP.
+* Access to the Security Verification Scan API is provided so that Admins can
+  invoke scans manually or through external systems, and also for the future
+  support of external scan result notifications.
