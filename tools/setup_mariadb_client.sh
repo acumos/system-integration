@@ -35,7 +35,7 @@ function wait_dpkg() {
   trap 'fail' ERR
   # TODO: workaround for "E: Could not get lock /var/lib/dpkg/lock - open (11: Resource temporarily unavailable)"
   log "waiting for dpkg to be unlocked"
-  while sudo fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do
+  while $sudo_cmd fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do
     sleep 1
   done
 }
@@ -50,9 +50,9 @@ setup_mariadb_client() {
     # update apt, after prior mariadb install using one of the mariadb mirrors.
     # The mirrors may become unreliable, thus the MARIADB_MIRROR env param
     log "Remove any prior reference to mariadb in /etc/apt/sources.list"
-    sudo sed -i -- '/mariadb/d' /etc/apt/sources.list
+    $sudo_cmd sed -i -- '/mariadb/d' /etc/apt/sources.list
 
-    sudo apt-get install software-properties-common -y
+    $sudo_cmd apt-get install software-properties-common -y
     case "$HOST_OS_VER" in
       "16.04")
         MARIADB_REPO="deb [arch=amd64,i386,ppc64el] http://$MARIADB_MIRROR/mariadb/repo/$ACUMOS_MARIADB_VERSION/ubuntu xenial main"
@@ -65,20 +65,20 @@ setup_mariadb_client() {
     esac
 
     log "Import mariadb repo key"
-    sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
-    sudo add-apt-repository "$MARIADB_REPO"
-    sudo apt-get update -y
-    sudo apt-get install -y mariadb-client
+    $sudo_cmd apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
+    $sudo_cmd add-apt-repository "$MARIADB_REPO"
+    $sudo_cmd apt-get update -y
+    $sudo_cmd apt-get install -y mariadb-client
   else
   # Add MariaDB 10 external yum repo
-    cat << EOF | sudo tee -a /etc/yum.repos.d/MariaDB.repo
+    cat << EOF | $sudo_cmd tee -a /etc/yum.repos.d/MariaDB.repo
 [mariadb]
 name = MariaDB
 baseurl = http://yum.mariadb.org/10.2/centos7-amd64
 gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
 gpgcheck=1
 EOF
-    sudo yum install -y MariaDB-client
+    $sudo_cmd yum install -y MariaDB-client
   fi
 }
 
@@ -89,4 +89,12 @@ cd $(dirname "$0")
 export AIO_ROOT="$(cd ../AIO; pwd -P)"
 source $AIO_ROOT/utils.sh
 source $AIO_ROOT/acumos_env.sh
-setup_mariadb_client
+if [[ "$(which sudo)" != "" ]]; then
+  sudo_cmd=$(which sudo)
+fi
+if [[ $(mysql --version | grep -c "$ACUMOS_MARIADB_VERSION.*-MariaDB" ) -eq 0 ]]; then
+  setup_mariadb_client
+else
+  log "MariaDB client is already the required version"
+  mysql --version
+fi

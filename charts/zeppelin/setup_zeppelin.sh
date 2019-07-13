@@ -69,9 +69,9 @@ function prereqs() {
 
 function setup() {
   trap 'fail' ERR
-  if [[ "$(helm list zeppelin)" != "" ]]; then
-    log "Delete/purge current zeppelin service"
-    helm delete --purge zeppelin
+  if [[ "$(helm list $namespace-zeppelin)" != "" ]]; then
+    helm delete --purge $namespace-zeppelin
+    log "Helm release $namespace-zeppelin deleted"
   fi
 
   log "Clone helm charts repo"
@@ -99,7 +99,7 @@ function setup() {
 
   log "Install the zepellin helm chart"
   helm repo update
-  helm upgrade --install zeppelin --namespace $namespace .
+  helm upgrade --install ${namespace}-zeppelin --namespace $namespace .
 
   log "Wait for zeppelin to be running"
   i=0

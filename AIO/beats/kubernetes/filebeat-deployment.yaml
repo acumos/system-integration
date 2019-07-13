@@ -58,13 +58,9 @@ spec:
           name: logs
 # Per https://github.com/elastic/beats/issues/8253
         securityContext:
-          privileged: true
+          privileged: <ACUMOS_PRIVILEGED_ENABLE>
       restartPolicy: Always
       volumes:
       - name: logs
         persistentVolumeClaim:
-         claimName: pvc-<ACUMOS_NAMESPACE>-logs
-      hostAliases:
-      - ip: "<ACUMOS_ELK_HOST_IP>"
-        hostnames:
-        - "<ACUMOS_ELK_DOMAIN>"
+         claimName: <ACUMOS_LOGS_PVC_NAME>
