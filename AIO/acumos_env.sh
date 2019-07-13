@@ -42,16 +42,16 @@ export ACUMOS_RELEASE=nexus3.acumos.org:10002
 # Core components
 export ACUMOS_DELETE_SNAPSHOTS=false
 export AZURE_CLIENT_IMAGE=$ACUMOS_RELEASE/acumos-azure-client:2.0.15
-export PORTAL_BE_IMAGE=$ACUMOS_RELEASE/acumos-portal-be:2.2.19
-export PORTAL_FE_IMAGE=$ACUMOS_RELEASE/acumos-portal-fe:2.2.19
+export PORTAL_BE_IMAGE=$ACUMOS_STAGING/acumos-portal-be:2.2.20
+export PORTAL_FE_IMAGE=$ACUMOS_STAGING/acumos-portal-fe:2.2.20
 export COMMON_DATASERVICE_IMAGE=$ACUMOS_RELEASE/common-dataservice:2.2.4
 export DESIGNSTUDIO_IMAGE=$ACUMOS_RELEASE/ds-compositionengine:2.1.0
 export FEDERATION_IMAGE=$ACUMOS_RELEASE/federation-gateway:2.2.0
 export KUBERNETES_CLIENT_IMAGE=$ACUMOS_RELEASE/kubernetes-client:2.0.11
-export MICROSERVICE_GENERATION_IMAGE=$ACUMOS_SNAPSHOT/microservice-generation:2.13.0-SNAPSHOT
+export MICROSERVICE_GENERATION_IMAGE=$ACUMOS_STAGING/microservice-generation:2.13.0
 export ONBOARDING_IMAGE=$ACUMOS_RELEASE/onboarding-app:2.15.0
 export SECURITY_VERIFICATION_IMAGE=$ACUMOS_RELEASE/security-verification:0.0.24
-export OPENSTACK_CLIENT_IMAGE=$ACUMOS_RELEASE/openstack-client:2.0.10
+export OPENSTACK_CLIENT_IMAGE=$ACUMOS_RELEASE/openstack-client:2.0.12
 
 # Model-execution-components
 export DATABROKER_SQLBROKER_IMAGE=$ACUMOS_RELEASE/sqldatabroker:1.2.0
