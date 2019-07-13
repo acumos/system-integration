@@ -56,7 +56,7 @@ services:
             "max_total_connections": "1",
             "max_per_route_connections": "1"
         },
-        "http_proxy": "\"${HTTP_PROXY}\"",
+        "http_proxy": "\"${ACUMOS_HTTP_PROXY}\"",
         "nexus": {
             "nexusEndPointURL": "http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/${ACUMOS_NEXUS_MAVEN_REPO_PATH}/${ACUMOS_NEXUS_MAVEN_REPO}/",
             "nexusUserName": "${ACUMOS_NEXUS_RW_USER}",

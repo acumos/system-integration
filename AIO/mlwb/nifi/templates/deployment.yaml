@@ -65,7 +65,7 @@ spec:
         args:
         - bash /opt/nifi/nifi-current/bin/start.sh;
         ports:
-        - containerPort: 19443
+        - containerPort: 443
           protocol: TCP
         volumeMounts:
         - mountPath: /opt/nifi/nifi-current/bin/start.sh
@@ -76,7 +76,6 @@ spec:
           name: nifi-configmap
         - mountPath: /opt/nifi/nifi-current/conf/sslkey
           name: nifi-certs
-
       volumes:
       - name: apache-configmap
         configMap:
@@ -87,3 +86,7 @@ spec:
       - name: nifi-configmap
         configMap:
           name: nifi-configmap-$USER
+      hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+        - "<ACUMOS_DOMAIN>"

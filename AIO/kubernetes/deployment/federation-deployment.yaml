@@ -44,7 +44,7 @@ spec:
       - name: federation
         image: <FEDERATION_IMAGE>
         securityContext:
-          privileged: true
+          privileged: <ACUMOS_PRIVILEGED_ENABLE>
         env:
         - name: SPRING_APPLICATION_JSON
           value: '{
@@ -123,11 +123,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+          claimName: <ACUMOS_LOGS_PVC_NAME>
       - name: certs-volume
         configMap:
           name: acumos-certs
-      hostAliases:
-      - ip: "<ACUMOS_HOST_IP>"
-        hostnames:
-        - "<ACUMOS_HOST>"

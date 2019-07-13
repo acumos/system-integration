@@ -82,9 +82,13 @@ EOF
   cat <<EOF >ingress-values.yaml
 controller:
   service:
+    nodePorts:
+      http: $ACUMOS_INGRESS_HTTP_PORT
+      https: $ACUMOS_INGRESS_HTTPS_PORT
     externalIPs: [$EXTERNAL_IP]
   extraArgs:
     default-ssl-certificate: "$NAMESPACE/ingress-cert"
+    enable-ssl-passthrough: ""
 EOF
   helm install --name ${NAMESPACE}-nginx-ingress --namespace $NAMESPACE \
     --set-string controller.config.proxy-body-size="0" \
