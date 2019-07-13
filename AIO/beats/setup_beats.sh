@@ -115,6 +115,10 @@ function setup_beat() {
     replace_env deploy
     start_service deploy/$beat-service.yaml
     start_deployment deploy/$beat-deployment.yaml
+    get_host_ip_from_etc_hosts $ACUMOS_ELK_DOMAIN
+    if [[ "$HOST_IP" != "" ]]; then
+      patch_deployment_with_host_alias $ACUMOS_NAMESPACE $beat $ACUMOS_ELK_DOMAIN $HOST_IP
+    fi
     wait_running $beat $ACUMOS_NAMESPACE
   fi
 }

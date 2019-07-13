@@ -1,4 +1,4 @@
-version: '3.2'
+apiVersion: batch/v1
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -17,32 +17,36 @@ version: '3.2'
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 
-# docker-compose for nexus
-#
-# Notes:
-# Ports are exposed since it's assumed that nexus service may be deployed
-# outside the acumos docker/k8s cluster, thus a nodeport-range (30000-32767)
-# port may be allocated. For the docker model port, this external port must
-# map to an internal port of the same value, since that is how the docker client
-# will connect to the docker repository (using the extrernal port #)
+# What this is: kubernetes template for Acumos kong deployment
+# How to use:
 
-services:
-  nexus-service:
-    image: sonatype/nexus3:3.9.0
-    environment:
-      log_level: "DEBUG"
-    ports:
-      - ${ACUMOS_NEXUS_API_PORT}:8081
-      - ${ACUMOS_DOCKER_MODEL_PORT}:8082
-    volumes:
-      - type: bind
-        source: /mnt/${ACUMOS_NAMESPACE}/logs
-        target: /maven/logs
-      - type: bind
-        source: /mnt/${ACUMOS_NAMESPACE}/nexus-data
-        target: /nexus-data
-    logging:
-      driver: json-file
-    extra_hosts:
-      - "${ACUMOS_HOST}:${ACUMOS_HOST_IP}"
-    restart: on-failure
+kind: Job
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: kong-configure
+spec:
+  template:
+    spec:
+      containers:
+      - name: kong-configure
+        image: buildpack-deps:bionic-curl
+        env:
+        - name: KONG_ADMIN_HOST
+          value: "kong-admin-service"
+        - name: KONG_ADMIN_PORT
+          value: "8001"
+        - name: ACUMOS_DOMAIN
+          value: <ACUMOS_DOMAIN>
+        - name: ACUMOS_CERT
+          value: <ACUMOS_CERT>
+        - name: ACUMOS_CERT_KEY
+          value: <ACUMOS_CERT_KEY>
+        volumeMounts:
+        - mountPath: /var/acumos/config
+          name: kong-config
+        command: ['/bin/bash', '/var/acumos/config/configure_kong.sh']
+      restartPolicy: Never
+      volumes:
+      - name: kong-config
+        configMap:
+          name: kong-config

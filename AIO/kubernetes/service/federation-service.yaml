@@ -36,6 +36,5 @@ spec:
     port: 9084
     targetPort: 9084
   - name: federation-local
-    nodePort: <ACUMOS_FEDERATION_LOCAL_PORT>
     port: 9011
     targetPort: 9011

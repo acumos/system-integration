@@ -23,15 +23,13 @@
 # - All hostnames/FQDNs specified for peers must be DNS-resolvable on all hosts
 #   (entries in /etc/hosts or in an actual DNS server)
 # - jq installed on the host where this script is being run
-# - Federation service on the peer is exposed at port 30984 (AIO default)
-#   (modify this script if another port is used)
 #
 # Usage:
 # $ bash create_subscription.sh <env> <admin> <peer> <accessType> <scopeType>
 #                               <refreshInterval> <cert> <key>
 #   env: path to local platform environment file acumos_env.sh
 #   admin: name of Admin role user on the local platform
-#   peer: hostname or FQDN of the peer platform
+#   peer: hostname or FQDN and port of the peer platform
 #   accessType: PB|OR|PR (public|company|private)
 #   scopeType: RF|FL (RF: references only | FL: all data)
 #   refreshInterval: time in minutes
@@ -41,7 +39,7 @@
 # See the "Common Data Service Requirements" for details on the codes above
 #
 # To cleanup all subscriptions:
-# i=0; while [[ $(curl -k -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X DELETE https://$ACUMOS_DOMAIN/ccds/peer/sub/$i | jq -r '.status') != 400 ]]; do i=$((i+1)); done
+# i=0; while [[ $(curl -k -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X DELETE https://$ACUMOS_ORIGIN/ccds/peer/sub/$i | jq -r '.status') != 400 ]]; do i=$((i+1)); done
 
 function fail() {
   reason="$1"
@@ -99,7 +97,7 @@ function find_peer() {
 function create_subscription() {
   trap 'fail' ERR
   local jsonout="/tmp/$(uuidgen)"
-  curl -v -k -o $jsonout --cert $cert --key $key https://$peer:30984/catalogs
+  curl -v -k -o $jsonout --cert $cert --key $key https://$peer:${peerPort}/catalogs
   cats=$(jq -r '.content | length' $jsonout)
   log DEBUG "$cats catalogs found: "
   cat $jsonout
@@ -148,7 +146,7 @@ Usage:
                                 <refreshInterval> <cert> <key>
     env: path to local platform environment file acumos_env.sh
     admin: name of Admin role user on the local platform
-    peer: hostname or FQDN of the peer Federation service
+    peer: hostname or FQDN and port of the peer Federation service
     accessType: PB|OR|PR (public|company|private)
     scopeType: RF|FL (RF: references only | FL: all data)
     refreshInterval: time in minutes
@@ -163,7 +161,8 @@ set -x
 export WORK_DIR=$(pwd)
 env=$1
 admin=$2
-peer=$3
+peer=$(echo $3 | cut -d ':' -f 1)
+peerPort=$(echo $3 | cut -d ':' -f 2)
 accessType=$4
 scopeType=$5
 refreshInterval=$6
@@ -172,7 +171,7 @@ key=$8
 set +x
 source $env
 set -x
-cds="https://$ACUMOS_DOMAIN/ccds"
+cds="https://$ACUMOS_ORIGIN/ccds"
 creds="$ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD"
 find_peer
 if [[ "$peerId" == "" ]]; then

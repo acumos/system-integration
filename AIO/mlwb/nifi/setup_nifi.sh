@@ -26,22 +26,11 @@
 #   "standard" is the required storage class.
 #
 # Usage:
-# $ bash setup_nifi.sh
+# $ bash setup_nifi.sh [setup|clean|all]
+#  setup: setup NiFi components
+#  clean: stop NiFi components
+#  all: (default) stop and setup
 #
-
-clean_resource() {
-# No trap fail here, as timing issues may cause commands to fail
-#  trap 'fail' ERR
-  if [[ $(kubectl get $1 -n $ACUMOS_NAMESPACE -o json | jq ".items | length") -gt 0 ]]; then
-    rss=$(kubectl get $1 -n $ACUMOS_NAMESPACE | awk '/nifi/{print $1}')
-    for rs in $rss; do
-      kubectl delete $1 -n $ACUMOS_NAMESPACE $rs
-      while [[ $(kubectl get $1 -n $ACUMOS_NAMESPACE $rs) ]]; do
-        sleep 5
-      done
-    done
-  fi
-}
 
 clean_nifi() {
   trap 'fail' ERR
@@ -50,14 +39,16 @@ clean_nifi() {
   trap - ERR
   rm -rf deploy
   log "Delete all NiFi resources"
-  clean_resource deployment
-  clean_resource replicaset
-  clean_resource pods
-  clean_resource service
-  clean_resource configmap
-  clean_resource ingress
-  clean_resource secret
-  clean_resource pvc
+  clean_resource $ACUMOS_NAMESPACE deployment nifi
+  clean_resource $ACUMOS_NAMESPACE replicaset nifi
+  clean_resource $ACUMOS_NAMESPACE pods nifi
+  clean_resource $ACUMOS_NAMESPACE service nifi
+  clean_resource $ACUMOS_NAMESPACE configmap nifi
+  clean_resource $ACUMOS_NAMESPACE secret nifi
+  clean_resource $ACUMOS_NAMESPACE pvc nifi
+  if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
+    clean_resource $ACUMOS_NAMESPACE ingress nifi
+  fi
   trap 'fail' ERR
 
   log "Delete cert, truststore, and keystore for nifi"
@@ -134,6 +125,8 @@ setup_nifi() {
   sedi "s/<MLWB_NIFI_KEYSTORE_PASSWORD>/$MLWB_NIFI_KEYSTORE_PASSWORD/g" deploy/nifi-registry-deployment.yaml
   sedi "s/<MLWB_NIFI_TRUSTSTORE_PASSWORD>/$MLWB_NIFI_TRUSTSTORE_PASSWORD/g" deploy/nifi-registry-deployment.yaml
   sedi "s/<MLWB_NIFI_REGISTRY_INITIAL_ADMIN>/$MLWB_NIFI_REGISTRY_INITIAL_ADMIN/g" deploy/nifi-registry-deployment.yaml
+  sedi "s~<MLWB_NIFI_REGISTRY_PVC_NAME>~$MLWB_NIFI_REGISTRY_PVC_NAME~g" deploy/nifi-registry-deployment.yaml
+  sedi "s~<ACUMOS_LOGS_PVC_NAME>~$ACUMOS_LOGS_PVC_NAME~g" deploy/nifi-registry-deployment.yaml
   replace_env deploy/ingress-registry.yaml
   replace_env deploy/namespace-admin-role.yaml
   replace_env deploy/namespace-admin-rolebinding.yaml
@@ -147,6 +140,7 @@ setup_nifi() {
   replace_env deploy/templates/ingress.yaml
   # Have to use sed since some files contain '<>' sequences that break replace_env
   sedi "s/<ACUMOS_DOMAIN>/$ACUMOS_DOMAIN/g" deploy/templates/apache_configmap.yaml
+  sedi "s/<ACUMOS_PORT>/$ACUMOS_PORT/g" deploy/templates/apache_configmap.yaml
   sedi "s/<ACUMOS_NAMESPACE>/$ACUMOS_NAMESPACE/g" deploy/templates/apache_configmap.yaml
   sedi "s/<ACUMOS_DOMAIN>/$ACUMOS_DOMAIN/g" deploy/templates/nifi_configmap.yaml
   sedi "s/<ACUMOS_NAMESPACE>/$ACUMOS_NAMESPACE/g" deploy/templates/nifi_configmap.yaml
@@ -160,10 +154,13 @@ setup_nifi() {
   kubectl create -f deploy/nifi-registry-apache-configmap.yaml
 
   log "Create NiFi Registry PVC in namespace $ACUMOS_NAMESPACE"
-  setup_pvc nifi-registry $ACUMOS_NAMESPACE $MLWB_NIFI_REGISTRY_PV_SIZE
+  setup_pvc $ACUMOS_NAMESPACE $MLWB_NIFI_REGISTRY_PVC_NAME \
+    $MLWB_NIFI_REGISTRY_PV_NAME $MLWB_NIFI_REGISTRY_PV_SIZE
 
-  log "Create NiFi Registry ingress"
-  kubectl create -f deploy/ingress-registry.yaml
+  if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
+    log "Create NiFi Registry ingress"
+    kubectl create -f deploy/ingress-registry.yaml
+  fi
 
   log "Create NiFi Registry service and deployment"
   kubectl create -f deploy/nifi-registry-service.yaml
@@ -191,6 +188,8 @@ cd $(dirname "$0")
 if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
 source $AIO_ROOT/utils.sh
 source $AIO_ROOT/acumos_env.sh
-clean_nifi
-setup_nifi
+action=$1
+if [[ "$action" == "" ]]; then action=all; fi
+if [[ "$action" == "clean" || "$action" == "all" ]]; then clean_nifi; fi
+if [[ "$action" == "setup" || "$action" == "all" ]]; then setup_nifi; fi
 cd $WORK_DIR

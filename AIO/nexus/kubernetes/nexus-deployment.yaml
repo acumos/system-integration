@@ -54,7 +54,7 @@ spec:
           value: "DEBUG"
         ports:
         - containerPort: 8081
-        - containerPort: <ACUMOS_DOCKER_MODEL_PORT>
+        - containerPort: 8082
         volumeMounts:
         - mountPath: /maven/logs
           name: logs
@@ -64,14 +64,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-         claimName: pvc-<ACUMOS_NAMESPACE>-logs
+         claimName: <ACUMOS_LOGS_PVC_NAME>
       - name: nexus-data
-        hostPath:
-          path: /mnt/<ACUMOS_NAMESPACE>/nexus-data
-# TODO: debug access issues with PVC, necessitating the hostPath entry above
-#        persistentVolumeClaim:
-#         claimName: pvc-<ACUMOS_NAMESPACE>-nexus-data
-      hostAliases:
-      - ip: "<ACUMOS_HOST_IP>"
-        hostnames:
-        - "<ACUMOS_HOST>"
+        persistentVolumeClaim:
+         claimName: <NEXUS_DATA_PVC_NAME>

@@ -74,7 +74,6 @@ spec:
         - set -x;
           cd maven;
           keytool -import -file certs/<MLWB_JUPYTERHUB_CERT> -alias jupyterhub -keystore /usr/local/openjdk-8/jre/lib/security/cacerts -storepass changeit -noprompt;
-          keytool -import -file certs/<MLWB_JUPYTERHUB_CA_CERT> -alias jupyterhub-ca -keystore /usr/local/openjdk-8/jre/lib/security/cacerts -storepass changeit -noprompt;
           java -Xms128m -Xmx256m -Djava.security.egd=file:/dev/./urandom -jar notebook-service*.jar;
         ports:
         - containerPort: 9089
@@ -90,11 +89,8 @@ spec:
           secretName: mlwb-jupyterhub-certs
       - name: logs
         persistentVolumeClaim:
-          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+          claimName: <ACUMOS_LOGS_PVC_NAME>
       hostAliases:
-      - ip: "<ACUMOS_HOST_IP>"
-        hostnames:
-        - "<ACUMOS_DOMAIN>"
       - ip: "<MLWB_JUPYTERHUB_HOST_IP>"
         hostnames:
         - "<MLWB_JUPYTERHUB_DOMAIN>"
@@ -141,11 +137,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: pvc-<ACUMOS_NAMESPACE>-logs
-      hostAliases:
-      - ip: "<ACUMOS_HOST_IP>"
-        hostnames:
-        - "<ACUMOS_HOST>"
+          claimName: <ACUMOS_LOGS_PVC_NAME>
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -193,8 +185,4 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: pvc-<ACUMOS_NAMESPACE>-logs
-      hostAliases:
-      - ip: "<ACUMOS_HOST_IP>"
-        hostnames:
-        - "<ACUMOS_HOST>"
+          claimName: <ACUMOS_LOGS_PVC_NAME>
