@@ -44,7 +44,7 @@ spec:
       - name: sv-scanning
         image: <SECURITY_VERIFICATION_IMAGE>
         securityContext:
-          privileged: true
+          privileged: <ACUMOS_PRIVILEGED_ENABLE>
         env:
         - name: LOG_LEVEL
           value: "INFO"
@@ -193,7 +193,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+          claimName: <ACUMOS_LOGS_PVC_NAME>
       - name: scripts
         configMap:
           name: sv-scanning-scripts
@@ -203,7 +203,3 @@ spec:
       - name: rules
         configMap:
           name: sv-scanning-rules
-      hostAliases:
-      - ip: "<ACUMOS_HOST_IP>"
-        hostnames:
-        - "<ACUMOS_HOST>"

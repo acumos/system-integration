@@ -42,7 +42,7 @@ spec:
       - name: docker-proxy
         image: nginx:stable
         securityContext:
-            privileged: true
+            privileged: <ACUMOS_PRIVILEGED_ENABLE>
         imagePullPolicy: IfNotPresent
         env:
         - name: ACUMOS_DOCKER_PROXY_HOST
@@ -94,11 +94,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-         claimName: pvc-<ACUMOS_NAMESPACE>-logs
+         claimName: <ACUMOS_LOGS_PVC_NAME>
       - name: conf-volume
         configMap:
           name: docker-proxy
-      hostAliases:
-      - ip: "<ACUMOS_HOST_IP>"
-        hostnames:
-        - "<ACUMOS_HOST>"

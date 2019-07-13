@@ -81,11 +81,21 @@ EOF
   log "Install nginx ingress controller via Helm"
   cat <<EOF >ingress-values.yaml
 controller:
+  podSecurityContext:
+    privileged: true
   service:
+    nodePorts:
+      http: $ACUMOS_INGRESS_HTTP_PORT
+      https: $ACUMOS_INGRESS_HTTPS_PORT
     externalIPs: [$EXTERNAL_IP]
   extraArgs:
     default-ssl-certificate: "$NAMESPACE/ingress-cert"
+    enable-ssl-passthrough: ""
 EOF
+
+  if [[ "$K8S_DIST" == "openshift" ]]; then
+    sed -i 's/externalIPs:.*/type: NodePort/' ingress-values.yaml
+  fi
   helm install --name ${NAMESPACE}-nginx-ingress --namespace $NAMESPACE \
     --set-string controller.config.proxy-body-size="0" \
     -f ingress-values.yaml stable/nginx-ingress

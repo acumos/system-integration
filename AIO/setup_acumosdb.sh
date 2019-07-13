@@ -32,23 +32,39 @@
 
 function clean_db() {
   trap 'fail' ERR
-  log "Remove Acumos databases if present in MariaDB"
-  if [[ $(mysql $server --user=root --password=$ACUMOS_MARIADB_PASSWORD -e "DROP DATABASE $ACUMOS_CDS_DB;") ]]; then
-    log "Database $ACUMOS_CDS_DB dropped"
+  if [[ "$ACUMOS_MARIADB_ROOT_ACCESS" == "true" ]]; then
+    log "Remove Acumos databases if present in MariaDB"
+    if [[ $(mysql $server --user=root --password=$ACUMOS_MARIADB_PASSWORD -e "DROP DATABASE $ACUMOS_CDS_DB;") ]]; then
+      log "Database $ACUMOS_CDS_DB dropped"
+    fi
+    log "Create database $ACUMOS_CDS_DB"
+    mysql $server --user=root --password=$ACUMOS_MARIADB_PASSWORD \
+      -e "CREATE DATABASE $ACUMOS_CDS_DB; USE $ACUMOS_CDS_DB; GRANT ALL PRIVILEGES ON $ACUMOS_CDS_DB.* TO \"$ACUMOS_MARIADB_USER\"@'%' IDENTIFIED BY \"$ACUMOS_MARIADB_USER_PASSWORD\";"
+  else
+    local tables=$(mysql $server --user=$ACUMOS_MARIADB_USER --password=$ACUMOS_MARIADB_USER_PASSWORD -e "use $ACUMOS_CDS_DB; show tables;" | grep -i C_ | awk '{print $1}')
+    if [[ "$tables" != "" ]]; then
+      cmd="USE $ACUMOS_CDS_DB; SET FOREIGN_KEY_CHECKS = 0;"
+      for table in $tables; do
+        cmd="$cmd DROP TABLE \`$table\`; "
+      done
+      cmd="$cmd SET FOREIGN_KEY_CHECKS = 1;"
+      echo "$cmd"
+      mysql $server --user=$ACUMOS_MARIADB_USER \
+        --password=$ACUMOS_MARIADB_USER_PASSWORD \
+        -e "$cmd"
+    fi
   fi
-  log "Create database $ACUMOS_CDS_DB"
-  mysql $server --user=root --password=$ACUMOS_MARIADB_PASSWORD \
-    -e "CREATE DATABASE $ACUMOS_CDS_DB; USE $ACUMOS_CDS_DB; GRANT ALL PRIVILEGES ON $ACUMOS_CDS_DB.* TO \"$ACUMOS_MARIADB_USER\"@'%' IDENTIFIED BY \"$ACUMOS_MARIADB_USER_PASSWORD\";"
 }
 
 function new_db() {
   trap 'fail' ERR
   log "Setting up Acumos database for CDS version $ACUMOS_CDS_VERSION"
+  if [[ "$ACUMOS_MARIADB_ROOT_ACCESS" == "true" ]]; then
+    log "Setup user for access to database $ACUMOS_CDS_DB"
+    mysql $server --user=root --password=$ACUMOS_MARIADB_PASSWORD \
+      -e "USE $ACUMOS_CDS_DB; GRANT ALL PRIVILEGES ON $ACUMOS_CDS_DB.* TO \"$ACUMOS_MARIADB_USER\"@'%' IDENTIFIED BY \"$ACUMOS_MARIADB_USER_PASSWORD\";"
+  fi
   # NOTE: user and default database was created in the process of server creation
-  log "Setup user for access to database $ACUMOS_CDS_DB"
-  mysql $server --user=root --password=$ACUMOS_MARIADB_PASSWORD \
-    -e "USE $ACUMOS_CDS_DB; GRANT ALL PRIVILEGES ON $ACUMOS_CDS_DB.* TO \"$ACUMOS_MARIADB_USER\"@'%' IDENTIFIED BY \"$ACUMOS_MARIADB_USER_PASSWORD\";"
-
   log "Retrieve and customize database script for CDS version $ACUMOS_CDS_VERSION"
   if [[ $(ls cmn-data-svc-ddl-dml-mysql*) != "" ]]; then rm cmn-data-svc-ddl-dml-mysql*; fi
   wget https://raw.githubusercontent.com/acumos/common-dataservice/master/cmn-data-svc-server/db-scripts/cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql
@@ -71,9 +87,7 @@ function upgrade_db() {
 
 function setup_acumosdb() {
   trap 'fail' ERR
-  if [[ "$ACUMOS_MARIADB" != "on-host" ]]; then
-    server="-h $ACUMOS_MARIADB_HOST_IP -P $ACUMOS_MARIADB_PORT"
-  fi
+  server="-h $ACUMOS_MARIADB_HOST -P $ACUMOS_MARIADB_PORT"
 
   if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
     clean_db

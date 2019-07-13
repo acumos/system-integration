@@ -83,10 +83,10 @@ spec:
               }
             },
             "qanda": {
-              "url": "https://stackoverflow.com"
+              "url": "https://stackoverflow.com/questions/tagged/acumos"
             },
-            "microservice" : {
-              "url" : "http://msg-service:8336/microservice-generation/v2/generateMicroservice"
+            "microservice": {
+              "url": "http://msg-service:8336/microservice-generation/v2/generateMicroservice"
             },
             "doc": {
               "url": "https://wiki.acumos.org"
@@ -97,8 +97,8 @@ spec:
                   "url": "http://onboarding-service:8090/onboarding-app/v2/models",
                   "dcae_url": "http://onboarding-service:8090/onboarding-app/v2/dcae_models"
                 },
-                "advancedmodel" : {
-                  "url" : "http://onboarding-service:8090/onboarding-app/v2/advancedModel"
+                "advancedmodel": {
+                  "url": "http://onboarding-service:8090/onboarding-app/v2/advancedModel"
                 }
               },
               "cliPushUrl": "<ACUMOS_ONBOARDING_CLIPUSHURL>",
@@ -148,18 +148,24 @@ spec:
                     \"imageUrl\": \"/images/deploy-cloud/deploy_to_local.png\" },
                   { \"cloudEnabled\": \"false\", \"cloudName\": \"whitebox\",
                     \"cloudDisplayText\": \"Deploy To White Box\",
-                    \"imageUrl\": \"/images/deploy-cloud/deploy_to_whitebox.png\" }]"
-                },
+                    \"imageUrl\": \"/images/deploy-cloud/deploy_to_whitebox.png\" }]",
+                "ds": {
+                  "menu": "{
+                    \"workbenchActive\": true,
+                    \"acucomposeActive\": true,
+                    \"blocks\": []}"
+                }
+              },
               "ui": {
                 "server": {
-                  "address": "https://<ACUMOS_DOMAIN>"
+                  "address": "https://<ACUMOS_ORIGIN>"
                 }
               },
               "submitValidation": {
                 "api": "http://validation-client-service:9603/status/v1.0/tasks"
               },
               "dashboard": {
-                "url": "http://<ACUMOS_ELK_DOMAIN}:<ACUMOS_ELK_KIBANA_PORT>"
+                "url": "http://<ACUMOS_ELK_DOMAIN>:<ACUMOS_ELK_KIBANA_PORT>"
               },
               "mailjet": {
                 "api": {
@@ -175,16 +181,16 @@ spec:
             },
             "spring": {
               "mail": {
-                "host" : "<ACUMOS_SPRING_MAIL_SERVICE_DOMAIN>",
-                "port" : <ACUMOS_SPRING_MAIL_SERVICE_PORT>,
-                "username" : "<ACUMOS_SPRING_MAIL_USERNAME>",
-                "password" : "<ACUMOS_SPRING_MAIL_PASSWORD>",
-                "debug" : "true",
-                "smtp" : {
-                  "starttls" : {
-                    "enable" : "<ACUMOS_SPRING_MAIL_STARTTLS>"
+                "host": "<ACUMOS_SPRING_MAIL_SERVICE_DOMAIN>",
+                "port": <ACUMOS_SPRING_MAIL_SERVICE_PORT>,
+                "username": "<ACUMOS_SPRING_MAIL_USERNAME>",
+                "password": "<ACUMOS_SPRING_MAIL_PASSWORD>",
+                "debug": "true",
+                "smtp": {
+                  "starttls": {
+                    "enable": "<ACUMOS_SPRING_MAIL_STARTTLS>"
                   },
-                  "auth" : "<ACUMOS_SPRING_MAIL_AUTH>"
+                  "auth": "<ACUMOS_SPRING_MAIL_AUTH>"
                 },
                 "transport": {
                   "protocol": "<ACUMOS_SPRING_MAIL_PROTOCOL>"
@@ -213,7 +219,7 @@ spec:
               }
             },
             "gateway": {
-              "url": "https://<ACUMOS_FEDERATION_HOST>:<ACUMOS_FEDERATION_LOCAL_PORT>"
+              "url": "https://federation-service:<ACUMOS_FEDERATION_LOCAL_PORT>"
             },
             "dcae": {
               "model": {
@@ -251,7 +257,7 @@ spec:
               "size": "<ACUMOS_PORTAL_DOCUMENT_MAX_SIZE>"
             },
             "jupyter": {
-              "url": "https://<ACUMOS_DOMAIN>/hub/"
+              "url": "https://<ACUMOS_ORIGIN>/hub/"
             },
             "kubernetes": {
                "doc": {
@@ -273,11 +279,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+          claimName: <ACUMOS_LOGS_PVC_NAME>
       - name: certs-volume
         configMap:
           name: acumos-certs
-      hostAliases:
-      - ip: "<ACUMOS_HOST_IP>"
-        hostnames:
-        - "<ACUMOS_HOST>"
