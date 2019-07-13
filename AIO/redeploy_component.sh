@@ -68,38 +68,10 @@ function redeploy_core_component() {
     fi
   else
     if [[ "$(grep -l "app: $app" kubernetes/service/*)" != "" ]]; then
-      yaml=$(basename $(grep -l "app: $app" kubernetes/service/*))
-      if [[ ! -e deploy ]]; then mkdir deploy; fi
-      cp kubernetes/service/$yaml deploy/.
-      replace_env deploy/$yaml
-      log "Bring the $app service down"
-      stop_service deploy/$yaml
-      log "Bring the $app service back up"
-      start_service deploy/$yaml
-      yaml=$(basename $(grep -l "app: $app" kubernetes/deployment/*))
-      cp kubernetes/deployment/$yaml deploy/.
-      replace_env deploy/$yaml
-      log "Bring the $app deployment down"
-      stop_deployment deploy/$yaml
-      cleanup_snapshot_images
-      if [[ "$app" == "sv-scanning" ]]; then
-        trap - ERR
-        kubectl delete configmap -n $ACUMOS_NAMESPACE sv-scanning-scripts
-        kubectl delete configmap -n $ACUMOS_NAMESPACE sv-scanning-licenses
-        kubectl delete configmap -n $ACUMOS_NAMESPACE sv-scanning-rules
-        trap 'fail' ERR
-        kubectl create configmap -n $ACUMOS_NAMESPACE sv-scanning-scripts \
-          --from-file=kubernetes/configmap/sv-scanning/scripts
-        kubectl create configmap -n $ACUMOS_NAMESPACE sv-scanning-licenses \
-          --from-file=kubernetes/configmap/sv-scanning/licenses
-        kubectl create configmap -n $ACUMOS_NAMESPACE sv-scanning-rules \
-          --from-file=kubernetes/configmap/sv-scanning/rules
-      fi
-      log "Bring the $app deployment back up"
-      start_deployment deploy/$yaml
-      wait_running $app $ACUMOS_NAMESPACE
+      stop_acumos_core_app $app
+      start_acumos_core_app $app
     else
-      fail "$app not found in $AIO_ROOT/kubernetes/deployment"
+      fail "$app not found; verify the 'app:' label in the template"
     fi
   fi
 }

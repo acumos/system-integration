@@ -53,10 +53,6 @@ function clean_ingress() {
 
 function setup_ingress() {
   trap 'fail' ERR
-
-  bash $AIO_ROOT/../charts/ingress/setup_ingress_controller.sh $ACUMOS_NAMESPACE \
-    $ACUMOS_HOST_IP $AIO_ROOT/certs/acumos.crt $AIO_ROOT/certs/acumos.key
-
   log "Create ingress resources for services"
   if [[ ! -d deploy ]]; then mkdir deploy; fi
   cp templates/* deploy/.

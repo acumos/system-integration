@@ -26,17 +26,40 @@
 # For docker-based deployments, run this script on the AIO host.
 # For k8s-based deployment, run this script on the AIO host or a workstation
 # connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
-# $ bash setup_kong.sh
+# $ bash setup_kong.sh [setup|clean|all]
+#  setup: setup the kong components
+#  clean: stop the kong components
+#  all: (default) stop and setup
 #
 
 function clean_kong() {
   trap 'fail' ERR
-  log "Stop any existing docker based components for kong-service"
-  cs=$(docker ps -a | awk '/kong/{print $1}')
-  for c in $cs; do
-    docker stop $c
-    docker rm $c
-  done
+  if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
+    log "Stop any existing docker based components for kong-service"
+    cs=$(docker ps -a | awk '/kong/{print $1}')
+    for c in $cs; do
+      docker stop $c
+      docker rm $c
+    done
+  else
+    log "Remove job kong-configure if running"
+    stop_job kong-configure
+    log "Stop any existing k8s based components for kong-service"
+    if [[ ! -e deploy/kong-service.yaml ]]; then
+      mkdir -p deploy
+      cp -r kubernetes/* deploy/.
+      replace_env deploy
+    fi
+    stop_service deploy/kong-admin-service.yaml
+    stop_service deploy/kong-service.yaml
+    stop_deployment deploy/kong-deployment.yaml
+    log "Remove PVC for kong-service"
+    delete_pvc kong-db $ACUMOS_NAMESPACE
+    log "Remove configmap kong-config"
+    if [[ $($k8s_cmd get configmap -n $ACUMOS_NAMESPACE kong-config) ]]; then
+      $k8s_cmd delete configmap -n $ACUMOS_NAMESPACE kong-config
+    fi
+  fi
 }
 
 function setup_kong() {
@@ -46,11 +69,45 @@ function setup_kong() {
   cp ../certs/$ACUMOS_CERT config/.
   cp ../certs/$ACUMOS_CERT_KEY config/.
 
-  log "Build the local configure-kong image"
-  docker build -t kong-configure .
-  log "Deploy the docker based components for kong"
-  bash docker_compose.sh up -d --build --force-recreate
-  wait_running kong-service
+  if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
+    log "Build the local configure-kong image"
+    docker build -t kong-configure .
+    log "Deploy the docker based components for kong"
+    bash docker_compose.sh up -d --build --force-recreate
+    wait_running kong-service
+    local secs=0
+    while [[ $(docker ps -a | grep kong-configure | grep -c 'Exited') -eq 0 ]]; do
+      log "Waiting 10 seconds for kong-configure job to complete"
+      sleep 10
+      secs=$((secs+10))
+      if [[ $secs -eq "$ACUMOS_SUCCESS_WAIT_TIME" ]]; then
+        fail "kong-configure job failed to complete"
+      fi
+    done
+  else
+    log "Setup the kong-db PVC"
+    setup_pvc $ACUMOS_NAMESPACE $KONG_DB_PVC_NAME $KONG_DB_PV_NAME $KONG_DB_PV_SIZE
+
+    log "Deploy the k8s based components for kong"
+    mkdir -p deploy
+    cp -r kubernetes/* deploy/.
+    replace_env deploy
+    start_service deploy/kong-admin-service.yaml
+    start_service deploy/kong-service.yaml
+    start_deployment deploy/kong-deployment.yaml
+    if [[ "$ACUMOS_KONG_PROXY_SSL_PORT" == '' ]]; then
+      local port=$(kubectl get services -n $ACUMOS_NAMESPACE kong-service -o json | jq -r '.spec.ports[0].nodePort')
+      update_acumos_env ACUMOS_KONG_PROXY_SSL_PORT $port force
+    fi
+    wait_running kong $ACUMOS_NAMESPACE
+
+    log "Create the kong-config configmap"
+    $k8s_cmd create configmap -n $ACUMOS_NAMESPACE kong-config --from-file=config
+
+    log "Create the kong-configure job"
+    $k8s_cmd create -f deploy/kong-configure-job.yaml
+    wait_completed kong-configure
+  fi
 }
 
 set -x
@@ -60,6 +117,8 @@ cd $(dirname "$0")
 if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ..; pwd -P)"; fi
 source $AIO_ROOT/utils.sh
 source $AIO_ROOT/acumos_env.sh
-clean_kong
-setup_kong
+action=$1
+if [[ "$action" == "" ]]; then action=all; fi
+if [[ "$action" == "clean" || "$action" == "all" ]]; then clean_kong; fi
+if [[ "$action" == "setup" || "$action" == "all" ]]; then setup_kong; fi
 cd $WORK_DIR
