@@ -40,13 +40,13 @@ function clean_docker_engine() {
   stop_service deploy/docker-service.yaml
   stop_deployment deploy/docker-deployment.yaml
   log "Removing PVC for docker-engine"
-  delete_pvc docker-volume $ACUMOS_NAMESPACE
+  delete_pvc $ACUMOS_NAMESPACE $DOCKER_VOLUME_PVC_NAME
 }
 
 function setup_docker_engine() {
   trap 'fail' ERR
   log "Setup the $ACUMOS_NAMESPACE-docker-volume PVC"
-  setup_pvc docker-volume $ACUMOS_NAMESPACE $DOCKER_VOLUME_PV_SIZE
+  setup_pvc $ACUMOS_NAMESPACE $DOCKER_VOLUME_PVC_NAME $DOCKER_VOLUME_PV_NAME $DOCKER_VOLUME_PV_SIZE
 
   log "Deploy the k8s based components for docker-service"
   mkdir -p deploy
@@ -55,6 +55,11 @@ function setup_docker_engine() {
 
   start_service deploy/docker-service.yaml
   start_deployment deploy/docker-deployment.yaml
+  get_host_ip_from_etc_hosts $ACUMOS_DOCKER_REGISTRY_HOST
+  if [[ "$HOST_IP" != "" ]]; then
+    patch_deployment_with_host_alias $ACUMOS_NAMESPACE docker-dind $ACUMOS_DOCKER_REGISTRY_HOST $HOST_IP
+  fi
+
   wait_running docker-dind $ACUMOS_NAMESPACE
 }
 

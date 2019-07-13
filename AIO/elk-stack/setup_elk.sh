@@ -68,8 +68,9 @@ function setup_elk() {
   # acumos_env.sh will call elk_env.sh as setup by setup_prereqs.sh
   if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
     cd $AIO_ROOT/../charts/elk-stack
-    cp $AIO_ROOT/elk_env.sh .
-    bash setup_elk.sh $ACUMOS_ELK_DOMAIN $K8S_DIST
+    source setup_elk_env.sh
+    bash setup_elk.sh clean $ACUMOS_ELK_DOMAIN $K8S_DIST
+    bash setup_elk.sh setup $ACUMOS_ELK_DOMAIN $K8S_DIST
   else
     log "Stop any existing docker based components for elk-stack"
     bash docker_compose.sh down

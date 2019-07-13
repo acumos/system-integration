@@ -46,21 +46,21 @@ spec:
         - name: ENVIRONMENT
           value: "deploy"
         - name: dashboardComponent
-          value: "https://<ACUMOS_DOMAIN>/mlwb-dashboard-webcomponent"
+          value: "https://<ACUMOS_ORIGIN>/mlwb-dashboard-webcomponent"
         - name: projectComponent
-          value: "https://<ACUMOS_DOMAIN>/mlwb-project-webcomponent"
+          value: "https://<ACUMOS_ORIGIN>/mlwb-project-webcomponent"
         - name: projectCatalogComponent
-          value: "https://<ACUMOS_DOMAIN>/mlwb-project-catalog-webcomponent"
+          value: "https://<ACUMOS_ORIGIN>/mlwb-project-catalog-webcomponent"
         - name: notebookComponent
-          value: "https://<ACUMOS_DOMAIN>/mlwb-notebook-webcomponent"
+          value: "https://<ACUMOS_ORIGIN>/mlwb-notebook-webcomponent"
         - name: notebookCatalogComponent
-          value: "https://<ACUMOS_DOMAIN>/mlwb-notebook-catalog-webcomponent"
+          value: "https://<ACUMOS_ORIGIN>/mlwb-notebook-catalog-webcomponent"
         - name: pipelineComponent
-          value: "https://<ACUMOS_DOMAIN>/mlwb-pipeline-webcomponent"
+          value: "https://<ACUMOS_ORIGIN>/mlwb-pipeline-webcomponent"
         - name: pipelineCatalogComponent
-          value: "https://<ACUMOS_DOMAIN>/mlwb-pipeline-catalog-webcomponent"
+          value: "https://<ACUMOS_ORIGIN>/mlwb-pipeline-catalog-webcomponent"
         - name: portalFEURL
-          value: "https://<ACUMOS_DOMAIN>"
+          value: "https://<ACUMOS_ORIGIN>"
         - name: menuItems
           value: '[
             {
@@ -98,8 +98,4 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: pvc-<ACUMOS_NAMESPACE>-logs
-      hostAliases:
-      - ip: "<ACUMOS_HOST_IP>"
-        hostnames:
-        - "<ACUMOS_HOST>"
+          claimName: <ACUMOS_LOGS_PVC_NAME>

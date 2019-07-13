@@ -66,16 +66,16 @@ function peer_test() {
   source $env1
   set -x
   name1=$ACUMOS_DOMAIN
-  peergw1="https://$ACUMOS_DOMAIN:$ACUMOS_FEDERATION_PORT"
+  peergw1="$ACUMOS_DOMAIN:$ACUMOS_FEDERATION_PORT"
   set +x
   source $env2
   set -x
   name2=$ACUMOS_DOMAIN
-  peergw2="https://$ACUMOS_DOMAIN:$ACUMOS_FEDERATION_PORT"
-  bash create_peer.sh $env1 $name2 "admin@$name2" "$peergw2"
-  bash create_peer.sh $env2 $name1 "admin@$name1" "$peergw1"
-  bash create_subscription.sh $env1 $admin1 $name2 PB FL 60 $cert2 $key2
-  bash create_subscription.sh $env2 $admin2 $name1 PB FL 60 $cert1 $key1
+  peergw2="$ACUMOS_DOMAIN:$ACUMOS_FEDERATION_PORT"
+  bash create_peer.sh $env1 $name2 "admin@$name2" "https://$peergw2"
+  bash create_peer.sh $env2 $name1 "admin@$name1" "https://$peergw1"
+  bash create_subscription.sh $env1 $admin1 $peergw2 PB FL 60 $cert2 $key2
+  bash create_subscription.sh $env2 $admin2 $peergw1 PB FL 60 $cert1 $key1
 }
 
 set -x

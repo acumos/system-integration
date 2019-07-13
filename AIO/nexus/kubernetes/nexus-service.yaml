@@ -44,5 +44,5 @@ spec:
     targetPort: 8081
   - name: nexus-model-docker
     nodePort: <ACUMOS_DOCKER_MODEL_PORT>
-    port: <ACUMOS_DOCKER_MODEL_PORT>
-    targetPort: <ACUMOS_DOCKER_MODEL_PORT>
+    port: 8082
+    targetPort: 8082
