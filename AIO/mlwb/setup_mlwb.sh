@@ -34,22 +34,11 @@
 # - Key-based SSH access to the Acumos host, for updating docker images
 #
 # Usage:
-# $ bash setup_mlwb.sh
+# $ bash setup_mlwb.sh [setup|clean|all]
+#  setup: setup the MLWB components
+#  clean: stop the MLWB components
+#  all: (default) stop and setup
 #
-
-clean_resource() {
-  # No trap fail here, as timing issues may cause commands to fail
-#  trap 'fail' ERR
-  if [[ $(kubectl get $1 -n $ACUMOS_NAMESPACE -o json | jq ".items | length") -gt 0 ]]; then
-    rss=$(kubectl get $1 -n $ACUMOS_NAMESPACE | awk '/mlwb/{print $1}')
-    for rs in $rss; do
-      kubectl delete $1 -n $ACUMOS_NAMESPACE $rs
-      while [[ $(kubectl get $1 -n $ACUMOS_NAMESPACE $rs) ]]; do
-        sleep 5
-      done
-    done
-  fi
-}
 
 function clean_mlwb() {
   trap 'fail' ERR
@@ -61,16 +50,17 @@ function clean_mlwb() {
       docker rm $c
     done
   else
-    log "Stop any existing k8s based components for NiFi"
-    trap - ERR
     rm -rf deploy
     log "Delete all MLWB resources"
-    clean_resource deployment
-    clean_resource pods
-    clean_resource service
-    clean_resource configmap
-    clean_resource ingress
-    clean_resource secret
+    clean_resource $ACUMOS_NAMESPACE deployment mlwb
+    clean_resource $ACUMOS_NAMESPACE pods mlwb
+    clean_resource $ACUMOS_NAMESPACE service mlwb
+    clean_resource $ACUMOS_NAMESPACE configmap mlwb
+    clean_resource $ACUMOS_NAMESPACE secret mlwb
+    clean_resource $ACUMOS_NAMESPACE pvc mlwb
+    if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
+      clean_resource $ACUMOS_NAMESPACE ingress mlwb
+    fi
   fi
   cleanup_snapshot_images
 }
@@ -117,7 +107,7 @@ mlwb-pipeline mlwb-pipeline-webcomponent mlwb-pipeline-catalog-webcomponent"
     cp kubernetes/mlwb-notebook* deploy/.
     cp kubernetes/mlwb-project* deploy/.
 
-    if [[ "$MLWB_DEPLOY_NIFI" == "true" ]]; then
+    if [[ "$MLWB_DEPLOY_PIPELINE" == "true" ]]; then
       apps="$apps mlwb-pipeline mlwb-pipeline-webcomponent mlwb-pipeline-catalog-webcomponent"
       cp kubernetes/mlwb-pipeline* deploy/.
     fi
@@ -127,10 +117,12 @@ mlwb-pipeline mlwb-pipeline-webcomponent mlwb-pipeline-catalog-webcomponent"
 
     log "Deploy the MLWB k8s-based components"
     # Create services first... see https://github.com/kubernetes/kubernetes/issues/16448
-    for f in  deploy/*-ingress.yaml ; do
-      log "Creating ingress from $f"
-      kubectl create -f $f
-    done
+    if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
+      for f in  deploy/*-ingress.yaml ; do
+        log "Creating ingress from $f"
+        kubectl create -f $f
+      done
+    fi
     for f in  deploy/*-service.yaml ; do
       log "Creating service from $f"
       kubectl create -f $f
@@ -139,6 +131,11 @@ mlwb-pipeline mlwb-pipeline-webcomponent mlwb-pipeline-catalog-webcomponent"
       log "Creating deployment from $f"
       kubectl create -f $f
     done
+    get_host_ip_from_etc_hosts $MLWB_JUPYTERHUB_DOMAIN
+    if [[ "$HOST_IP" != "" ]]; then
+      patch_deployment_with_host_alias $ACUMOS_NAMESPACE mlwb-pipeline \
+       $MLWB_JUPYTERHUB_DOMAIN $HOST_IP
+    fi
 
     log "Wait for all MLWB core pods to be Running"
     for app in $apps; do
@@ -161,20 +158,23 @@ update_mlwb_env MLWB_JUPYTERHUB_HOST $MLWB_JUPYTERHUB_HOST force
 update_mlwb_env MLWB_JUPYTERHUB_HOST_IP $MLWB_JUPYTERHUB_HOST_IP force
 update_mlwb_env MLWB_JUPYTERHUB_HOST_USER $MLWB_JUPYTERHUB_HOST_USER force
 
+action=$1
+if [[ "$action" == "" ]]; then action=all; fi
+
 if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
   update_mlwb_env MLWB_DEPLOY_JUPYTERHUB false
   update_mlwb_env MLWB_DEPLOY_NIFI false
 else
   if [[ "$MLWB_DEPLOY_NIFI" == "true" ]]; then
-    bash nifi/setup_nifi.sh
+    bash nifi/setup_nifi.sh $action
   fi
   if [[ "$MLWB_DEPLOY_JUPYTERHUB" == "true" ]]; then
-    bash $AIO_ROOT/../charts/jupyterhub/setup_jupyterhub.sh \
-      $ACUMOS_NAMESPACE $ACUMOS_DOMAIN $ACUMOS_ONBOARDING_TOKENMODE
+    bash $AIO_ROOT/../charts/jupyterhub/setup_jupyterhub.sh $action \
+      $ACUMOS_NAMESPACE $ACUMOS_ORIGIN $ACUMOS_ONBOARDING_TOKENMODE
   fi
 fi
 log "Apply any updates to mlwb_env.sh"
 source mlwb_env.sh
-clean_mlwb
-setup_mlwb
+if [[ "$action" == "clean" || "$action" == "all" ]]; then clean_mlwb; fi
+if [[ "$action" == "setup" || "$action" == "all" ]]; then setup_mlwb; fi
 cd $WORK_DIR

@@ -54,7 +54,7 @@ services:
          }
       }'
     ports:
-      - "${ACUMOS_CDS_NODEPORT}:8000"
+      - "${ACUMOS_CDS_PORT}:8000"
     volumes:
       - type: bind
         source: /mnt/${ACUMOS_NAMESPACE}/logs
