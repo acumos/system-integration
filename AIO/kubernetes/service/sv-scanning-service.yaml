@@ -29,9 +29,8 @@ metadata:
 spec:
   selector:
     app: sv-scanning
-  type: NodePort
+  type: ClusterIP
   ports:
   - name: sv-scanning-port
-    nodePort: <ACUMOS_SECURITY_VERIFICATION_PORT>
-    port: 9082
+    port: <ACUMOS_SECURITY_VERIFICATION_PORT>
     targetPort: 9082

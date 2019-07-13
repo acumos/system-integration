@@ -132,10 +132,10 @@ spec:
           name: nifi-registry-apache-configmap
       - name: nifi-registry
         persistentVolumeClaim:
-          claimName: pvc-<ACUMOS_NAMESPACE>-nifi-registry
+          claimName: <MLWB_NIFI_REGISTRY_PVC_NAME>
       - name: logs
         persistentVolumeClaim:
-          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+          claimName: <ACUMOS_LOGS_PVC_NAME>
       - name: nifi-certs
         secret:
           secretName: nifi-certs-registry

@@ -357,7 +357,7 @@ Version 0.6, 13 August 2018
 
   * `ACUMOS-1146: docker or kubernetes as target env for AIO deployment <https://jira.acumos.org/browse/ACUMOS-1146>`_
   * Remove validation-client
-  * Add HTTP_PROXY and HTTPS_PROXY env vars, add to docker template
+  * Add ACUMOS_HTTP_PROXY and ACUMOS_HTTPS_PROXY env vars, add to docker template
   * Fix trailing whitespace
   * Retrieve and customize database script for CDS version
   * Refactor create-user.sh
