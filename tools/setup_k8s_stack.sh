@@ -24,7 +24,7 @@
 # - Ubuntu Xenial/Bionic or Centos 7 server
 # - All hostnames specified in acumos_env.sh must be DNS-resolvable on all hosts
 #   (entries in /etc/hosts or in an actual DNS server)
-# - For deployments behind proxies, set HTTP_PROXY and HTTPS_PROXY in acumos_env.sh
+# - For deployments behind proxies, set ACUMOS_HTTP_PROXY and ACUMOS_HTTPS_PROXY in acumos_env.sh
 # - User running this script has:
 #   - Installed docker per system-integration/tools/setup_docker.sh
 #   - Added themselves to the docker group (sudo usermod -aG docker $USER)
@@ -39,6 +39,11 @@
 #   clean: remove all stack components
 #   setup: setup all stack components
 #
+
+function prep_k8s() {
+  trap 'fail' ERR
+  bash $WORK_DIR/system-integration/tools/setup_k8s_stack.sh setup
+}
 
 function clean_k8s() {
   # clean current environment
@@ -60,6 +65,7 @@ function clean_k8s() {
     if [[ $(which docker) ]]; then docker system prune -a -f; fi
     sudo apt-get purge -y docker-ce docker docker-engine docker.io
   fi
+  rm -rf ~/.kube
   sudo iptables -F && sudo iptables -t nat -F && sudo iptables -t mangle -F && sudo iptables -X
 }
 

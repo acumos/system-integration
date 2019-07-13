@@ -45,7 +45,7 @@ spec:
         image: <ONBOARDING_IMAGE>
         # TODO: assess why privilege is needed in Centos to avoid errors ala '(No such file or directory)'
         securityContext:
-          privileged: true
+          privileged: <ACUMOS_PRIVILEGED_ENABLE>
         env:
         - name: SPRING_APPLICATION_JSON
           value: '{
@@ -82,12 +82,12 @@ spec:
               "max_total_connections": "1",
               "max_per_route_connections": "1"
             },
-            "http_proxy": "<HTTP_PROXY>",
+            "http_proxy": "<ACUMOS_HTTP_PROXY>",
             "nexus": {
               "nexusEndPointURL": "http://<ACUMOS_NEXUS_HOST>:<ACUMOS_NEXUS_API_PORT>/<ACUMOS_NEXUS_MAVEN_REPO_PATH>/<ACUMOS_NEXUS_MAVEN_REPO>/",
               "nexusUserName": "<ACUMOS_NEXUS_RW_USER>",
               "nexusPassword": "<ACUMOS_NEXUS_RW_USER_PASSWORD>",
-              "nexusproxy": "",
+              "nexusproxy": "<ACUMOS_HTTP_PROXY>",
               "nexusGroupId": "<ACUMOS_NEXUS_GROUP>"
             },
             "cmndatasvc": {
@@ -133,8 +133,4 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-         claimName: pvc-<ACUMOS_NAMESPACE>-logs
-      hostAliases:
-      - ip: "<ACUMOS_HOST_IP>"
-        hostnames:
-        - "<ACUMOS_HOST>"
+         claimName: <ACUMOS_LOGS_PVC_NAME>

@@ -57,10 +57,11 @@ function log() {
 }
 
 function find_user() {
+  trap 'fail' ERR
   log "Find user $1"
   local tmp="/tmp/$(uuidgen)"
   curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    -k https://$ACUMOS_DOMAIN/ccds/user
+    -k https://$ACUMOS_ORIGIN/ccds/user
   cat $tmp
   users=$(jq -r '.content | length' $tmp)
   i=0; userId=""
@@ -90,15 +91,15 @@ function register_user() {
 EOF
   cat $jsoninp
   local jsonout="/tmp/$(uuidgen)"
-  local apiurl="https://$ACUMOS_DOMAIN/api/users/register"
+  local apiurl="https://$ACUMOS_ORIGIN/api/users/register"
   curl -k -s -o $jsonout -X POST $apiurl \
     -H "Content-Type: application/json" -d @$jsoninp
   cat $jsonout
-  i=0
+  t=0
   while [[ "$(jq -r '.response_detail' $jsonout)" != "Success" ]]; do
     sleep 10
-    i=$((i+1))
-    if [[ $i -eq 6 ]]; then
+    t=$((i+10))
+    if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
       rm $jsoninp $jsonout
       fail "Unable to register user after 1 minute"
     fi
@@ -113,7 +114,7 @@ function find_role() {
   local tmp="/tmp/$(uuidgen)"
   log "Finding role name $1"
   curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    -k https://$ACUMOS_DOMAIN/ccds/role
+    -k https://$ACUMOS_ORIGIN/ccds/role
   cat $tmp
   roles=$(jq -r '.content | length' $tmp)
   i=0; roleId=""
@@ -132,7 +133,7 @@ function create_role() {
   log "Create role name $1"
   local tmp="/tmp/$(uuidgen)"
   curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST \
-  -k https://$ACUMOS_DOMAIN/ccds/role \
+  -k https://$ACUMOS_ORIGIN/ccds/role \
     -H "accept: */*" -H "Content-Type: application/json" \
     -d "{\"name\": \"$1\", \"active\": true}"
   cat $tmp
@@ -150,7 +151,7 @@ function assign_role() {
   log "Assign roleId $2 to userId $1"
   local tmp="/tmp/$(uuidgen)"
   curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST \
-    -k https://$ACUMOS_DOMAIN/ccds/user/$1/role/$2
+    -k https://$ACUMOS_ORIGIN/ccds/user/$1/role/$2
   status=$(jq -r '.status' $tmp)
   if [[ $status -ne 200 ]]; then
     cat $tmp
@@ -180,7 +181,7 @@ function setup_user() {
   fi
   log "Resulting user account record"
   curl -s -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    -k https://$ACUMOS_DOMAIN/ccds/user/$userId
+    -k https://$ACUMOS_ORIGIN/ccds/user/$userId
 }
 
 set -x

@@ -128,8 +128,8 @@ data:
     nifi.web.http.host=
     nifi.web.http.port=
     nifi.web.http.network.interface.default=
-    nifi.web.https.host=
-    nifi.web.https.port=19443
+    nifi.web.https.host=<ACUMOS_DOMAIN>
+    nifi.web.https.port=443
     nifi.web.https.network.interface.default=
     nifi.web.jetty.working.directory=./work/jetty
     nifi.web.jetty.threads=200
