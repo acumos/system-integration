@@ -85,6 +85,7 @@ controller:
     externalIPs: [$EXTERNAL_IP]
   extraArgs:
     default-ssl-certificate: "$NAMESPACE/ingress-cert"
+    enable-ssl-passthrough: ""
 EOF
   helm install --name ${NAMESPACE}-nginx-ingress --namespace $NAMESPACE \
     --set-string controller.config.proxy-body-size="0" \

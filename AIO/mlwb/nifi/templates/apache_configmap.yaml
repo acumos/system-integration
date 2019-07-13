@@ -271,7 +271,7 @@ data:
             RequestHeader set X-ProxiedEntitiesChain "%{RU}e"
             RequestHeader set X-ProxyScheme "https"
             RequestHeader set X-ProxyHost "<ACUMOS_DOMAIN>"
-            RequestHeader set X-ProxyPort "443"
+            RequestHeader set X-ProxyPort "<ACUMOS_PORT>"
             RequestHeader set X-ProxyContextPath "/$USER/nifi-user/"
     </IF>
     <Else>

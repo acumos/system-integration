@@ -51,7 +51,7 @@ function find_user() {
   log "Find user $1"
   local tmp="/tmp/$(uuidgen)"
   curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    -k https://$ACUMOS_DOMAIN/ccds/user
+    -k https://$ACUMOS_ORIGIN/ccds/user
   cat $tmp
   users=$(jq -r '.content | length' $tmp)
   i=0; userId=""
@@ -70,7 +70,7 @@ function delete_user() {
   if [[ "$userId" != "" ]]; then
     log "Delete user $username"
     curl -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X DELETE \
-      -k https://$ACUMOS_DOMAIN/ccds/user/$userId
+      -k https://$ACUMOS_ORIGIN/ccds/user/$userId
     find_user $username
     if [[ "$userId" != "" ]]; then
       fail "User delete failed"

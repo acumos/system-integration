@@ -41,14 +41,7 @@ if [[ -e elk_env.sh ]]; then source elk_env.sh; fi
 export ACUMOS_ELK_NAMESPACE="${ACUMOS_ELK_NAMESPACE:-acumos-elk}"
 export ACUMOS_ELK_DOMAIN="${ACUMOS_ELK_DOMAIN:-$ACUMOS_DOMAIN}"
 export ACUMOS_ELK_HOST="${ACUMOS_ELK_HOST:-$ACUMOS_HOST}"
-
-if [[ $(host $ACUMOS_ELK_HOST | grep -c 'not found') -eq 0 ]]; then
-  export ACUMOS_ELK_HOST_IP=$(host $ACUMOS_ELK_HOST | head -1 | cut -d ' ' -f 4)
-elif [[ $(grep -c -E " $ACUMOS_ELK_HOST( |$)" /etc/hosts) -gt 0 ]]; then
-  export ACUMOS_ELK_HOST_IP=$(grep -E "$ACUMOS_ELK_HOST( |$)" /etc/hosts | cut -d ' ' -f 1)
-else
-  fail "Please ensure host $ACUMOS_ELK_HOST is resolvable thru DNS or hosts file"
-fi
+export ACUMOS_ELK_HOST_IP="${ACUMOS_ELK_HOST_IP:-$ACUMOS_HOST_IP}"
 
 # External component options
 export HTTP_PROXY="${HTTP_PROXY:-}"
@@ -71,8 +64,10 @@ export ACUMOS_ELK_LS_JAVA_HEAP_MIN_SIZE="${ACUMOS_ELK_LS_JAVA_HEAP_MIN_SIZE:-1g}
 export ACUMOS_ELK_LS_JAVA_HEAP_MAX_SIZE="${ACUMOS_ELK_LS_JAVA_HEAP_MAX_SIZE:-2g}"
 
 # Persistent Volume options
-export ACUMOS_ELASTICSEARCH_DATA_PVC_NAME="${ACUMOS_ELASTICSEARCH_DATA_PVC_NAME:-pvc-$ACUMOS_ELK_NAMESPACE-elasticsearch-data}"
-export ACUMOS_ELASTICSEARCH_DATA_PV_NAME="${ACUMOS_ELASTICSEARCH_DATA_PV_NAME:-pv-$ACUMOS_ELK_NAMESPACE-elasticsearch-data}"
+# TODO: Address Elasticsearch access to PV requiring privileged security context
+export ACUMOS_ELASTICSEARCH_PRIVILEGED_ENABLE="${ACUMOS_ELASTICSEARCH_PRIVILEGED_ENABLE:-true}"
+export ACUMOS_ELASTICSEARCH_DATA_PVC_NAME="${ACUMOS_ELASTICSEARCH_DATA_PVC_NAME:-elasticsearch-data}"
+export ACUMOS_ELASTICSEARCH_DATA_PV_NAME="${ACUMOS_ELASTICSEARCH_DATA_PV_NAME:-elasticsearch-data}"
 export ACUMOS_ELASTICSEARCH_DATA_PV_SIZE="${ACUMOS_ELASTICSEARCH_DATA_PV_SIZE:-10Gi}"
 
 cat <<EOF >elk_env.sh

@@ -32,6 +32,6 @@ spec:
   type: NodePort
   ports:
   - name: docker-proxy-port
-    nodePort: <ACUMOS_DOCKER_PROXY_PORT>
+    port: <ACUMOS_DOCKER_PROXY_PORT>
     port: 8443
     targetPort: 8443
