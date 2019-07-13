@@ -40,6 +40,11 @@
 #   setup: setup all stack components
 #
 
+function prep_k8s() {
+  trap 'fail' ERR
+  bash $WORK_DIR/system-integration/tools/setup_k8s_stack.sh setup
+}
+
 function clean_k8s() {
   # clean current environment
   if [[ "$K8S_DIST" == "openshift" ]]; then
@@ -60,6 +65,7 @@ function clean_k8s() {
     if [[ $(which docker) ]]; then docker system prune -a -f; fi
     sudo apt-get purge -y docker-ce docker docker-engine docker.io
   fi
+  rm -rf ~/.kube
   sudo iptables -F && sudo iptables -t nat -F && sudo iptables -t mangle -F && sudo iptables -X
 }
 
