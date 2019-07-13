@@ -5,7 +5,7 @@
   "https_only": true,
   "upstream_url": "http://kubernetes-client-service:8082",
   "uris": [
-    "/getSolutionZip"
+    "/package"
   ],
   "preserve_host": false,
   "upstream_connect_timeout": 60000,

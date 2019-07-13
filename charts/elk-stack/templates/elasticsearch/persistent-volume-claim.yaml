@@ -23,10 +23,9 @@ metadata:
     app: elasticsearch
   name: {{ .Values.elasticsearch.persistence.pvcName }}
   namespace: "{{ .Values.namespace }}"
-  annotations:
-    "helm.sh/resource-policy": keep
+#  annotations:
+#    "helm.sh/resource-policy": keep
 spec:
-  storageClassName: {{ .Values.namespace }}
   accessModes:
     - ReadWriteOnce
   resources:

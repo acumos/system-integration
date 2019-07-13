@@ -31,6 +31,9 @@ services:
         "server": {
            "port": 8085
          },
+        "qanda": {
+          "url": "https://stackoverflow.com/questions/tagged/acumos"
+        },
         "zuul": {
           "routes": {
              "api": {

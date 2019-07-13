@@ -56,7 +56,7 @@ spec:
         - name: ACUMOS_ELK_JDBC_PASSWORD
           value: "<ACUMOS_MARIADB_USER_PASSWORD>"
         - name: ACUMOS_ELASTICSEARCH_PORT
-          value: "<ACUMOS_ELK_ELASTICSEARCH_PORT>"
+          value: "9300"
         ports:
         - containerPort: 5044
         volumeMounts:

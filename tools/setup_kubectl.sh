@@ -145,7 +145,7 @@ if [[ "$SECRET" == "" ]]; then
 fi
 log "SECRET=$SECRET"
 TOKEN=$(ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $user@$server \
-  kubectl describe secret $SECRET | grep -E '^token' | cut -f2 -d':' | tr -d " ")
+  kubectl describe secret $SECRET | grep -E '^token' | cut -f2 -d ':' | tr -d " ")
 if [[ "$TOKEN" == "" ]]; then
   fail "Unable to retrieve token"
 fi
