@@ -29,20 +29,6 @@
 # $ bash setup_nifi.sh
 #
 
-clean_resource() {
-# No trap fail here, as timing issues may cause commands to fail
-#  trap 'fail' ERR
-  if [[ $(kubectl get $1 -n $ACUMOS_NAMESPACE -o json | jq ".items | length") -gt 0 ]]; then
-    rss=$(kubectl get $1 -n $ACUMOS_NAMESPACE | awk '/nifi/{print $1}')
-    for rs in $rss; do
-      kubectl delete $1 -n $ACUMOS_NAMESPACE $rs
-      while [[ $(kubectl get $1 -n $ACUMOS_NAMESPACE $rs) ]]; do
-        sleep 5
-      done
-    done
-  fi
-}
-
 clean_nifi() {
   trap 'fail' ERR
 
@@ -50,14 +36,14 @@ clean_nifi() {
   trap - ERR
   rm -rf deploy
   log "Delete all NiFi resources"
-  clean_resource deployment
-  clean_resource replicaset
-  clean_resource pods
-  clean_resource service
-  clean_resource configmap
-  clean_resource ingress
-  clean_resource secret
-  clean_resource pvc
+  clean_resource $ACUMOS_NAMESPACE deployment nifi
+  clean_resource $ACUMOS_NAMESPACE replicaset nifi
+  clean_resource $ACUMOS_NAMESPACE pods nifi
+  clean_resource $ACUMOS_NAMESPACE service nifi
+  clean_resource $ACUMOS_NAMESPACE configmap nifi
+  clean_resource $ACUMOS_NAMESPACE ingress nifi
+  clean_resource $ACUMOS_NAMESPACE secret nifi
+  clean_resource $ACUMOS_NAMESPACE pvc nifi
   trap 'fail' ERR
 
   log "Delete cert, truststore, and keystore for nifi"
@@ -134,6 +120,8 @@ setup_nifi() {
   sedi "s/<MLWB_NIFI_KEYSTORE_PASSWORD>/$MLWB_NIFI_KEYSTORE_PASSWORD/g" deploy/nifi-registry-deployment.yaml
   sedi "s/<MLWB_NIFI_TRUSTSTORE_PASSWORD>/$MLWB_NIFI_TRUSTSTORE_PASSWORD/g" deploy/nifi-registry-deployment.yaml
   sedi "s/<MLWB_NIFI_REGISTRY_INITIAL_ADMIN>/$MLWB_NIFI_REGISTRY_INITIAL_ADMIN/g" deploy/nifi-registry-deployment.yaml
+  sedi "s~<MLWB_NIFI_REGISTRY_PVC_NAME>~$MLWB_NIFI_REGISTRY_PVC_NAME~g" deploy/nifi-registry-deployment.yaml
+  sedi "s~<ACUMOS_LOGS_PVC_NAME>~$ACUMOS_LOGS_PVC_NAME~g" deploy/nifi-registry-deployment.yaml
   replace_env deploy/ingress-registry.yaml
   replace_env deploy/namespace-admin-role.yaml
   replace_env deploy/namespace-admin-rolebinding.yaml
@@ -160,7 +148,8 @@ setup_nifi() {
   kubectl create -f deploy/nifi-registry-apache-configmap.yaml
 
   log "Create NiFi Registry PVC in namespace $ACUMOS_NAMESPACE"
-  setup_pvc nifi-registry $ACUMOS_NAMESPACE $MLWB_NIFI_REGISTRY_PV_SIZE
+  setup_pvc $ACUMOS_NAMESPACE $MLWB_NIFI_REGISTRY_PVC_NAME \
+    $MLWB_NIFI_REGISTRY_PV_NAME $MLWB_NIFI_REGISTRY_PV_SIZE
 
   log "Create NiFi Registry ingress"
   kubectl create -f deploy/ingress-registry.yaml

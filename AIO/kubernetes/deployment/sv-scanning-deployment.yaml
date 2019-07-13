@@ -193,7 +193,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+          claimName: <ACUMOS_LOGS_PVC_NAME>
       - name: scripts
         configMap:
           name: sv-scanning-scripts

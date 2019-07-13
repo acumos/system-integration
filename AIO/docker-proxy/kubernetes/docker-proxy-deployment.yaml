@@ -94,7 +94,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-         claimName: pvc-<ACUMOS_NAMESPACE>-logs
+         claimName: <ACUMOS_LOGS_PVC_NAME>
       - name: conf-volume
         configMap:
           name: docker-proxy

@@ -31,39 +31,50 @@
 # Usage:
 # Run this script on the AIO host or a workstation connected to the k8s cluster
 # via kubectl (e.g. via tools/setup_kubectl.sh)
-# $ bash setup_elk.sh <ACUMOS_ELK_DOMAIN> <K8S_DIST> [prep]
+# $ bash setup_elk.sh <clean|prep|setup|all> <ACUMOS_ELK_DOMAIN> <K8S_DIST>
+#   clean|prep|setup|all: action to execute
 #   ACUMOS_ELK_DOMAIN: hostname or FQDN of ELK service. Must be resolvable locally
 #     or thru DNS. Can be the hostname of the k8s master node.
 #   K8S_DIST: generic|openshift
-#   prep: (optional) run prerequisite setup steps (requires sudo)
 #
 
 function clean_elk() {
-  trap 'elk_fail' ERR
-  if [[ $(helm list elk) ]]; then
-    helm delete --purge elk
-    echo "Helm release elk deleted"
+  trap 'fail' ERR
+  if [[ $(helm list $ACUMOS_ELK_NAMESPACE-elk) ]]; then
+    helm delete --purge $ACUMOS_ELK_NAMESPACE-elk
+    echo "Helm release $ACUMOS_ELK_NAMESPACE-elk deleted"
   fi
-  delete_namespace $ACUMOS_ELK_NAMESPACE
-  # The PVC sometimes takes longer to be deleted than the namespace, probably
-  # due to PV data recycle operations; this can block later re-creation...
-  delete_pvc elasticsearch-data $ACUMOS_ELK_NAMESPACE
-
-  if [[ "$prep" == "prep" ]]; then
-    reset_pv elasticsearch-data $ACUMOS_ELK_NAMESPACE \
-      $ACUMOS_ELASTICSEARCH_DATA_PV_SIZE "1000:1000"
-  fi
+  log "Delete all ELK resources"
+  wait_until_notfound "kubectl get pods -n $ACUMOS_ELK_NAMESPACE" elasticsearch
+  wait_until_notfound "kubectl get pods -n $ACUMOS_ELK_NAMESPACE" kibana
+  wait_until_notfound "kubectl get pods -n $ACUMOS_ELK_NAMESPACE" logstash
+  clean_resource $ACUMOS_ELK_NAMESPACE deployment elk
+  clean_resource $ACUMOS_ELK_NAMESPACE pods elk
+  clean_resource $ACUMOS_ELK_NAMESPACE secret elk
+  delete_pvc $ACUMOS_ELK_NAMESPACE $ACUMOS_ELASTICSEARCH_DATA_PVC_NAME
   cleanup_snapshot_images
 }
 
-function setup_elk() {
-  trap 'elk_fail' ERR
-  set_k8s_env
+function prep_elk() {
+  trap 'fail' ERR
+  verify_ubuntu_or_centos
+  if [[ "$ACUMOS_CREATE_PVS" == "true" ]]; then
+    reset_pv $ACUMOS_ELK_NAMESPACE $ACUMOS_ELASTICSEARCH_DATA_PV_NAME \
+      $ACUMOS_ELASTICSEARCH_DATA_PV_SIZE "1000:1000"
+  fi
   create_namespace $ACUMOS_ELK_NAMESPACE
+}
+
+function setup_elk() {
+  trap 'fail' ERR
+  set_k8s_env
   create_acumos_registry_secret $ACUMOS_ELK_NAMESPACE
   replace_env templates/elasticsearch
   replace_env templates/kibana
   replace_env templates/logstash
+  if [[ "$ACUMOS_CREATE_PVS" != "true" ]]; then
+    export ACUMOS_ELASTICSEARCH_DATA_PV_NAME=""
+  fi
   replace_env values.yaml
 
   if [[ "$K8S_DIST" == "openshift" ]]; then
@@ -73,45 +84,48 @@ function setup_elk() {
 
   log "Create the elk Helm release"
   helm repo update
-  helm install -n elk --namespace $ACUMOS_ELK_NAMESPACE .
+  helm install -n $ACUMOS_ELK_NAMESPACE-elk --namespace $ACUMOS_ELK_NAMESPACE .
 
   log "Wait for all elk-stack pods to be Running"
   apps="elasticsearch kibana logstash"
   for app in $apps; do
     wait_running $app $ACUMOS_ELK_NAMESPACE
   done
+
+  ACUMOS_ELK_ELASTICSEARCH_PORT=$(kubectl get services -n $ACUMOS_ELK_NAMESPACE elasticsearch -o json | jq -r '.spec.ports[0].nodePort')
+  update_elk_env ACUMOS_ELK_ELASTICSEARCH_PORT $ACUMOS_ELK_ELASTICSEARCH_PORT force
+  ACUMOS_ELK_ELASTICSEARCH_INDEX_PORT=$(kubectl get services -n $ACUMOS_ELK_NAMESPACE elasticsearch -o json | jq -r '.spec.ports[1].nodePort')
+  update_elk_env ACUMOS_ELK_ELASTICSEARCH_INDEX_PORT $ACUMOS_ELK_ELASTICSEARCH_INDEX_PORT force
+  ACUMOS_ELK_LOGSTASH_PORT=$(kubectl get services -n $ACUMOS_ELK_NAMESPACE logstash -o json | jq -r '.spec.ports[0].nodePort')
+  update_elk_env ACUMOS_ELK_LOGSTASH_PORT $ACUMOS_ELK_LOGSTASH_PORT force
+  ACUMOS_ELK_KIBANA_PORT=$(kubectl get services -n $ACUMOS_ELK_NAMESPACE kibana -o json | jq -r '.spec.ports[0].nodePort')
+  update_elk_env ACUMOS_ELK_KIBANA_PORT $ACUMOS_ELK_KIBANA_PORT force
 }
 
-trap 'elk_fail' ERR
-
-if [[ $# -lt 2 ]]; then
+if [[ $# -lt 1 ]]; then
   cat <<'EOF'
 Usage:
-  $ bash setup_elk.sh <ACUMOS_ELK_DOMAIN> <K8S_DIST> [prep]
-    ACUMOS_ELK_DOMAIN: hostname or FQDN of ELK service. Must be resolvable locally
-      or thru DNS. Can be the hostname of the k8s master node.
-    K8S_DIST: generic|openshift
-    prep: (optional) run prerequisite setup steps (requires sudo)
+$ bash setup_elk.sh <clean|prep|setup|all> <ACUMOS_ELK_DOMAIN> <K8S_DIST>
+ clean|prep|setup|all: action to execute
+ ACUMOS_ELK_DOMAIN: hostname or FQDN of ELK service. Must be resolvable locally
+   or thru DNS. Can be the hostname of the k8s master node.
+ K8S_DIST: generic|openshift
 EOF
   echo "All parameters not provided"
   exit 1
 fi
 
 set -x
+trap 'fail' ERR
 WORK_DIR=$(pwd)
 cd $(dirname "$0")
 if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
 source $AIO_ROOT/utils.sh
 source $AIO_ROOT/acumos_env.sh
-export ACUMOS_ELK_DOMAIN=$1
+action=$1
+export ACUMOS_ELK_DOMAIN=$2
 export DEPLOYED_UNDER=k8s
-export K8S_DIST=$2
-prep=$3
-
-if [[ "$prep" == "prep" ]]; then
-  verify_ubuntu_or_centos
-  export ACUMOS_ELK_HOST=$(hostname)
-fi
+export K8S_DIST=$3
 
 if [[ -e elk_env.sh ]]; then
   source elk_env.sh
@@ -121,10 +135,9 @@ if [[ "$ACUMOS_ELK_HOST" == "" ]]; then
 fi
 get_host_ip $ACUMOS_ELK_HOST
 source setup_elk_env.sh
-
-clean_elk
-setup_elk
-
+if [[ "$action" == "clean" || "$action" == "all" ]]; then clean_elk; fi
+if [[ "$action" == "prep" || "$action" == "all" ]]; then prep_elk; fi
+if [[ "$action" == "setup" || "$action" == "all" ]]; then setup_elk; fi
 sedi 's/DEPLOY_RESULT=.*/DEPLOY_RESULT=success/' elk_env.sh
 cp elk_env.sh $AIO_ROOT/.
 cd $WORK_DIR

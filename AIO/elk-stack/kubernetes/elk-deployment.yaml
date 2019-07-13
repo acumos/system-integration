@@ -63,7 +63,7 @@ spec:
       volumes:
       - name: elasticsearch-data
         persistentVolumeClaim:
-          claimName: pvc-<ACUMOS_ELK_NAMESPACE>-elasticsearch-data
+          claimName: <ACUMOS_ELASTICSEARCH_DATA_PVC_NAME>
       hostAliases:
       - ip: "<ACUMOS_ELK_HOST_IP>"
         hostnames:

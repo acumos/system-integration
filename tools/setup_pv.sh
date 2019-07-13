@@ -25,14 +25,15 @@
 # - key-based SSH setup between the workstation and k8s master node
 #
 # Usage: on the workstation,
-# $ bash setup_pv.sh <setup|clean> <master> <username> <name> <path> <size> [storageClassName]
-#   setup|clean: setup or remove (including host files)
+# $ bash setup_pv.sh <setup|clean|all> <master> <username> <path> <name> <size> <owner> [storageClassName]
+#   setup|clean\all: setup, remove (including host files), or both
 #   master: IP address or hostname of k8s master node
 #   username: username on the server where the master was installed (this is
 #     the user who setup the cluster, and for which key-based SSH is setup)
-#   name: name of the PV, e.g. "pv-001"
 #   path: path of the host folder where 'name' should be created (if not existing)
+#   name: name of the PV, e.g. "pv-001"
 #   size: size in Gi to allocate to the PV
+#   owner: owner to set for the PV folder
 #   storageClassName: storageClassName to assign
 #
 
@@ -50,15 +51,17 @@ function run_tmp() {
 function setup() {
   trap 'fail' ERR
   # Per https://kubernetes.io/docs/tasks/configure-pod-container/configure-persistent-volume-storage/
-  tmp=/tmp/$(uuidgen)
-  cat <<EOF >$tmp
-if [[ ! \$(kubectl get pv $name) ]]; then
-  if [[ ! -e $path/$name ]]; then
-    sudo mkdir -p $path/$name
-    sudo chown \$USER:users $path/$name
-    chmod 777 $path/$name
-  fi
-  cat <<EOG >$name.yaml
+  if [[ "$(kubectl get pv $name)" == "" ]]; then
+    local tmp=/tmp/$(uuidgen)
+    cat <<EOF >$tmp
+if [[ -e $path/$name ]]; then rm -rf $path/$name; fi
+sudo mkdir -p $path/$name
+sudo chown $owner $path/$name
+sudo chmod 777 $path/$name
+EOF
+    run_tmp
+
+    cat <<EOF >$tmp.yaml
 kind: PersistentVolume
 apiVersion: v1
 metadata:
@@ -74,22 +77,27 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: "/$path/$name"
-EOG
-  kubectl create -f $name.yaml
-  kubectl get pv $name
-else
-  echo "PV $name already exists"
-  exit 1
-fi
 EOF
-  run_tmp
+    kubectl create -f $tmp.yaml
+    kubectl get pv $name
+    rm $tmp.yaml
+  else
+    log "PV $name already exists"
+  fi
 }
 
 function clean() {
   trap 'fail' ERR
-  tmp=/tmp/$(uuidgen)
+  if [[ "$(kubectl get pv $name)" != "" ]]; then
+    if [[ "$(kubectl get pv $name -o json | jq -r '.spec.claimRef.name')" != "null" ]]; then
+      kubectl patch pv $name --type json -p '[{ "op": "remove", "path": "/spec/claimRef" }]'
+    fi
+    if [[ "$(kubectl get pv $name)" != "" ]]; then
+      kubectl delete pv $name
+    fi
+  fi
+  local tmp=/tmp/$(uuidgen)
   cat <<EOF >$tmp
-kubectl delete pv $name
 sudo rm -rf /$path/$name
 EOF
   run_tmp
@@ -97,14 +105,15 @@ EOF
 
 if [[ $# -lt 6 ]]; then
   cat <<'EOF'
- $ bash setup_pv.sh <setup|clean> <master> <username> <name> <path> <size> [storageClassName]
-   setup|clean: setup or remove (including host files)
+ $ bash setup_pv.sh <setup|clean|all> <master> <username> <path> <name> <size> <owner> [storageClassName]
+   setup|clean|all: setup, remove (including host files), or both
    master: IP address or hostname of k8s master node
    username: username on the server where the master was installed (this is
      the user who setup the cluster, and for which key-based SSH is setup)
-   name: name of the PV, e.g. "pv-001"
    path: path of the host folder where 'name' should be created (if not existing)
+   name: name of the PV, e.g. "pv-001"
    size: size in Gi to allocate to the PV
+   owner: owner to set for the PV folder
    storageClassName: storageClassName to assign
 EOF
   echo "All parameters not provided"
@@ -120,15 +129,13 @@ source $AIO_ROOT/utils.sh
 action=$1
 master=$2
 username=$3
-name=$4
-path=$5
+path=$4
+name=$5
 size=$6
-storageClassName=$7
+owner=$7
+storageClassName=$8
 
-if [[ "$action" == "clean" ]]; then
-  clean
-else
-  setup
-fi
+if [[ "$action" == "clean" || "$action" = "all" ]]; then clean; fi
+if [[ "$action" == "setup" || "$action" = "all" ]]; then setup; fi
 
 cd $WORK_DIR

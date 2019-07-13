@@ -52,9 +52,9 @@ function clean_docker_proxy() {
   fi
 }
 
-setup_docker_proxy() {
+update_nginx_auth() {
   trap 'fail' ERR
-  log "Update docker-proxy config for building the docker image"
+  log "Update docker-proxy auth config for nginx"
   ACUMOS_DOCKER_PROXY_AUTH=$(echo -n "$ACUMOS_NEXUS_RW_USER:$ACUMOS_NEXUS_RW_USER_PASSWORD" | base64)
   sedi "s~<ACUMOS_DOCKER_PROXY_AUTH>~$ACUMOS_DOCKER_PROXY_AUTH~g" auth/nginx.conf
   sedi "s~<ACUMOS_DOCKER_REGISTRY_HOST>~$ACUMOS_DOCKER_REGISTRY_HOST~g" auth/nginx.conf
@@ -62,15 +62,29 @@ setup_docker_proxy() {
   sedi "s~<ACUMOS_DOCKER_PROXY_PORT>~$ACUMOS_DOCKER_PROXY_PORT~g" auth/nginx.conf
   sedi "s~<ACUMOS_DOCKER_PROXY_HOST>~$ACUMOS_DOCKER_PROXY_HOST~g" auth/nginx.conf
 
-  log "Copy the Acumos server cert and key to auth/ for the docker image"
+  log "Copy the Acumos server cert and key for nginx"
   cp ../certs/$ACUMOS_CERT auth/domain.crt
   cp ../certs/$ACUMOS_CERT_KEY auth/domain.key
+}
+
+setup_docker_proxy() {
+  trap 'fail' ERR
 
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
+    update_nginx_auth
     log "Build the local acumos-docker-proxy image"
     docker build -t acumos-docker-proxy .
     bash docker_compose.sh up -d --build --force-recreate
   else
+    mkdir -p deploy
+    cp -r kubernetes/* deploy/.
+    log "Update the docker-proxy-service template and deploy the service"
+    replace_env deploy/docker-proxy-service.yaml
+    start_service deploy/docker-proxy-service.yaml
+    ACUMOS_DOCKER_PROXY_PORT=$(kubectl get services -n $ACUMOS_NAMESPACE docker-proxy-service -o json | jq -r '.spec.ports[0].nodePort')
+    update_acumos_env ACUMOS_DOCKER_PROXY_PORT $ACUMOS_DOCKER_PROXY_PORT force
+    update_nginx_auth
+
     log "Create kubernetes configmap for docker-proxy"
     # See use in docker-proxy deployment template
     if [[ $(kubectl get configmap -n $ACUMOS_NAMESPACE docker-proxy) ]]; then
@@ -80,11 +94,8 @@ setup_docker_proxy() {
     kubectl create configmap -n $ACUMOS_NAMESPACE docker-proxy \
       --from-file=auth/nginx.conf,auth/domain.key,auth/domain.crt,auth/acumos_auth.py
 
-    log "Deploy the k8s based components for docker-proxy"
-    mkdir -p deploy
-    cp -r kubernetes/* deploy/.
-    replace_env deploy
-    start_service deploy/docker-proxy-service.yaml
+    log "Update the docker-proxy deployment template and deploy it"
+    replace_env deploy/docker-proxy-deployment.yaml
     start_deployment deploy/docker-proxy-deployment.yaml
     wait_running docker-proxy $ACUMOS_NAMESPACE
   fi

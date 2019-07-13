@@ -63,7 +63,7 @@ spec:
       volumes:
       - name: mariadb-data
         persistentVolumeClaim:
-          claimName: pvc-<ACUMOS_MARIADB_NAMESPACE>-mariadb-data
+          claimName: <MARIADB_DATA_PVC_NAME>
       hostAliases:
       - ip: "<ACUMOS_HOST_IP>"
         hostnames:

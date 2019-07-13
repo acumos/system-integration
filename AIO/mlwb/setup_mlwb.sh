@@ -37,20 +37,6 @@
 # $ bash setup_mlwb.sh
 #
 
-clean_resource() {
-  # No trap fail here, as timing issues may cause commands to fail
-#  trap 'fail' ERR
-  if [[ $(kubectl get $1 -n $ACUMOS_NAMESPACE -o json | jq ".items | length") -gt 0 ]]; then
-    rss=$(kubectl get $1 -n $ACUMOS_NAMESPACE | awk '/mlwb/{print $1}')
-    for rs in $rss; do
-      kubectl delete $1 -n $ACUMOS_NAMESPACE $rs
-      while [[ $(kubectl get $1 -n $ACUMOS_NAMESPACE $rs) ]]; do
-        sleep 5
-      done
-    done
-  fi
-}
-
 function clean_mlwb() {
   trap 'fail' ERR
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
@@ -61,16 +47,15 @@ function clean_mlwb() {
       docker rm $c
     done
   else
-    log "Stop any existing k8s based components for NiFi"
-    trap - ERR
     rm -rf deploy
     log "Delete all MLWB resources"
-    clean_resource deployment
-    clean_resource pods
-    clean_resource service
-    clean_resource configmap
-    clean_resource ingress
-    clean_resource secret
+    clean_resource $ACUMOS_NAMESPACE deployment mlwb
+    clean_resource $ACUMOS_NAMESPACE pods mlwb
+    clean_resource $ACUMOS_NAMESPACE service mlwb
+    clean_resource $ACUMOS_NAMESPACE configmap mlwb
+    clean_resource $ACUMOS_NAMESPACE ingress mlwb
+    clean_resource $ACUMOS_NAMESPACE secret mlwb
+    clean_resource $ACUMOS_NAMESPACE pvc mlwb
   fi
   cleanup_snapshot_images
 }
@@ -169,7 +154,7 @@ else
     bash nifi/setup_nifi.sh
   fi
   if [[ "$MLWB_DEPLOY_JUPYTERHUB" == "true" ]]; then
-    bash $AIO_ROOT/../charts/jupyterhub/setup_jupyterhub.sh \
+    bash $AIO_ROOT/../charts/jupyterhub/setup_jupyterhub.sh all \
       $ACUMOS_NAMESPACE $ACUMOS_DOMAIN $ACUMOS_ONBOARDING_TOKENMODE
   fi
 fi

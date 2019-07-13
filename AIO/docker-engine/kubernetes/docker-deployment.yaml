@@ -42,7 +42,7 @@ spec:
       # Docker-commands-container
       containers:
       - name: docker-cmds
-        image: docker:18.06.3-ce-dind
+        image: docker:18-dind
         securityContext:
             privileged: true
         command: ['docker', 'run', '-p', '80:80', 'httpd:2.4']
@@ -57,7 +57,7 @@ spec:
           protocol: TCP
       # Docker-Daemon-container
       - name: docker-daemon
-        image: docker:dind
+        image: docker:18-dind
         securityContext:
             privileged: true
         env:
@@ -76,7 +76,7 @@ spec:
       volumes:
       - name: docker-volume
         persistentVolumeClaim:
-         claimName: pvc-<ACUMOS_NAMESPACE>-docker-volume
+         claimName: <DOCKER_VOLUME_PVC_NAME>
       hostAliases:
       - ip: "<ACUMOS_HOST_IP>"
         hostnames:

@@ -54,6 +54,9 @@ spec:
             "server": {
               "port": 8085
             },
+            "qanda": {
+              "url": "https://stackoverflow.com/questions/tagged/acumos"
+            },
             "zuul": {
               "routes": {
                 "api": {
@@ -109,7 +112,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-         claimName: pvc-<ACUMOS_NAMESPACE>-logs
+         claimName: <ACUMOS_LOGS_PVC_NAME>
       hostAliases:
       - ip: "<ACUMOS_HOST_IP>"
         hostnames:

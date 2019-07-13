@@ -110,7 +110,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+          claimName: <ACUMOS_LOGS_PVC_NAME>
       - name: nifi-certs-registry
         secret:
           secretName: nifi-certs-registry
@@ -164,7 +164,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+          claimName: <ACUMOS_LOGS_PVC_NAME>
       hostAliases:
       - ip: "<ACUMOS_HOST_IP>"
         hostnames:
@@ -216,7 +216,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: pvc-<ACUMOS_NAMESPACE>-logs
+          claimName: <ACUMOS_LOGS_PVC_NAME>
       hostAliases:
       - ip: "<ACUMOS_HOST_IP>"
         hostnames:
