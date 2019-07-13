@@ -271,16 +271,16 @@ data:
             RequestHeader set X-ProxiedEntitiesChain "%{RU}e"
             RequestHeader set X-ProxyScheme "https"
             RequestHeader set X-ProxyHost "<ACUMOS_DOMAIN>"
-            RequestHeader set X-ProxyPort "443"
+            RequestHeader set X-ProxyPort "<ACUMOS_PORT>"
             RequestHeader set X-ProxyContextPath "/$USER/nifi-user/"
     </IF>
     <Else>
             RequestHeader set X-ProxiedEntitiesChain "unauth_noaccess_user"
     </Else>
 
-    ProxyPass /nifi/ https://localhost:19443/nifi/
-    ProxyPass /nifi-api/ https://localhost:19443/nifi-api/
-    ProxyPass /nifi-docs/ https://localhost:19443/nifi-docs/
+    ProxyPass /nifi/ https://<ACUMOS_DOMAIN>/nifi/
+    ProxyPass /nifi-api/ https://<ACUMOS_DOMAIN>/nifi-api/
+    ProxyPass /nifi-docs/ https://<ACUMOS_DOMAIN>/nifi-docs/
     <Directory "/var/www/html">
         Options Indexes FollowSymLinks Includes
         AllowOverride None

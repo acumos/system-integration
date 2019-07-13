@@ -84,7 +84,7 @@ function clean_nexus() {
     stop_service deploy/nexus-service.yaml
     stop_deployment deploy/nexus-deployment.yaml
     log "Remove PVC for nexus-service"
-    delete_pvc nexus-data $ACUMOS_NAMESPACE
+    delete_pvc $ACUMOS_NAMESPACE $NEXUS_DATA_PVC_NAME
   fi
 }
 
@@ -95,17 +95,23 @@ function setup_nexus() {
     wait_running nexus-service
   else
     log "Setup the nexus-data PVC"
-    setup_pvc nexus-data $ACUMOS_NAMESPACE $NEXUS_DATA_PV_SIZE
+    setup_pvc $ACUMOS_NAMESPACE $NEXUS_DATA_PVC_NAME $NEXUS_DATA_PV_NAME $NEXUS_DATA_PV_SIZE
 
-    log "Deploy the k8s based components for nexus"
     mkdir -p deploy
     cp -r kubernetes/* deploy/.
-    replace_env deploy
+    log "Update the nexus-service template and deploy the service"
+    replace_env deploy/nexus-service.yaml
     start_service deploy/nexus-service.yaml
+    ACUMOS_NEXUS_API_PORT=$(kubectl get services -n $ACUMOS_NAMESPACE nexus-service -o json | jq -r '.spec.ports[0].nodePort')
+    update_acumos_env ACUMOS_NEXUS_API_PORT $ACUMOS_NEXUS_API_PORT force
+    ACUMOS_DOCKER_MODEL_PORT=$(kubectl get services -n $ACUMOS_NAMESPACE nexus-service -o json | jq -r '.spec.ports[1].nodePort')
+    update_acumos_env ACUMOS_DOCKER_MODEL_PORT $ACUMOS_DOCKER_MODEL_PORT force
+
+    log "Update the nexus deployment template and deploy it"
+    replace_env deploy/nexus-deployment.yaml
     start_deployment deploy/nexus-deployment.yaml
     wait_running nexus $ACUMOS_NAMESPACE
   fi
-
 
   # Add -m 10 since for some reason curl seems to hang waiting for a response
   cmd="curl -v -m 10 \
@@ -115,14 +121,14 @@ function setup_nexus() {
   while [[ ! $($cmd) ]]; do
     log "Nexus API is not ready... waiting 10 seconds"
     sleep 10
-    i=$((i+1))
-    if [[  $i -eq 60 ]]; then
+    i=$((i+10))
+    if [[  $i -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
       fail "Nexus API failed to respond"
     fi
   done
 
   setup_nexus_repo $ACUMOS_NEXUS_MAVEN_REPO 'Maven'
-  setup_nexus_repo $ACUMOS_NEXUS_DOCKER_REPO 'Docker' $ACUMOS_DOCKER_MODEL_PORT
+  setup_nexus_repo $ACUMOS_NEXUS_DOCKER_REPO 'Docker' 8082
 
   log "Add nexus roles and users"
   cat <<EOF >nexus-script.json

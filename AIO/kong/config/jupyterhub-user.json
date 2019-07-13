@@ -1,11 +1,11 @@
 {
   "strip_uri": true,
-  "name": "jupyterhub",
+  "name": "jupyterhub-user",
   "http_if_terminated": false,
   "https_only": true,
-  "upstream_url": "http://hub:8081",
+  "upstream_url": "http://proxy-public:80",
   "uris": [
-    "/hub"
+    "/user"
   ],
   "preserve_host": false,
   "upstream_connect_timeout": 60000,
