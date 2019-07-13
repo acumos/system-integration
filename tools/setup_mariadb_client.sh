@@ -89,4 +89,9 @@ cd $(dirname "$0")
 export AIO_ROOT="$(cd ../AIO; pwd -P)"
 source $AIO_ROOT/utils.sh
 source $AIO_ROOT/acumos_env.sh
-setup_mariadb_client
+if [[ $(mysql --version | grep -c "$ACUMOS_MARIADB_VERSION.*-MariaDB" ) -eq 0 ]]; then
+  setup_mariadb_client
+else
+  log "MariaDB client is already the required version"
+  mysql --version
+fi

@@ -62,8 +62,10 @@ NOTICE:
 * by default, the Acumos platform is deployed with service exposure options
   typical for development environments. Production environments and especially
   public environments will need additional planning and restrictions on exposed
-  services, that otherwise could expose your host to security risks. FOR TEST
-  PURPOSES ONLY
+  services, that otherwise could expose your host to security risks. See
+  `Security Considerations`_ for recommendations on what/how to lock down as
+  needed, for exposure of an AIO-based Acumos platform outside development/test
+  environments.
 
 Docker Based Deployment
 -----------------------
@@ -199,10 +201,12 @@ URLs to access the various platform services. You can also view the file
 
    Portal: https://acumos.example.com
    Common Data Service Swagger UI: https://acumos.example.com/ccds/swagger-ui.html
+   - if you have issues with using the CDS swagger over HTTPS, try the HTTP link
+     http://$ACUMOS_DOMAIN:$ACUMOS_CDS_NODEPORT/ccds/swagger-ui.htm
    Portal Swagger UI: https://acumos.example.com/api/swagger-ui.html
    Onboarding Service Swagger UI: https://acumos.example.com/onboarding-app/swagger-ui.html
-   Kibana: http://<IP address of acumos.example.com>:30561/app/kibana
-   Nexus: http://<IP address of acumos.example.com>:30881
+   Kibana: http://acumos.example.com:30561/app/kibana
+   Nexus: http://acumos.example.com:30881
 
 By default, the platform is not configured to require email confirmation of
 new accounts, so you can create a new account directly on the Portal home. To
@@ -919,3 +923,146 @@ Logs Location
 Logs are easily accessible on the AIO host under /mnt/<ACUMOS_NAMESPACE>/logs
 directory ('<ACUMOS_NAMESPACE>' is by default 'acumos'). That directory is
 mounted by most Acumos components as their log directory.
+
+Security Considerations
+=======================
+
+As noted in `Introduction`_, the AIO deployment approach includes various
+development/test environment-enabling aspects, that for a more "production" or
+publicly-exposed deployment, should be reconsidered and as needed, locked down.
+
+For k8s-based platforms, some of these aspects are related to work-in-progress
+on more fully supporting platform exposure through ingress controllers. An
+ingress controller is a convenient place to apply subnet-based restrictions on
+service access. See the
+`NGINX ingress annotations guide for whitelist-source-range <https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#whitelist-source-range>`_
+for more information. Following are the services exposed in the Acumos platform
+that can be access-controlled using a whitelist-source-range source annotation,
+by updating the related ingress template:
+
+.. csv-table::
+    :header: "Service", "Recommendation", "Ingress template"
+    :widths: 30, 30, 40
+    :align: left
+
+    "CDS (Common Data Service)", "Admin access only", "AIO/ingress/templates/cds-ingress.yaml"
+    "NiFi Registry", "Admin access only", "AIO/mlwb/nifi/kubernetes/ingress-registry.yaml"
+    "NiFi User", "User access (required)", "AIO/mlwb/nifi/templates/ingress.yaml"
+    "JupyterHub (Hub and User)", "User access (required)", "See note below"
+    "Kubernetes client", "User access (required)", "AIO/ingress/templates/k8s-client-ingress.yaml"
+    "Onboarding", "User access (required)", "AIO/ingress/templates/onboarding-ingress.yaml"
+    "Portal", "User access (required)", "AIO/ingress/templates/portal-ingress.yaml"
+    "MLWB Dashboard", "User access (required)", "AIO/mlwb/kubernetes/mlwb-dashboard-webcomponent-ingress.yaml"
+    "MLWB Home", "User access (required)", "AIO/mlwb/kubernetes/mlwb-home-webcomponent-ingress.yaml"
+    "MLWB Notebook", "User access (required)", "AIO/mlwb/kubernetes/mlwb-notebook-webcomponent-ingress.yaml"
+    "MLWB Notebook Catalog", "User access (required)", "AIO/mlwb/kubernetes/mlwb-notebook-catalog-webcomponent-ingress.yaml"
+    "MLWB Pipeline", "User access (required)", "AIO/mlwb/kubernetes/mlwb-pipeline-webcomponent-ingress.yaml"
+    "MLWB Pipeline Catalog", "User access (required)", "AIO/mlwb/kubernetes/mlwb-pipeline-catalog-webcomponent-ingress.yaml"
+    "MLWB Project", "User access (required)", "AIO/mlwb/kubernetes/mlwb-project-webcomponent-ingress.yaml"
+    "MLWB Project Catalog", "User access (required)", "AIO/mlwb/kubernetes/mlwb-project-catalog-webcomponent-ingress.yaml"
+..
+
+Notes on the table above:
+
+* JupyterHub ingress rules are currently created by the deployment script
+  in charts/jupyterhub/setup_jupytyerhub.sh.
+
+For other components, k8s nodeports are currently used for primary access or
+supplementatl access. Note that if possible, these services will be migrated to
+access via the ingress controller, early in the next release. However, in many
+cases these services may be provided as shared application services, and
+deployed outside the Acumos platform. The AIO toolset supports that as an option,
+which eliminates any concern about exposing these services as part of an Acumos
+platform:
+
+.. csv-table::
+    :header: "Service", "NodePort (default)", "Rational for NodePort Use", "Security Recommendation"
+    :widths: 20, 10, 30, 40
+    :align: left
+
+    "CDS (Common Data Service)", "30800", "Alternative swagger UI (see note)", "Apply firewall rule if needed"
+    "Docker Proxy", "30883", "Ingress rule is WIP (see note)", "Leave open (required)"
+    "Federation (peer access)", "30984", "Ingress rule is WIP (see note)", "Leave open (required)"
+    "Federation (local access)", "30985", "Ingress rule is WIP (see note)", "Leave open (required)"
+    "Nexus (Maven)", "30881", "Admin access to Nexus UI (see note)", "Apply firewall rule if needed, or use external service"
+    "Nexus (Docker)", "30882", "Admin access to Nexus Docker Registry (see note)", "Apply firewall rule if needed, or use external service"
+    "JupyterHub", "(dynamic ports)", "Access to the Jupyter proxy (see note)", "Apply firewall rule if needed"
+    "Security Verification (SV) Scanning Service", "30982", "Admin access to the SV service (see note)", "Apply firewall rule if needed"
+..
+
+Notes on the table above:
+
+* The CDS NodePort addresses current issues (under investigation) with access to
+  the CDS swagger UI via HTTPS thru the ingress controller
+* The Docker Proxy NodePort is currently required because an ingress rule for
+  it has not been implemented/tested. An update will be published as soon as this
+  has been done.
+* Ingress support fort Federation NodePort is a WIP, like Docker Proxy. Use of a
+  context path is hypothetically possible since peer configuration allows the
+  use of a context path when defining the peer API endpoint; this just needs to
+  be implemented/tested, and documented.  An update will be published as soon as
+  this has been done.
+* Configuraton of JupyterHub to avoid NodePort use is a WIP.
+* Access to the Security Verification Scan API is provided so that Admins can
+  invoke scans manually or through external systems, and also for the future
+  support of external scan result notifications.
+
+Known Issues
+============
+
+Following are some things to watch out for in the process of deploying the
+Acumos platform with the AIO toolset. Solutions to improve the reliability of
+platform deployment are being implemented with each release, but this is a
+work-in-progress, and given that the Acumos platform deployment depends upon
+a number of upstream projects/components, issues such as the below may be
+encountered. This list will be updated as needed after the final Boreas release
+user guide is published, and will be available on the Acumos wiki at
+`Hints and Known Issues <https://wiki.acumos.org/display/OAM/Hints+and+Known+Issues>`_
+
+MariaDB Mirror Reliability
+==========================
+
+Periodically, the list of active mirrors for the MariaDB project may change.
+This can break Acumos installation at the point of setting up the MariaDB client,
+which is the only MariaDB component that needs to be installed on the platform
+host. The client enables the AIO tools to setup/upgrade the Acumos database as
+needed. If you encounter an AIO install failure of the type below, you will need
+to update the MariaDB mirror found in charts/mariadb/setup_mariadb_env.sh:
+
+.. code-block:: bash
+
+  ...
+  Reading package lists...
+  W: The repository 'http://ftp.utexas.edu/mariadb/repo/10.2/ubuntu xenial Release' does not have a Release file.
+  E: Failed to fetch http://ftp.utexas.edu/mariadb/repo/10.2/ubuntu/dists/xenial/main/binary-i386/Packages  403  Forbidden
+  E: Some index files failed to download. They have been ignored, or old ones used instead.
+  ++ fail
+  ++ set +x
+
+  fail:42 (Wed Jul 17 17:06:41 UTC 2019) unknown failure at setup_mariadb_client 70
+
+..
+
+If you see such a failure, select and configure a new MariaDB mirror from the
+`MariaDB mirror list <https://downloads.mariadb.org/mariadb/repositories/#>`_,
+as needed using a site such as
+`the status of MariaDB mirrors <http://spenntur.askmonty.org/>`_ to know which
+mirrors are active. Update the following line in
+charts/mariadb/setup_mariadb_env.sh and restart the deployment, selecting
+a new mirror host to replace 'sfo1.mirrors.digitalocean.com'.
+
+.. code-block:: bash
+
+  export MARIADB_MIRROR="${MARIADB_MIRROR:-sfo1.mirrors.digitalocean.com}"
+
+..
+
+You may also need to manually remove old/inactive MariaDB mirrors from
+/etc/apt/sources.list, if you get later errors from using 'apt-get update',
+via these commands:
+
+.. code-block:: bash
+
+  sudo sed -i -- '/mariadb/d' /etc/apt/sources.list
+  sudo apt-get update
+..
