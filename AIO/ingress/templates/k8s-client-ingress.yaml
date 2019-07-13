@@ -22,6 +22,7 @@ metadata:
   name: kubernetes-client-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   tls:
   - hosts:
@@ -31,7 +32,7 @@ spec:
   - host: <ACUMOS_DOMAIN>
     http:
       paths:
-      - path: "/getSolutionZip/"
+      - path: "/package(/|$)(.*)"
         backend:
           serviceName: kubernetes-client-service
           servicePort: 8082
