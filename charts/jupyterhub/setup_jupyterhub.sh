@@ -36,19 +36,23 @@
 # - Key-based SSH access to the Acumos host, for updating docker images
 #
 # Usage: on the installing user's workstation or on the target host
-# $ bash setup_jupytyerhub.sh <NAMESPACE> <ACUMOS_DOMAIN>
-#   <ACUMOS_ONBOARDING_TOKENMODE> [standalone] [CERT] [CERT_KEY]
+# $ bash setup_jupyterhub.sh <setup|clean|all> <NAMESPACE> <ACUMOS_ORIGIN>
+#   <ACUMOS_ONBOARDING_TOKENMODE> [standalone] [CERT] [CERT_KEY]#
+#   setup|clean|all: action to take
+#   additional parameters for action 'setup' or 'all':
+#     NAMESPACE: namespace under which to deploy JupyterHub
 #
-#   NAMESPACE: namespace under which to deploy JupyterHub
-#   ACUMOS_DOMAIN: domain name of the Acumos platform (ingress controller)
-#   ACUMOS_ONBOARDING_TOKENMODE: tokenmode set in the Acumos platform
-#   standalone: (optional) setup a standalone JupyterHub instance
+#   additional parameters for action setup|all:
+#     ACUMOS_ORIGIN: domain name (and port, if not 443) of the Acumos platform
+#       (ingress controller)
+#     ACUMOS_ONBOARDING_TOKENMODE: tokenmode set in the Acumos platform
+#     standalone: (optional) setup a standalone JupyterHub instance
 #
-#   (optional) For standalone deployment, add these parameters to use pre-created
-#   certificates for the jupyterhub ingress controller, and place the files in
-#   system-integration/charts/jupyterhub/certs
-#   CERT: filename of certificate
-#   CERT_KEY: filename of certificate key
+#     (optional) For standalone deployment, add these parameters to use pre-created
+#     certificates for the jupyterhub ingress controller, and place the files in
+#     system-integration/charts/jupyterhub/certs
+#     CERT: filename of certificate
+#     CERT_KEY: filename of certificate key
 #
 #     Setting up a standalone JupyterHub requires a dedicated host, on which:
 #       - a single-node Kubernetes cluster will be created
@@ -58,7 +62,7 @@
 #         export MLWB_JUPYTERHUB_DOMAIN=<FQDN or hostname>
 #         export MLWB_JUPYTERHUB_HOST=<hostname>
 #         export MLWB_JUPYTERHUB_HOST_USER=<host user>
-#           Note: the host user much be part of the docker group, and typically
+#           Note: the host user must be part of the docker group, and typically
 #                 should be the Admin account for k8s.
 #
 # To release a failed PV:
@@ -66,16 +70,18 @@
 
 function standalone_prep() {
   trap 'fail' ERR
-  if [[ $(helm delete --purge jupyterhub) ]]; then
-    log "Helm release jupyterhub deleted"
+  if [[ $(helm delete --purge $NAMESPACE-jupyterhub) ]]; then
+    log "Helm release $NAMESPACE-jupyterhub deleted"
   fi
 
-  ings=$(kubectl get ingress -n $NAMESPACE | awk '/-ingress/{print $1}')
-  for ing in $ings; do
-    if [[ $(kubectl delete ingress -n $NAMESPACE $ing) ]]; then
-      log "Ingress $ing deleted"
-    fi
-  done
+  if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
+    ings=$(kubectl get ingress -n $NAMESPACE | awk '/-ingress/{print $1}')
+    for ing in $ings; do
+      if [[ $(kubectl delete ingress -n $NAMESPACE $ing) ]]; then
+        log "Ingress $ing deleted"
+      fi
+    done
+  fi
 
   log "Delete pods and PVCs for Jupyter SingleUser containers (not cleaned up by Helm)"
   if [[ $(kubectl get pod -n $NAMESPACE -o json | jq ".items | length") -gt 0 ]]; then
@@ -91,18 +97,9 @@ function standalone_prep() {
     done
   fi
 
-  log "Create PVs for JupyterHub and Jupyter SingleUser containers"
-  bash $AIO_ROOT/../tools/setup_pv.sh clean $HOSTNAME $USER jupyterhub-hub \
-    /mnt/$NAMESPACE 1Gi
-    bash $AIO_ROOT/../tools/setup_pv.sh setup $HOSTNAME $USER jupyterhub-hub \
-      /mnt/$NAMESPACE 1Gi
-  pvs="01 02 03 04 05"
-  for pv in $pvs; do
-    bash $AIO_ROOT/../tools/setup_pv.sh clean $HOSTNAME $USER jupyterhub-user-$pv \
-      /mnt/$NAMESPACE 10Gi
-    bash $AIO_ROOT/../tools/setup_pv.sh setup $HOSTNAME $USER jupyterhub-user-$pv \
-      /mnt/$NAMESPACE 10Gi
-  done
+  log "Create PV for JupyterHub"
+  bash $AIO_ROOT/../tools/setup_pv.sh all /mnt/$NAMESPACE \
+     $MLWB_JUPYTERHUB_HUB_PV_NAME 1Gi $USER:$USER
 
   cd certs
   if [[ "$CERT" == "" ]]; then
@@ -120,11 +117,13 @@ function standalone_prep() {
 
 function clean() {
   trap 'fail' ERR
-  if [[ $(helm delete --purge jupyterhub) ]]; then
-    log "Helm release jupyterhub deleted"
+  if [[ $(helm delete --purge $NAMESPACE-jupyterhub) ]]; then
+    log "Helm release $NAMESPACE-jupyterhub deleted"
   fi
-  if [[ $(kubectl delete ingress -n $NAMESPACE jupyterhub-ingress) ]]; then
-    log "Ingress jupyterhub-ingress deleted"
+  if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
+    if [[ $(kubectl delete ingress -n $NAMESPACE jupyterhub-ingress) ]]; then
+      log "Ingress jupyterhub-ingress deleted"
+    fi
   fi
 }
 
@@ -138,14 +137,15 @@ function setup() {
   helm repo update
 
   log "Generate API token"
-  MLWB_JUPYTERHUB_API_TOKEN=$(openssl rand -hex 32)
-  update_mlwb_env MLWB_JUPYTERHUB_API_TOKEN $MLWB_JUPYTERHUB_API_TOKEN
+  token=$(openssl rand -hex 32)
+  update_mlwb_env MLWB_JUPYTERHUB_API_TOKEN $token force
 
   log "Customize jupyterhub config.yaml"
   # Get the latest image tag at:
   # https://hub.docker.com/r/jupyter/<nbtype>-notebook/tags/
   # Using the last build with python 3.6, since the Acumos library requires <3.7
-  tag=9e8682c9ea54
+  # MLWB_JUPYTERHUB_IMAGE_TAG=9e8682c9ea54
+  tag=$MLWB_JUPYTERHUB_IMAGE_TAG
   # https://zero-to-jupyterhub.readthedocs.io/en/latest/user-storage.html
   # https://zero-to-jupyterhub.readthedocs.io/en/stable/user-environment.html
   tmp=/tmp/$(uuidgen)
@@ -168,7 +168,7 @@ hub:
           if "$MLWB_JUPYTERHUB_DOMAIN" == "$ACUMOS_DOMAIN" :
             auth_url = "http://onboarding-service:8090/onboarding-app/v2/auth"
           else:
-            auth_url = "https://$ACUMOS_DOMAIN/onboarding-app/v2/auth"
+            auth_url = "https://$ACUMOS_ORIGIN/onboarding-app/v2/auth"
           username = data['username']
           data = { "request_body": {"username": username, "password": data['password']}}
           data_json = json.dumps(data)
@@ -262,34 +262,24 @@ EOF
   cat $tmp
 
   log "Install jupyterhub"
-  RELEASE=jupyterhub
+  RELEASE=${NAMESPACE}-jupyterhub
 
-  log "Pre-pulling notebook images to avoid timeout on Jupyterhub install via Helm"
-  images="jupyter/minimal-notebook jupyter/r-notebook jupyter/scipy-notebook \
-    jupyter/tensorflow-notebook jupyter/datascience-notebook \
-    jupyter/pyspark-notebook jupyter/all-spark-notebook"
-  for image in $images; do
-    if [[ "$HOSTNAME" == "$MLWB_JUPYTERHUB_HOST" ]]; then
-      docker pull $image:$tag
-    else
-      ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-        $MLWB_JUPYTERHUB_HOST_USER@$MLWB_JUPYTERHUB_HOST docker pull $image:$tag
-    fi
-  done
   log "Attempting to deploy Jupyterhub via Helm"
   helm repo update
   helm fetch jupyterhub/jupyterhub
-  helm upgrade --install $RELEASE jupyterhub/jupyterhub --namespace $NAMESPACE \
+  helm install --name $RELEASE jupyterhub/jupyterhub \
+    --namespace $NAMESPACE \
     --version=v0.8.2 --values $tmp
   rm $tmp
 
-  if [[ "$STANDALONE" == "standalone" ]]; then
+  if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" && "$STANDALONE" == "standalone" && "$ACUMOS_K8S_ADMIN_SCOPE" == "cluster" ]]; then
     HOST_IP=$(/sbin/ip route get 8.8.8.8 | head -1 | sed 's/^.*src //' | awk '{print $1}')
     bash ../ingress/setup_ingress_controller.sh $NAMESPACE $HOST_IP $CERT $CERT_KEY
   fi
 
-  log "Setup ingress for Jupyterhub"
-  cat <<EOF >jupyterhub-ingress.yaml
+  if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
+    log "Setup ingress for Jupyterhub"
+    cat <<EOF >jupyterhub-ingress.yaml
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -316,8 +306,9 @@ spec:
           servicePort: 80
 EOF
 
-  if [[ ! $(kubectl create -f jupyterhub-ingress.yaml) ]]; then
-    fail "Setup ingress for Jupyterhub failed"
+    if [[ ! $(kubectl create -f jupyterhub-ingress.yaml) ]]; then
+      fail "Setup ingress for Jupyterhub failed"
+    fi
   fi
 
   log "Patch deployment to resolve Acumos domain in case not registered in DNS"
@@ -327,14 +318,21 @@ EOF
   echo "Access jupyterhub at https://$MLWB_JUPYTERHUB_DOMAIN/hub/"
 }
 
-if [[ $# -lt 3 ]]; then
+if [[ $# -lt 2 ]]; then usage=yes;
+elif [[ "$1" != 'clean' && $# -lt 4 ]]; then usage=yes
+fi
+
+if [[ "$usage" == "yes" ]]; then
   cat <<'EOF'
 Usage: on the installing user's workstation or on the target host
-$ bash setup_jupytyerhub.sh <NAMESPACE> <ACUMOS_DOMAIN>
-   <ACUMOS_ONBOARDING_TOKENMODE> [standalone] [CERT] [CERT_KEY]
-
+$ bash setup_jupyterhub.sh <setup|clean|all> <NAMESPACE> <ACUMOS_ORIGIN>
+   <ACUMOS_ONBOARDING_TOKENMODE> [standalone] [CERT] [CERT_KEY]#
+   setup|clean|all: action to take
    NAMESPACE: namespace under which to deploy JupyterHub
-   ACUMOS_DOMAIN: domain name of the Acumos platform (ingress controller)
+
+   additional parameters for action setup|all:
+   ACUMOS_ORIGIN: domain name (and port, if not 443) of the Acumos platform
+     (ingress controller)
    ACUMOS_ONBOARDING_TOKENMODE: tokenmode set in the Acumos platform
    standalone: (optional) setup a standalone JupyterHub instance
 
@@ -344,16 +342,16 @@ $ bash setup_jupytyerhub.sh <NAMESPACE> <ACUMOS_DOMAIN>
    CERT: filename of certificate
    CERT_KEY: filename of certificate key
 
-     Setting up a standalone JupyterHub requires a dedicated host, on which:
-       - a single-node Kubernetes cluster will be created
-       - an NGINX ingress controller will be created, using self-signed certs or
-         certs as specified, and set to serve requests at "MLWB_JUPYTERHUB_DOMAIN"
-       - set the mlwb_env.sh values for the following, per the target host
-         export MLWB_JUPYTERHUB_DOMAIN=<FQDN or hostname>
-         export MLWB_JUPYTERHUB_HOST=<hostname>
-         export MLWB_JUPYTERHUB_HOST_USER=<host user>
-           Note: the host user much be part of the docker group, and typically
-                 should be the Admin account for k8s.
+   Setting up a standalone JupyterHub requires a dedicated host, on which:
+     - a single-node Kubernetes cluster will be created
+     - an NGINX ingress controller will be created, using self-signed certs or
+       certs as specified, and set to serve requests at "MLWB_JUPYTERHUB_DOMAIN"
+     - set the mlwb_env.sh values for the following, per the target host
+       export MLWB_JUPYTERHUB_DOMAIN=<FQDN or hostname>
+       export MLWB_JUPYTERHUB_HOST=<hostname>
+       export MLWB_JUPYTERHUB_HOST_USER=<host user>
+         Note: the host user must be part of the docker group, and typically
+               should be the Admin account for k8s.
 EOF
   log "All parameters not provided"
   exit 1
@@ -367,17 +365,22 @@ if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
 source $AIO_ROOT/utils.sh
 source $AIO_ROOT/acumos_env.sh
 source $AIO_ROOT/mlwb/mlwb_env.sh
-NAMESPACE=$1
-ACUMOS_DOMAIN=$2
-ACUMOS_ONBOARDING_TOKENMODE=$3
-STANDALONE=$4
+action=$1
+NAMESPACE=$2
+update_mlwb_env MLWB_JUPYTERHUB_NAMESPACE $NAMESPACE force
 export DEPLOYED_UNDER=k8s
 export K8S_DIST=generic
-if [[ "$STANDALONE" == "standalone" ]]; then
-  CERT=$5
-  CERT_KEY=$6
-  standalone_prep
+if [[ "$action" == "clean" || "$action" == "all" ]]; then clean; fi
+if [[ "$action" == "setup" || "$action" == "all" ]]; then
+  ACUMOS_ORIGIN=$3
+  ACUMOS_DOMAIN=$(echo $ACUMOS_ORIGIN | cut -d ":" -f 1)
+  ACUMOS_ONBOARDING_TOKENMODE=$4
+  STANDALONE=$5
+  if [[ "$STANDALONE" == "standalone" ]]; then
+    CERT=$5
+    CERT_KEY=$6
+    standalone_prep
+  fi
+  setup
 fi
-clean
-setup
 cd $WORK_DIR
