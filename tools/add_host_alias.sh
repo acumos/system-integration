@@ -45,8 +45,8 @@ function add_host_alias() {
   log "Determining host IP address for $name"
   if [[ $(host $name | grep -c 'not found') -eq 0 ]]; then
     ip=$(host $name | head -1 | cut -d ' ' -f 4)
-  elif [[ $(grep -c -E " $name( |$)" /etc/hosts) -gt 0 ]]; then
-    ip=$(grep -E " $name( |$)" /etc/hosts | cut -d ' ' -f 1)
+  elif [[ $(grep -c -E "\s$name( |$)" /etc/hosts) -gt 0 ]]; then
+    ip=$(grep -E "\s$name( |$)" /etc/hosts | awk '{print $1}')
   else
     log "Please ensure $name is resolvable thru DNS or hosts file"
     fail "IP address of $name cannot be determined."

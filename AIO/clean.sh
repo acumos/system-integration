@@ -37,33 +37,30 @@ WORK_DIR=$(pwd)
 cd $(dirname "$0")
 source utils.sh
 source acumos_env.sh
-nss="$ACUMOS_NAMESPACE $ACUMOS_MARIADB_NAMESPACE $ACUMOS_ELK_NAMESPACE"
+source mlwb/mlwb_env.sh
 if [[ $(kubectl get namespaces) ]]; then
-  if [[ "$(helm list -a | grep -v 'NAME' | awk '{print $1}')" != "" ]]; then
-    rlss=$(helm list -a | grep -v 'NAME' | awk '{print $1}')
+  releases="mariadb elk jupyterhub nginx-ingress zeppelin"
+  for release in $releases; do
+    rlss=$(helm list | grep $release | awk '{print $1}')
     for rls in $rlss; do
-      helm delete --purge $rls
+      if [[ $(helm delete --purge $rls) ]]; then
+        log "Helm release $rls deleted"
+      fi
     done
-  fi
-  if [[ "$K8S_DIST" == "openshift" ]]; then
-    for ns in $nss; do
-      echo "Delete project $ns"
-      oc delete project $ns
-      while oc project $ns; do
-        echo "Waiting 10 seconds for project $ns to be deleted"
-        sleep 10
-      done
-    done
-  else
-    for ns in $nss; do
-      echo "Delete namespace $ns"
-      kubectl delete namespace $ns
-      while kubectl namespace $ns; do
-        echo "Waiting 10 seconds for namespace $ns to be deleted"
-        sleep 10
-      done
-    done
-  fi
+  done
+  nss=$(kubectl get namespace | grep acumos | awk '{print $1}')
+  for ns in $nss; do
+    log "Attempting to cleanup all resources in namespace $ns"
+    log "Please be patient, this may take some minutes"
+    if [[ $(kubectl delete namespace $ns) ]]; then
+      log "Namespace $ns deleted"
+    fi
+  done
+#  pvs=$(kubectl get pv | grep -v NAME | awk '{print $1}')
+#  for pv in $pvs ; do
+#    kubectl delete pv $pv
+#  done
+#  cleanup_stuck_pvs
 fi
 
 if [[ $(docker ps -a | grep -c 'acumos_') -gt 0 ]]; then
@@ -76,24 +73,26 @@ if [[ $(docker ps -a | grep -c 'acumos_') -gt 0 ]]; then
   fi
 fi
 
+log "Cleanup any PV folders"
+for ns in $nss; do
+  if [[ -e /mnt/$ns ]]; then
+    sudo rm -rf /mnt/$ns
+  fi
+done
+
 if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-  echo "Cleanup any PV folders"
-  for ns in $nss; do
-    ds=$(ls /mnt/$ns | grep -v docker)
-    for d in $ds; do
-      sudo rm -rf /mnt/$ns/$d/*
+  log "Cleanup any orphan docker containers"
+  if [[ "$(docker ps --format '{{.Names}}' | grep 'acumos_')" != "" ]]; then
+    cs=$(docker ps --format '{{.Names}}' | grep 'acumos_')
+    for c in $cs; do
+      docker stop $c
+      docker rm -v $c
     done
-  done
-  echo "Cleanup any orphan docker containers"
-  cs=$(docker ps --format '{{.Names}}' | grep 'acumos_')
-  for c in $cs; do
-    docker stop $c
-    docker rm -v $c
-  done
+  fi
 fi
 
 if [[ "$1" == "prune" ]]; then
-  echo "Cleanup unused docker images"
+  log "Cleanup unused docker images"
   docker image prune -a -f
 fi
 

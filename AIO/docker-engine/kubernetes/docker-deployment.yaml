@@ -42,7 +42,8 @@ spec:
       # Docker-commands-container
       containers:
       - name: docker-cmds
-        image: docker:18.06.3-ce-dind
+        image: docker:18-dind
+        # Required, per https://hub.docker.com/_/docker
         securityContext:
             privileged: true
         command: ['docker', 'run', '-p', '80:80', 'httpd:2.4']
@@ -57,14 +58,15 @@ spec:
           protocol: TCP
       # Docker-Daemon-container
       - name: docker-daemon
-        image: docker:dind
+        image: docker:18-dind
+        # Required, per https://hub.docker.com/_/docker
         securityContext:
             privileged: true
         env:
           - name: HTTP_PROXY
-            value: "<HTTP_PROXY>"
+            value: "<ACUMOS_HTTP_PROXY>"
           - name: HTTPS_PROXY
-            value: "<HTTPS_PROXY>"
+            value: "<ACUMOS_HTTPS_PROXY>"
           - name: DIND_INSECURE_REGISTRIES
             value: "[\"0.0.0.0/0\"]"
           - name: DOCKER_OPTS
@@ -76,21 +78,4 @@ spec:
       volumes:
       - name: docker-volume
         persistentVolumeClaim:
-         claimName: pvc-<ACUMOS_NAMESPACE>-docker-volume
-      hostAliases:
-      - ip: "<ACUMOS_HOST_IP>"
-        hostnames:
-        - "<ACUMOS_HOST>"
-#      dnsPolicy: None
-#      dnsConfig:
-#        nameservers:
-#          - 8.8.8.8
-#          - 8.8.4.4
-#        searches:
-#          - <ACUMOS_NAMESPACE>.svc.cluster.local
-# Address issue with DNS resolution intermittent failure from docker-engine
-# https://www.weave.works/blog/racy-conntrack-and-dns-lookup-timeouts
-#        options:
-#          - name: ndots
-#            value: "5"
-#          - name: edns0
+         claimName: <DOCKER_VOLUME_PVC_NAME>
