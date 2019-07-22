@@ -52,8 +52,7 @@ spec:
               }
             },
             "server": {
-              "port": 8000,
-              "connection-timeout": 900000
+              "port": 8000
             },
             "spring": {
               "datasource": {
