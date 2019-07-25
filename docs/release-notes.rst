@@ -23,6 +23,13 @@
 System Integration Release Notes
 ================================
 
+---------------------------
+Version 3.0.0, 25 July 2019
+---------------------------
+
+* monitoring resource utilization in kubernetes (`ACUMOS-3069 <https://jira.acumos.org/browse/ACUMOS-3069>`_)
+* Monitor resource usage in K8 (`ACUMOS-3162 <https://jira.acumos.org/browse/ACUMOS-3162>`_)
+
 ............................
 All-in-One (OneClick Deploy)
 ............................

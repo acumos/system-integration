@@ -256,7 +256,7 @@ Future releases may include these new features:
 Prerequisites
 -------------
 
-Setup of Kubernetes cluster in Azure and  kubectl, the Kubernetes command-line client.
+Setup of Kubernetes cluster in Azure and  kubectl, the Kubernetes command-line client ,Tiller to install using helm charts.
 
 Step-by-Step Guide
 ------------------
@@ -443,12 +443,12 @@ Step-by-Step Guide
      PKCS12_FILE=acumos-k8s.pkcs12
      openssl pkcs12 -export -nokeys -in ${CERT_DIR}/${CERT_FILE} -out ${CERT_DIR}/${PKCS12_FILE}
 
-27. Give complete access to .pkcs12 and .jks file by making use of below command
+27. Give read and execute access to .pkcs12 and .jks file by making use of below command
 
 .. code-block:: bash
 
-     chmod 777 acumosTrustStore.jks
-     chmod 777 acumos-k8s.pkcs12
+     chmod 755 acumosTrustStore.jks
+     chmod 755 acumos-k8s.pkcs12
 
 28. Copy acumosTrustStore.jks and acumos-k8s.pkcs12 to volume mounted for federation gateway container. Make use of below commands. In our case /path-to-directory/acumos-k8s/certs/acumos-k8s.pkcs12 is the path where file is located under K8 , acumos-ns01 is the namespace created and acumos-1353575208-c235g is the pod name that contains all the containers including federation-gateway.
 /app/certs is the mount directory for federation-gateway container
@@ -560,3 +560,191 @@ Execute below scripts to create acumos and acumos cms database. e.g we have used
 
 Execute the DDL and DML scripts for any database version that needs to be configured.
 
+
+Set up using Helm Charts
+------------------------
+
+1. Clone the system-integration repository.
+
+.. code-block:: bash
+
+   $ git clone https://gerrit.acumos.org/r/system-integration
+
+2. Change directory to  acumosk8s-public-cloud/azure/HELM
+
+.. code-block:: bash
+	
+   $ cd  acumosk8s-public-cloud/azure/HELM
+
+3. Create a secret file for acumos that contains base64 encoding to pull docker image from nexus repo.
+
+.. code-block:: bash	
+
+   $ log "Create k8s secret for docker image pulling from nexus repo"
+     b64=$(cat ~/.docker/config.json | base64 -w 0)
+     cat <<EOF >acumos-secret.yaml
+     apiVersion: v1
+     kind: Secret
+     metadata:
+       name: acumos-secret
+       namespace: <namespace name>
+     data:
+       .dockerconfigjson: $b64
+     type: kubernetes.io/dockerconfigjson
+     EOF				
+
+4. Use below helm install command on kubernetes client machine to install helm chart for non core components like nexus, mariadb ,etc and elk stack.
+
+.. code-block:: bash	
+
+   $ helm install k8-noncore-chart
+   $ helm install k8-elk-chart
+
+5. Follow below step to set up MariaDB
+
+Run below command to connect to acumos-mysql container.
+
+.. code-block:: bash
+
+   kubectl -n <namespace_name> exec -it <acumos-mysql-pod name> /bin/sh
+
+Connect to Mariadb.
+
+.. code-block:: bash
+
+   mysql -u root -p <password>
+
+Execute below scripts to create acumos database. e.g we have used CDS but it need to be same mentioned in env file.
+
+.. code-block:: bash
+
+   drop database if exists CDS;
+   create database CDS;
+   create user 'CDS_USER'@'localhost' identified by 'CDS_PASS';
+   grant all on CDS.* to 'CDS_USER'@'localhost';
+   create user 'CDS_USER'@'%' identified by 'CDS_PASS';
+   grant all on CDS.* to 'CDS_USER'@'%';
+
+Execute the DDL and DML scripts for any database version that needs to be configured.This is available in common data service gerrit repo.
+
+
+6. Edit values.yaml file inside k8-acumos-chart to make changes related to latest assembly , database connection , credentials ,onboarding-cli service,etc.
+
+.. code-block:: bash	
+
+   $ cd k8-acumos-chart
+   $ vi values.yaml
+
+7. Use below helm install command on kubernetes client machine to install helm chart for acumos core components like portal- fe , portal-be, onboarding,etc.
+
+.. code-block:: bash	
+
+   $ helm install k8-acumos-chart
+
+8. To view and delete the helm charts installed.
+
+.. code-block:: bash	
+
+   $ helm list
+   $ helm delete <chart name>
+
+9. Generate certificates using above mentioned steps. Copy acumosTrustStore.jks and acumos-k8s.pkcs12 to volume mounted for federation gateway container. Make use of below commands. In our case /path-to-directory/acumos-k8s/certs/acumos-k8s.pkcs12 is the path where file is located under K8 , acumos-ns01 is the namespace created and acumos-1353575208-c235g is the pod name that contains all the containers including federation-gateway.
+/app/certs is the mount directory for federation-gateway container
+
+.. code-block:: bash
+
+     kubectl cp /path-to-directory/acumos-k8s/certs/acumos-k8s.pkcs12 acumos-ns01/acumos-1353575208-c235g:/app/certs/ -c federation-gateway
+
+     kubectl cp /path-to-directory/acumos-k8s/certs/acumosTrustStore.jks acumos-ns01/acumos-1353575208-c235g:/app/certs/ -c federation-gateway
+
+10. After copying .pkcs12 and .jks file restart the federation-gateway pod.
+
+11. To redeploy core components based on weekly assembly use chart k8-acumos-redeploy-chart.
+
+.. code-block:: bash	
+
+   $ helm install k8-acumos-redeploy-chart
+
+12. Run secure-acumos-api-internal.sh file on K8. You need to change few configuration listed below based on your environment in this file 
+
+.. code-block:: bash
+
+  export ACUMOS_KONG_API_HOST_NAME=acumosk8s.FQDN
+
+  export ACUMOS_KONG_API_HOST_SNIS=acumosk8s.FQDN
+
+  export ACUMOS_KONG_API_PORT=8001 
+
+  export ACUMOS_KONG_CERTIFICATE_PATH=/path-to-directory/certificates-is-stored
+
+  export ACUMOS_CRT=acumos-k8s.cert
+
+  export ACUMOS_KEY=acumos-k8s.key 
+
+  export ACUMOS_HOST_NAME=<acumos service name>.<namespace>
+
+  export ACUMOS_NEXUS_HOST_NAME=acumos-nexus-service.<namespace>
+
+  export ACUMOS_HOME_PAGE_PORT=8085
+
+  export ACUMOS_ONBOARDING_PORT=8090
+
+  export ACUMOS_NEXUS_PORT=8001
+
+  
+Monitoring resource utilization in kubernetes using Prometheus and Grafana
+--------------------------------------------------------------------------
+
+1. Create a folder called prometheus. Here we will create all our monitoring resources.Create a file called prometheus/namespace.yml with the content.
+
+.. code-block:: bash
+
+   kind: Namespace
+   apiVersion: v1
+   metadata:
+     name: prometheus
+
+2. Apply & Test the namespace exists.
+
+.. code-block:: bash
+
+    $ kubectl get namespaces
+
+3. Deploy Prometheus into the prometheus namespace.
+
+.. code-block:: bash
+
+   $ helm install stable/prometheus --namespace prometheus --name prometheus
+
+4. We can confirm by checking that the pods are running.
+
+.. code-block:: bash
+
+    $ kubectl get pods -n prometheus
+
+5. Deploy Grafana into the pometheus namespace.
+
+.. code-block:: bash
+
+   $ helm install stable/grafana --namespace prometheus --name grafana
+
+6. Grafana is deployed with a password. Run below command to get the initial password.The username is admin.
+
+.. code-block:: bash
+
+   $ kubectl get secret --namespace prometheus grafana -o jsonpath="{.data.admin-password}"
+    | base64 --decode ; echo
+
+7. Port Forward the Grafana dashboard to see whats happening
+
+.. code-block:: bash
+
+    $ export POD_NAME=$(kubectl get pods --namespace prometheus -l "app=grafana,release=grafana" -o 
+      jsonpath="{.items[0].metadata.name}")
+    $ kubectl --namespace prometheus port-forward $POD_NAME 3000
+
+8. Go to http://localhost:3000 in your browser. You should see the Grafana login screen.If step 7 gives 
+   connectivity issue then we can change type as LoadBalancer in grafana service file that will create an 
+   external endpoint and url will be accessible.
+
+9. Set the smtp settings in grafana config map to send email alerts notification.
