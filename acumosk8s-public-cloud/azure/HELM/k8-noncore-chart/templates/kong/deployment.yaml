@@ -33,7 +33,7 @@ spec:
         image: kong:0.11.0
         env:
           - name: KONG_ADMIN_LISTEN
-            value: "0.0.0.0:{{ .Values.acumosKongAdminPort }}, 0.0.0.0:{{ .Values.acumosKongAdmSslPort }} ssl"
+            value: "0.0.0.0:{{ .Values.acumosKongAdminPort }}"
           - name: KONG_PG_PASSWORD
             value: {{ .Values.acumosKongPGPassword }}
           - name: KONG_PG_HOST

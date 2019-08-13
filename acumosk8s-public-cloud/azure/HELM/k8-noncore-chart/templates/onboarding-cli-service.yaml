@@ -1,7 +1,7 @@
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
-# Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
 # ===================================================================================
 # This Acumos software file is distributed by AT&T and Tech Mahindra
 # under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
-name: k8-elk-chart
-version: 0.1.0
-appVersion: "1.0.0"
-description: A Helm chart for Kubernetes ELK stack
+apiVersion: v1
+kind: Service
+metadata:
+  name: onboarding-cli-service
+  namespace: "{{ .Values.namespace }}"
+  labels:
+    app: onboarding-cli-service
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8090
+      targetPort: 8090
+      protocol: TCP
+      name: onboarding
+  selector:
+    app: acumos
