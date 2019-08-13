@@ -1,7 +1,7 @@
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
-# Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
 # ===================================================================================
 # This Acumos software file is distributed by AT&T and Tech Mahindra
 # under the Apache License, Version 2.0 (the "License");
@@ -58,7 +58,7 @@ spec:
         - name: ES_JAVA_OPTS
           value: "-Djava.net.preferIPv4Stack=true -Xms4g -Xmx4g"
         ports:
-        - containerPort: {{ .Values.elasticsearch.image.port }}
+        - containerPort: 9200
         volumeMounts:
         - name: elasticsearch
           mountPath: /usr/share/elasticsearch/config/elasticsearch.yml

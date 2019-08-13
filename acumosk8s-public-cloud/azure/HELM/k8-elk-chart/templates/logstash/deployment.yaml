@@ -1,7 +1,7 @@
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
-# Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
 # ===================================================================================
 # This Acumos software file is distributed by AT&T and Tech Mahindra
 # under the Apache License, Version 2.0 (the "License");
@@ -52,7 +52,7 @@ spec:
         - name: ACUMOS_ELK_JDBC_PASSWORD
           value: "{{ .Values.databasePassword }}"
         ports:
-        - containerPort: {{ .Values.logstash.image.port }}
+        - containerPort: 5044
         volumeMounts:
         - name: config
           mountPath: /usr/share/logstash/config/logstash.yml

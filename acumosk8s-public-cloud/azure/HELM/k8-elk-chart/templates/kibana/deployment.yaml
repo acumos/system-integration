@@ -1,7 +1,7 @@
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
-# Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
 # ===================================================================================
 # This Acumos software file is distributed by AT&T and Tech Mahindra
 # under the Apache License, Version 2.0 (the "License");
@@ -39,14 +39,14 @@ spec:
         image: "{{ .Values.kibana.image.repository}}:{{ .Values.kibana.image.tag}}"
         imagePullPolicy: {{ .Values.elasticsearch.image.pullPolicy | quote }}
         ports:
-        - containerPort: {{ .Values.kibana.image.port}}
+        - containerPort: 5601
         volumeMounts:
           - name: kibana
             mountPath: /usr/share/kibana/config/kibana.yml
             subPath: kibana.yml
         env:
         - name: ELASTICSEARCH_URL
-          value: http://elasticsearch.{{ .Values.namespace }}:{{ .Values.elasticsearch.image.port }}
+          value: http://elasticsearch.{{ .Values.namespace }}:9200
       volumes:
         - name: kibana
           configMap:

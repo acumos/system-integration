@@ -1,7 +1,7 @@
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
-# Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
 # ===================================================================================
 # This Acumos software file is distributed by AT&T and Tech Mahindra
 # under the Apache License, Version 2.0 (the "License");
@@ -15,12 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
-# Default values for elasticsearch.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 appVersion: "1.0.0"
 
-namespace: "acumos-ns01"
+namespace: "acumos-test"
 clusterName: "k8-cluster-noncore-components"
 
 docker:
@@ -30,6 +29,7 @@ docker:
 
 # Ports
 acumosMariaDbPort: "3306"
+acumosMariaDbRootPassword: "XXXXXXXX"
 acumosOnboardingAppPort: "8090"
 acumosFederationGatewayPort: "9084"
 acumosFederationLocalPort: "9884"
@@ -48,23 +48,20 @@ acumosDockerPlatformPort: "8002"
 acumosDockerHost: "acumos-docker-service"
 acumosNexusService: "acumos-nexus-service"
 acumosNexusUsername: "acumos-k8-user-rw"
-acumosNexusPassword: "XXXXXXXXX"
+acumosNexusPassword: "XXXXXXXXXXx"
 acumosProxy: "acumos-proxy"
-acumosDockerUsername: "XXXX"
-acumosDockerPassword: "XXXXXx"
+acumosDockerUsername: "docker"
+acumosDockerPassword: "XXXXXXXXXXXXX"
 acumosDockerProxyHost: "acumos-docker-proxy-service"
 acumosDockerProxyPort: "8883"
 
 #Kong
 acumosKongPostgresUser: "kong"
-acumosKongPostgresPassword: "XXXXXX"
+acumosKongPostgresPassword: "XXXXXXXXX"
 acumosKongPostgresDB: "kong"
-acumosKongPGPassword: "XXXXXXX"
-acumosMariaDbRootPassword: "XXXX"
+acumosKongPGPassword: "XXXXXXXX"
 
 #PVC
 acumosMariaDbPvcStorage: "1Gi"
 acumosPVCStorage: "2Gi"
 acumosNexusPVCStorage: "50Gi"
-
-

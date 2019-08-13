@@ -1,0 +1,4 @@
+name: k8-acumos-redeploy-chart
+version: 2.2.22
+appVersion: "1.1.0"
+description: A Helm chart for Acumos Kubernetes to redeploy core components 
