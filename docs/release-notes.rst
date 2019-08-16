@@ -35,6 +35,41 @@ All-in-One (OneClick Deploy)
 ............................
 
 ---------------------------
+Version 2.4.0, 15 Aug 2019
+---------------------------
+
+This release adds final enhancements to the Boreas maintenance release.
+
+* `4851: Boreas maintenance release wrapup <https://gerrit.acumos.org/r/#/c/system-integration/+/4851/>`_
+
+  * `ACUMOS-3212 Boreas maintenance release <https://jira.acumos.org/browse/ACUMOS-3212>`_
+
+    * Includes these enhancements:
+
+      * portal-be: enable publication feature with AIO setup
+      * Update to release assembly Acumos_1907311600
+      * Support platform deployment for k8s cluster tenants
+
+        * minimize nodeport use
+        * enable dynamic nodeport assignment
+        * merge prep scripts to minimize process variance
+        * select whether to create PVc
+        * select whether to bind PVCs to specific PVs
+        * reorder component deployments to ensure dependencies
+        * make ingress controller / ingress object creation optional
+        * clean resources specifically instead of deleting namespaces
+
+      * Update clean.sh
+      * Support prep|setup|clean action in all component scripts
+      * Use docker:18-dind to avoid issues with 19-dind
+      * Add qanda element to portal-be springenv
+      * Parameterize wait times
+      * Pre-pull images
+      * Update user guide
+      * Add aio_k8s_deployer (containerized k8s deployment tool)
+      * Update AIO support in OpenShift (NOTE: WIP for ingress control)
+
+---------------------------
 Version 2.3.0, 11 July 2019
 ---------------------------
 
@@ -364,7 +399,7 @@ Version 0.6, 13 August 2018
 
   * `ACUMOS-1146: docker or kubernetes as target env for AIO deployment <https://jira.acumos.org/browse/ACUMOS-1146>`_
   * Remove validation-client
-  * Add HTTP_PROXY and HTTPS_PROXY env vars, add to docker template
+  * Add ACUMOS_HTTP_PROXY and ACUMOS_HTTPS_PROXY env vars, add to docker template
   * Fix trailing whitespace
   * Retrieve and customize database script for CDS version
   * Refactor create-user.sh

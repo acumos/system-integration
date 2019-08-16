@@ -17,21 +17,21 @@ apiVersion: v1
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 
-# What this is: kubernetes template for Acumos common-data-svc service
+# What this is: kubernetes template for Acumos portal-fe service
 # How to use:
 
 kind: Service
 metadata:
   namespace: <ACUMOS_NAMESPACE>
-  name: cds-service
+  name: kong-service
   labels:
-    app: cds
+    app: kong
 spec:
   selector:
-    app: cds
+    app: kong
   type: NodePort
   ports:
-  - name: cds-port
-    nodePort: <ACUMOS_CDS_NODEPORT>
-    port: 8000
-    targetPort: 8000
+  - name: kong-proxy-ssl-port
+    nodePort: <ACUMOS_KONG_PROXY_SSL_PORT>
+    port: 8443
+    targetPort: 8443
