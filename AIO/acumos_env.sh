@@ -3,6 +3,7 @@
 # Acumos Apache-2.0
 # ===================================================================================
 # Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# Modifications Copyright (C) 2019 Nordix Foundation.
 # ===================================================================================
 # This Acumos software file is distributed by AT&T and Tech Mahindra
 # under the Apache License, Version 2.0 (the "License");
@@ -44,6 +45,7 @@ export ACUMOS_DELETE_SNAPSHOTS=false
 export AZURE_CLIENT_IMAGE=$ACUMOS_RELEASE/acumos-azure-client:2.0.15
 export PORTAL_BE_IMAGE=$ACUMOS_RELEASE/acumos-portal-be:2.2.23
 export PORTAL_FE_IMAGE=$ACUMOS_RELEASE/acumos-portal-fe:2.2.23
+export LICENSE_PROFILE_EDITOR_IMAGE=$ACUMOS_SNAPSHOT/license-profile-editor:0.0.1-SNAPSHOT
 export COMMON_DATASERVICE_IMAGE=$ACUMOS_RELEASE/common-dataservice:2.2.5
 export DESIGNSTUDIO_IMAGE=$ACUMOS_RELEASE/ds-compositionengine:2.1.0
 export FEDERATION_IMAGE=$ACUMOS_RELEASE/federation-gateway:2.2.1
