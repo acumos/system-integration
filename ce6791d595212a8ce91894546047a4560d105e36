@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "543ec644_1b133243",
+        "filename": "AIO/acumos_env.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2019-08-16T16:37:38Z",
+      "side": 1,
+      "message": "add \"-SNAPSHOT\" to the end of the image ref",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 81
+      },
+      "revId": "ce6791d595212a8ce91894546047a4560d105e36",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a3e96714_1bc27e25",
+        "filename": "AIO/kubernetes/deployment/license-profile-editor-deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2019-08-16T16:37:38Z",
+      "side": 1,
+      "message": "change to: \u003cACUMOS_LOGS_PVC_NAME\u003e",
+      "range": {
+        "startLine": 55,
+        "startChar": 21,
+        "endLine": 55,
+        "endChar": 48
+      },
+      "revId": "ce6791d595212a8ce91894546047a4560d105e36",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2bafc864_a6d5dfa4",
+        "filename": "AIO/kubernetes/deployment/license-profile-editor-deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 93
+      },
+      "writtenOn": "2019-08-16T16:37:38Z",
+      "side": 1,
+      "message": "Delete this; it will be added as a patch by the deployment scripts, if needed.",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 25
+      },
+      "revId": "ce6791d595212a8ce91894546047a4560d105e36",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
