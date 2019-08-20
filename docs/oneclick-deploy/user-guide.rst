@@ -70,6 +70,24 @@ NOTICE:
 Please make sure you review the host prerequisite requirements under
 `Host/VM Preparation`_.
 
+See these specific sections based upon how you want to deploy the platform:
+
+* if you have a server/VM or existing k8s cluster upon which you want to install
+  the Acumos platform under k8s, using your local workstation to manage the
+  platform, see `Deploying from Your Workstation, via the AIO Deployer Tool`_
+* if you have a server/VM upon which you want to directly install/manage the
+  Acumos platform under k8s, see:
+
+  * `Deploying as a Privileged (sudo) User`_ if you are a sudo user on that
+    server/VM, and want to deploy/manage the platform under your own account
+  * `Preparation by Host Admin with Platform Deployment by Normal (non-sudo) User`_
+    if you are a sudo user on the server/VM, and want to prepare the server/VM
+    for another to install/manage the platform upon.
+
+* `Docker Based Deployment`_, if you want to use the legacy docker-compose
+  based method of installation. NOTE not all Boreas release features are
+  supported under docker-compose.
+
 Kubernetes Based Deployment
 ---------------------------
 
@@ -78,8 +96,8 @@ distribution, or the OpenShift kubernetes distribution. The scripts will detect
 which distribution is installed and deploy per the requirements of that
 distribution.
 
-Deployment into an Existing k8s Cluster by a Cluster Admin or Namespace Admin
-.............................................................................
+Deploying from Your Workstation, via the AIO Deployer Tool
+..........................................................
 
 This process supports users with the role of either a cluster admin (full rights
 to manage cluster resources) or namespace admin (rights to manage resources
@@ -126,16 +144,20 @@ folder is used, with these prerequisite steps:
 * the aio_k8s_deployer.sh script and files in the deploy subfolder have been
   customized as desired, including these files
 
-  * a clone (customized as desired) of the system-integration repo
-  * k8s configuration file "kube-config"; this will be used in the
-    container, to access the cluster via kubectl
-  * (optional) an environment customization script "customize_env.sh",
-    based upon the sample script customize_env.sh in this folder, to override the
-    default environment variables for Acumos, MLWB, MariaDB, and ELK
-  * (optional) updated the Dockerfile in this folder, as desired
-  * (optional) a post-deploy script, which can include any actions the user
-    wants to automatically occur after the platform is installed, e.g.
-    creation of user accounts, model onboarding, ...
+  * in the "deploy" subfolder
+
+    * a clone (customized as desired) of the system-integration repo
+    * k8s configuration file "kube-config"; this will be used in the
+      container, to access the cluster via kubectl
+    * (optional) an environment customization script "customize_env.sh",
+      based upon the sample script customize_env.sh, to override the
+      default environment variables for Acumos, MLWB, MariaDB, and ELK
+    * (optional) updated the Dockerfile, as desired
+    * (optional) a post-deploy script, which can include any actions the user
+      wants to automatically occur after the platform is installed, e.g.
+      creation of user accounts, model onboarding; by default the
+      aio_k8s_deployer.sh script will invoke a script named 'post_deploy.sh'
+      if present in the deploy subfolder.
 
 To prepare the k8s environment and install using the aio_k8s_deployer:
 
@@ -170,8 +192,11 @@ To prepare the k8s environment and install using the aio_k8s_deployer:
 
   * starts the acumos-deployer container
   * updates the AIO tools environment to run under the container
-  * executes oneclick_deploy.sh, and saves a log on the host
+  * executes oneclick_deploy.sh, and saves a log
   * executes the post_deploy.sh script, if present
+  * copies the updated files from the acumos-deployer container to the user's
+    workstation deploy subfolder, incuding the log files and all updated files
+    under the system-integration repo
 
 .. code-block:: bash
 
@@ -929,6 +954,19 @@ Stopping, Restarting, Redeploying
 
 Note: the following sections assume that you have deployed the Acumos platform
 from the system-integration folder in your user home directory, i.e. "~/".
+
+Redeploying With Current Database
++++++++++++++++++++++++++++++++++
+
+If you just want to redeploy Acumos components, without affecting any data in the
+MariaDB or Nexus, be sure to set these variables in AIO/acumos_env.sh:
+
+.. code-block:: bash
+
+  export ACUMOS_DEPLOY_MARIADB=false
+  export ACUMOS_SETUP_DB=false
+  export ACUMOS_DEPLOY_NEXUS=false
+..
 
 Docker-Based Deployments
 ++++++++++++++++++++++++
