@@ -236,7 +236,16 @@ function setup_federation() {
   done
   local jsonout="/tmp/$(uuidgen)"
   curl -s -k -o $jsonout -u $creds $cdsapi/peer
-  if [[ "$(jq -r '.content[0].name' $jsonout)" != "$ACUMOS_DOMAIN" ]]; then
+  local peers=$(jq -r '.content | length' $jsonout)
+  local peer=0
+  local found=no
+  while [[ $peer -lt $peers ]]; do
+    if [[ "$(jq -r ".content[$peer].name" $jsonout)" == "$ACUMOS_DOMAIN" ]]; then
+      found=yes
+    fi
+    peer=$((peer+1))
+  done
+  if [[ "$found" == "no" ]]; then
     log "Create 'self' peer entry (required) via CDS API"
     local jsonin="/tmp/$(uuidgen)"
     cat <<EOF >$jsonin

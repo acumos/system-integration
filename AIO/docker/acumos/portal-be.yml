@@ -196,7 +196,7 @@ services:
           }
         },
         "gateway": {
-          "url": "https://${ACUMOS_FEDERATION_HOST}:${ACUMOS_FEDERATION_LOCAL_PORT}"
+          "url": "https://${ACUMOS_HOST_IP}:${ACUMOS_FEDERATION_LOCAL_PORT}"
         },
         "dcae": {
           "model": {
