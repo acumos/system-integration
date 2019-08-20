@@ -47,7 +47,13 @@ function setup_keystore() {
   else
     log "Creating new certs in certs subfolder"
     cd certs
-    bash setup_certs.sh $ACUMOS_CERT_PREFIX $ACUMOS_DOMAIN
+    if [[ "$ACUMOS_DOMAIN_IP" == "$ACUMOS_HOST_IP" ]]; then
+      extra_ips="$ACUMOS_DOMAIN_IP"
+    else
+      extra_ips="$ACUMOS_DOMAIN_IP $ACUMOS_HOST_IP"
+    fi
+    bash setup_certs.sh $ACUMOS_CERT_PREFIX $ACUMOS_DOMAIN \
+      "$ACUMOS_HOST" "$extra_ips"
     cd ..
   fi
 
