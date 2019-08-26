@@ -34,7 +34,18 @@ spec:
     metadata:
       labels:
         app: mlwb-notebook
+        service: <ACUMOS_MLWB_SERVICE_LABEL>
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: service
+                operator: NotIn
+                values:
+                - <ACUMOS_MLWB_SERVICE_LABEL>
+            topologyKey: "kubernetes.io/node"
       imagePullSecrets:
       - name: acumos-registry
       containers:
@@ -60,7 +71,8 @@ spec:
             "jupyterhub": {
               "url": "https://<MLWB_JUPYTERHUB_DOMAIN>:<MLWB_JUPYTERHUB_PORT>",
               "token":"<MLWB_JUPYTERHUB_API_TOKEN>",
-              "storepass": "changeit"
+              "storepass": "changeit",
+              "installcert": <MLWB_JUPYTERHUB_INSTALL_CERT>
             },
             "jupyternotebook": {
               "url": "https://<MLWB_JUPYTERHUB_DOMAIN>:<MLWB_JUPYTERHUB_PORT>"
@@ -89,7 +101,7 @@ spec:
           secretName: mlwb-jupyterhub-certs
       - name: logs
         persistentVolumeClaim:
-          claimName: <ACUMOS_LOGS_PVC_NAME>
+          claimName: <ACUMOS_MLWB_LOGS_PVC_NAME>
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -109,7 +121,18 @@ spec:
     metadata:
       labels:
         app: mlwb-notebook-webcomponent
+        service: <ACUMOS_MLWB_SERVICE_LABEL>
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: service
+                operator: NotIn
+                values:
+                - <ACUMOS_MLWB_SERVICE_LABEL>
+            topologyKey: "kubernetes.io/node"
       imagePullSecrets:
       - name: acumos-registry
       containers:
@@ -133,7 +156,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: <ACUMOS_LOGS_PVC_NAME>
+          claimName: <ACUMOS_MLWB_LOGS_PVC_NAME>
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -153,7 +176,18 @@ spec:
     metadata:
       labels:
         app: mlwb-notebook-catalog-webcomponent
+        service: <ACUMOS_MLWB_SERVICE_LABEL>
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: service
+                operator: NotIn
+                values:
+                - <ACUMOS_MLWB_SERVICE_LABEL>
+            topologyKey: "kubernetes.io/node"
       imagePullSecrets:
       - name: acumos-registry
       containers:
@@ -181,4 +215,4 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: <ACUMOS_LOGS_PVC_NAME>
+          claimName: <ACUMOS_MLWB_LOGS_PVC_NAME>

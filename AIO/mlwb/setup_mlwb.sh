@@ -99,12 +99,14 @@ setup_mlwb() {
 
     apps="mlwb-dashboard-webcomponent mlwb-home-webcomponent \
 mlwb-project mlwb-project-webcomponent mlwb-project-catalog-webcomponent \
-mlwb-notebook mlwb-notebook-webcomponent mlwb-notebook-catalog-webcomponent"
+mlwb-notebook mlwb-notebook-webcomponent mlwb-notebook-catalog-webcomponent \
+mlwb-model"
 
     cp kubernetes/mlwb-dashboard* deploy/.
     cp kubernetes/mlwb-home* deploy/.
     cp kubernetes/mlwb-notebook* deploy/.
     cp kubernetes/mlwb-project* deploy/.
+    cp kubernetes/mlwb-model* deploy/.
 
     if [[ "$MLWB_DEPLOY_PIPELINE" == "true" ]]; then
       apps="$apps mlwb-pipeline mlwb-pipeline-webcomponent mlwb-pipeline-catalog-webcomponent"

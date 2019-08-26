@@ -33,7 +33,18 @@ spec:
     metadata:
       labels:
         app: mlwb-pipeline
+        service: <ACUMOS_MLWB_SERVICE_LABEL>
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: service
+                operator: NotIn
+                values:
+                - <ACUMOS_MLWB_SERVICE_LABEL>
+            topologyKey: "kubernetes.io/node"
       imagePullSecrets:
       - name: acumos-registry
       containers:
@@ -110,7 +121,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: <ACUMOS_LOGS_PVC_NAME>
+          claimName: <ACUMOS_MLWB_LOGS_PVC_NAME>
       - name: nifi-certs-registry
         secret:
           secretName: nifi-certs-registry
@@ -136,7 +147,18 @@ spec:
     metadata:
       labels:
         app: mlwb-pipeline-webcomponent
+        service: <ACUMOS_MLWB_SERVICE_LABEL>
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: service
+                operator: NotIn
+                values:
+                - <ACUMOS_MLWB_SERVICE_LABEL>
+            topologyKey: "kubernetes.io/node"
       imagePullSecrets:
       - name: acumos-registry
       containers:
@@ -160,7 +182,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: <ACUMOS_LOGS_PVC_NAME>
+          claimName: <ACUMOS_MLWB_LOGS_PVC_NAME>
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -180,7 +202,18 @@ spec:
     metadata:
       labels:
         app: mlwb-pipeline-catalog-webcomponent
+        service: <ACUMOS_MLWB_SERVICE_LABEL>
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: service
+                operator: NotIn
+                values:
+                - <ACUMOS_MLWB_SERVICE_LABEL>
+            topologyKey: "kubernetes.io/node"
       imagePullSecrets:
       - name: acumos-registry
       containers:
@@ -208,4 +241,4 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: <ACUMOS_LOGS_PVC_NAME>
+          claimName: <ACUMOS_MLWB_LOGS_PVC_NAME>

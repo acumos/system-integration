@@ -50,7 +50,7 @@ services:
           "proxy": "",
           "password": "${ACUMOS_NEXUS_RW_USER_PASSWORD}",
           "username": "${ACUMOS_NEXUS_RW_USER}",
-          "groupid": "${ACUMOS_NEXUS_GROUP}"
+          "groupId": "${ACUMOS_NEXUS_GROUP}"
         },
         "cdms": {
           "client": {

@@ -33,7 +33,18 @@ spec:
     metadata:
       labels:
         app: nifi-$USER
+        service: <MLWB_NIFI_USER_SERVICE_LABEL>
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: service
+                operator: NotIn
+                values:
+                - <MLWB_NIFI_USER_SERVICE_LABEL>
+            topologyKey: "kubernetes.io/node"
       securityContext:
         runAsUser: 0
         fsGroup: 1000

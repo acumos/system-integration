@@ -1171,6 +1171,92 @@ Notes on the table above:
   invoke scans manually or through external systems, and also for the future
   support of external scan result notifications.
 
+Deploying Acumos in Enterprise Kubernetes Clusters
+==================================================
+
+The AIO toolset is primarily oriented toward supporting use of the Acumos
+platform by developers/testers in environments managed by them or their support
+teams. In such environments, security restrictions and the ability to deploy
+the entire platform under a local machine or cluster may be more relaxed and
+thus provide a more effective development/test environment. In more production
+oriented environments however, you can expect to see more security restrictions
+and requirements to use external services for some of the Acumos dependencies.
+Following are some typical choices/adaptations you may need to make using the AIO
+tools, to deploy the Acumos platform in such environments.
+
+No Privileged Containers
+------------------------
+
+Debugging Hints
+===============
+
+Accessing Logs
+--------------
+
+For k8s-based deployments, the simplest way to view/tail log files is to run
+the following command in the pod for the specific component, modifying the
+example as needed per the specific component, as shown in the table following:
+
+.. code-block:: bash
+
+  source system-integration/AIO/acumos_env.sh
+  pod=$(kubectl get pods -n $ACUMOS_NAMESPACE -l app=cds | awk '/cds/{print $1}')
+  kubectl exec -n $ACUMOS_NAMESPACE $pod -- cat maven/logs/cmn-data-svc/cmn-data-svc.log
+..
+
+.. csv-table::
+    :header: "Component", "App Label", "Log Path"
+    :widths: 20, 80
+    :align: left
+
+    "Common Data Service", "cds", "maven/logs/cmn-data-svc/cmn-data-svc.log"
+    "Portal-FE", "portal-fe", "maven/logs/cmn-data-svc/cmn-data-svc.log"
+    "Onboarding", "onboarding", "maven/logs//maven/logs/on-boarding/on-boarding.log"
+    "Microservice Generation", "msg", "maven/logs//maven/logs/microservice-generation/microservice-generation.log"
+    "Federation", "federation", "maven/logs/federation-gateway/federation-gateway.log"
+    "AcuCompose", "dsce", "maven/logs/ds-compositionengine/ds-compositionengine.log"
+    "Kubernetes Client", "kubernetes-client", "maven/logs/deployment/kubernetes-client/kubernetes-client.log"
+    "Azure Client", "azure-client", "maven/logs/deployment/acumos-azure-client/acumos-azure-client.log"
+    "MLWB Pipeline Service", "mlwb-pipeline", "maven/logs/pipeline-service/pipeline-service.log"
+    "MLWB Notebook Service", "mlwb-notebook", "maven/logs/notebook-service/notebook-service.log"
+    "MLWB Model Service", "mlwb-model", "maven/logs/model-service/model-service.log"
+..
+
+Enable Debug Log Level
+----------------------
+
+For components deployed through kubernetes templates (not via Helm), the AIO
+toolset creates parameter-substituted component deployment templates in
+a "deploy" subfolder under:
+
+* AIO (for most core components)
+* AIO/docker-proxy
+* AIO/mlwb
+* AIO/mariadb
+* AIO/nexus
+* AIO/beats
+
+For the Java Springboot-based Acumos core components, you can enable debug logs
+using the following example bash commands, which will enable debug for the
+CDS, Portal-FE, and Portal-BE components.
+
+.. code-block:: bash
+  cs="portal-fe portal-be cds"
+  for c in $cs; do
+    sed -i -- 's/"root": "INFO"/"root": "DEBUG"/' system-integration/AIO/deploy/$c-deployment.yaml
+    kubectl apply -f system-integration/AIO/deploy/$c-deployment.yaml
+  done
+..
+
+For the Security Verification Client Library (SVCL) which is built into the
+Portal-BE image, enable debug logs via:
+
+.. code-block:: bash
+  sed -i -- 's/"securityverification": "INFO"/"securityverification": "DEBUG"/' system-integration/AIO/deploy/portal-be-deployment.yaml
+  sed -i -- 's/"portal": "INFO"/"portal": "DEBUG"/' system-integration/AIO/deploy/portal-be-deployment.yaml
+  kubectl apply -f system-integration/AIO/deploy/portal-be-deployment.yaml
+..
+
 Known Issues
 ============
 

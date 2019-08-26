@@ -37,7 +37,18 @@ spec:
     metadata:
       labels:
         app: sv-scanning
+        service: <ACUMOS_SECURITY_VERIFICATION_SERVICE_LABEL>
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: service
+                operator: NotIn
+                values:
+                - <ACUMOS_SECURITY_VERIFICATION_SERVICE_LABEL>
+            topologyKey: "kubernetes.io/node"
       imagePullSecrets:
       - name: acumos-registry
       containers:
@@ -64,8 +75,14 @@ spec:
           value: "<ACUMOS_NEXUS_HOST>"
         - name: ACUMOS_NEXUS_API_PORT
           value: "<ACUMOS_NEXUS_API_PORT>"
+        - name: ACUMOS_NEXUS_MAVEN_REPO_PATH
+          value: "<ACUMOS_NEXUS_MAVEN_REPO_PATH>"
         - name: ACUMOS_NEXUS_MAVEN_REPO
           value: "<ACUMOS_NEXUS_MAVEN_REPO>"
+        - name: ACUMOS_NEXUS_RW_USER
+          value: "<ACUMOS_NEXUS_RW_USER>"
+        - name: ACUMOS_NEXUS_RW_USER_PASSWORD
+          value: "<ACUMOS_NEXUS_RW_USER_PASSWORD>"
         - name: SPRING_APPLICATION_JSON
           value: '{
             "logging": {
@@ -193,7 +210,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: <ACUMOS_LOGS_PVC_NAME>
+          claimName: <ACUMOS_COMMON_LOGS_PVC_NAME>
       - name: scripts
         configMap:
           name: sv-scanning-scripts

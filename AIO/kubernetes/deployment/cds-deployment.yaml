@@ -37,7 +37,18 @@ spec:
     metadata:
       labels:
         app: cds
+        service: <ACUMOS_COMMON_DATA_SERVICE_LABEL>
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: service
+                operator: NotIn
+                values:
+                - <ACUMOS_COMMON_DATA_SERVICE_LABEL>
+            topologyKey: "kubernetes.io/node"
       imagePullSecrets:
       - name: acumos-registry
       containers:
@@ -85,4 +96,4 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-         claimName: <ACUMOS_LOGS_PVC_NAME>
+         claimName: <ACUMOS_COMMON_LOGS_PVC_NAME>

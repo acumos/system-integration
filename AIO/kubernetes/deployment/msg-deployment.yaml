@@ -37,7 +37,18 @@ spec:
     metadata:
       labels:
         app: msg
+        service: <ACUMOS_MICROSERVICE_GENERATION_SERVICE_LABEL>
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: service
+                operator: NotIn
+                values:
+                - <ACUMOS_MICROSERVICE_GENERATION_SERVICE_LABEL>
+            topologyKey: "kubernetes.io/node"
       imagePullSecrets:
       - name: acumos-registry
       containers:
@@ -129,4 +140,4 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-         claimName: <ACUMOS_LOGS_PVC_NAME>
+          claimName: <ACUMOS_ONBOARDING_LOGS_PVC_NAME>

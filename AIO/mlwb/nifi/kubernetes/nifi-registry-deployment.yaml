@@ -36,7 +36,18 @@ spec:
     metadata:
       labels:
         app: nifi-registry
+        service: <MLWB_NIFI_REGISTRY_SERVICE_LABEL>
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: service
+                operator: NotIn
+                values:
+                - <MLWB_NIFI_REGISTRY_SERVICE_LABEL>
+            topologyKey: "kubernetes.io/node"
       containers:
       - name: apache
         image: "httpd:2.4"

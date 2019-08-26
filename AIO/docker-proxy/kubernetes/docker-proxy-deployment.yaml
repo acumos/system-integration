@@ -37,7 +37,18 @@ spec:
     metadata:
       labels:
         app: docker-proxy
+        service: <ACUMOS_DOCKER_PROXY_SERVICE_LABEL>
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: service
+                operator: NotIn
+                values:
+                - <ACUMOS_DOCKER_PROXY_SERVICE_LABEL>
+            topologyKey: "kubernetes.io/node"
       containers:
       - name: docker-proxy
         image: nginx:stable
@@ -94,7 +105,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-         claimName: <ACUMOS_LOGS_PVC_NAME>
+         claimName: <ACUMOS_COMMON_LOGS_PVC_NAME>
       - name: conf-volume
         configMap:
           name: docker-proxy
