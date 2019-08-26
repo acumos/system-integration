@@ -111,6 +111,16 @@ spec:
           value: "https://wiki.acumos.org/display/TRAIN"
         - name: pipelineFlag
           value: "true"
+        - name: createTimeout
+          value: "60000"
+        - name: modelmSURL
+          value: "http://mlwb-model-service:9093/mlWorkbench/v1/modelservice"
+        - name: modelWikiURL
+          value: "http://wiki.acumos.org/display/TRAIN"
+        - name: portalFEURL
+          value: "https://<ACUMOS_DOMAIN>"
+        - name: portalBEURL
+          value: "http://portal-be-service:8083"
         ports:
         - containerPort: 9084
         volumeMounts:

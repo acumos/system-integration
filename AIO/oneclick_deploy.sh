@@ -187,16 +187,19 @@ function setup_ingress() {
 }
 
 function customize_catalog() {
-  local catalog_index=$1
+  local old_name=$1
   local accessTypeCode=$2
   local name=$3
   local cdsapi="https://$ACUMOS_ORIGIN/ccds"
   local creds="$ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD"
-  local jsonin="/tmp/$(uuidgen)"
-  local jsonout="/tmp/$(uuidgen)"
-
-  cid=$(curl -s -k -u $creds $cdsapi/catalog | jq -r ".content[$catalog_index].catalogId")
-  cat <<EOF >$jsonin
+  local cats=$(curl -s -k -u $creds $cdsapi/catalog | jq '.content | length')
+  local cat=0
+  while $cat -lt $cats; do
+    if [[ "$(curl -s -k -u $creds $cdsapi/catalog | jq -r ".content[$catalog_index].name")" == "$old_name" ]]; then
+      local jsonin="/tmp/$(uuidgen)"
+      local jsonout="/tmp/$(uuidgen)"
+      cid=$(curl -s -k -u $creds $cdsapi/catalog | jq -r ".content[$catalog_index].catalogId")
+      cat <<EOF >$jsonin
 {
 "catalogId": "$cid",
 "accessTypeCode": "$accessTypeCode",
@@ -208,16 +211,18 @@ function customize_catalog() {
 "url": "https://$ACUMOS_ORIGIN"
 }
 EOF
-  curl -s -k -o $jsonout -u $creds -X PUT $cdsapi/catalog/$cid \
-    -H "accept: */*" -H "Content-Type: application/json" \
-    -d @$jsonin
-  if [[ "$(jq '.status' $jsonout)" != "200" ]]; then
-    cat $jsonin
-    cat $jsonout
-    fail "Catalog update failed"
-  fi
-  rm $jsonin
-  rm $jsonout
+      curl -s -k -o $jsonout -u $creds -X PUT $cdsapi/catalog/$cid \
+        -H "accept: */*" -H "Content-Type: application/json" \
+        -d @$jsonin
+      if [[ "$(jq '.status' $jsonout)" != "200" ]]; then
+        cat $jsonin
+        cat $jsonout
+        fail "Catalog update failed"
+      fi
+      rm $jsonin
+      rm $jsonout
+    fi
+  done
 }
 
 function setup_federation() {
@@ -279,8 +284,8 @@ EOF
   # i.e. peers cannot have the exact same catalog name
   # Note: the name must be less than 50 chars
   name=$(echo $ACUMOS_DOMAIN | cut -d '.' -f 1)
-  customize_catalog 0 PB "$name Public"
-  customize_catalog 1 RS "$name Internal"
+  customize_catalog 'Public Models' PB "$name Public"
+  customize_catalog 'Company Models' RS "$name Internal"
 }
 
 set -x
@@ -336,6 +341,16 @@ if [[ "$ACUMOS_SETUP_DB" == "true" ]]; then
   bash $AIO_ROOT/setup_acumosdb.sh
   # Prevent redeploy from resetting database unless specifically requested
   update_acumos_env ACUMOS_CDS_PREVIOUS_VERSION $ACUMOS_CDS_VERSION force
+fi
+
+if [[ "$ACUMOS_DEPLOY_COUCHDB" == "true" ]]; then
+  bash $AIO_ROOT/../charts/couchdb/setup_couchdb.sh all $ACUMOS_NAMESPACE $ACUMOS_DOMAIN
+  update_acumos_env ACUMOS_DEPLOY_COUCHDB false force
+fi
+
+if [[ "$ACUMOS_DEPLOY_JENKINS" == "true" ]]; then
+  bash $AIO_ROOT/../charts/jenkins/setup_jenkins.sh all $ACUMOS_NAMESPACE $ACUMOS_DOMAIN
+  update_acumos_env ACUMOS_DEPLOY_JENKINS false force
 fi
 
 # Filebeat depends upon pre-configuration of the ELK stack

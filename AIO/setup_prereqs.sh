@@ -107,7 +107,7 @@ setup_keystore() {
 
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     if [[ ! -e /mnt/$ACUMOS_NAMESPACE/certs ]]; then
-      setup_docker_volume ACUMOS_NAMESPACE/certs "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
+      setup_docker_volume $ACUMOS_NAMESPACE/certs "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
     fi
     if [[ "$(ls certs/* | grep -v '\.sh')" != "" ]]; then
       sudo cp $(ls certs/* | grep -v '\.sh') /mnt/$ACUMOS_NAMESPACE/certs/.
