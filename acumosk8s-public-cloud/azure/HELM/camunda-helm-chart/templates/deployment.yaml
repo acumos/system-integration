@@ -1,0 +1,70 @@
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+# This is a YAML-formatted file
+# Declare variables to be passed into your templates.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: "{{ .Values.namespace }}"
+  labels:
+    {{- ( include "labels" . ) | indent 4 }}
+    {{- if .Values.aadIdentityName }}
+    aadpodidbinding: {{ .Values.aadIdentityName }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        {{- ( include "labels" . ) | indent 8 }}
+        {{- if .Values.aadIdentityName }}
+        aadpodidbinding: {{ .Values.aadIdentityName }}
+        {{- end }}        
+    spec:
+      containers:
+      - image: "camunda/camunda-bpm-platform"
+        name: {{ .Release.Name }}
+        env:
+          {{- if eq .Values.databaseType "pod" }}
+          - name: DB_URL
+            value: jdbc:postgresql://acumos-postgres.acumos-ns01:5432/{{ required "postgresql.postgresqlDatabase " .Values.postgresql.postgresqlDatabase  }}
+          - name: DB_USERNAME
+            value: {{ required "postgresql.postgresqlUsername " .Values.postgresql.postgresqlUsername  }}
+          - name: DB_PASSWORD
+            value: {{ required "postgresql.postgresqlPassword " .Values.postgresql.postgresqlPassword  }}
+          {{- else if eq .Values.databaseType "external" }}
+          - name: DB_URL
+            value: jdbc:postgresql://{{ required "postgresqlHost " .Values.postgresqlHost }}:{{ .Values.postgresqlPort | default "5432" }}/{{ required "postgresqlDatabase " .Values.postgresqlDatabase }}?sslmode=require
+          {{- end }}
+          - name: DB_DRIVER
+            value: org.postgresql.Driver
+        resources:
+          requests:
+            memory: {{ required "memoryRequests " .Values.memoryRequests  }}
+            cpu: {{ required "cpuRequests " .Values.cpuRequests  }}
+          limits:
+            memory: {{  required "memoryLimits  " .Values.memoryLimits   }}
+            cpu: {{  required "cpuLimits  " .Values.cpuLimits   }}
+        ports:
+        - containerPort: {{ required "applicationPort " .Values.applicationPort  }}
+          name: http
+        imagePullPolicy: IfNotPresent

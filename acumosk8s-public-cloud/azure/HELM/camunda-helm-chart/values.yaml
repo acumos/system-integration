@@ -1,0 +1,55 @@
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+# This is a YAML-formatted file
+# Declare variables to be passed into your templates.
+global:
+  environment: "dev"
+
+applicationPort: 8080
+namespace: "acumos-ns01"
+memoryRequests: '512Mi'
+cpuRequests: '100m'
+memoryLimits: '1024Mi'
+cpuLimits: '2500m'
+readinessPath: '/engine-rest/version'
+readinessDelay: 30
+readinessTimeout: 3
+readinessPeriod: 15
+livenessPath: '/engine-rest/version'
+livenessDelay: 30
+livenessTimeout: 3
+livenessPeriod: 15
+livenessFailureThreshold: 3
+replicas: 1
+aadIdentityName: camunda
+
+databaseType: pod
+tags:
+  postgresql-pod: true
+postgresqlServerName: "acumos-postgres"
+postgresqlHost: "acumos-postgres.acumos-ns01"
+postgresqlDatabase: "kong"
+postgresqlUsername: "xxxxx"
+postgresqlPassword: "xxxxxx"
+postgresql:
+  persistence:
+    enabled: false
+  postgresqlUsername: "xxxxxx"
+  postgresqlPassword: "xxxxxx"
+  postgresqlDatabase: "kong"
+
