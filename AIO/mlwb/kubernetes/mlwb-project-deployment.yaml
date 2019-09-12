@@ -143,6 +143,10 @@ spec:
           value: "https://<ACUMOS_DOMAIN>"
         - name: portalBEURL
           value: "http://portal-be-service:8083"
+        - name: useExternalNotebook
+          value: "true"
+        - name: useExternalPipeline
+          value: "true"
         ports:
         - containerPort: 9084
         volumeMounts:

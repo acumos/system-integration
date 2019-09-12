@@ -137,6 +137,8 @@ APISERVER=$(ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
 if [[ "$APISERVER" == "" ]]; then
   fail "Unable to retrieve API server URL"
 fi
+# Handle cases for cloud VMs with server URL based upon private IP
+APISERVER="https://$server:$(echo $APISERVER | cut -d ':' -f 3)"
 log "APISERVER=$APISERVER"
 SECRET=$(ssh -x -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $user@$server \
   kubectl get secrets | grep -m1 ^default-token | cut -f1 -d ' ')

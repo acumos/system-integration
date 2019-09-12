@@ -344,7 +344,7 @@ if [[ "$ACUMOS_SETUP_DB" == "true" ]]; then
   update_acumos_env ACUMOS_CDS_PREVIOUS_VERSION $ACUMOS_CDS_VERSION force
 fi
 
-if [[ "$ACUMOS_DEPLOY_COUCHDB" == "true" ]]; then
+if [[ "$DEPLOYED_UNDER" == "k8s" && "$ACUMOS_DEPLOY_COUCHDB" == "true" ]]; then
   bash $AIO_ROOT/../charts/couchdb/setup_couchdb.sh all $ACUMOS_NAMESPACE $ACUMOS_DOMAIN
   update_acumos_env ACUMOS_DEPLOY_COUCHDB false force
 fi

@@ -96,7 +96,8 @@ spec:
                 "serviceadmin": "service_admin.yaml",
                 "ingress": "ingress.yaml",
                 "deployment": "deployment.yaml"
-              }
+              },
+              "useexternalpipeline": true
             }
           }'
         command: ["/bin/bash", "-c"]
@@ -173,6 +174,8 @@ spec:
           value: "http://mlwb-pipeline-service:9090/mlWorkbench/v1/pipeline"
         - name: pipelineWikiURL
           value: "https://wiki.acumos.org/display/TRAIN"
+        - name: useExternalPipeline
+          value: "true"
         ports:
         - containerPort: 9091
         volumeMounts:
@@ -232,6 +235,10 @@ spec:
           value: "http://mlwb-pipeline-service:9090/mlWorkbench/v1/pipeline"
         - name: notebookWikiURL
           value: "https://wiki.acumos.org/display/TRAIN"
+        - name: useExternalPipeline
+          value: "true"
+        - name: createTimeout
+          value: "60000"
         ports:
         - containerPort: 9092
         volumeMounts:

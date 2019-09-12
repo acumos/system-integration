@@ -47,8 +47,12 @@ function setup_couchdb() {
   trap 'fail' ERR
 
   log "Install couchdb via Helm"
+  # Sometimes get Error: failed to download "stable/couchdb" (hint: running `helm repo update` may help)
+  helm repo update
   # Per https://github.com/helm/charts/tree/master/stable/couchdb
-  helm install --name couchdb --namespace $NAMESPACE stable/couchdb
+  helm install --name couchdb --namespace $NAMESPACE \
+    --set service.type=NodePort \
+    stable/couchdb
 
   log "Wait for couchdb to be ready"
   local t=0
@@ -60,9 +64,9 @@ function setup_couchdb() {
     sleep 10
     t=$((t+10))
   done
-  local COUCHDB_IP=$(kubectl get services -n $NAMESPACE -o wide | awk '/couchdb-svc-couchdb/{print $3}')
-  local COUCHDB_PORT=$(kubectl get services -n $NAMESPACE couchdb-svc-couchdb -o json | jq -r '.spec.ports[0].port')
-  until [[ $(curl -v http://$COUCHDB_IP:$COUCHDB_PORT | grep -c couchdb) -gt 0 ]]; do
+  local ACUMOS_COUCHDB_PORT=$(kubectl get services -n $NAMESPACE couchdb-svc-couchdb -o json | jq -r '.spec.ports[0].nodePort')
+  update_acumos_env ACUMOS_COUCHDB_PORT $ACUMOS_COUCHDB_PORT force
+  until [[ $(curl -v http://$ACUMOS_COUCHDB_DOMAIN:$ACUMOS_COUCHDB_PORT | grep -c couchdb) -gt 0 ]]; do
     if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
       fail "couchdb is not ready after $ACUMOS_SUCCESS_WAIT_TIME seconds"
     fi
