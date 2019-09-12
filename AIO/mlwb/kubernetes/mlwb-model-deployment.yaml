@@ -76,7 +76,7 @@ spec:
                   "if-not-exist": true
               },
               "protocol": "http",
-              "host": "<ACUMOS_DOMAIN>",
+              "host": "<ACUMOS_COUCHDB_DOMAIN>",
               "port": <ACUMOS_COUCHDB_PORT>
             }
           }'

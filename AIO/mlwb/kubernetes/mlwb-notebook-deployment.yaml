@@ -79,7 +79,8 @@ spec:
             },
             "jwt" : {
               "secretkey": "<ACUMOS_JWT_KEY>"
-            }
+            },
+            "useexternalnotebook": true
           }'
         command: ["/bin/bash", "-c"]
         args:
@@ -206,6 +207,8 @@ spec:
           value: "http://mlwb-pipeline-service:9090/mlWorkbench/v1/pipeline"
         - name: notebookWikiURL
           value: "https://wiki.acumos.org/display/TRAIN"
+        - name: useExternalNotebook
+          value: "true"
         ports:
         - containerPort: 9087
         volumeMounts:

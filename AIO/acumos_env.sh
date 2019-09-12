@@ -26,7 +26,7 @@
 #
 
 # Version of the AIO toolset
-export ACUMOS_AIO_VERSION=2.4
+export ACUMOS_AIO_VERSION=3.0
 
 # Acumos project Registries
 export ACUMOS_PROJECT_NEXUS_USERNAME=docker
@@ -38,22 +38,21 @@ export ACUMOS_STAGING=nexus3.acumos.org:10004
 # Should ONLY use Release version
 export ACUMOS_RELEASE=nexus3.acumos.org:10002
 
-# Images based upon Boreas release assembly
-# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_Boreas_Release
+# Images based upon Clio release assembly
+# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_Clio_1909032130
 # Core components
 export ACUMOS_DELETE_SNAPSHOTS=false
 export AZURE_CLIENT_IMAGE=$ACUMOS_RELEASE/acumos-azure-client:2.0.15
-export PORTAL_BE_IMAGE=$ACUMOS_RELEASE/acumos-portal-be:2.2.23
-export PORTAL_FE_IMAGE=$ACUMOS_RELEASE/acumos-portal-fe:2.2.23
+export PORTAL_BE_IMAGE=$ACUMOS_SNAPSHOT/acumos-portal-be:3.0.10-SNAPSHOT
+export PORTAL_FE_IMAGE=$ACUMOS_SNAPSHOT/acumos-portal-fe:3.0.10-SNAPSHOT
 export LICENSE_PROFILE_EDITOR_IMAGE=$ACUMOS_SNAPSHOT/license-profile-editor:0.0.1-SNAPSHOT
-export COMMON_DATASERVICE_IMAGE=$ACUMOS_RELEASE/common-dataservice:2.2.5
-export DESIGNSTUDIO_IMAGE=$ACUMOS_RELEASE/ds-compositionengine:2.1.0
+export COMMON_DATASERVICE_IMAGE=$ACUMOS_STAGING/common-dataservice:2.2.6
+export DESIGNSTUDIO_IMAGE=$ACUMOS_STAGING/ds-compositionengine:2.2.1
 export FEDERATION_IMAGE=$ACUMOS_RELEASE/federation-gateway:2.2.1
 export KUBERNETES_CLIENT_IMAGE=$ACUMOS_RELEASE/kubernetes-client:2.0.11
-export MICROSERVICE_GENERATION_IMAGE=$ACUMOS_SNAPSHOT/microservice-generation:2.14.1-SNAPSHOT
-export ONBOARDING_IMAGE=$ACUMOS_RELEASE/onboarding-app:2.16.0
+export MICROSERVICE_GENERATION_IMAGE=$ACUMOS_STAGING/microservice-generation:3.0.0
+export ONBOARDING_IMAGE=$ACUMOS_STAGING/onboarding-app:3.0.0
 export SECURITY_VERIFICATION_IMAGE=$ACUMOS_RELEASE/security-verification:0.0.24
-export DEPLOYMENT_CLIENT_IMAGE=nginx
 export OPENSTACK_CLIENT_IMAGE=$ACUMOS_RELEASE/openstack-client:2.0.12
 
 # Model-execution-components
@@ -96,8 +95,8 @@ export ACUMOS_DEPLOY_ELK_FILEBEAT=true
 export ACUMOS_DEPLOY_MLWB=true
 export ACUMOS_DEPLOY_INGRESS=true
 export ACUMOS_COUCHDB_DB_NAME=mlwbdb
-export ACUMOS_COUCHDB_HOST=couchdb-svc-couchdb
-export ACUMOS_COUCHDB_PORT=5984
+export ACUMOS_COUCHDB_DOMAIN=$ACUMOS_DOMAIN
+export ACUMOS_COUCHDB_PORT=
 export ACUMOS_JENKINS_DOMAIN=jenkins
 export ACUMOS_JENKINS_PORT=8080
 export ACUMOS_DOCKER_API_HOST=docker-dind-service

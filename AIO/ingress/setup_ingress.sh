@@ -43,10 +43,11 @@
 
 function clean_ingress() {
   trap 'fail' ERR
-  ings=$(kubectl get ingress -n $ACUMOS_NAMESPACE | awk '/-ingress/{print $1}')
-  for ing in $ings; do
-    if [[ $(kubectl delete ingress -n $ACUMOS_NAMESPACE $ing) ]]; then
-      log "Ingress $ing deleted"
+  apps="cds deployment-client kubernetes-client onboarding portal sv-scanning"
+  for app in $apps; do
+    if [[ $(kubectl get ingress -n $ACUMOS_NAMESPACE $ing-ingress) ]]; then
+      kubectl delete ingress -n $ACUMOS_NAMESPACE $ing-ingress
+      log "Ingress $ing-ingress deleted"
     fi
   done
 }
