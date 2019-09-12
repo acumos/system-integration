@@ -98,10 +98,10 @@ EOF
   t=0
   while [[ "$(jq -r '.response_detail' $jsonout)" != "Success" ]]; do
     sleep 10
-    t=$((i+10))
+    t=$((t+10))
     if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
       rm $jsoninp $jsonout
-      fail "Unable to register user after 1 minute"
+      fail "Unable to register user after $ACUMOS_SUCCESS_WAIT_TIME seconds"
     fi
     curl -k -s -o $jsonout -X POST $apiurl \
       -H "Content-Type: application/json" -d @$jsoninp

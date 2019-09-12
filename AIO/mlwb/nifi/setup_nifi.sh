@@ -127,6 +127,7 @@ setup_nifi() {
   sedi "s/<MLWB_NIFI_REGISTRY_INITIAL_ADMIN>/$MLWB_NIFI_REGISTRY_INITIAL_ADMIN/g" deploy/nifi-registry-deployment.yaml
   sedi "s~<MLWB_NIFI_REGISTRY_PVC_NAME>~$MLWB_NIFI_REGISTRY_PVC_NAME~g" deploy/nifi-registry-deployment.yaml
   sedi "s~<ACUMOS_LOGS_PVC_NAME>~$ACUMOS_LOGS_PVC_NAME~g" deploy/nifi-registry-deployment.yaml
+  sedi "s~<MLWB_NIFI_REGISTRY_SERVICE_LABEL>~$MLWB_NIFI_REGISTRY_SERVICE_LABEL~g" deploy/nifi-registry-deployment.yaml
   replace_env deploy/ingress-registry.yaml
   replace_env deploy/namespace-admin-role.yaml
   replace_env deploy/namespace-admin-rolebinding.yaml

@@ -17,26 +17,26 @@ apiVersion: apps/v1
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 
-# What this is: kubernetes template for Acumos kubernetes-client deployment
+# What this is: kubernetes template for Acumos deployment-client deployment
 # How to use:
 
 kind: Deployment
 metadata:
   namespace: <ACUMOS_NAMESPACE>
-  name: kubernetes-client
+  name: deployment-client
   labels:
-    app: kubernetes-client
+    app: deployment-client
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kubernetes-client
+      app: deployment-client
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: kubernetes-client
+        app: deployment-client
         service: <ACUMOS_DEPLOYMENT_CLIENT_SERVICE_LABEL>
     spec:
       affinity:
@@ -52,8 +52,8 @@ spec:
       imagePullSecrets:
       - name: acumos-registry
       containers:
-      - name: kubernetes-client
-        image: <KUBERNETES_CLIENT_IMAGE>
+      - name: deployment-client
+        image: <DEPLOYMENT_CLIENT_IMAGE>
         env:
         - name: SPRING_APPLICATION_JSON
           value: '{
@@ -61,6 +61,9 @@ spec:
               "level": {
                 "root": "INFO"
               }
+            },
+            "api": {
+              "baseUrl": "https://<ACUMOS_DOMAIN>/deployment/"
             },
             "kube" : {
               "incrementPort": "8557",
@@ -75,14 +78,14 @@ spec:
               "nginxImageName": "nginx",
               "nexusEndPointURL": "http://localhost:80"
             },
-            "dockerproxy": {
-            "host": "<ACUMOS_DOCKER_PROXY_HOST>",
-            "port": "<ACUMOS_DOCKER_PROXY_PORT>"
+            "dockerRegistry": {
+              "url": "https://<ACUMOS_DOCKER_PROXY_HOST>:<ACUMOS_DOCKER_PROXY_PORT>/",
+              "username": "<ACUMOS_DOCKER_PROXY_USERNAME>",
+              "password": "<ACUMOS_DOCKER_PROXY_PASSWORD>"
             },
             "blueprint": {
               "ImageName": "<BLUEPRINT_ORCHESTRATOR_IMAGE>",
               "name": "blueprint-orchestrator",
-              "nodePort": "30555",
               "port": "8555"
             },
             "nexus": {
@@ -96,25 +99,22 @@ spec:
               "cmndatasvcuser": "<ACUMOS_CDS_USER>",
               "cmndatasvcpwd": "<ACUMOS_CDS_PASSWORD>"
             },
-            "probe": {
-              "probeImageName": "<PROTO_VIEWER_IMAGE>",
-              "probeImagePORT": "5006",
-              "probeModelPort": "5006",
-              "probeNodePort": "30800",
-              "probeTargetPort": "5006",
-              "probeApiPort": "5006",
-              "probeExternalPort": "30800",
-              "probeSchemaPort": "80"
-            },
             "logstash": {
               "host": "<ACUMOS_ELK_HOST>",
               "ip": "<ACUMOS_ELK_HOST_IP>",
               "port": "<ACUMOS_ELK_LOGSTASH_PORT>"
             }
           }'
+        command: ['/bin/bash', '-c']
+        args:
+        - apt-get update; apt-get install -y curl jq netcat;
+          cp -r /app/config /usr/share/nginx/html;
+          nginx -g "daemon off;"
         ports:
-        - containerPort: 8082
+        - containerPort: 80
         volumeMounts:
+        - mountPath: /app/config
+          name: config
         - mountPath: /maven/logs
           name: logs
       restartPolicy: Always
@@ -122,3 +122,6 @@ spec:
       - name: logs
         persistentVolumeClaim:
          claimName: <ACUMOS_DEPLOYMENT_LOGS_PVC_NAME>
+      - name: deployment-config
+        persistentVolumeClaim:
+         claimName: <ACUMOS_DEPLOYMENT_CONFIG_PVC_NAME>

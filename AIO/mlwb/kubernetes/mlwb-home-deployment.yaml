@@ -34,7 +34,18 @@ spec:
     metadata:
       labels:
         app: mlwb-home-webcomponent
+        service: <ACUMOS_MLWB_SERVICE_LABEL>
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: service
+                operator: NotIn
+                values:
+                - <ACUMOS_MLWB_SERVICE_LABEL>
+            topologyKey: "kubernetes.io/node"
       imagePullSecrets:
       - name: acumos-registry
       containers:
@@ -98,4 +109,4 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: <ACUMOS_LOGS_PVC_NAME>
+          claimName: <ACUMOS_MLWB_LOGS_PVC_NAME>

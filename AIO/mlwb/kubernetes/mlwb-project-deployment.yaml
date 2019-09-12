@@ -34,7 +34,18 @@ spec:
     metadata:
       labels:
         app: mlwb-project
+        service: <ACUMOS_MLWB_SERVICE_LABEL>
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: service
+                operator: NotIn
+                values:
+                - <ACUMOS_MLWB_SERVICE_LABEL>
+            topologyKey: "kubernetes.io/node"
       imagePullSecrets:
       - name: acumos-registry
       containers:
@@ -66,7 +77,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: <ACUMOS_LOGS_PVC_NAME>
+          claimName: <ACUMOS_MLWB_LOGS_PVC_NAME>
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -86,7 +97,18 @@ spec:
     metadata:
       labels:
         app: mlwb-project-webcomponent
+        service: <ACUMOS_MLWB_SERVICE_LABEL>
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: service
+                operator: NotIn
+                values:
+                - <ACUMOS_MLWB_SERVICE_LABEL>
+            topologyKey: "kubernetes.io/node"
       imagePullSecrets:
       - name: acumos-registry
       containers:
@@ -111,6 +133,16 @@ spec:
           value: "https://wiki.acumos.org/display/TRAIN"
         - name: pipelineFlag
           value: "true"
+        - name: createTimeout
+          value: "60000"
+        - name: modelmSURL
+          value: "http://mlwb-model-service:9093/mlWorkbench/v1/modelservice"
+        - name: modelWikiURL
+          value: "http://wiki.acumos.org/display/TRAIN"
+        - name: portalFEURL
+          value: "https://<ACUMOS_DOMAIN>"
+        - name: portalBEURL
+          value: "http://portal-be-service:8083"
         ports:
         - containerPort: 9084
         volumeMounts:
@@ -120,7 +152,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: <ACUMOS_LOGS_PVC_NAME>
+          claimName: <ACUMOS_MLWB_LOGS_PVC_NAME>
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -140,7 +172,18 @@ spec:
     metadata:
       labels:
         app: mlwb-project-catalog-webcomponent
+        service: <ACUMOS_MLWB_SERVICE_LABEL>
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: service
+                operator: NotIn
+                values:
+                - <ACUMOS_MLWB_SERVICE_LABEL>
+            topologyKey: "kubernetes.io/node"
       imagePullSecrets:
       - name: acumos-registry
       containers:
@@ -168,4 +211,4 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: <ACUMOS_LOGS_PVC_NAME>
+          claimName: <ACUMOS_MLWB_LOGS_PVC_NAME>
