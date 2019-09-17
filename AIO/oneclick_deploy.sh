@@ -37,6 +37,12 @@
 #   - the User running this script must have been added to the "docker" group
 #     $ sudo usermod <user> -aG docker
 #   - AIO prerequisites setup by sudo user via setup_prereqs.sh
+#  - If calling this script without first running setup_prereqs.sh, ensure that
+#    these values have been set/updated in acumos_env.sh:
+#    DEPLOYED_UNDER: k8s|docker
+#    ACUMOS_DOMAIN: DNS or hosts-file resolvable FQDN of the Acumos platform
+#    K8S_DIST: openshift|generic
+#    ACUMOS_HOST:  DNS or hosts-file resolvable hostname of the Acumos host
 #
 # Usage:
 #   For docker-based deployments, run this script on the AIO host.
@@ -57,7 +63,7 @@
 function stop_acumos_core_in_k8s() {
   trap 'fail' ERR
   apps=" azure-client cds docker-proxy dsce federation kubernetes-client msg \
-    onboarding portal-be portal-fe sv-scanning"
+    onboarding portal-be portal-fe sv-scanning license-profile-editor license-rtu-editor"
   for app in $apps; do
     if [[ $(kubectl delete deployment -n $ACUMOS_NAMESPACE $app) ]]; then
       log "Deployment deleted for app $app"
@@ -66,7 +72,7 @@ function stop_acumos_core_in_k8s() {
       log "Service deleted for app $app"
     fi
   done
-  cfgs="acumos-certs sv-scanning-licenses sv-scanning-rules sv-scanning-scripts"
+  cfgs="acumos-certs sv-scanning"
   for cfg in $cfgs; do
     if [[ $(kubectl delete configmap -n $ACUMOS_NAMESPACE $cfg) ]]; then
       log "Configmap $cfg deleted"
@@ -122,12 +128,22 @@ function prepare_env() {
   fi
 }
 
+function setup_jenkins() {
+  trap 'fail' ERR
+  bash $AIO_ROOT/../charts/jenkins/setup_jenkins.sh all $ACUMOS_NAMESPACE $ACUMOS_DOMAIN
+  if [[ ! -e deploy/security-verification ]]; then
+    git clone https://gerrit.acumos.org/r/security-verification deploy/security-verification
+  fi
+  mkdir -p deploy/jenkins/acumos
+  grep -e ACUMOS_CDS -e ACUMOS_NEXUS acumos_env.sh >deploy/jenkins/acumos/acumos_env.sh
+  cp -r deploy/security-verification/security-verification-service/scan deploy/jenkins/acumos/sv
+  pod=$(kubectl get pods -n $ACUMOS_NAMESPACE | awk '/jenkins/{print $1}')
+  kubectl cp deploy/jenkins/acumos $pod:/acumos
+  update_acumos_env ACUMOS_DEPLOY_JENKINS false force
+}
+
 function setup_acumos() {
   trap 'fail' ERR
-
-  mkdir -p kubernetes/configmap/sv-scanning/scripts
-  mkdir -p kubernetes/configmap/sv-scanning/licenses
-  mkdir -p kubernetes/configmap/sv-scanning/rules
 
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     log "Login to LF Nexus Docker repos, for Acumos project images"
@@ -141,7 +157,8 @@ function setup_acumos() {
   else
     log "Deploy the Acumos core components"
     if [[ ! -e deploy ]]; then mkdir deploy; fi
-    local apps="cds federation portal-fe portal-be onboarding msg dsce \
+    local apps="cds license-profile-editor license-rtu-editor federation \
+portal-fe portal-be onboarding msg dsce \
 kubernetes-client azure-client sv-scanning"
     for app in $apps; do
       start_acumos_core_app $app
@@ -157,8 +174,6 @@ function setup_ingress() {
   if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
     if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
       if [[ "$ACUMOS_INGRESS_SERVICE" == "nginx" ]]; then
-        bash $AIO_ROOT/../charts/ingress/setup_ingress_controller.sh $ACUMOS_NAMESPACE \
-          $ACUMOS_HOST_IP $AIO_ROOT/certs/acumos.crt $AIO_ROOT/certs/acumos.key
         bash $AIO_ROOT/ingress/setup_ingress.sh
         if [[ "$K8S_DIST" == "openshift" ]]; then
           update_acumos_env ACUMOS_ORIGIN $ACUMOS_DOMAIN:$ACUMOS_INGRESS_HTTPS_PORT force
@@ -300,8 +315,10 @@ update_acumos_env DEPLOY_RESULT "" force
 update_acumos_env FAIL_REASON "" force
 set_k8s_env
 
+get_host_ip $ACUMOS_DOMAIN
+update_acumos_env ACUMOS_DOMAIN_IP $HOST_IP force
 get_host_ip $ACUMOS_HOST
-update_acumos_env ACUMOS_HOST_IP $HOST_IP
+update_acumos_env ACUMOS_HOST_IP $HOST_IP force
 update_acumos_env ACUMOS_JWT_KEY $(uuidgen)
 update_acumos_env ACUMOS_CDS_PASSWORD $(uuidgen)
 update_acumos_env ACUMOS_NEXUS_RO_USER_PASSWORD $(uuidgen)
@@ -315,6 +332,16 @@ source acumos_env.sh
 
 prepare_env
 bash $AIO_ROOT/setup_keystore.sh
+
+# Ingress controller setup needs to precede ingress creations
+if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
+  if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
+    if [[ "$ACUMOS_INGRESS_SERVICE" == "nginx" ]]; then
+      bash $AIO_ROOT/../charts/ingress/setup_ingress_controller.sh $ACUMOS_NAMESPACE \
+        $ACUMOS_HOST_IP $AIO_ROOT/certs/acumos.crt $AIO_ROOT/certs/acumos.key
+    fi
+  fi
+fi
 
 # Acumos components depend upon pre-configuration of Nexus (e.g. ports)
 if [[ "$ACUMOS_DEPLOY_NEXUS" == "true" && "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
@@ -345,13 +372,13 @@ if [[ "$ACUMOS_SETUP_DB" == "true" ]]; then
 fi
 
 if [[ "$DEPLOYED_UNDER" == "k8s" && "$ACUMOS_DEPLOY_COUCHDB" == "true" ]]; then
+  update_acumos_env ACUMOS_COUCHDB_PASSWORD $(uuidgen)
   bash $AIO_ROOT/../charts/couchdb/setup_couchdb.sh all $ACUMOS_NAMESPACE $ACUMOS_DOMAIN
   update_acumos_env ACUMOS_DEPLOY_COUCHDB false force
 fi
 
 if [[ "$ACUMOS_DEPLOY_JENKINS" == "true" ]]; then
-  bash $AIO_ROOT/../charts/jenkins/setup_jenkins.sh all $ACUMOS_NAMESPACE $ACUMOS_DOMAIN
-  update_acumos_env ACUMOS_DEPLOY_JENKINS false force
+  setup_jenkins
 fi
 
 # Filebeat depends upon pre-configuration of the ELK stack
@@ -375,6 +402,8 @@ if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
   else
     update_acumos_env ACUMOS_DOCKER_API_HOST $ACUMOS_HOST_IP force
   fi
+else
+  update_acumos_env ACUMOS_DOCKER_API_HOST $ACUMOS_HOST_IP force
 fi
 
 # Apply any env updates from above

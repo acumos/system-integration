@@ -62,6 +62,19 @@ spec:
                 "root": "INFO"
               }
             },
+            "server": {
+              "port": 8337
+            },
+            "jenkins": {
+              "url": "<ACUMOS_JENKINS_API_URL>",
+              "user": "<ACUMOS_JENKINS_USER>",
+              "password": "<ACUMOS_JENKINS_PASSWORD>",
+              "job": {
+                "simple": "<ACUMOS_JENKINS_SIMPLE_SOLUTION_DEPLOY_JOB>",
+                "composite": "<ACUMOS_JENKINS_COMPOSITE_SOLUTION_DEPLOY_JOB>",
+                "nifi": "<ACUMOS_JENKINS_NIFI_DEPLOY_JOB>"
+              }
+            },
             "api": {
               "baseUrl": "https://<ACUMOS_DOMAIN>/deployment/"
             },
@@ -105,23 +118,24 @@ spec:
               "port": "<ACUMOS_ELK_LOGSTASH_PORT>"
             }
           }'
-        command: ['/bin/bash', '-c']
+        command: ["/bin/bash", "-c"]
         args:
-        - apt-get update; apt-get install -y curl jq netcat;
-          cp -r /app/config /usr/share/nginx/html;
-          nginx -g "daemon off;"
+        - set -x;
+          cd maven;
+          keytool -import -file certs/<ACUMOS_CERT> -alias <ACUMOS_DOMAIN> -keystore /opt/java/openjdk/lib/security/cacerts -storepass changeit -noprompt;
+          java -Xms128m -Xmx256m -Djava.security.egd=file:/dev/./urandom -jar deployment-client*.jar;
         ports:
-        - containerPort: 80
+        - containerPort: 8337
         volumeMounts:
-        - mountPath: /app/config
-          name: config
         - mountPath: /maven/logs
           name: logs
+        - mountPath: /maven/certs
+          name: certs-volume
       restartPolicy: Always
       volumes:
       - name: logs
         persistentVolumeClaim:
          claimName: <ACUMOS_DEPLOYMENT_LOGS_PVC_NAME>
-      - name: deployment-config
-        persistentVolumeClaim:
-         claimName: <ACUMOS_DEPLOYMENT_CONFIG_PVC_NAME>
+      - name: certs-volume
+        configMap:
+          name: acumos-certs

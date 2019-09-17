@@ -35,4 +35,4 @@ spec:
       - path: "/deployment(/|$)(.*)"
         backend:
           serviceName: deployment-client-service
-          servicePort: 8080
+          servicePort: 8337

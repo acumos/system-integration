@@ -61,9 +61,6 @@
 #       - set the mlwb_env.sh values for the following, per the target host
 #         export MLWB_JUPYTERHUB_DOMAIN=<FQDN or hostname>
 #         export MLWB_JUPYTERHUB_HOST=<hostname>
-#         export MLWB_JUPYTERHUB_HOST_USER=<host user>
-#           Note: the host user must be part of the docker group, and typically
-#                 should be the Admin account for k8s.
 #
 # To release a failed PV:
 # kubectl patch pv/pv-5 --type json -p '[{ "op": "remove", "path": "/spec/claimRef" }]'
@@ -349,9 +346,6 @@ $ bash setup_jupyterhub.sh <setup|clean|all> <NAMESPACE> <ACUMOS_ORIGIN>
      - set the mlwb_env.sh values for the following, per the target host
        export MLWB_JUPYTERHUB_DOMAIN=<FQDN or hostname>
        export MLWB_JUPYTERHUB_HOST=<hostname>
-       export MLWB_JUPYTERHUB_HOST_USER=<host user>
-         Note: the host user must be part of the docker group, and typically
-               should be the Admin account for k8s.
 EOF
   log "All parameters not provided"
   exit 1

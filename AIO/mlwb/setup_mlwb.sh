@@ -157,7 +157,6 @@ source mlwb_env.sh
 update_mlwb_env MLWB_JUPYTERHUB_DOMAIN $MLWB_JUPYTERHUB_DOMAIN force
 update_mlwb_env MLWB_JUPYTERHUB_HOST $MLWB_JUPYTERHUB_HOST force
 update_mlwb_env MLWB_JUPYTERHUB_HOST_IP $MLWB_JUPYTERHUB_HOST_IP force
-update_mlwb_env MLWB_JUPYTERHUB_HOST_USER $MLWB_JUPYTERHUB_HOST_USER force
 
 action=$1
 if [[ "$action" == "" ]]; then action=all; fi
