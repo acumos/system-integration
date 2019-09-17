@@ -57,32 +57,6 @@ spec:
         securityContext:
           privileged: <ACUMOS_PRIVILEGED_ENABLE>
         env:
-        - name: LOG_LEVEL
-          value: "INFO"
-        - name: JAVA_OPTS
-          value: "-Xms128m -Xmx256m"
-        - name: ACUMOS_ADMIN_USER
-          value: "admin"
-        - name: ACUMOS_CDS_HOST
-          value: "cds-service"
-        - name: ACUMOS_CDS_PORT
-          value: "8000"
-        - name: ACUMOS_CDS_USER
-          value: "<ACUMOS_CDS_USER>"
-        - name: ACUMOS_CDS_PASSWORD
-          value: "<ACUMOS_CDS_PASSWORD>"
-        - name: ACUMOS_NEXUS_HOST
-          value: "<ACUMOS_NEXUS_HOST>"
-        - name: ACUMOS_NEXUS_API_PORT
-          value: "<ACUMOS_NEXUS_API_PORT>"
-        - name: ACUMOS_NEXUS_MAVEN_REPO_PATH
-          value: "<ACUMOS_NEXUS_MAVEN_REPO_PATH>"
-        - name: ACUMOS_NEXUS_MAVEN_REPO
-          value: "<ACUMOS_NEXUS_MAVEN_REPO>"
-        - name: ACUMOS_NEXUS_RW_USER
-          value: "<ACUMOS_NEXUS_RW_USER>"
-        - name: ACUMOS_NEXUS_RW_USER_PASSWORD
-          value: "<ACUMOS_NEXUS_RW_USER_PASSWORD>"
         - name: SPRING_APPLICATION_JSON
           value: '{
             "logging": {
@@ -111,112 +85,114 @@ spec:
                 "groupId": "<ACUMOS_NEXUS_GROUP>"
               }
             },
-            "siteConfig": "{ \"verification\": {
-                \"externalScan\": \"false\",
-                \"allowedLicense\": [
-                  { \"type\": \"SPDX\", \"value\": \"Apache-2.0\" },
-                  { \"type\": \"SPDX\", \"value\": \"CC-BY-4.0\" },
-                  { \"type\": \"SPDX\", \"value\": \"BSD-3-Clause\" },
-                  { \"type\": \"VendorA\", \"value\": \"Vendor-A-OSS\" },
-                  { \"type\": \"CompanyB\", \"value\": \"Company-B-Proprietary\" }
-                ],
-                \"compatibleLicenses\":[
-                  { \"name\":\"Apache-2.0\", \"compatible\":[
-                      { \"name\":\"CC-BY-4.0\" },
-                      { \"name\":\"Apache-2.0\" },
-                      { \"name\":\"BSD-3-Clause\" },
-                      { \"name\":\"MIT-License\" }
-                    ]
-                  },
-                  { \"name\":\"BSD-3-Clause\", \"compatible\":[
-                      { \"name\":\"CC-BY-4.0\" },
-                      { \"name\":\"Apache-2.0\" },
-                      { \"name\":\"BSD-3-Clause\" },
-                      { \"name\":\"MIT-License\" }
-                    ]
-                  },
-                  { \"name\":\"MIT-License\", \"compatible\":[
-                      { \"name\":\"CC-BY-4.0\" },
-                      { \"name\":\"Apache-2.0\" },
-                      { \"name\":\"BSD-3-Clause\" },
-                      { \"name\":\"MIT-License\" }
-                    ]
-                  },
-                  { \"name\":\"Vendor-A-OSS\", \"compatible\":[
-                      { \"name\":\"Vendor-A-OSS\" },
-                      { \"name\":\"CC-BY-4.0\" },
-                      { \"name\":\"Apache-2.0\" },
-                      { \"name\":\"BSD-3-Clause\" },
-                      { \"name\":\"MIT-License\" }
-                    ]
-                  },
-                  { \"name\":\"Company-B-Proprietary\", \"compatible\":[
-                      { \"name\":\"Company-B-Proprietary\" },
-                      { \"name\":\"CC-BY-4.0\" },
-                      { \"name\":\"Apache-2.0\" },
-                      { \"name\":\"BSD-3-Clause\" },
-                      { \"name\":\"MIT-License\" }
-                    ]
-                  }
-                ],
-                \"licenseScan\": {
-                  \"created\": \"true\",
-                  \"updated\": \"true\",
-                  \"deploy\": \"false\",
-                  \"download\": \"false\",
-                  \"share\": \"false\",
-                  \"publishCompany\": \"false\",
-                  \"publishPublic\": \"false\"
+            "jenkins": {
+              "client": {
+                "url": "<ACUMOS_JENKINS_API_URL>",
+                "user": "<ACUMOS_JENKINS_USER>",
+                "password": "<ACUMOS_JENKINS_PASSWORD>",
+                "scanJob": "<ACUMOS_JENKINS_SCAN_JOB>"
+              }
+            },
+            "siteConfig": "{
+              \"externalScan\": \"<ACUMOS_SECURITY_VERIFICATION_EXTERNAL_SCAN>\",
+              \"allowedLicense\": [
+                { \"type\": \"SPDX\", \"name\": \"Apache-2.0\", \"rtuRequired\": \"false\" },
+                { \"type\": \"SPDX\", \"name\": \"CC-BY-4.0\", \"rtuRequired\": \"false\" },
+                { \"type\": \"SPDX\", \"name\": \"BSD-3-Clause\", \"rtuRequired\": \"false\" },
+                { \"type\": \"VendorA\", \"name\": \"Vendor-A-OSS\", \"rtuRequired\": \"false\" },
+                { \"type\": \"CompanyB\", \"name\": \"Company-B-Proprietary\", \"rtuRequired\": \"true\" }
+              ],
+              \"compatibleLicenses\":[
+                { \"name\":\"Apache-2.0\", \"compatible\":[
+                    { \"name\":\"CC-BY-4.0\" },
+                    { \"name\":\"Apache-2.0\" },
+                    { \"name\":\"BSD-3-Clause\" },
+                    { \"name\":\"MIT-License\" }
+                  ]
                 },
-                \"securityScan\": {
-                  \"created\": \"true\",
-                  \"updated\": \"true\",
-                  \"deploy\": \"false\",
-                  \"download\": \"false\",
-                  \"share\": \"false\",
-                  \"publishCompany\": \"false\",
-                  \"publishPublic\": \"false\"
+                { \"name\":\"BSD-3-Clause\", \"compatible\":[
+                    { \"name\":\"CC-BY-4.0\" },
+                    { \"name\":\"Apache-2.0\" },
+                    { \"name\":\"BSD-3-Clause\" },
+                    { \"name\":\"MIT-License\" }
+                  ]
                 },
-                \"licenseVerify\": {
-                  \"deploy\": \"true\",
-                  \"download\": \"true\",
-                  \"share\": \"false\",
-                  \"publishCompany\": \"true\",
-                  \"publishPublic\": \"true\"
+                { \"name\":\"MIT-License\", \"compatible\":[
+                    { \"name\":\"CC-BY-4.0\" },
+                    { \"name\":\"Apache-2.0\" },
+                    { \"name\":\"BSD-3-Clause\" },
+                    { \"name\":\"MIT-License\" }
+                  ]
                 },
-                \"securityVerify\": {
-                  \"deploy\": \"true\",
-                  \"download\": \"true\",
-                  \"share\": \"false\",
-                  \"publishCompany\": \"true\",
-                  \"publishPublic\": \"true\"
+                { \"name\":\"Vendor-A-OSS\", \"compatible\":[
+                    { \"name\":\"Vendor-A-OSS\" },
+                    { \"name\":\"CC-BY-4.0\" },
+                    { \"name\":\"Apache-2.0\" },
+                    { \"name\":\"BSD-3-Clause\" },
+                    { \"name\":\"MIT-License\" }
+                  ]
+                },
+                { \"name\":\"Company-B-Proprietary\", \"compatible\":[
+                    { \"name\":\"Company-B-Proprietary\" },
+                    { \"name\":\"CC-BY-4.0\" },
+                    { \"name\":\"Apache-2.0\" },
+                    { \"name\":\"BSD-3-Clause\" },
+                    { \"name\":\"MIT-License\" }
+                  ]
                 }
+              ],
+              \"licenseScan\": {
+                \"created\": \"true\",
+                \"updated\": \"true\",
+                \"deploy\": \"false\",
+                \"download\": \"false\",
+                \"share\": \"false\",
+                \"publishCompany\": \"false\",
+                \"publishPublic\": \"false\"
+              },
+              \"securityScan\": {
+                \"created\": \"true\",
+                \"updated\": \"true\",
+                \"deploy\": \"false\",
+                \"download\": \"false\",
+                \"share\": \"false\",
+                \"publishCompany\": \"false\",
+                \"publishPublic\": \"false\"
+              },
+              \"licenseVerify\": {
+                \"deploy\": \"true\",
+                \"download\": \"true\",
+                \"share\": \"false\",
+                \"publishCompany\": \"true\",
+                \"publishPublic\": \"true\"
+              },
+              \"securityVerify\": {
+                \"deploy\": \"true\",
+                \"download\": \"true\",
+                \"share\": \"false\",
+                \"publishCompany\": \"true\",
+                \"publishPublic\": \"true\"
               }
             }"
           }'
-        command: ["/bin/bash", "/maven/scan/setup.sh"]
+        command: ["/bin/bash", "-c"]
+        args:
+        - set -x;
+          cd maven;
+          keytool -import -file certs/<ACUMOS_CERT> -alias <ACUMOS_DOMAIN> -keystore /opt/java/openjdk/lib/security/cacerts -storepass changeit -noprompt;
+          java -Xms128m -Xmx256m -Djava.security.egd=file:/dev/./urandom -jar security-verification-service*.jar;
         ports:
         - containerPort: 9082
         volumeMounts:
         - mountPath: /maven/logs
           name: logs
-        - mountPath: /maven/conf/scripts
-          name: scripts
-        - mountPath: /maven/conf/licenses
-          name: licenses
-        - mountPath: /maven/conf/rules
-          name: rules
+        - mountPath: /maven/certs
+          name: certs-volume
       restartPolicy: Always
       volumes:
       - name: logs
         persistentVolumeClaim:
           claimName: <ACUMOS_COMMON_LOGS_PVC_NAME>
-      - name: scripts
+      - name: certs-volume
         configMap:
-          name: sv-scanning-scripts
-      - name: licenses
-        configMap:
-          name: sv-scanning-licenses
-      - name: rules
-        configMap:
-          name: sv-scanning-rules
+          name: acumos-certs

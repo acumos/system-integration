@@ -25,7 +25,6 @@ System Integration
        :maxdepth: 2
 
        release-notes
-       user-guide
        oneclick-deploy/index
 
 

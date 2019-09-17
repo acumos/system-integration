@@ -41,7 +41,6 @@ function clean_jenkins() {
   fi
   # Helm delete does not remove PVC
   delete_pvc $NAMESPACE jenkins
-  delete_pvc $NAMESPACE jenkins-ingress
   # Ingress is managed directly, not by Helm
   if [[ $(kubectl delete ingress -n $NAMESPACE jenkins-ingress) ]]; then
     log "Ingress deleted for Jenkins"
@@ -55,12 +54,10 @@ function setup_jenkins() {
   mkdir deploy
 
   log "Update values.yaml as input to Helm for deploying the Jenkins chart"
+  update_acumos_env ACUMOS_JENKINS_PASSWORD $(uuidgen)
   cp values.yaml deploy/.
   get_host_ip $K8S_INGRESS_DOMAIN
-  sedi "s/<NAMESPACE>/$NAMESPACE/g" deploy/values.yaml
-  sedi "s/<K8S_INGRESS_DOMAIN>/$K8S_INGRESS_DOMAIN/g" deploy/values.yaml
-  get_host_ip $K8S_INGRESS_DOMAIN
-  sedi "s/<HOST_IP>/$HOST_IP/g" deploy/values.yaml
+  replace_env deploy/values.yaml
 
   log "Resulting values.yaml:"
   cat deploy/values.yaml
@@ -70,8 +67,7 @@ function setup_jenkins() {
 
   log "Setup ingress for Jenkins"
   cp jenkins-ingress.yaml deploy/.
-  sedi "s/<NAMESPACE>/$NAMESPACE/g" deploy/jenkins-ingress.yaml
-  sedi "s/<K8S_INGRESS_DOMAIN>/$K8S_INGRESS_DOMAIN/g" deploy/jenkins-ingress.yaml
+  replace_env deploy/jenkins-ingress.yaml
   kubectl create -f deploy/jenkins-ingress.yaml
 
   log "Wait for Jenkins to be ready"
@@ -81,10 +77,11 @@ function setup_jenkins() {
     sleep 10
     t=$((t+10))
     if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
-      rm $jsoninp $jsonout
       fail "Jenkins is not ready after $ACUMOS_SUCCESS_WAIT_TIME seconds"
     fi
-    curl -s -o /dev/null -D headers.txt -vL -k https://$K8S_INGRESS_DOMAIN/jenkins/api/
+    if [[ $(curl -s -o /dev/null -D headers.txt -vL -k https://$K8S_INGRESS_DOMAIN/jenkins/api/) == "" ]]; then
+      log "Jenkins is not yet ready"
+    fi
   done
 }
 
@@ -95,8 +92,8 @@ Usage:
  connected to the k8s cluster via kubectl.
  $ bash setup_jenkins.sh <setup|clean|all> <NAMESPACE> <K8S_INGRESS_DOMAIN>
    setup|clean|all: action to take
-   K8S_INGRESS_DOMAIN: origin (FQDN:port) assigned to the k8s cluster ingress controller
    NAMESPACE: k8s namespace to deploy under (will be created if not existing)
+   K8S_INGRESS_DOMAIN: origin (FQDN:port) assigned to the k8s cluster ingress controller
 EOF
   echo "All parameters not provided"
   exit 1
