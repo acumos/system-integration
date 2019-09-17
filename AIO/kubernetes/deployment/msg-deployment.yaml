@@ -88,7 +88,7 @@ spec:
                 "version": "1.23"
               },
               "imagetag": {
-                "prefix": "<ACUMOS_DOCKER_REGISTRY_HOST>:<ACUMOS_DOCKER_MODEL_PORT>"
+                "prefix": "<ACUMOS_DOCKER_IMAGETAG_PREFIX>"
               },
               "max_total_connections": "1",
               "max_per_route_connections": "1"
