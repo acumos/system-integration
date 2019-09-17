@@ -80,7 +80,7 @@ spec:
             "jwt" : {
               "secretkey": "<ACUMOS_JWT_KEY>"
             },
-            "useexternalnotebook": true
+            "useexternalnotebook": <MLWB_JUPYTERHUB_EXTERNAL_NOTEBOOK_SERVICE>
           }'
         command: ["/bin/bash", "-c"]
         args:

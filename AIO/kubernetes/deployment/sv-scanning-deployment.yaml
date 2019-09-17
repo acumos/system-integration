@@ -114,11 +114,11 @@ spec:
             "siteConfig": "{ \"verification\": {
                 \"externalScan\": \"false\",
                 \"allowedLicense\": [
-                  { \"type\": \"SPDX\", \"value\": \"Apache-2.0\" },
-                  { \"type\": \"SPDX\", \"value\": \"CC-BY-4.0\" },
-                  { \"type\": \"SPDX\", \"value\": \"BSD-3-Clause\" },
-                  { \"type\": \"VendorA\", \"value\": \"Vendor-A-OSS\" },
-                  { \"type\": \"CompanyB\", \"value\": \"Company-B-Proprietary\" }
+                  { \"type\": \"SPDX\", \"value\": \"Apache-2.0\", \"rtuRequired\": \"false\" },
+                  { \"type\": \"SPDX\", \"value\": \"CC-BY-4.0\", \"rtuRequired\": \"false\" },
+                  { \"type\": \"SPDX\", \"value\": \"BSD-3-Clause\", \"rtuRequired\": \"false\" },
+                  { \"type\": \"VendorA\", \"value\": \"Vendor-A-OSS\", \"rtuRequired\": \"false\" },
+                  { \"type\": \"CompanyB\", \"value\": \"Company-B-Proprietary\", \"rtuRequired\": \"true\" }
                 ],
                 \"compatibleLicenses\":[
                   { \"name\":\"Apache-2.0\", \"compatible\":[
