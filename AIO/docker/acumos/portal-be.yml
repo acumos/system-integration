@@ -59,6 +59,9 @@ services:
             "password": "${ACUMOS_CDS_PASSWORD}"
           }
         },
+        "lum": {
+          "url": "${ACUMOS_LUM_API_URL}"
+        },
         "qanda": {
           "url": "https://stackoverflow.com/questions/tagged/acumos"
         },

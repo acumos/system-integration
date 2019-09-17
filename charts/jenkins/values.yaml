@@ -20,13 +20,16 @@
 
 namespaceOverride: <NAMESPACE>
 master:
-  numExecutors: 10
-  adminPassword: admin
+  adminPassword: <ACUMOS_JENKINS_PASSWORD>
   serviceType: ClusterIP
   jenkinsUriPrefix: "/jenkins/"
+  numExecutors: 10
   authorizationStrategy: |-
-    <useSecurity>false</useSecurity>
+    <useSecurity>true</useSecurity>
   hostAliases:
     - ip: "<HOST_IP>"
       hostnames:
       - "<K8S_INGRESS_DOMAIN>"
+  csrf:
+    defaultCrumbIssuer:
+      enabled: false

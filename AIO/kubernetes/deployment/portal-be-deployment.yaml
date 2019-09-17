@@ -76,7 +76,7 @@ spec:
                 "email": "<ACUMOS_ADMIN_EMAIL>"
               },
               "imagetag": {
-                "prefix": "<ACUMOS_DOCKER_IMAGETAG_PREFIX>"
+                "prefix": "<ACUMOS_DOCKER_REGISTRY_HOST>:<ACUMOS_DOCKER_MODEL_PORT><ACUMOS_DOCKER_IMAGETAG_PREFIX>"
               }
             },
             "nexus": {
