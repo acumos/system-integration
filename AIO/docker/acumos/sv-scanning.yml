@@ -25,6 +25,8 @@ services:
     environment:
       LOG_LEVEL: "INFO"
       JAVA_OPTS: "-Xms128m -Xmx256m"
+      ACUMOS_SECURITY_VERIFICATION_EXTERNAL_SCAN: "${ACUMOS_SECURITY_VERIFICATION_EXTERNAL_SCAN}"
+      ACUMOS_DOMAIN: "${ACUMOS_DOMAIN}"
       ACUMOS_ADMIN_USER: "admin"
       ACUMOS_CDS_HOST: "${ACUMOS_CDS_HOST}"
       ACUMOS_CDS_PORT: "${ACUMOS_CDS_PORT}"
@@ -33,6 +35,7 @@ services:
       ACUMOS_NEXUS_HOST: "${ACUMOS_NEXUS_HOST}"
       ACUMOS_NEXUS_API_PORT: "${ACUMOS_NEXUS_API_PORT}"
       ACUMOS_NEXUS_MAVEN_REPO: "${ACUMOS_NEXUS_MAVEN_REPO}"
+      ACUMOS_NEXUS_MAVEN_REPO_PATH: "${ACUMOS_NEXUS_MAVEN_REPO_PATH}"
       SPRING_APPLICATION_JSON: '{
         "logging": {
           "level": {
@@ -59,7 +62,7 @@ services:
           }
         },
         "siteConfig": "{ \"verification\": {
-            \"externalScan\": \"false\",
+            \"externalScan\": \"${ACUMOS_SECURITY_VERIFICATION_EXTERNAL_SCAN}\",
             \"allowedLicense\": [
               { \"type\": \"SPDX\", \"value\": \"Apache-2.0\" },
               { \"type\": \"SPDX\", \"value\": \"CC-BY-4.0\" },

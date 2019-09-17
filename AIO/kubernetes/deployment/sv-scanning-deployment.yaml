@@ -61,6 +61,10 @@ spec:
           value: "INFO"
         - name: JAVA_OPTS
           value: "-Xms128m -Xmx256m"
+        - name: ACUMOS_SECURITY_VERIFICATION_EXTERNAL_SCAN
+          value: "<ACUMOS_SECURITY_VERIFICATION_EXTERNAL_SCAN>"
+        - name: ACUMOS_DOMAIN
+          value: "<ACUMOS_DOMAIN>"
         - name: ACUMOS_ADMIN_USER
           value: "admin"
         - name: ACUMOS_CDS_HOST
@@ -112,13 +116,13 @@ spec:
               }
             },
             "siteConfig": "{ \"verification\": {
-                \"externalScan\": \"false\",
+                \"externalScan\": \"<ACUMOS_SECURITY_VERIFICATION_EXTERNAL_SCAN>\",
                 \"allowedLicense\": [
-                  { \"type\": \"SPDX\", \"value\": \"Apache-2.0\" },
-                  { \"type\": \"SPDX\", \"value\": \"CC-BY-4.0\" },
-                  { \"type\": \"SPDX\", \"value\": \"BSD-3-Clause\" },
-                  { \"type\": \"VendorA\", \"value\": \"Vendor-A-OSS\" },
-                  { \"type\": \"CompanyB\", \"value\": \"Company-B-Proprietary\" }
+                  { \"type\": \"SPDX\", \"value\": \"Apache-2.0\", \"rtuRequired\": \"false\" },
+                  { \"type\": \"SPDX\", \"value\": \"CC-BY-4.0\", \"rtuRequired\": \"false\" },
+                  { \"type\": \"SPDX\", \"value\": \"BSD-3-Clause\", \"rtuRequired\": \"false\" },
+                  { \"type\": \"VendorA\", \"value\": \"Vendor-A-OSS\", \"rtuRequired\": \"false\" },
+                  { \"type\": \"CompanyB\", \"value\": \"Company-B-Proprietary\", \"rtuRequired\": \"true\" }
                 ],
                 \"compatibleLicenses\":[
                   { \"name\":\"Apache-2.0\", \"compatible\":[
@@ -200,23 +204,13 @@ spec:
         volumeMounts:
         - mountPath: /maven/logs
           name: logs
-        - mountPath: /maven/conf/scripts
-          name: scripts
-        - mountPath: /maven/conf/licenses
-          name: licenses
-        - mountPath: /maven/conf/rules
-          name: rules
+        - mountPath: /maven/conf
+          name: conf
       restartPolicy: Always
       volumes:
       - name: logs
         persistentVolumeClaim:
           claimName: <ACUMOS_COMMON_LOGS_PVC_NAME>
-      - name: scripts
+      - name: conf
         configMap:
-          name: sv-scanning-scripts
-      - name: licenses
-        configMap:
-          name: sv-scanning-licenses
-      - name: rules
-        configMap:
-          name: sv-scanning-rules
+          name: sv-scanning

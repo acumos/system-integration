@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+# ===============LICENSE_START================================================
+# Acumos Apache-2.0
+# ============================================================================
+# Copyright (C) 2019 Nordix Foundation.
+#  ============================================================================
+#  This Acumos software file is distributed by Nordix Foundation
+#  under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+# 
+#       http://www.apache.org/licenses/LICENSE-2.0
+# 
+#  This file is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#  ===============LICENSE_END==================================================
+
+# What this is: kubernetes template for Acumos license-rtu-editor deployment
+# How to use:
+
+kind: Deployment
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: license-rtu-editor
+  labels:
+    app: license-rtu-editor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: license-rtu-editor
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: license-rtu-editor
+    spec:
+      imagePullSecrets:
+      - name: acumos-registry
+      containers:
+      - name: license-rtu-editor
+        image: <LICENSE_RTU_EDITOR_IMAGE>
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: /maven/logs
+          name: logs
+      restartPolicy: Always
+      volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: <ACUMOS_LOGS_PVC_NAME>

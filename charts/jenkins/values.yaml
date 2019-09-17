@@ -30,3 +30,14 @@ master:
     - ip: "<HOST_IP>"
       hostnames:
       - "<K8S_INGRESS_DOMAIN>"
+  csrf:
+    defaultCrumbIssuer:
+      enabled: false
+agent:
+  volumes:
+  - type: ConfigMap
+    configMapName: jenkins-config
+    mountPath: /acumos/config
+  - type: ConfigMap
+    configMapName: sv-scanning
+    mountPath: /acumos/sv
