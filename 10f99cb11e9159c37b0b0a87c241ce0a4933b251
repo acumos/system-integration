@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "af1d928b_76f02a30",
+        "filename": "AIO/mlwb/mlwb_env.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 11
+      },
+      "writtenOn": "2019-09-17T13:08:03Z",
+      "side": 1,
+      "message": "need to be updated $ACUMOS_RELEASE/project-service:1.0.1 to \n$ACUMOS_SNAPSHOT/project-service:1.0.2-SNAPSHOT",
+      "range": {
+        "startLine": 23,
+        "startChar": 34,
+        "endLine": 23,
+        "endChar": 71
+      },
+      "revId": "10f99cb11e9159c37b0b0a87c241ce0a4933b251",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
