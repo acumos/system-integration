@@ -34,7 +34,7 @@ spec:
   - host: <K8S_INGRESS_DOMAIN>
     http:
       paths:
-      - path: "/jenkins/"
+      - path: "/<ACUMOS_JENKINS_API_CONTEXT_PATH>/"
         backend:
           serviceName: jenkins
           servicePort: 8080

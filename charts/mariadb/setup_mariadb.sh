@@ -167,20 +167,24 @@ EOF
   ACUMOS_MARIADB_PORT=$(kubectl get services -n $ACUMOS_MARIADB_NAMESPACE $ACUMOS_MARIADB_NAMESPACE-mariadb -o json | jq -r '.spec.ports[0].nodePort')
   update_mariadb_env ACUMOS_MARIADB_PORT $ACUMOS_MARIADB_PORT force
 
+  local t=0
   log "Wait for mariadb server to accept connections"
   while ! nc -z $ACUMOS_MARIADB_HOST_IP $ACUMOS_MARIADB_PORT ; do
-    log "mariadb is not yet listening at $ACUMOS_MARIADB_HOST_IP:$ACUMOS_MARIADB_PORT"
+    log "Mariadb is not yet listening at $ACUMOS_MARIADB_HOST_IP:$ACUMOS_MARIADB_PORT"
     sleep 10
+    t=$((t+10))
+    if [[ $t -gt $ACUMOS_SUCCESS_WAIT_TIME ]]; then
+      fail "MariaDB failed to respond after $ACUMOS_SUCCESS_WAIT_TIME seconds"
+    fi
   done
-  i=0
   while ! mysql -h $ACUMOS_MARIADB_HOST_IP -P $ACUMOS_MARIADB_PORT --user=root \
   --password=$ACUMOS_MARIADB_PASSWORD -e "SHOW DATABASES;" ; do
-    i=$((i+1))
-    if [[ $i -gt 30 ]]; then
-      fail "MariaDB failed to respond after 5 minutes"
-    fi
     log "Mariadb server is not yet accepting connections from $ACUMOS_MARIADB_ADMIN_HOST"
     sleep 10
+    t=$((t+10))
+    if [[ $t -gt $ACUMOS_SUCCESS_WAIT_TIME ]]; then
+      fail "MariaDB failed to respond after $ACUMOS_SUCCESS_WAIT_TIME seconds"
+    fi
   done
 
   log "Initialize Acumos database"

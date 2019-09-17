@@ -392,14 +392,8 @@ function start_acumos_core_app() {
   if [[ "$app" == "federation" ]]; then
     ACUMOS_FEDERATION_PORT=$(kubectl get services -n $ACUMOS_NAMESPACE federation-service -o json | jq -r '.spec.ports[0].nodePort')
     update_acumos_env ACUMOS_FEDERATION_PORT $ACUMOS_FEDERATION_PORT force
-  elif [[ "$app" == "sv-scanning" ]]; then
-    log "Create sv-scanning configmaps"
-    kubectl create configmap -n $ACUMOS_NAMESPACE sv-scanning-scripts \
-      --from-file=kubernetes/configmap/sv-scanning/scripts
-    kubectl create configmap -n $ACUMOS_NAMESPACE sv-scanning-licenses \
-      --from-file=kubernetes/configmap/sv-scanning/licenses
-    kubectl create configmap -n $ACUMOS_NAMESPACE sv-scanning-rules \
-      --from-file=kubernetes/configmap/sv-scanning/rules
+    ACUMOS_FEDERATION_PORT=$(kubectl get services -n $ACUMOS_NAMESPACE federation-service -o json | jq -r '.spec.ports[1].nodePort')
+    update_acumos_env ACUMOS_FEDERATION_LOCAL_PORT $ACUMOS_FEDERATION_LOCAL_PORT force
   fi
 
   log "Update the $app deployment template and deploy it"
