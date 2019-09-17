@@ -157,8 +157,6 @@ function setup_ingress() {
   if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
     if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
       if [[ "$ACUMOS_INGRESS_SERVICE" == "nginx" ]]; then
-        bash $AIO_ROOT/../charts/ingress/setup_ingress_controller.sh $ACUMOS_NAMESPACE \
-          $ACUMOS_HOST_IP $AIO_ROOT/certs/acumos.crt $AIO_ROOT/certs/acumos.key
         bash $AIO_ROOT/ingress/setup_ingress.sh
         if [[ "$K8S_DIST" == "openshift" ]]; then
           update_acumos_env ACUMOS_ORIGIN $ACUMOS_DOMAIN:$ACUMOS_INGRESS_HTTPS_PORT force
@@ -316,6 +314,16 @@ source acumos_env.sh
 prepare_env
 bash $AIO_ROOT/setup_keystore.sh
 
+# Ingress controller setup needs to precede ingress creations
+if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
+  if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
+    if [[ "$ACUMOS_INGRESS_SERVICE" == "nginx" ]]; then
+      bash $AIO_ROOT/../charts/ingress/setup_ingress_controller.sh $ACUMOS_NAMESPACE \
+        $ACUMOS_HOST_IP $AIO_ROOT/certs/acumos.crt $AIO_ROOT/certs/acumos.key
+    fi
+  fi
+fi
+
 # Acumos components depend upon pre-configuration of Nexus (e.g. ports)
 if [[ "$ACUMOS_DEPLOY_NEXUS" == "true" && "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
   bash $AIO_ROOT/nexus/setup_nexus.sh
@@ -345,6 +353,7 @@ if [[ "$ACUMOS_SETUP_DB" == "true" ]]; then
 fi
 
 if [[ "$DEPLOYED_UNDER" == "k8s" && "$ACUMOS_DEPLOY_COUCHDB" == "true" ]]; then
+  update_acumos_env ACUMOS_COUCHDB_PASSWORD $(uuidgen)
   bash $AIO_ROOT/../charts/couchdb/setup_couchdb.sh all $ACUMOS_NAMESPACE $ACUMOS_DOMAIN
   update_acumos_env ACUMOS_DEPLOY_COUCHDB false force
 fi
