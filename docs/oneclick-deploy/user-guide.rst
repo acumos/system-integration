@@ -179,8 +179,9 @@ To prepare the k8s environment and install using the aio_k8s_deployer:
   $ bash aio_k8s_deployer.sh build
 ..
 
-* if the user has a cluster admin role, the user runs the following command
-  to setup typical prerequisites on the k8s master, e.g.
+* if the user has a cluster admin role, the user can run the setup_prereqs.sh
+  script via the aio_k8s_deployer.sh script, to setup typical prerequisites on
+  the k8s master, e.g.
 
   * apply the environment customizations in customize_env.sh
   * cleans the ~/system-integration folder on the sudo user's account
@@ -198,7 +199,17 @@ To prepare the k8s environment and install using the aio_k8s_deployer:
     * <host>: hostname of the k8s master node to execute the steps on
     * <user>: sudo user on the k8s master node
 
-* the user then runs the following command to deploy the platform, which
+* if the cluster prerequisites were setup *without* running setup_prereqs.sh,
+  ensure that the following environment variables are specified in
+  system-integration/AIO/acumos_env.sh:
+
+  * DEPLOYED_UNDER: k8s|docker
+  * ACUMOS_DOMAIN: DNS or hosts-file resolvable FQDN of the Acumos platform
+  * K8S_DIST: openshift|generic
+  * ACUMOS_HOST: DNS or hosts-file resolvable hostname of the Acumos host
+
+* once the cluster prerequisites have been setup, the user can deploy the
+  platform via the following command, which
 
   * starts the acumos-deployer container
   * updates the AIO tools environment to run under the container
