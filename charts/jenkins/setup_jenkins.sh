@@ -41,7 +41,6 @@ function clean_jenkins() {
   fi
   # Helm delete does not remove PVC
   delete_pvc $NAMESPACE jenkins
-  delete_pvc $NAMESPACE jenkins-ingress
   # Ingress is managed directly, not by Helm
   if [[ $(kubectl delete ingress -n $NAMESPACE jenkins-ingress) ]]; then
     log "Ingress deleted for Jenkins"
@@ -84,7 +83,9 @@ function setup_jenkins() {
       rm $jsoninp $jsonout
       fail "Jenkins is not ready after $ACUMOS_SUCCESS_WAIT_TIME seconds"
     fi
-    curl -s -o /dev/null -D headers.txt -vL -k https://$K8S_INGRESS_DOMAIN/jenkins/api/
+    if [[ $(curl -s -o /dev/null -D headers.txt -vL -k https://$K8S_INGRESS_DOMAIN/jenkins/api/) == "" ]]; then
+      log "Jenkins is not yet ready" 
+    fi
   done
 }
 
@@ -95,8 +96,8 @@ Usage:
  connected to the k8s cluster via kubectl.
  $ bash setup_jenkins.sh <setup|clean|all> <NAMESPACE> <K8S_INGRESS_DOMAIN>
    setup|clean|all: action to take
-   K8S_INGRESS_DOMAIN: origin (FQDN:port) assigned to the k8s cluster ingress controller
    NAMESPACE: k8s namespace to deploy under (will be created if not existing)
+   K8S_INGRESS_DOMAIN: origin (FQDN:port) assigned to the k8s cluster ingress controller
 EOF
   echo "All parameters not provided"
   exit 1
