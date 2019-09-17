@@ -41,7 +41,6 @@ function clean_jenkins() {
   fi
   # Helm delete does not remove PVC
   delete_pvc $NAMESPACE jenkins
-  delete_pvc $NAMESPACE jenkins-ingress
   # Ingress is managed directly, not by Helm
   if [[ $(kubectl delete ingress -n $NAMESPACE jenkins-ingress) ]]; then
     log "Ingress deleted for Jenkins"
@@ -95,8 +94,8 @@ Usage:
  connected to the k8s cluster via kubectl.
  $ bash setup_jenkins.sh <setup|clean|all> <NAMESPACE> <K8S_INGRESS_DOMAIN>
    setup|clean|all: action to take
-   K8S_INGRESS_DOMAIN: origin (FQDN:port) assigned to the k8s cluster ingress controller
    NAMESPACE: k8s namespace to deploy under (will be created if not existing)
+   K8S_INGRESS_DOMAIN: origin (FQDN:port) assigned to the k8s cluster ingress controller
 EOF
   echo "All parameters not provided"
   exit 1

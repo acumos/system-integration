@@ -191,26 +191,10 @@ fi
 EOG
 }
 
-function setup_k8s_master() {
+function start_k8s_master() {
   trap 'fail' ERR
-  log "Setting up kubernetes master"
-  # Install master
-  bash ~/prereqs.sh master
-  # per https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
-  # If the following command fails, run "kubeadm reset" before trying again
-  # --pod-network-cidr=192.168.0.0/16 is required for calico; this should not
-  # conflict with your server network interface subnets
-  # Start cluster
-  log "Workaround issue '/etc/kubernetes/manifests is not empty'"
+  log "Starting kubernetes master"
   tmp="/home/$USER/$(uuidgen)"
-  # workaround for [preflight] Some fatal errors occurred:
-	#                /etc/kubernetes/manifests is not empty
-  sudo rm -rf /etc/kubernetes/manifests/*
-  log "Disable swap to workaround k8s incompatibility with swap"
-  # per https://github.com/kubernetes/kubeadm/issues/610
-  sudo swapoff -a
-  sudo sed -i -- '/swap/d' /etc/fstab
-  log "Start the cluster"
   sudo kubeadm init --pod-network-cidr=192.168.0.0/16 >>$tmp
   cat $tmp
   export k8s_joincmd=$(grep "kubeadm join" $tmp)
@@ -281,6 +265,28 @@ subjects:
   namespace: kube-system
 EOF
   kubectl create -f dashboard-admin.yaml
+}
+
+function setup_k8s_master() {
+  trap 'fail' ERR
+  log "Setting up kubernetes master"
+  bash ~/prereqs.sh master
+  # per https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
+  # If the following command fails, run "kubeadm reset" before trying again
+  # --pod-network-cidr=192.168.0.0/16 is required for calico; this should not
+  # conflict with your server network interface subnets
+  # Start cluster
+  log "Workaround issue '/etc/kubernetes/manifests is not empty'"
+  # workaround for [preflight] Some fatal errors occurred:
+  #                /etc/kubernetes/manifests is not empty
+  sudo rm -rf /etc/kubernetes/manifests/*
+  log "Disable swap to workaround k8s incompatibility with swap"
+  # per https://github.com/kubernetes/kubeadm/issues/610
+  sudo swapoff -a
+  sudo sed -i -- '/swap/d' /etc/fstab
+  if ! $(curl -v -k https://localhost:6443/version); then
+    start_k8s_master
+  fi
 }
 
 function setup_k8s_workers() {
@@ -364,15 +370,16 @@ cd $(dirname "$0")
 export AIO_ROOT="$(cd ../AIO; pwd -P)"
 source $AIO_ROOT/utils.sh
 cd $WORK_DIR
-verify_ubuntu_or_centos
-setup_prereqs
-
-if ! $(curl -v -k https://localhost:6443/version); then
+action=$1
+if [[ "$action" == "" ]]; then
+  verify_ubuntu_or_centos
+  setup_prereqs
   setup_k8s_master
-fi
-
-if [[ ! -z "$1" ]]; then
-  setup_k8s_workers "$1"
+  if [[ ! -z "$1" ]]; then
+    setup_k8s_workers "$1"
+  fi
+else
+  start_k8s_master
 fi
 
 log "Setup is complete."
