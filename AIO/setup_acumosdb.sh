@@ -66,22 +66,25 @@ function new_db() {
   fi
   # NOTE: user and default database was created in the process of server creation
   log "Retrieve and customize database script for CDS version $ACUMOS_CDS_VERSION"
-  if [[ $(ls cmn-data-svc-ddl-dml-mysql*) != "" ]]; then rm cmn-data-svc-ddl-dml-mysql*; fi
-  wget https://raw.githubusercontent.com/acumos/common-dataservice/master/cmn-data-svc-server/db-scripts/cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql
-  sedi "1s/^/use $ACUMOS_CDS_DB;\n/" cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql
-  mysql $server --user=$ACUMOS_MARIADB_USER --password=$ACUMOS_MARIADB_USER_PASSWORD < cmn-data-svc-ddl-dml-mysql-$ACUMOS_CDS_VERSION.sql
+  # NOTE: Naming convention change in sql scripts as of 3.0-rev2 !
+  # See https://github.com/acumos/common-dataservice/tree/master/cmn-data-svc-server/db-scripts
+  if [[ $(ls cmn-data-svc-ddl-dml-*) != "" ]]; then rm cmn-data-svc-ddl-dml-*; fi
+  wget https://raw.githubusercontent.com/acumos/common-dataservice/master/cmn-data-svc-server/db-scripts/cmn-data-svc-ddl-dml-$ACUMOS_CDS_VERSION.sql
+  sedi "1s/^/use $ACUMOS_CDS_DB;\n/" cmn-data-svc-ddl-dml-$ACUMOS_CDS_VERSION.sql
+  mysql $server --user=$ACUMOS_MARIADB_USER --password=$ACUMOS_MARIADB_USER_PASSWORD < cmn-data-svc-ddl-dml-$ACUMOS_CDS_VERSION.sql
 }
 
 function upgrade_db() {
   trap 'fail' ERR
   log "Upgrading database from CDS version $ACUMOS_CDS_PREVIOUS_VERSION to $ACUMOS_CDS_VERSION"
-  upgrade="cds-mysql-upgrade-${ACUMOS_CDS_PREVIOUS_VERSION}-to-${ACUMOS_CDS_VERSION}.sql"
+  upgrade="cmn-data-svc-upgrade-${ACUMOS_CDS_PREVIOUS_VERSION}-to-${ACUMOS_CDS_VERSION}.sql"
   if [[ $(ls ${upgrade}*) != "" ]]; then rm ${upgrade}*; fi
-  if [[ $(wget https://raw.githubusercontent.com/acumos/common-dataservice/master/cmn-data-svc-server/db-scripts/$upgrade) ]]; then
+  wget https://raw.githubusercontent.com/acumos/common-dataservice/master/cmn-data-svc-server/db-scripts/$upgrade
+  if [[ -e $upgrade ]]; then
     sedi "1s/^/use $ACUMOS_CDS_DB;\n/" $upgrade
     mysql $server --user=$ACUMOS_MARIADB_USER --password=$ACUMOS_MARIADB_USER_PASSWORD < $upgrade
   else
-    fail "No available upgrade script for CDS upgrade from $ACUMOS_CDS_VERSION to $ACUMOS_CDS_PREVIOUS_VERSION"
+    fail "No available upgrade script for CDS upgrade from $ACUMOS_CDS_PREVIOUS_VERSION to $ACUMOS_CDS_VERSION"
   fi
 }
 

@@ -30,7 +30,7 @@ services:
         },
         "federation": {
              "instance": "gateway",
-             "instance.name": "aio",
+             "instance.name": "<ACUMOS_FEDERATION_DOMAIN>",
              "operator": "${ACUMOS_OPERATOR_ID}",
              "address": "0.0.0.0",
              "server": {
