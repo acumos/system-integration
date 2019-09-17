@@ -80,7 +80,7 @@ spec:
             "jwt" : {
               "secretkey": "<ACUMOS_JWT_KEY>"
             },
-            "useexternalnotebook": true
+            "useexternalnotebook": <MLWB_JUPYTERHUB_EXTERNAL_NOTEBOOK_SERVICE>
           }'
         command: ["/bin/bash", "-c"]
         args:
@@ -148,6 +148,8 @@ spec:
           value: "http://mlwb-notebook-service:9089/mlWorkbench/v1/notebook"
         - name: notebookWikiURL
           value: "https://wiki.acumos.org/display/TRAIN"
+        - name: useExternalNotebook
+          value: "<MLWB_JUPYTERHUB_EXTERNAL_NOTEBOOK_SERVICE>"
         ports:
         - containerPort: 9086
         volumeMounts:
@@ -208,7 +210,7 @@ spec:
         - name: notebookWikiURL
           value: "https://wiki.acumos.org/display/TRAIN"
         - name: useExternalNotebook
-          value: "true"
+          value: "<MLWB_JUPYTERHUB_EXTERNAL_NOTEBOOK_SERVICE>"
         ports:
         - containerPort: 9087
         volumeMounts:

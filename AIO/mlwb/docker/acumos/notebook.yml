@@ -47,7 +47,7 @@ services:
     command: >
       /bin/bash -c "
         cd maven;
-        eytool -importkeystore -srckeystore certs/jupyterhub-keystore.p12 -srcstorepass ${MLWB_JUPYTERHUB_KEYSTORE_PASSWORD} -srcstoretype PKCS12 -destkeystore $JAVA_HOME/jre/lib/security/cacerts -deststorepass changeit -deststoretype JKS -noprompt;
+        keytool -importkeystore -srckeystore certs/jupyterhub-keystore.p12 -srcstorepass ${MLWB_JUPYTERHUB_KEYSTORE_PASSWORD} -srcstoretype PKCS12 -destkeystore $JAVA_HOME/jre/lib/security/cacerts -deststorepass changeit -deststoretype JKS -noprompt;
         java -Xms128m -Xmx256m -Djava.security.egd=file:/dev/./urandom -jar notebook-service*.jar;
       "
     ports:

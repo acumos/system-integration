@@ -21,12 +21,30 @@
 namespaceOverride: <NAMESPACE>
 master:
   numExecutors: 10
-  adminPassword: admin
+  adminPassword: <ACUMOS_JENKINS_PASSWORD>
   serviceType: ClusterIP
   jenkinsUriPrefix: "/jenkins/"
   authorizationStrategy: |-
-    <useSecurity>false</useSecurity>
+    <useSecurity>true</useSecurity>
   hostAliases:
     - ip: "<HOST_IP>"
       hostnames:
       - "<K8S_INGRESS_DOMAIN>"
+  csrf:
+    defaultCrumbIssuer:
+      enabled: false
+  volumes:
+  - type: ConfigMap
+    configMapName: jenkins-config
+    mountPath: /acumos/config
+  - type: ConfigMap
+    configMapName: sv-scanning
+    mountPath: /acumos/sv
+agent:
+  volumes:
+  - type: ConfigMap
+    configMapName: jenkins-config
+    mountPath: /acumos/config
+  - type: ConfigMap
+    configMapName: sv-scanning
+    mountPath: /acumos/sv

@@ -71,9 +71,11 @@ spec:
               "secretkey": "<ACUMOS_JWT_KEY>"
             },
             "couchdb": {
+              "user": "<ACUMOS_COUCHDB_USER>",
+              "pwd": "<ACUMOS_COUCHDB_PASSWORD>",
               "name": "<ACUMOS_COUCHDB_DB_NAME>",
-                "createdb": {
-                  "if-not-exist": true
+              "createdb": {
+                "if-not-exist": true
               },
               "protocol": "http",
               "host": "<ACUMOS_COUCHDB_DOMAIN>",
