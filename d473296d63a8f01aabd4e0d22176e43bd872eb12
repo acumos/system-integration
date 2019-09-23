@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "83f7e4f5_f7a2359a",
+        "filename": "AIO/acumos_env.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 290
+      },
+      "writtenOn": "2019-09-23T18:20:16Z",
+      "side": 1,
+      "message": "We need to update to RELEASE not SNAPSHOT (once done)",
+      "revId": "d473296d63a8f01aabd4e0d22176e43bd872eb12",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
