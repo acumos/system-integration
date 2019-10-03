@@ -36,11 +36,11 @@
 function clean_jenkins() {
   trap 'fail' ERR
 
-  if [[ $(helm delete --purge jenkins) ]]; then
-    log "Helm release jenkins deleted"
+  if [[ $(helm delete --purge $ACUMOS_NAMESPACE-jenkins) ]]; then
+    log "Helm release $ACUMOS_NAMESPACE-jenkins deleted"
   fi
   # Helm delete does not remove PVC
-  delete_pvc $NAMESPACE jenkins
+  delete_pvc $NAMESPACE $NAMESPACE-jenkins
   # Ingress is managed directly, not by Helm
   if [[ $(kubectl delete ingress -n $NAMESPACE jenkins-ingress) ]]; then
     log "Ingress deleted for Jenkins"
@@ -50,8 +50,7 @@ function clean_jenkins() {
 function setup_jenkins() {
   trap 'fail' ERR
 
-  if [[ -e deploy ]]; then rm -rf deploy; fi
-  mkdir deploy
+  if [[ ! -e deploy ]]; then mkdir deploy; fi
 
   log "Update values.yaml as input to Helm for deploying the Jenkins chart"
   update_acumos_env ACUMOS_JENKINS_PASSWORD $(uuidgen)
@@ -63,7 +62,8 @@ function setup_jenkins() {
   cat deploy/values.yaml
 
   log "Install Jenkins via Helm"
-  helm install --name jenkins -f deploy/values.yaml stable/jenkins
+  helm repo update
+  helm install --name $ACUMOS_NAMESPACE-jenkins -f deploy/values.yaml stable/jenkins
 
   log "Setup ingress for Jenkins"
   cp jenkins-ingress.yaml deploy/.
@@ -71,6 +71,10 @@ function setup_jenkins() {
   kubectl create -f deploy/jenkins-ingress.yaml
 
   log "Wait for Jenkins to be ready"
+  local url="-k https://$K8S_INGRESS_DOMAIN/jenkins/api/"
+  if [[ "$ACUMOS_DEPLOY_AS_POD" == "true" ]]; then
+    url=$ACUMOS_JENKINS_API_URL
+  fi
   echo "" > headers.txt
   t=0
   until [[ $(grep -c -i 'X-Jenkins:' headers.txt) -gt 0 ]]; do
@@ -79,7 +83,7 @@ function setup_jenkins() {
     if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
       fail "Jenkins is not ready after $ACUMOS_SUCCESS_WAIT_TIME seconds"
     fi
-    if [[ $(curl -s -o /dev/null -D headers.txt -vL -k https://$K8S_INGRESS_DOMAIN/jenkins/api/) == "" ]]; then
+    if [[ $(curl -s -o /dev/null -D headers.txt -vL $url) == "" ]]; then
       log "Jenkins is not yet ready"
     fi
   done

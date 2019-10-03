@@ -79,6 +79,8 @@ function clean() {
       log "WARN: PV $name is currently claimed and in use by pods. If needed, cleanup references first, e.g. via clean.sh"
     else
       namespace=$(echo $pv_claim_refs | jq -r ".[0].namespace")
+      # Avoid hangs due to https://kubernetes.io/docs/concepts/storage/persistent-volumes/#storage-object-in-use-protection
+      kubectl patch pvc -n $namespace $pv_claim -p '{"metadata":{"finalizers": []}}' --type=merge
       if [[ "$(kubectl delete pvc -n $namespace $pv_claim)" ]]; then
         log "PVC $pv_claim in namespace $namespace deleted"
         kubectl delete pv $name
