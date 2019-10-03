@@ -175,11 +175,7 @@ function setup_ingress() {
     if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
       if [[ "$ACUMOS_INGRESS_SERVICE" == "nginx" ]]; then
         bash $AIO_ROOT/ingress/setup_ingress.sh
-        if [[ "$K8S_DIST" == "openshift" ]]; then
-          update_acumos_env ACUMOS_ORIGIN $ACUMOS_DOMAIN:$ACUMOS_INGRESS_HTTPS_PORT force
-        else
-          update_acumos_env ACUMOS_ORIGIN $ACUMOS_DOMAIN force
-        fi
+        update_acumos_env ACUMOS_ORIGIN $ACUMOS_DOMAIN force
         echo "Portal: https://$ACUMOS_ORIGIN" >acumos.url
       else
         bash $AIO_ROOT/kong/setup_kong.sh
@@ -321,11 +317,6 @@ get_host_ip $ACUMOS_HOST
 update_acumos_env ACUMOS_HOST_IP $HOST_IP force
 update_acumos_env ACUMOS_JWT_KEY $(uuidgen)
 update_acumos_env ACUMOS_CDS_PASSWORD $(uuidgen)
-update_acumos_env ACUMOS_NEXUS_RO_USER_PASSWORD $(uuidgen)
-update_acumos_env ACUMOS_NEXUS_RW_USER_PASSWORD $(uuidgen)
-update_acumos_env ACUMOS_DOCKER_REGISTRY_PASSWORD $ACUMOS_NEXUS_RW_USER_PASSWORD
-update_acumos_env ACUMOS_DOCKER_PROXY_USERNAME $(uuidgen)
-update_acumos_env ACUMOS_DOCKER_PROXY_PASSWORD $(uuidgen)
 
 log "Apply environment customizations to unset values in acumos_env.sh"
 source acumos_env.sh
@@ -345,7 +336,7 @@ fi
 
 # Acumos components depend upon pre-configuration of Nexus (e.g. ports)
 if [[ "$ACUMOS_DEPLOY_NEXUS" == "true" && "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
-  bash $AIO_ROOT/nexus/setup_nexus.sh
+  bash $AIO_ROOT/nexus/setup_nexus.sh all
   # Prevent redeploy from reinstalling Nexus unless specifically requested
   update_acumos_env ACUMOS_DEPLOY_NEXUS false force
 fi

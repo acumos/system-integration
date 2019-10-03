@@ -69,7 +69,7 @@ EOF
     http://$ACUMOS_NEXUS_HOST:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script/$1/run
 }
 
-function clean_nexus() {
+function nexus_clean() {
   trap 'fail' ERR
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     log "Stop any existing docker based components for nexus-service"
@@ -84,33 +84,39 @@ function clean_nexus() {
     stop_service deploy/nexus-service.yaml
     stop_deployment deploy/nexus-deployment.yaml
     log "Remove PVC for nexus-service"
-    delete_pvc $ACUMOS_NAMESPACE $NEXUS_DATA_PVC_NAME
+    delete_pvc $ACUMOS_NEXUS_NAMESPACE $NEXUS_DATA_PVC_NAME
   fi
 }
 
-function setup_nexus() {
+function nexus_setup() {
   trap 'fail' ERR
+  update_nexus_env ACUMOS_NEXUS_RO_USER_PASSWORD $(uuidgen)
+  update_nexus_env ACUMOS_NEXUS_RW_USER_PASSWORD $(uuidgen)
+  update_nexus_env ACUMOS_DOCKER_REGISTRY_PASSWORD $ACUMOS_NEXUS_RW_USER_PASSWORD
+  update_nexus_env ACUMOS_DOCKER_PROXY_USERNAME $(uuidgen)
+  update_nexus_env ACUMOS_DOCKER_PROXY_PASSWORD $(uuidgen)
+
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
     bash docker_compose.sh up -d --build --force-recreate
     wait_running nexus-service
   else
     log "Setup the nexus-data PVC"
-    setup_pvc $ACUMOS_NAMESPACE $NEXUS_DATA_PVC_NAME $NEXUS_DATA_PV_NAME $NEXUS_DATA_PV_SIZE
+    setup_pvc $ACUMOS_NEXUS_NAMESPACE $NEXUS_DATA_PVC_NAME $NEXUS_DATA_PV_NAME $NEXUS_DATA_PV_SIZE
 
     mkdir -p deploy
     cp -r kubernetes/* deploy/.
     log "Update the nexus-service template and deploy the service"
     replace_env deploy/nexus-service.yaml
     start_service deploy/nexus-service.yaml
-    ACUMOS_NEXUS_API_PORT=$(kubectl get services -n $ACUMOS_NAMESPACE nexus-service -o json | jq -r '.spec.ports[0].nodePort')
-    update_acumos_env ACUMOS_NEXUS_API_PORT $ACUMOS_NEXUS_API_PORT force
-    ACUMOS_DOCKER_MODEL_PORT=$(kubectl get services -n $ACUMOS_NAMESPACE nexus-service -o json | jq -r '.spec.ports[1].nodePort')
-    update_acumos_env ACUMOS_DOCKER_MODEL_PORT $ACUMOS_DOCKER_MODEL_PORT force
+    ACUMOS_NEXUS_API_PORT=$(kubectl get services -n $ACUMOS_NEXUS_NAMESPACE nexus-service -o json | jq -r '.spec.ports[0].nodePort')
+    update_nexus_env ACUMOS_NEXUS_API_PORT $ACUMOS_NEXUS_API_PORT force
+    ACUMOS_DOCKER_MODEL_PORT=$(kubectl get services -n $ACUMOS_NEXUS_NAMESPACE nexus-service -o json | jq -r '.spec.ports[1].nodePort')
+    update_nexus_env ACUMOS_DOCKER_MODEL_PORT $ACUMOS_DOCKER_MODEL_PORT force
 
     log "Update the nexus deployment template and deploy it"
     replace_env deploy/nexus-deployment.yaml
     start_deployment deploy/nexus-deployment.yaml
-    wait_running nexus $ACUMOS_NAMESPACE
+    wait_running nexus $ACUMOS_NEXUS_NAMESPACE
   fi
 
   # Add -m 10 since for some reason curl seems to hang waiting for a response
@@ -212,13 +218,34 @@ EOF
     -d @nexus-admin.json
 }
 
+if [[ $# -lt 1 ]]; then
+  cat <<'EOF'
+Usage: from the k8s master or a host setup use kubectl/helm remotely
+  $ bash setup_nexus.sh <clean|prep|setup|all>
+    clean|prep|setup|all: action to execute
+EOF
+  echo "All parameters not provided"
+  exit 1
+fi
+
 set -x
 trap 'fail' ERR
 WORK_DIR=$(pwd)
 cd $(dirname "$0")
 if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ..; pwd -P)"; fi
 source $AIO_ROOT/utils.sh
-source $AIO_ROOT/acumos_env.sh
-clean_nexus
-setup_nexus
+
+if [[ -e nexus_env.sh ]]; then
+  log "Using prepared nexus_env.sh for customized environment values"
+  source nexus_env.sh
+fi
+
+source setup_nexus_env.sh
+cp nexus_env.sh $AIO_ROOT/.
+if [[ "$action" == "clean" || "$action" == "all" ]]; then nexus_clean; fi
+if [[ "$action" == "prep" || "$action" == "all" ]]; then nexus_prep; fi
+if [[ "$action" == "setup" || "$action" == "all" ]]; then nexus_setup; fi
+
+nexus_clean
+nexus_setup
 cd $WORK_DIR

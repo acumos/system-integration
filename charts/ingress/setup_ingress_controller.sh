@@ -84,9 +84,7 @@ controller:
   podSecurityContext:
     privileged: true
   service:
-    nodePorts:
-      http: $ACUMOS_INGRESS_HTTP_PORT
-      https: $ACUMOS_INGRESS_HTTPS_PORT
+    externalTrafficPolicy: Local
     externalIPs: [$EXTERNAL_IP]
   extraArgs:
     default-ssl-certificate: "$NAMESPACE/ingress-cert"

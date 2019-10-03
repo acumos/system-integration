@@ -494,12 +494,14 @@ function start_service() {
 function stop_service() {
   trap 'fail' ERR
   local app
+  local namespace=$(grep namespace $1 | cut -d ":" -f 2)
   if [[ -e $1 ]]; then
+    local namespace=$(grep namespace $1 | cut -d ':' -f 2)
     app=$(grep "app: " -m1 $1 | sed 's/^.*app: //')
-    if [[ $(kubectl get svc -n $ACUMOS_NAMESPACE -l app=$app) ]]; then
+    if [[ $(kubectl get svc -n $namespace -l app=$app) ]]; then
       log "Stop service for $app"
-      kubectl delete service -n $ACUMOS_NAMESPACE $app-service
-      wait_until_notfound "kubectl get svc -n $ACUMOS_NAMESPACE" $app
+      kubectl delete service -n $namespace $app-service
+      wait_until_notfound "kubectl get svc -n $namespace" $app
     else
       log "Service not found for $app"
     fi
@@ -517,12 +519,13 @@ function stop_deployment() {
   trap 'fail' ERR
   local app
   if [[ -e $1 ]]; then
+    local namespace=$(grep namespace $1 | cut -d ":" -f 2)
     app=$(grep "app: " -m1 $1 | sed 's/^.*app: //')
     # Note any related PV and PVC are not deleted
-    if [[ $(kubectl get deployment -n $ACUMOS_NAMESPACE -l app=$app) ]]; then
+    if [[ $(kubectl get deployment -n $namespace -l app=$app) ]]; then
       log "Stop deployment for $app"
-      kubectl delete deployment -n $ACUMOS_NAMESPACE $app
-      wait_until_notfound "kubectl get pods -n $ACUMOS_NAMESPACE" $app
+      kubectl delete deployment -n $namespace $app
+      wait_until_notfound "kubectl get pods -n $namespace" $app
     else
       log "Deployment not found for $app"
     fi
@@ -611,6 +614,12 @@ function update_mariadb_env() {
   trap 'fail' ERR
   update_env $AIO_ROOT/../charts/mariadb/mariadb_env.sh $1 "$2" $3
   cp $AIO_ROOT/../charts/mariadb/mariadb_env.sh $AIO_ROOT/.
+}
+
+function update_nexus_env() {
+  trap 'fail' ERR
+  update_env $AIO_ROOT/nexus/nexus_env.sh $1 "$2" $3
+  cp $AIO_ROOT/nexus/nexus_env.sh $AIO_ROOT/.
 }
 
 function update_elk_env() {
