@@ -36,5 +36,5 @@ spec:
       paths:
       - path: "/<ACUMOS_JENKINS_API_CONTEXT_PATH>/"
         backend:
-          serviceName: jenkins
+          serviceName: <NAMESPACE>-jenkins
           servicePort: 8080

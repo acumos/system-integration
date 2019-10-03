@@ -65,6 +65,18 @@ services:
         "qanda": {
           "url": "https://stackoverflow.com/questions/tagged/acumos"
         },
+        "elk" : {
+          "url" : "http://${ACUMOS_ELK_DOMAIN}:9600/elkclient"
+        },
+        "license_profile" : {
+          "url" : "http://lpe-service:8087/license-profile-editor/"
+        },
+        "k8_deploy" : {
+          "url" : "http://deployment-client-service:8337"
+        },
+        "lum" : {
+          "url" : "http://lum-service:1234"
+        },
         "microservice": {
           "url": "http://msg-service:8336/microservice-generation/v2/generateMicroservice"
         },
@@ -105,6 +117,9 @@ services:
             "verifyToken": {
               "exp_time": ${ACUMOS_TOKEN_EXP_TIME}
             },
+            "loginExpire" : {
+              "duration" : "1M"
+            },
             "sv": {
               "enabled": "${ACUMOS_ENABLE_SECURITY_VERIFICATION}",
               "api": "http://sv-scanning-service:9082/scan"
@@ -120,6 +135,9 @@ services:
               { \"cloudEnabled\": \"true\", \"cloudName\": \"rackspace\",
                 \"cloudDisplayText\": \"Rackspace\",
                 \"imageUrl\": \"/images/deploy-cloud/rackspace.png\" },
+              { \"cloudEnabled\" : \"true\", \"cloudName\" : \"K8S\",
+                \"cloudDisplayText\" : \"Deploy To K8S\",
+                \"imageUrl\": \"/images/deploy-cloud/logo_kubernetes.png\" },
               { \"cloudEnabled\": \"false\", \"cloudName\": \"gcp\",
                 \"cloudDisplayText\": \"Google Cloud Platform\",
                 \"imageUrl\": \"/images/deploy-cloud/google_cloud_platform.png\" },

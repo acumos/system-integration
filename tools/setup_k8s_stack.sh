@@ -35,7 +35,7 @@
 # - Then run the command below
 #
 # Usage:
-# $ bash system-integration/AIO/k8s_stack.sh <clean|setup>
+# $ bash system-integration/tools/setup_k8s_stack.sh <clean|setup>
 #   clean: remove all stack components
 #   setup: setup all stack components
 #

@@ -58,8 +58,8 @@ logstash:
   port: "<ACUMOS_ELK_LOGSTASH_PORT>"
   mariadb:
     host:
-      name: "<ACUMOS_MARIADB_HOST>"
-      ip: "<ACUMOS_MARIADB_HOST_IP>"
+      name: "<ACUMOS_MARIADB_DOMAIN>"
+      ip: "<ACUMOS_MARIADB_IP>"
 
 kibana:
   image:

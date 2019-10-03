@@ -40,8 +40,8 @@
 function clean_couchdb() {
   trap 'fail' ERR
 
-  if [[ $(helm delete --purge couchdb) ]]; then
-    log "Helm release couchdb deleted"
+  if [[ $(helm delete --purge $NAMESPACE-couchdb) ]]; then
+    log "Helm release $NAMESPACE-couchdb deleted"
   fi
   # Helm delete does not remove PVC
   delete_pvc $NAMESPACE couchdb-volumeclaim
@@ -54,29 +54,41 @@ function setup_couchdb() {
   # Sometimes get Error: failed to download "stable/couchdb" (hint: running `helm repo update` may help)
   helm repo update
   # Per https://github.com/helm/charts/tree/master/stable/couchdb
-  helm install --name couchdb --namespace $NAMESPACE \
+  helm repo update
+  helm install --name $NAMESPACE-couchdb --namespace $NAMESPACE \
     --set service.type=NodePort \
     stable/couchdb
 
-  log "Wait for couchdb to be ready"
-  local t=0
-  until kubectl get svc -n $NAMESPACE couchdb-svc-couchdb; do
-    if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
-      fail "couchdb is not ready after $ACUMOS_SUCCESS_WAIT_TIME seconds"
+  if [[ "$ACUMOS_COUCHDB_VERIFY_READY" == "true" ]]; then
+    log "Wait for couchdb to be ready"
+    local t=0
+    until kubectl get svc -n $NAMESPACE $NAMESPACE-couchdb-svc-couchdb; do
+      if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
+        fail "couchdb is not ready after $ACUMOS_SUCCESS_WAIT_TIME seconds"
+      fi
+      log "CouchDB service is not yet running, waiting 10 seconds"
+      sleep 10
+      t=$((t+10))
+    done
+    if [[ "$ACUMOS_COUCHDB_DOMAIN" == "$ACUMOS_NAMESPACE-couchdb-svc-couchdb" ]]; then
+      if [[ "$ACUMOS_DEPLOY_AS_POD" == "true" ]]; then
+        host=$NAMESPACE-couchdb-svc-couchdb; port=5984
+      else
+        port=$(kubectl get services -n $NAMESPACE $NAMESPACE-couchdb-svc-couchdb -o json | jq -r '.spec.ports[0].nodePort')
+        host=$ACUMOS_DOMAIN
+      fi
+    else
+      host=$ACUMOS_COUCHDB_DOMAIN
+      port=$ACUMOS_COUCHDB_PORT
     fi
-    log "CouchDB service is not yet running, waiting 10 seconds"
-    sleep 10
-    t=$((t+10))
-  done
-  local ACUMOS_COUCHDB_PORT=$(kubectl get services -n $NAMESPACE couchdb-svc-couchdb -o json | jq -r '.spec.ports[0].nodePort')
-  update_acumos_env ACUMOS_COUCHDB_PORT $ACUMOS_COUCHDB_PORT force
-  until [[ $(curl -m 5 -v http://$ACUMOS_COUCHDB_DOMAIN:$ACUMOS_COUCHDB_PORT | grep -c couchdb) -gt 0 ]]; do
-    if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
-      fail "couchdb is not ready after $ACUMOS_SUCCESS_WAIT_TIME seconds"
-    fi
-    sleep 10
-    t=$((t+10))
-  done
+    until [[ $(curl -m 5 -v http://$host:$port | grep -c couchdb) -gt 0 ]]; do
+      if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
+        fail "couchdb is not ready after $ACUMOS_SUCCESS_WAIT_TIME seconds"
+      fi
+      sleep 10
+      t=$((t+10))
+    done
+  fi
 }
 
 if [[ $# -lt 3 ]]; then

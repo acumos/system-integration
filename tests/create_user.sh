@@ -61,9 +61,9 @@ function find_user() {
   log "Find user $1"
   local tmp="/tmp/$(uuidgen)"
   curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    -k https://$ACUMOS_ORIGIN/ccds/user
+    $cds_baseurl/user
   cat $tmp
-  users=$(jq -r '.content | length' $tmp)
+  users=$(jq '.content | length' $tmp)
   i=0; userId=""
   while [[ $i -lt $users && "$userId" == "" ]] ; do
     if [[ "$(jq -r ".content[$i].loginName" $tmp)" == "$1" ]]; then
@@ -91,8 +91,11 @@ function register_user() {
 EOF
   cat $jsoninp
   local jsonout="/tmp/$(uuidgen)"
-  local apiurl="https://$ACUMOS_ORIGIN/api/users/register"
-  curl -k -s -o $jsonout -X POST $apiurl \
+  local apiurl="-k https://$ACUMOS_ORIGIN/api/users/register"
+  if [[ $(host portal-fe-service | grep -c 'not found') -eq 0 ]]; then
+    apiurl="http://portal-fe-service:8085/api/users/register"
+  fi
+  curl -s -o $jsonout -X POST $apiurl \
     -H "Content-Type: application/json" -d @$jsoninp
   cat $jsonout
   t=0
@@ -103,7 +106,7 @@ EOF
       rm $jsoninp $jsonout
       fail "Unable to register user after $ACUMOS_SUCCESS_WAIT_TIME seconds"
     fi
-    curl -k -s -o $jsonout -X POST $apiurl \
+    curl -s -o $jsonout -X POST $apiurl \
       -H "Content-Type: application/json" -d @$jsoninp
   done
   rm $jsonout $jsoninp
@@ -114,9 +117,9 @@ function find_role() {
   local tmp="/tmp/$(uuidgen)"
   log "Finding role name $1"
   curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    -k https://$ACUMOS_ORIGIN/ccds/role
+    $cds_baseurl/role
   cat $tmp
-  roles=$(jq -r '.content | length' $tmp)
+  roles=$(jq '.content | length' $tmp)
   i=0; roleId=""
   while [[ $i -lt $roles && "$roleId" == "" ]] ; do
     name=$(jq -r ".content[$i].name" $tmp)
@@ -133,7 +136,7 @@ function create_role() {
   log "Create role name $1"
   local tmp="/tmp/$(uuidgen)"
   curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST \
-  -k https://$ACUMOS_ORIGIN/ccds/role \
+  $cds_baseurl/role \
     -H "accept: */*" -H "Content-Type: application/json" \
     -d "{\"name\": \"$1\", \"active\": true}"
   cat $tmp
@@ -151,7 +154,7 @@ function assign_role() {
   log "Assign roleId $2 to userId $1"
   local tmp="/tmp/$(uuidgen)"
   curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X POST \
-    -k https://$ACUMOS_ORIGIN/ccds/user/$1/role/$2
+    $cds_baseurl/user/$1/role/$2
   status=$(jq -r '.status' $tmp)
   if [[ $status -ne 200 ]]; then
     cat $tmp
@@ -181,7 +184,7 @@ function setup_user() {
   fi
   log "Resulting user account record"
   curl -s -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    -k https://$ACUMOS_ORIGIN/ccds/user/$userId
+    $cds_baseurl/user/$userId
 }
 
 set -x
@@ -198,6 +201,10 @@ if [[ $# -ge 6 ]]; then
   WORK_DIR=$(pwd)
   cd $(dirname "$0")
   source $env
+  cds_baseurl="-k https://$ACUMOS_DOMAIN/ccds"
+  if [[ $(host cds-service | grep -c 'not found') -eq 0 ]]; then
+    cds_baseurl="http://cds-service:8000/ccds"
+  fi
   setup_user
   log "User creation is complete"
   cd $WORK_DIR

@@ -29,7 +29,7 @@ apiVersion: v1
 
 kind: Service
 metadata:
-  namespace: <ACUMOS_NAMESPACE>
+  namespace: <ACUMOS_NEXUS_NAMESPACE>
   name: nexus-service
   labels:
     app: nexus
@@ -39,10 +39,10 @@ spec:
   type: NodePort
   ports:
   - name: nexus-api
-    nodePort: <ACUMOS_NEXUS_API_PORT>
+    nodePort: <ACUMOS_NEXUS_API_NODEPORT>
     port: 8081
     targetPort: 8081
   - name: nexus-model-docker
-    nodePort: <ACUMOS_DOCKER_MODEL_PORT>
+    nodePort: <ACUMOS_DOCKER_MODEL_NODEPORT>
     port: 8082
     targetPort: 8082

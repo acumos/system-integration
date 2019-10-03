@@ -58,7 +58,7 @@ function setup_helm() {
     chmod 700 get_helm.sh
     ./get_helm.sh
     log "Initialize helm"
-    helm init
+    helm init --upgrade
   #  nohup helm serve > /dev/null 2>&1 &
   #  log "Run helm repo update"
   #  helm repo update

@@ -53,7 +53,7 @@ function setup_prereqs() {
   trap 'fail' ERR
   if [[ ! $(which kubectl) ]]; then
     get_dist
-    KUBE_VERSION=1.10.0
+    KUBE_VERSION=1.13.8
     if [[ "$dist" == "ubuntu" ]]; then
       sudo apt-get install -y curl
       if [[ $(dpkg -l | grep -c kubectl) -eq 0 ]]; then
