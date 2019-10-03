@@ -30,7 +30,7 @@ apiVersion: apps/v1
 
 kind: Deployment
 metadata:
-  namespace: <ACUMOS_NAMESPACE>
+  namespace: <ACUMOS_NEXUS_NAMESPACE>
   name: nexus
   labels:
     app: nexus
@@ -56,15 +56,10 @@ spec:
         - containerPort: 8081
         - containerPort: 8082
         volumeMounts:
-        - mountPath: /maven/logs
-          name: logs
         - mountPath: /nexus-data
           name: nexus-data
       restartPolicy: Always
       volumes:
-      - name: logs
-        persistentVolumeClaim:
-         claimName: <ACUMOS_LOGS_PVC_NAME>
       - name: nexus-data
         persistentVolumeClaim:
          claimName: <NEXUS_DATA_PVC_NAME>

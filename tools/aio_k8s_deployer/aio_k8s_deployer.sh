@@ -73,17 +73,89 @@
 #   - executes the acumos_k8s_prep.sh script, and save a log on the host
 #   - copies the updated system-integration folders/env back to the local host
 #
-#   bash aio_k8s_deployer.sh deploy <host> [tag=<tag>] [add-host=<host>:<ip>]
+#   bash aio_k8s_deployer.sh deploy <host> [tag=<tag>] [add-host=<host>:<ip>] [as-pod=<image>]
 #   deploy: deploy the platform
 #   <host>: name to suffix to the docker container, to identify the
 #     customized container for use with a specific deployment instance
 #   [tag]: (optional) docker image tag
 #   [add-host]: (optional) value to pass to docker as add-host option
+#   [as-pod]: (optional) Run the oneclick_deploy.sh script from within the cluster
+#     under a acumos-deployer pod, using the specified image (local image, or an
+#     image in a docker registry)
 #   Use this action to deploy the platform. This action:
 #   - starts the acumos-deployer container
 #   - updates the AIO tools environment to run under the container
 #   - executes oneclick_deploy.sh, and saves a log on the host
 #   - executes the post_deploy.sh script, if present
+
+function sedi () {
+    sed --version >/dev/null 2>&1 && sed -i -- "$@" || sed -i "" "$@"
+}
+
+function prepare_env() {
+    if [[ -e deploy/customize_env.sh ]]; then
+    NAMESPACE=$(awk '/update_acumos_env ACUMOS_NAMESPACE/{print $3}' deploy/customize_env.sh)
+  fi
+  if [[ "$NAMESPACE" == "" ]]; then NAMESPACE=acumos; fi
+}
+
+function prepare_deploy_script() {
+  docker login https://nexus3.acumos.org:10002 -u docker -p docker
+  docker login https://nexus3.acumos.org:10003 -u docker -p docker
+  docker login https://nexus3.acumos.org:10004 -u docker -p docker
+  cp ~/.docker/config.json deploy/docker-config.json
+  cat <<EOF >deploy/deploy.sh
+set -x -e
+mkdir ~/.kube
+mkdir /root/.docker
+cp /deploy/docker-config.json /root/.docker/config.json
+cp /deploy/kube-config ~/.kube/config
+sed -i -- 's~AIO_ROOT=.*~AIO_ROOT=/deploy/system-integration/AIO~' \
+/deploy/system-integration/AIO/acumos_env.sh
+cd /deploy
+if [[ -e customize_env.sh ]]; then bash customize_env.sh; fi
+cd system-integration/AIO
+bash oneclick_deploy.sh
+if [[ -e /deploy/post_deploy.sh ]]; then
+  bash /deploy/post_deploy.sh
+fi
+EOF
+}
+
+function prepare_deployer_yaml() {
+  sedi "s/<ACUMOS_NAMESPACE>/$NAMESPACE/" deploy/aio_k8s_deployer.yaml
+  sedi "s~<AIO_K8S_DEPLOYER_IMAGE>~$AS_POD~" deploy/aio_k8s_deployer.yaml
+  sedi "s~<LOG>~$LOG~" deploy/aio_k8s_deployer.yaml
+  if [[ "$hosts" != "" ]]; then
+      cat <<EOF >>deploy/aio_k8s_deployer.yaml
+      hostAliases:
+EOF
+    for h in $hosts; do
+        name=$(echo $h | cut -d ':' -f 1 | sed 's/--add-host=//')
+        ip=$(echo $h | cut -d ':' -f 2)
+        cat <<EOF >>deploy/aio_k8s_deployer.yaml
+      - ip: "$ip"
+        hostnames:
+        - "$name"
+EOF
+    done
+  fi
+}
+
+function create_deployer() {
+  if [[ "$(kubectl get deployment -n $NAMESPACE aio-k8s-deployer)" != "" ]]; then
+    kubectl delete deployment -n $NAMESPACE aio-k8s-deployer
+    while [[ $(kubectl get pods -n $NAMESPACE -l app=aio-k8s-deployer) != "" ]]; do
+      echo "Waiting 10 more seconds for aio-k8s-deployer to be terminated"
+      sleep 10
+    done
+  fi
+  kubectl create -f deploy/aio_k8s_deployer.yaml
+  while [[ $(kubectl get pods -n $NAMESPACE -l app=aio-k8s-deployer | grep -c 'Running') -lt 1 ]]; do
+    echo "Waiting 10 more seconds for aio-k8s-deployer to be running"
+    sleep 10
+  done
+}
 
 set -x -e
 
@@ -130,33 +202,31 @@ elif [[ "$1" == "deploy" ]]; then
   for arg; do
     if [[ "$arg" == *"tag="* ]]; then tag=$(echo $arg | cut -d '=' -f 2);
     elif [[ "$arg" == *"add-host="* ]]; then hosts="$hosts --$arg";
+    elif [[ "$arg" == *"as-pod="* ]]; then AS_POD=$(echo $arg | cut -d '=' -f 2);
     fi
   done
-  cat <<EOF >deploy/system-integration/deploy.sh
-set -x -e
-mkdir ~/.kube
-cp /deploy/kube-config ~/.kube/config
-sed -i -- 's~AIO_ROOT=.*~AIO_ROOT=/deploy/system-integration/AIO~' \
-  /deploy/system-integration/AIO/acumos_env.sh
-cd /deploy
-if [[ -e customize_env.sh ]]; then bash customize_env.sh; fi
-cd system-integration/AIO
-bash oneclick_deploy.sh
-if [[ -e /deploy/post_deploy.sh ]]; then
-  bash /deploy/post_deploy.sh
-fi
-EOF
-
-  docker stop acumos-deploy-$ACUMOS_HOST && true
-  docker rm -v acumos-deploy-$ACUMOS_HOST && true
-  log=deploy/aio-deploy_$(date +%y%m%d%H%M%S).log
-  docker run -d $hosts --name acumos-deploy-$ACUMOS_HOST \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    -v $(pwd)/deploy:/deploy acumos-deployer bash -c "while true; do sleep 3600; done"
-  test -t 1 && USE_TTY="-t"
-  docker exec $USE_TTY acumos-deploy-$ACUMOS_HOST bash -c \
-    "bash /deploy/system-integration/deploy.sh 2>&1 | tee $log"
-  sudo docker cp acumos-deploy-$ACUMOS_HOST:/deploy .
+  prepare_env
+  prepare_deploy_script
+  LOG=/deploy/aio-deploy_$(date +%y%m%d%H%M%S).log
+  if [[ "$AS_POD" != "" ]]; then
+    prepare_deployer_yaml
+    create_deployer
+    pod=$(kubectl get pods -n $NAMESPACE | awk '/aio-k8s-deployer/{print $1}')
+    kubectl cp deploy $pod:/.
+    kubectl exec -it -n $NAMESPACE $pod -- bash -c \
+      "bash /deploy/deploy.sh 2>&1 | tee $LOG"
+    kubectl cp $pod:/deploy .
+  else
+    docker stop acumos-deploy-$ACUMOS_HOST && true
+    docker rm -v acumos-deploy-$ACUMOS_HOST && true
+    docker run -d $hosts --name acumos-deploy-$ACUMOS_HOST \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -v $(pwd)/deploy:/deploy acumos-deployer bash -c "while true; do sleep 3600; done"
+    test -t 1 && USE_TTY="-t"
+    docker exec $USE_TTY acumos-deploy-$ACUMOS_HOST bash -c \
+      "bash /deploy/deploy.sh 2>&1 | tee $LOG"
+    sudo docker cp acumos-deploy-$ACUMOS_HOST:/deploy .
+  fi
   sudo chown -R $USER deploy
 else
   echo <<EOF
@@ -179,11 +249,15 @@ Usage: default options and parameters are as below (customize to your needs)
   - executes the acumos_k8s_prep.sh script, and save a log on the host
   - copies the updated system-integration folders/env back to the local host
 
-  bash aio_k8s_deployer.sh deploy <host> [add-host]
-  deploy: deploy the platform
-  <host>: name to suffix to the docker container, to identify the
-    customized container for use with a specific deployment instance
-  [add-host]: (optional) value to pass to docker as add-host option
+ bash aio_k8s_deployer.sh deploy <host> [tag=<tag>] [add-host=<host>:<ip>] [as-pod=<image>]
+ deploy: deploy the platform
+ <host>: name to suffix to the docker container, to identify the
+   customized container for use with a specific deployment instance
+ [tag]: (optional) docker image tag
+ [add-host]: (optional) value to pass to docker as add-host option
+ [as-pod]: (optional) Run the oneclick_deploy.sh script from within the cluster
+   under a acumos-deployer pod, using the specified image (local image, or an
+   image in a docker registry)
   Use this action to deploy the platform. This action:
   - starts the acumos-deployer container
   - updates the AIO tools environment to run under the container

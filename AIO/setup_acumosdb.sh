@@ -90,7 +90,11 @@ function upgrade_db() {
 
 function setup_acumosdb() {
   trap 'fail' ERR
-  server="-h $ACUMOS_MARIADB_HOST -P $ACUMOS_MARIADB_PORT"
+  if [[ "$ACUMOS_DEPLOY_AS_POD" == "true" ]]; then
+    server="-h $ACUMOS_MARIADB_NAMESPACE-mariadb -P 3306"
+  else
+    server="-h $ACUMOS_MARIADB_HOST -P $ACUMOS_MARIADB_PORT"
+  fi
 
   if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
     clean_db

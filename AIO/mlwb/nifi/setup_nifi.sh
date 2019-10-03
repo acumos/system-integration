@@ -37,7 +37,6 @@ clean_nifi() {
 
   log "Stop any existing k8s based components for NiFi"
   trap - ERR
-  rm -rf deploy
   log "Delete all NiFi resources"
   clean_resource $ACUMOS_NAMESPACE deployment nifi
   clean_resource $ACUMOS_NAMESPACE replicaset nifi
@@ -116,7 +115,7 @@ setup_nifi() {
     --from-file=apache_key.pem,apache_cert.pem,apache_proxy.pem,nifi_key.pem,nifi_cert.pem,nifi-truststore.jks,nifi-keystore.p12
 
   log "Update templates with environment variables"
-  if [[ ! -d deploy ]]; then mkdir deploy; fi
+  if [[ ! -e deploy ]]; then mkdir deploy; fi
   cp kubernetes/* deploy/.
   # Have to use sed since some files contain '<>' sequences that break replace_env
   sedi "s/<ACUMOS_NAMESPACE>/$ACUMOS_NAMESPACE/g" deploy/nifi-registry-apache-configmap.yaml
