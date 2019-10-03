@@ -66,6 +66,17 @@ spec:
             },
             "jwt" : {
               "secretkey": "<ACUMOS_JWT_KEY>"
+            },
+            "couchdb": {
+              "user": "<ACUMOS_COUCHDB_USER>",
+              "pwd": "<ACUMOS_COUCHDB_PASSWORD>",
+              "name": "<ACUMOS_COUCHDB_DB_NAME>",
+              "createdb": {
+                "if-not-exist": true
+              },
+              "protocol": "http",
+              "host": "<ACUMOS_COUCHDB_DOMAIN>",
+              "port": <ACUMOS_COUCHDB_PORT>
             }
           }'
         ports:
@@ -119,6 +130,8 @@ spec:
           value: "-Xms128m -Xmx256m"
         - name: ENVIRONMENT
           value: "deploy"
+        - name: PORT
+          value: "9084"
         - name: projectmSURL
           value: "http://mlwb-project-service:9088/mlWorkbench/v1/project"
         - name: notebookmSURL
