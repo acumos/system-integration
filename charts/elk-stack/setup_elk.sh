@@ -40,9 +40,8 @@
 
 function clean_elk() {
   trap 'fail' ERR
-  if [[ $(helm list $ACUMOS_ELK_NAMESPACE-elk) ]]; then
-    helm delete --purge $ACUMOS_ELK_NAMESPACE-elk
-    echo "Helm release $ACUMOS_ELK_NAMESPACE-elk deleted"
+  if [[ $(helm delete --purge $ACUMOS_ELK_NAMESPACE-elk) ]]; then
+    log "Helm release $ACUMOS_ELK_NAMESPACE-elk deleted"
   fi
   log "Delete all ELK resources"
   wait_until_notfound "kubectl get pods -n $ACUMOS_ELK_NAMESPACE" elasticsearch
@@ -70,13 +69,19 @@ function setup_elk() {
   trap 'fail' ERR
   set_k8s_env
   create_acumos_registry_secret $ACUMOS_ELK_NAMESPACE
-  replace_env templates/elasticsearch
-  replace_env templates/kibana
-  replace_env templates/logstash
+  if [[ -e deploy ]]; then rm -rf deploy; fi
+  mkdir deploy
+  cp -r templates deploy/.
+  replace_env deploy/templates/elasticsearch
+  replace_env deploy/templates/kibana
+  replace_env deploy/templates/logstash
   if [[ "$ACUMOS_CREATE_PVS" != "true" ]]; then
     export ACUMOS_ELASTICSEARCH_DATA_PV_NAME=""
   fi
-  replace_env values.yaml
+  get_host_ip $ACUMOS_MARIADB_DOMAIN
+  ACUMOS_MARIADB_IP=$HOST_IP
+  cp *.yaml deploy/.
+  replace_env deploy/values.yaml
 
   if [[ "$K8S_DIST" == "openshift" ]]; then
     log "Workaround: Acumos AIO requires privilege for elasticsearch"
@@ -85,7 +90,9 @@ function setup_elk() {
 
   log "Create the elk Helm release"
   helm repo update
+  cd deploy
   helm install -n $ACUMOS_ELK_NAMESPACE-elk --namespace $ACUMOS_ELK_NAMESPACE .
+  cd $WORK_DIR
 
   log "Wait for all elk-stack pods to be Running"
   apps="elasticsearch kibana logstash"
@@ -123,6 +130,7 @@ cd $(dirname "$0")
 if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
 source $AIO_ROOT/utils.sh
 source $AIO_ROOT/acumos_env.sh
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
 action=$1
 export ACUMOS_ELK_DOMAIN=$2
 export DEPLOYED_UNDER=k8s

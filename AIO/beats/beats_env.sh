@@ -26,8 +26,8 @@
 #
 
 # images
-export ACUMOS_FILEBEAT_IMAGE=$ACUMOS_RELEASE/acumos-filebeat:2.2.2
-export ACUMOS_METRICBEAT_IMAGE=$ACUMOS_RELEASE/acumos-metricbeat:2.2.2
+export ACUMOS_FILEBEAT_IMAGE=$ACUMOS_STAGING/acumos-filebeat:3.0.4
+export ACUMOS_METRICBEAT_IMAGE=$ACUMOS_STAGING/acumos-metricbeat:3.0.4
 
 # Component options
 export ACUMOS_FILEBEAT_PORT=8099

@@ -31,7 +31,7 @@ RUN add-apt-repository "deb [arch=amd64] \
   apt-cache madison docker-ce && \
   apt-get install -y docker-ce=18.06.3~ce~3-0~ubuntu
 RUN curl -o /usr/local/bin/kubectl \
-  -LO https://storage.googleapis.com/kubernetes-release/release/v1.10.2/bin/linux/amd64/kubectl && \
+  -LO https://storage.googleapis.com/kubernetes-release/release/v1.13.8/bin/linux/amd64/kubectl && \
   chmod +x /usr/local/bin/kubectl
 RUN curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
 RUN chmod 700 get_helm.sh && ./get_helm.sh && helm init --client-only
@@ -40,3 +40,4 @@ ENV MARIADB_VERSION 10.2
 RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8 && \
   add-apt-repository "deb [arch=amd64,arm64,ppc64el] http://$MARIADB_MIRROR/mariadb/repo/$MARIADB_VERSION/ubuntu bionic main" && \
   apt-get update -y && apt-get install -y mariadb-client
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y tshark
