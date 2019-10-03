@@ -50,7 +50,6 @@ function clean_mlwb() {
       docker rm $c
     done
   else
-    rm -rf deploy
     log "Delete all MLWB resources"
     clean_resource $ACUMOS_NAMESPACE deployment mlwb
     clean_resource $ACUMOS_NAMESPACE pods mlwb
@@ -95,7 +94,6 @@ setup_mlwb() {
     source mlwb_env.sh
 
     if [[ ! -e deploy ]]; then mkdir deploy; fi
-    rm -f deploy/*
 
     apps="mlwb-dashboard-webcomponent mlwb-home-webcomponent \
 mlwb-project mlwb-project-webcomponent mlwb-project-catalog-webcomponent \

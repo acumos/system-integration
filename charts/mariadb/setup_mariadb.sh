@@ -83,8 +83,7 @@ function mariadb_deploy_chart() {
 
 function mariadb_clean() {
   trap 'fail' ERR
-  if [[ $(helm list $ACUMOS_MARIADB_NAMESPACE-mariadb) ]]; then
-    helm delete --purge $ACUMOS_MARIADB_NAMESPACE-mariadb
+  if [[ $(helm delete --purge $ACUMOS_MARIADB_NAMESPACE-mariadb) ]]; then
     log "Helm release $ACUMOS_MARIADB_NAMESPACE-mariadb deleted"
   fi
   log "Delete all MariaDB resources"
@@ -169,15 +168,20 @@ EOF
 
   local t=0
   log "Wait for mariadb server to accept connections"
-  while ! nc -z $ACUMOS_MARIADB_HOST_IP $ACUMOS_MARIADB_PORT ; do
-    log "Mariadb is not yet listening at $ACUMOS_MARIADB_HOST_IP:$ACUMOS_MARIADB_PORT"
+  if [[ "$ACUMOS_DEPLOY_AS_POD" == "true" ]]; then
+    host=$ACUMOS_MARIADB_NAMESPACE-mariadb; port=3306
+  else
+    host=$ACUMOS_MARIADB_HOST; port=$ACUMOS_MARIADB_PORT
+  fi
+  while ! nc -z $host $port ; do
+    log "Mariadb is not yet listening at $host:$port"
     sleep 10
     t=$((t+10))
     if [[ $t -gt $ACUMOS_SUCCESS_WAIT_TIME ]]; then
       fail "MariaDB failed to respond after $ACUMOS_SUCCESS_WAIT_TIME seconds"
     fi
   done
-  while ! mysql -h $ACUMOS_MARIADB_HOST_IP -P $ACUMOS_MARIADB_PORT --user=root \
+  while ! mysql -h $host -P $port --user=root \
   --password=$ACUMOS_MARIADB_PASSWORD -e "SHOW DATABASES;" ; do
     log "Mariadb server is not yet accepting connections from $ACUMOS_MARIADB_ADMIN_HOST"
     sleep 10
@@ -218,11 +222,10 @@ cd $(dirname "$0")
 if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
 source $AIO_ROOT/utils.sh
 source $AIO_ROOT/acumos_env.sh
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
 action=$1
 if [[ "$action" != 'clean' ]]; then
   export ACUMOS_MARIADB_HOST=$2
-  get_host_ip $ACUMOS_MARIADB_HOST
-  export ACUMOS_MARIADB_HOST_IP=$HOST_IP
   export DEPLOYED_UNDER=k8s
   export K8S_DIST=$3
 fi
@@ -231,8 +234,6 @@ if [[ -e mariadb_env.sh ]]; then
   log "Using prepared mariadb_env.sh for customized environment values"
   source mariadb_env.sh
 fi
-
-set_k8s_env
 
 source setup_mariadb_env.sh
 cp mariadb_env.sh $AIO_ROOT/.

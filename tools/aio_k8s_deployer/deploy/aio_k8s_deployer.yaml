@@ -1,4 +1,4 @@
-#!/bin/bash
+apiVersion: apps/v1
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -17,18 +17,31 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# What this is: Environment file for ELK stack "beats" depoyment for Acumos.
-# Prerequisites:
-# - Ubuntu Xenial or Centos 7 server
-# Usage:
-# - Intended to be called from setup_beats.sh
-# - Customize the values here for your needs.
-#
+# What this is: deployment template for the AIO k8s deployer tool, when run
+# in the target k8s cluster as a pod.
 
-# images
-export ACUMOS_FILEBEAT_IMAGE=$ACUMOS_STAGING/acumos-filebeat:3.0.4
-export ACUMOS_METRICBEAT_IMAGE=$ACUMOS_STAGING/acumos-metricbeat:3.0.4
-
-# Component options
-export ACUMOS_FILEBEAT_PORT=8099
-export ACUMOS_METRICBEAT_PORT=8098
+kind: Deployment
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: aio-k8s-deployer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aio-k8s-deployer
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: aio-k8s-deployer
+    spec:
+      securityContext:
+        runAsUser: 0
+        fsGroup: 1000
+      containers:
+      - name: aio-k8s-deployer
+        image: <AIO_K8S_DEPLOYER_IMAGE>
+        command: ['/bin/bash', '-c']
+        args:
+        - while true; do sleep 3600; done;

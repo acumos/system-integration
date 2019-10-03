@@ -265,6 +265,7 @@ EOF
   helm repo update
   helm fetch jupyterhub/jupyterhub
   helm install --name $RELEASE jupyterhub/jupyterhub \
+    --timeout $ACUMOS_SUCCESS_WAIT_TIME \
     --namespace $NAMESPACE \
     --version=v0.8.2 --values $tmp
   rm $tmp

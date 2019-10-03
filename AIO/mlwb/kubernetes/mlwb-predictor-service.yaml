@@ -1,8 +1,7 @@
-#!/bin/bash
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
-# Copyright (C) 2017-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
 # ===================================================================================
 # This Acumos software file is distributed by AT&T and Tech Mahindra
 # under the Apache License, Version 2.0 (the "License");
@@ -16,19 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
-#
-# What this is: Environment file for ELK stack "beats" depoyment for Acumos.
-# Prerequisites:
-# - Ubuntu Xenial or Centos 7 server
-# Usage:
-# - Intended to be called from setup_beats.sh
-# - Customize the values here for your needs.
-#
 
-# images
-export ACUMOS_FILEBEAT_IMAGE=$ACUMOS_STAGING/acumos-filebeat:3.0.4
-export ACUMOS_METRICBEAT_IMAGE=$ACUMOS_STAGING/acumos-metricbeat:3.0.4
-
-# Component options
-export ACUMOS_FILEBEAT_PORT=8099
-export ACUMOS_METRICBEAT_PORT=8098
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: mlwb-predictor-service
+  labels:
+    app: mlwb-predictor
+spec:
+  selector:
+    app: mlwb-predictor
+  type: ClusterIP
+  ports:
+  - name: service-port
+    port: 9096
+    targetPort: 9096
