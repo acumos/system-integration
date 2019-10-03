@@ -57,7 +57,8 @@ function setup_prereqs() {
 
   log "/etc/hosts customizations"
   # Ensure cluster hostname resolves inside the cluster
-  if [[ $(host $ACUMOS_DOMAIN | grep -c 'not found') -gt 0 ]]; then
+  check_name_resolves $ACUMOS_DOMAIN
+  if [[ "$NAME_RESOLVES" == "false" ]]; then
     if [[ $(grep -c -E " $ACUMOS_DOMAIN( |$)" /etc/hosts) -eq 0 ]]; then
       log "Add $ACUMOS_DOMAIN to /etc/hosts"
       echo "$ACUMOS_HOST_IP $ACUMOS_DOMAIN" | sudo tee -a /etc/hosts
@@ -309,14 +310,21 @@ function prepare_elk() {
 function prepare_nexus() {
   trap 'fail' ERR
   if [[ "$ACUMOS_DEPLOY_NEXUS" == "true" ]]; then
+    if [[ ! -e nexus_env.sh ]]; then
+      cd $AIO_ROOT/nexus
+      source setup_nexus_env.sh
+      cp nexus_env.sh $AIO_ROOT/.
+      cd $AIO_ROOT
+    fi
     if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
+      create_namespace $ACUMOS_NEXUS_NAMESPACE
       if [[ "$ACUMOS_CREATE_PVS" == "true" ]]; then
-      bash $AIO_ROOT/../tools/setup_pv.sh all /mnt/$ACUMOS_NAMESPACE \
+      bash $AIO_ROOT/../tools/setup_pv.sh all /mnt/$ACUMOS_NEXUS_NAMESPACE \
         $NEXUS_DATA_PV_NAME $NEXUS_DATA_PV_SIZE \
         "200:$ACUMOS_HOST_USER"
       fi
     else
-      setup_docker_volume /mnt/$ACUMOS_NAMESPACE/$NEXUS_DATA_PV_NAME \
+      setup_docker_volume /mnt/$ACUMOS_NEXUS_NAMESPACE/$NEXUS_DATA_PV_NAME \
         "200:$ACUMOS_HOST_USER"
     fi
   fi
@@ -416,7 +424,7 @@ function prepare_env() {
       # PV recyclers run in the default namespace and also need hostaccess
       oc adm policy add-scc-to-user hostaccess -z default -n default
     fi
-    setup_utility_pvs 5 "1Gi 5Gi 10Gi"
+    setup_utility_pvs 10 "1Gi 5Gi 10Gi"
     prepare_helm
   fi
 

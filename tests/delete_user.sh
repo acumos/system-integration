@@ -51,9 +51,9 @@ function find_user() {
   log "Find user $1"
   local tmp="/tmp/$(uuidgen)"
   curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    -k https://$ACUMOS_ORIGIN/ccds/user
+    $cds_baseurl/user
   cat $tmp
-  users=$(jq -r '.content | length' $tmp)
+  users=$(jq '.content | length' $tmp)
   i=0; userId=""
   while [[ $i -lt $users && "$userId" == "" ]] ; do
     if [[ "$(jq -r ".content[$i].loginName" $tmp)" == "$1" ]]; then
@@ -70,7 +70,7 @@ function delete_user() {
   if [[ "$userId" != "" ]]; then
     log "Delete user $username"
     curl -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD -X DELETE \
-      -k https://$ACUMOS_ORIGIN/ccds/user/$userId
+      $cds_baseurl/user/$userId
     find_user $username
     if [[ "$userId" != "" ]]; then
       fail "User delete failed"
@@ -90,7 +90,14 @@ if [[ $# -eq 2 ]]; then
   username=$2
   WORK_DIR=$(pwd)
   cd $(dirname "$0")
+  export AIO_ROOT="$(cd ../AIO; pwd -P)"
+  source $AIO_ROOT/utils.sh
   source $env
+  cds_baseurl="-k https://$ACUMOS_DOMAIN/ccds"
+  check_name_resolves cds-service
+  if [[ "$NAME_RESOLVES" == "true" ]]; then
+    cds_baseurl="http://cds-service:8000/ccds"
+  fi
   delete_user
   cd $WORK_DIR
 else

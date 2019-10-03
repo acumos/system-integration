@@ -50,6 +50,7 @@ services:
     environment:
       ES_JAVA_OPTS: "-Xms128m -Xmx256m"
       ENVIRONMENT: "deploy"
+      PORT: 9084
       projectmSURL: "http://mlwb-project-service:9088/mlWorkbench/v1/project"
       notebookmSURL: "http://mlwb-notebook-service:9089/mlWorkbench/v1/notebook"
       pipelinemSURL: "http://mlwb-pipeline-service:9090/mlWorkbench/v1/pipeline"

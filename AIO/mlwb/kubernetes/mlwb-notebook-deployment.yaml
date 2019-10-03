@@ -82,7 +82,7 @@ spec:
             },
             "useexternalnotebook": <MLWB_JUPYTERHUB_EXTERNAL_NOTEBOOK_SERVICE>
           }'
-        command: ["/bin/bash", "-c"]
+        command: ["/bin/sh", "-c"]
         args:
         - set -x;
           cd maven;

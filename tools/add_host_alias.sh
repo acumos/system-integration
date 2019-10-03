@@ -43,7 +43,8 @@
 function add_host_alias() {
   trap 'fail' ERR
   log "Determining host IP address for $name"
-  if [[ $(host $name | grep -c 'not found') -eq 0 ]]; then
+  check_name_resolves $name
+  if [[ "$NAME_RESOLVES" == "true" ]]; then
     ip=$(host $name | head -1 | cut -d ' ' -f 4)
   elif [[ $(grep -c -E "\s$name( |$)" /etc/hosts) -gt 0 ]]; then
     ip=$(grep -E "\s$name( |$)" /etc/hosts | awk '{print $1}')

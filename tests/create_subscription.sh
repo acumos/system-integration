@@ -63,8 +63,8 @@ function find_user() {
   trap 'fail' ERR
   log "Finding user name $admin"
   local jsonout="/tmp/$(uuidgen)"
-  curl -s -k -o $jsonout -u $creds -H 'Accept: application/json' $cds/user
-  users=$(jq -r '.content | length' $jsonout)
+  curl -s -o $jsonout -u $creds -H 'Accept: application/json' $cds_baseurl/user
+  users=$(jq '.content | length' $jsonout)
   i=0; userId=""
   while [[ $i -lt $users && "$userId" == "" ]] ; do
     loginName=$(jq -r ".content[$i].loginName" $jsonout)
@@ -80,8 +80,8 @@ function find_user() {
 function find_peer() {
   trap 'fail' ERR
   local jsonout="/tmp/$(uuidgen)"
-  curl -s -k -o $jsonout -u $creds -H 'Accept: application/json' $cds/peer
-  peers=$(jq -r '.content | length' $jsonout)
+  curl -s -o $jsonout -u $creds -H 'Accept: application/json' $cds_baseurl/peer
+  peers=$(jq '.content | length' $jsonout)
   i=0; peerId=""
   while [[ $i -lt $peers && "$peerId" == "" ]] ; do
     name=$(jq -r ".content[$i].name" $jsonout)
@@ -98,7 +98,7 @@ function create_subscription() {
   trap 'fail' ERR
   local jsonout="/tmp/$(uuidgen)"
   curl -v -k -o $jsonout --cert $cert --key $key https://$peer:${peerPort}/catalogs
-  cats=$(jq -r '.content | length' $jsonout)
+  cats=$(jq '.content | length' $jsonout)
   log DEBUG "$cats catalogs found: "
   cat $jsonout
   j=0
@@ -124,7 +124,7 @@ function create_subscription() {
 EOF
   cat $jsonin
   local jsonout="/tmp/$(uuidgen)"
-  curl -s -k -o $jsonout -u $creds -X POST $cds/peer/sub \
+  curl -s -o $jsonout -u $creds -X POST $cds_baseurl/peer/sub \
     -H "accept: */*" -H "Content-Type: application/json" -d @$jsonin
   rm $jsonin
   created=$(jq -r '.created' $jsonout)
@@ -135,7 +135,7 @@ EOF
   fi
   log "Subscription created successfully:"
   log "Current subscriptions at $ACUMOS_DOMAIN for peer $peer with ID $peerId"
-  curl -k -u $creds -H 'Accept: application/json' $cds/peer/$peerId/sub
+  curl -u $creds -H 'Accept: application/json' $cds_baseurl/peer/$peerId/sub
 }
 
 set -x
@@ -169,9 +169,15 @@ refreshInterval=$6
 cert=$7
 key=$8
 set +x
+export AIO_ROOT="$(cd ../AIO; pwd -P)"
+source $AIO_ROOT/utils.sh
 source $env
 set -x
-cds="https://$ACUMOS_ORIGIN/ccds"
+cds_baseurl="-k https://$ACUMOS_DOMAIN/ccds"
+check_name_resolves cds-service
+if [[ "$NAME_RESOLVES" == "true" ]]; then
+  cds_baseurl="http://cds-service:8000/ccds"
+fi
 creds="$ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD"
 find_peer
 if [[ "$peerId" == "" ]]; then
