@@ -56,10 +56,6 @@ logstash:
     tag: "2.2.2"
     pullPolicy: "IfNotPresent"
   port: "<ACUMOS_ELK_LOGSTASH_PORT>"
-  mariadb:
-    host:
-      name: "<ACUMOS_MARIADB_HOST>"
-      ip: "<ACUMOS_MARIADB_HOST_IP>"
 
 kibana:
   image:

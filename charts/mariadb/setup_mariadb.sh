@@ -169,15 +169,15 @@ EOF
 
   local t=0
   log "Wait for mariadb server to accept connections"
-  while ! nc -z $ACUMOS_MARIADB_HOST_IP $ACUMOS_MARIADB_PORT ; do
-    log "Mariadb is not yet listening at $ACUMOS_MARIADB_HOST_IP:$ACUMOS_MARIADB_PORT"
+  while ! nc -z $ACUMOS_MARIADB_HOST $ACUMOS_MARIADB_PORT ; do
+    log "Mariadb is not yet listening at $ACUMOS_MARIADB_HOST:$ACUMOS_MARIADB_PORT"
     sleep 10
     t=$((t+10))
     if [[ $t -gt $ACUMOS_SUCCESS_WAIT_TIME ]]; then
       fail "MariaDB failed to respond after $ACUMOS_SUCCESS_WAIT_TIME seconds"
     fi
   done
-  while ! mysql -h $ACUMOS_MARIADB_HOST_IP -P $ACUMOS_MARIADB_PORT --user=root \
+  while ! mysql -h $ACUMOS_MARIADB_HOST -P $ACUMOS_MARIADB_PORT --user=root \
   --password=$ACUMOS_MARIADB_PASSWORD -e "SHOW DATABASES;" ; do
     log "Mariadb server is not yet accepting connections from $ACUMOS_MARIADB_ADMIN_HOST"
     sleep 10
@@ -221,8 +221,6 @@ source $AIO_ROOT/acumos_env.sh
 action=$1
 if [[ "$action" != 'clean' ]]; then
   export ACUMOS_MARIADB_HOST=$2
-  get_host_ip $ACUMOS_MARIADB_HOST
-  export ACUMOS_MARIADB_HOST_IP=$HOST_IP
   export DEPLOYED_UNDER=k8s
   export K8S_DIST=$3
 fi
