@@ -100,7 +100,7 @@ spec:
               "useexternalpipeline": true
             }
           }'
-        command: ["/bin/bash", "-c"]
+        command: ["/bin/sh", "-c"]
         args:
         - if [[ ! -d /maven/templates ]]; then
             mkdir /maven/templates;

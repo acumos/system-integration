@@ -88,6 +88,12 @@ spec:
               "registryPassword": "<ACUMOS_DOCKER_REGISTRY_PASSWORD>",
               "registryEmail": "<ACUMOS_ADMIN_EMAIL>"
             },
+            "license-manager" : {
+              "url" : "http://lum-service:2080"
+            },
+            "verification": {
+              "url" : "http://sv-scanning-service:9082/scan"
+            },
             "local": {
               "address": "0.0.0.0",
               "server": {
