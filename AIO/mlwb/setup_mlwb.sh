@@ -50,7 +50,6 @@ function clean_mlwb() {
       docker rm $c
     done
   else
-    rm -rf deploy
     log "Delete all MLWB resources"
     clean_resource $ACUMOS_NAMESPACE deployment mlwb
     clean_resource $ACUMOS_NAMESPACE pods mlwb
@@ -95,7 +94,6 @@ setup_mlwb() {
     source mlwb_env.sh
 
     if [[ ! -e deploy ]]; then mkdir deploy; fi
-    rm -f deploy/*
 
     apps="mlwb-dashboard-webcomponent mlwb-home-webcomponent \
 mlwb-project mlwb-project-webcomponent mlwb-project-catalog-webcomponent \
@@ -165,12 +163,12 @@ if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
   update_mlwb_env MLWB_DEPLOY_JUPYTERHUB false
   update_mlwb_env MLWB_DEPLOY_NIFI false
 else
-  if [[ "$MLWB_DEPLOY_NIFI" == "true" ]]; then
-    bash nifi/setup_nifi.sh $action
-  fi
   if [[ "$MLWB_DEPLOY_JUPYTERHUB" == "true" ]]; then
     bash $AIO_ROOT/../charts/jupyterhub/setup_jupyterhub.sh $action \
       $ACUMOS_NAMESPACE $ACUMOS_ORIGIN $ACUMOS_ONBOARDING_TOKENMODE
+  fi
+  if [[ "$MLWB_DEPLOY_NIFI" == "true" ]]; then
+    bash nifi/setup_nifi.sh $action
   fi
 fi
 log "Apply any updates to mlwb_env.sh"

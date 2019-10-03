@@ -65,6 +65,11 @@ spec:
             "server": {
               "port": 8337
             },
+            "siteConfig": "[
+              { \"name\": \"default\" },
+              { \"name\": \"cluster2\" },
+              { \"name\": \"cluster3\" }
+            ]",
             "jenkins": {
               "url": "<ACUMOS_JENKINS_API_URL>",
               "user": "<ACUMOS_JENKINS_USER>",
@@ -81,15 +86,15 @@ spec:
             "kube" : {
               "incrementPort": "8557",
               "singleModelPort": "8556",
-              "folderPath": "/maven/home",
+              "folderPath": "config/jobs/solution_deploy",
+              "templateYmlDirectory": "config/jobs/solution_deploy/templates/",
               "singleNodePort": "30333",
               "singleTargetPort": "3330",
               "dataBrokerModelPort": "8556",
               "dataBrokerNodePort": "30556",
               "dataBrokerTargetPort": "8556",
               "mlTargetPort": "3330",
-              "nginxImageName": "nginx",
-              "nexusEndPointURL": "http://localhost:80"
+              "nginxImageName": "nginx:latest"
             },
             "dockerRegistry": {
               "url": "https://<ACUMOS_DOCKER_PROXY_HOST>:<ACUMOS_DOCKER_PROXY_PORT>/",
