@@ -63,7 +63,7 @@ function find_user() {
   trap 'fail' ERR
   log "Finding user name $admin"
   local jsonout="/tmp/$(uuidgen)"
-  curl -s -k -o $jsonout -u $creds -H 'Accept: application/json' $cds/user
+  curl -s -o $jsonout -u $creds -H 'Accept: application/json' $cds_baseurl/user
   users=$(jq -r '.content | length' $jsonout)
   i=0; userId=""
   while [[ $i -lt $users && "$userId" == "" ]] ; do
@@ -80,7 +80,7 @@ function find_user() {
 function find_peer() {
   trap 'fail' ERR
   local jsonout="/tmp/$(uuidgen)"
-  curl -s -k -o $jsonout -u $creds -H 'Accept: application/json' $cds/peer
+  curl -s -o $jsonout -u $creds -H 'Accept: application/json' $cds_baseurl/peer
   peers=$(jq -r '.content | length' $jsonout)
   i=0; peerId=""
   while [[ $i -lt $peers && "$peerId" == "" ]] ; do
@@ -124,7 +124,7 @@ function create_subscription() {
 EOF
   cat $jsonin
   local jsonout="/tmp/$(uuidgen)"
-  curl -s -k -o $jsonout -u $creds -X POST $cds/peer/sub \
+  curl -s -o $jsonout -u $creds -X POST $cds_baseurl/peer/sub \
     -H "accept: */*" -H "Content-Type: application/json" -d @$jsonin
   rm $jsonin
   created=$(jq -r '.created' $jsonout)
@@ -135,7 +135,7 @@ EOF
   fi
   log "Subscription created successfully:"
   log "Current subscriptions at $ACUMOS_DOMAIN for peer $peer with ID $peerId"
-  curl -k -u $creds -H 'Accept: application/json' $cds/peer/$peerId/sub
+  curl -u $creds -H 'Accept: application/json' $cds_baseurl/peer/$peerId/sub
 }
 
 set -x
@@ -171,7 +171,10 @@ key=$8
 set +x
 source $env
 set -x
-cds="https://$ACUMOS_ORIGIN/ccds"
+cds_baseurl="-k https://$ACUMOS_DOMAIN/ccds"
+if [[ $(host cds-service | grep -c 'not found') -eq 0 ]]; then
+  cds_baseurl="http://cds-service:8000/ccds"
+fi
 creds="$ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD"
 find_peer
 if [[ "$peerId" == "" ]]; then

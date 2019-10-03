@@ -40,3 +40,4 @@ ENV MARIADB_VERSION 10.2
 RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8 && \
   add-apt-repository "deb [arch=amd64,arm64,ppc64el] http://$MARIADB_MIRROR/mariadb/repo/$MARIADB_VERSION/ubuntu bionic main" && \
   apt-get update -y && apt-get install -y mariadb-client
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y tshark

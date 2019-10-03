@@ -90,6 +90,8 @@ function standalone_prep() {
   if [[ $(kubectl get pvc -n $NAMESPACE -o json | jq ".items | length") -gt 0 ]]; then
     pvcs=$(kubectl get pvc -n $NAMESPACE | awk '/claim/{print $1}')
     for pvc in $pvcs; do
+      # Avoid hangs due to https://kubernetes.io/docs/concepts/storage/persistent-volumes/#storage-object-in-use-protection
+      kubectl patch pvc -n $NAMESPACE $pvc -p '{"metadata":{"finalizers": []}}' --type=merge
       kubectl delete pvc -n $NAMESPACE $pvc
     done
   fi
@@ -265,6 +267,7 @@ EOF
   helm repo update
   helm fetch jupyterhub/jupyterhub
   helm install --name $RELEASE jupyterhub/jupyterhub \
+    --timeout $ACUMOS_SUCCESS_WAIT_TIME \
     --namespace $NAMESPACE \
     --version=v0.8.2 --values $tmp
   rm $tmp

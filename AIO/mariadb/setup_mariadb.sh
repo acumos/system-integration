@@ -38,7 +38,7 @@ function setup_mariadb() {
     wait_running mariadb-service
     log "Wait for mariadb server to accept connections"
     i=0
-    while ! mysql -h $ACUMOS_MARIADB_HOST_IP -P $ACUMOS_MARIADB_PORT --user=root \
+    while ! mysql -h $ACUMOS_MARIADB_HOST -P $ACUMOS_MARIADB_PORT --user=root \
     --password=$ACUMOS_MARIADB_PASSWORD -e "SHOW DATABASES;" ; do
       i=$((i+1))
       if [[ $i -gt 30 ]]; then
