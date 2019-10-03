@@ -40,9 +40,8 @@
 
 function clean_elk() {
   trap 'fail' ERR
-  if [[ $(helm list $ACUMOS_ELK_NAMESPACE-elk) ]]; then
-    helm delete --purge $ACUMOS_ELK_NAMESPACE-elk
-    echo "Helm release $ACUMOS_ELK_NAMESPACE-elk deleted"
+  if [[ $(helm delete --purge $ACUMOS_ELK_NAMESPACE-elk) ]]; then
+    log "Helm release $ACUMOS_ELK_NAMESPACE-elk deleted"
   fi
   log "Delete all ELK resources"
   wait_until_notfound "kubectl get pods -n $ACUMOS_ELK_NAMESPACE" elasticsearch
@@ -76,6 +75,8 @@ function setup_elk() {
   if [[ "$ACUMOS_CREATE_PVS" != "true" ]]; then
     export ACUMOS_ELASTICSEARCH_DATA_PV_NAME=""
   fi
+  get_host_ip $ACUMOS_MARIADB_HOST
+  ACUMOS_MARIADB_HOST_IP=$HOST_IP
   replace_env values.yaml
 
   if [[ "$K8S_DIST" == "openshift" ]]; then
@@ -123,6 +124,7 @@ cd $(dirname "$0")
 if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
 source $AIO_ROOT/utils.sh
 source $AIO_ROOT/acumos_env.sh
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
 action=$1
 export ACUMOS_ELK_DOMAIN=$2
 export DEPLOYED_UNDER=k8s
