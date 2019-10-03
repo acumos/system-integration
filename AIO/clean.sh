@@ -39,7 +39,7 @@ source utils.sh
 source acumos_env.sh
 source mlwb/mlwb_env.sh
 if [[ $(kubectl get namespaces) ]]; then
-  releases="mariadb elk jupyterhub nginx-ingress zeppelin"
+  releases="mariadb elk couchdb jenkins jupyterhub nginx-ingress zeppelin"
   for release in $releases; do
     rlss=$(helm list | grep $release | awk '{print $1}')
     for rls in $rlss; do
@@ -50,7 +50,22 @@ if [[ $(kubectl get namespaces) ]]; then
   done
   nss=$(kubectl get namespace | grep acumos | awk '{print $1}')
   for ns in $nss; do
-    log "Attempting to cleanup all resources in namespace $ns"
+    ks="deployment replicaset daemonset pod pvc service"
+    for k in $ks; do
+      rs=$(kubectl get $k -n $ns | grep -v NAME | awk '{print $1}')
+      for r in $rs ; do
+        echo; echo $r
+        if [[ $(kubectl delete $k -n $ns $r) ]]; then
+          log "$k $r deleted in namespace $ns"
+        fi
+      done
+    done
+    log "Cleanup any evicted pods in namespace $ns"
+    es=$(kubectl get pods -n $ns | awk '/Evicted/{print $1}')
+    for e in $es; do
+      kubectl delete pod -n $ns $e
+    done
+    log "Attempting to cleanup all remaining resources in namespace $ns"
     log "Please be patient, this may take some minutes"
     if [[ $(kubectl delete namespace $ns) ]]; then
       log "Namespace $ns deleted"
@@ -72,6 +87,9 @@ if [[ $(docker ps -a | grep -c 'acumos_') -gt 0 ]]; then
     done
   fi
 fi
+
+log "Cleanup any stuck PVs"
+pvs=$(kubectl get pv | awk '/Failed/{print $1}'); for pv in $pvs ; do kubectl patch pv $pv --type json -p '[{ "op": "remove", "path": "/spec/claimRef" }]'; done
 
 log "Cleanup any PV folders"
 for ns in $nss; do

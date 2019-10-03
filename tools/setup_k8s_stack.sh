@@ -35,7 +35,7 @@
 # - Then run the command below
 #
 # Usage:
-# $ bash system-integration/AIO/k8s_stack.sh <clean|setup>
+# $ bash system-integration/tools/setup_k8s_stack.sh <clean|setup>
 #   clean: remove all stack components
 #   setup: setup all stack components
 #
@@ -64,6 +64,7 @@ function clean_k8s() {
     sudo rm -rf /var/lib/etcd/* && true
     if [[ $(which docker) ]]; then docker system prune -a -f; fi
     sudo apt-get purge -y docker-ce docker docker-engine docker.io
+    sudo rm -rf /var/lib/docker
   fi
   rm -rf ~/.kube
   sudo iptables -F && sudo iptables -t nat -F && sudo iptables -t mangle -F && sudo iptables -X

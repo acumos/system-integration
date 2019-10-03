@@ -110,10 +110,12 @@ function docker_login() {
 function create_acumos_registry_secret() {
   trap 'fail' ERR
   local namespace=$1
-  log "Login to LF Nexus Docker repos, for Acumos project images"
-  docker_login https://nexus3.acumos.org:10004
-  docker_login https://nexus3.acumos.org:10003
-  docker_login https://nexus3.acumos.org:10002
+  if [[ "$ACUMOS_DEPLOY_AS_POD" == "false" && ! -f /.dockerenv ]]; then
+    log "Login to LF Nexus Docker repos, for Acumos project images"
+    docker_login https://nexus3.acumos.org:10004
+    docker_login https://nexus3.acumos.org:10003
+    docker_login https://nexus3.acumos.org:10002
+  fi
 
   if [[ $(kubectl get secret -n $namespace acumos-registry) ]]; then
     log "Deleting k8s secret acumos-registry, prior to recreating it"
@@ -233,6 +235,8 @@ function delete_pvc() {
   local namespace=$1
   local name=$2
   if [[ "$(kubectl get pvc -n $namespace $name)" != "" ]]; then
+    # Avoid hangs due to https://kubernetes.io/docs/concepts/storage/persistent-volumes/#storage-object-in-use-protection
+    kubectl patch pvc -n $namespace $name -p '{"metadata":{"finalizers": []}}' --type=merge
     kubectl delete pvc -n $namespace $name
     while kubectl get pvc -n $namespace $name ; do
      log "Waiting for $namespace PVC $name to be deleted"
@@ -392,7 +396,7 @@ function start_acumos_core_app() {
   if [[ "$app" == "federation" ]]; then
     ACUMOS_FEDERATION_PORT=$(kubectl get services -n $ACUMOS_NAMESPACE federation-service -o json | jq -r '.spec.ports[0].nodePort')
     update_acumos_env ACUMOS_FEDERATION_PORT $ACUMOS_FEDERATION_PORT force
-    ACUMOS_FEDERATION_PORT=$(kubectl get services -n $ACUMOS_NAMESPACE federation-service -o json | jq -r '.spec.ports[1].nodePort')
+    ACUMOS_FEDERATION_LOCAL_PORT=$(kubectl get services -n $ACUMOS_NAMESPACE federation-service -o json | jq -r '.spec.ports[1].nodePort')
     update_acumos_env ACUMOS_FEDERATION_LOCAL_PORT $ACUMOS_FEDERATION_LOCAL_PORT force
   fi
 
@@ -494,12 +498,14 @@ function start_service() {
 function stop_service() {
   trap 'fail' ERR
   local app
+  local namespace=$(grep namespace $1 | cut -d ":" -f 2)
   if [[ -e $1 ]]; then
+    local namespace=$(grep namespace $1 | cut -d ':' -f 2)
     app=$(grep "app: " -m1 $1 | sed 's/^.*app: //')
-    if [[ $(kubectl get svc -n $ACUMOS_NAMESPACE -l app=$app) ]]; then
+    if [[ $(kubectl get svc -n $namespace -l app=$app) ]]; then
       log "Stop service for $app"
-      kubectl delete service -n $ACUMOS_NAMESPACE $app-service
-      wait_until_notfound "kubectl get svc -n $ACUMOS_NAMESPACE" $app
+      kubectl delete service -n $namespace $app-service
+      wait_until_notfound "kubectl get svc -n $namespace" $app
     else
       log "Service not found for $app"
     fi
@@ -517,12 +523,13 @@ function stop_deployment() {
   trap 'fail' ERR
   local app
   if [[ -e $1 ]]; then
+    local namespace=$(grep namespace $1 | cut -d ":" -f 2)
     app=$(grep "app: " -m1 $1 | sed 's/^.*app: //')
     # Note any related PV and PVC are not deleted
-    if [[ $(kubectl get deployment -n $ACUMOS_NAMESPACE -l app=$app) ]]; then
+    if [[ $(kubectl get deployment -n $namespace -l app=$app) ]]; then
       log "Stop deployment for $app"
-      kubectl delete deployment -n $ACUMOS_NAMESPACE $app
-      wait_until_notfound "kubectl get pods -n $ACUMOS_NAMESPACE" $app
+      kubectl delete deployment -n $namespace $app
+      wait_until_notfound "kubectl get pods -n $namespace" $app
     else
       log "Deployment not found for $app"
     fi
@@ -613,6 +620,12 @@ function update_mariadb_env() {
   cp $AIO_ROOT/../charts/mariadb/mariadb_env.sh $AIO_ROOT/.
 }
 
+function update_nexus_env() {
+  trap 'fail' ERR
+  update_env $AIO_ROOT/nexus/nexus_env.sh $1 "$2" $3
+  cp $AIO_ROOT/nexus/nexus_env.sh $AIO_ROOT/.
+}
+
 function update_elk_env() {
   trap 'fail' ERR
   update_env $AIO_ROOT/../charts/elk-stack/elk_env.sh $1 "$2" $3
@@ -662,12 +675,12 @@ function save_logs() {
       kubectl get pods -n $ACUMOS_NAMESPACE > $logs/acumos-pods.log
       local tmp="/tmp/$(uuidgen)"
       pods=$(kubectl get pods -n $ACUMOS_NAMESPACE -o json >$tmp)
-      np=$(jq -r '.content | length' $tmp)
+      np=$(jq '.content | length' $tmp)
       i=0;
       while [[ $i -lt $np ]] ; do
         pod=$(jq -r ".content[$i].metadata.name" $tmp)
         kubectl describe pods -n $ACUMOS_NAMESPACE $pod > $logs/$app.log
-        nc=$(jq -r ".content[$i].spec.containers | length" $tmp)
+        nc=$(jq ".content[$i].spec.containers | length" $tmp)
         cs=$(jq -r ".content[$i].spec.containers" $tmp)
         j=0
         while [[ $j -lt $nc ]] ; do
@@ -686,9 +699,14 @@ function find_user() {
   trap 'fail' ERR
   log "Find user $1"
   local tmp="/tmp/$(uuidgen)"
+  local cds_baseurl="-k https://$ACUMOS_DOMAIN/ccds"
+  check_name_resolves cds-service
+  if [[ "$NAME_RESOLVES" == "true" ]]; then
+    cds_baseurl="http://cds-service:8000/ccds"
+  fi
   curl -s -o $tmp -u $ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD \
-    -k https://$ACUMOS_HOST/ccds/user
-  users=$(jq -r '.content | length' $tmp)
+    $cds_baseurl/user
+  users=$(jq '.content | length' $tmp)
   i=0; userId=""
   # Disable trap as not finding the user will trigger ERR
   trap - ERR
@@ -746,12 +764,22 @@ function get_host_ip_from_etc_hosts() {
   HOST_IP=$(grep -E "\s$1( |$)" /etc/hosts | grep -v '^127\.' | awk '{print $1}')
 }
 
+function check_name_resolves() {
+  trap 'fail' ERR
+  local domain=$1
+  if [[ $(host $domain | grep -c 'has address') -gt 0 ]]; then
+    NAME_RESOLVES=true
+  else
+    NAME_RESOLVES=false
+  fi
+}
+
 function get_host_ip() {
   trap 'fail' ERR
   log "Determining host IP address for $1"
   get_host_ip_from_etc_hosts $1
   if [[ "$HOST_IP" == "" ]]; then
-    if [[ $(host $1 | grep -c 'not found') -eq 0 ]]; then
+    if [[ $(host $1 | grep -c 'has address') -gt 0 ]]; then
       HOST_IP=$(host $1 | grep "has address" | grep -v ' 127\.' | cut -d ' ' -f 4)
     else
       log "Please ensure $1 is resolvable thru DNS or hosts file"

@@ -58,7 +58,7 @@ function mariadb_customize_values() {
   sed -i -- '/    \[mysqld\]/a\ \ \ \ sql_mode=""' /tmp/charts/stable/mariadb/values.yaml
   sed -i -- 's/type: ClusterIP/type: NodePort/' /tmp/charts/stable/mariadb/values.yaml
   sed -i -- 's/# nodePort:/nodePort:/' /tmp/charts/stable/mariadb/values.yaml
-  sed -i -- "s/#   master: 30001/   master: $ACUMOS_MARIADB_PORT/" /tmp/charts/stable/mariadb/values.yaml
+  sed -i -- "s/#   master: 30001/   master: $ACUMOS_MARIADB_NODEPORT/" /tmp/charts/stable/mariadb/values.yaml
   sed -i -- "s/  password:\$/  password: $ACUMOS_MARIADB_PASSWORD/" /tmp/charts/stable/mariadb/values.yaml
   sed -i -- "s/  password:\$/  password: $ACUMOS_MARIADB_USER_PASSWORD/" /tmp/charts/stable/mariadb/values.yaml
   sed -i -- "s/  user:/  user: $ACUMOS_MARIADB_USER/" /tmp/charts/stable/mariadb/values.yaml
@@ -83,8 +83,7 @@ function mariadb_deploy_chart() {
 
 function mariadb_clean() {
   trap 'fail' ERR
-  if [[ $(helm list $ACUMOS_MARIADB_NAMESPACE-mariadb) ]]; then
-    helm delete --purge $ACUMOS_MARIADB_NAMESPACE-mariadb
+  if [[ $(helm delete --purge $ACUMOS_MARIADB_NAMESPACE-mariadb) ]]; then
     log "Helm release $ACUMOS_MARIADB_NAMESPACE-mariadb deleted"
   fi
   log "Delete all MariaDB resources"
@@ -164,20 +163,27 @@ EOF
   mariadb_deploy_chart /tmp/charts/stable/mariadb/.
   wait_running mariadb $ACUMOS_MARIADB_NAMESPACE
 
-  ACUMOS_MARIADB_PORT=$(kubectl get services -n $ACUMOS_MARIADB_NAMESPACE $ACUMOS_MARIADB_NAMESPACE-mariadb -o json | jq -r '.spec.ports[0].nodePort')
-  update_mariadb_env ACUMOS_MARIADB_PORT $ACUMOS_MARIADB_PORT force
+  ACUMOS_MARIADB_NODEPORT=$(kubectl get services -n $ACUMOS_MARIADB_NAMESPACE $ACUMOS_MARIADB_NAMESPACE-mariadb -o json | jq -r '.spec.ports[0].nodePort')
+  update_mariadb_env ACUMOS_MARIADB_NODEPORT $ACUMOS_MARIADB_NODEPORT force
 
   local t=0
   log "Wait for mariadb server to accept connections"
-  while ! nc -z $ACUMOS_MARIADB_HOST_IP $ACUMOS_MARIADB_PORT ; do
-    log "Mariadb is not yet listening at $ACUMOS_MARIADB_HOST_IP:$ACUMOS_MARIADB_PORT"
+  port=$ACUMOS_MARIADB_PORT
+  host=$ACUMOS_MARIADB_HOST
+  if [[ "$ACUMOS_DEPLOY_AS_POD" == "false" || "$ACUMOS_MARIADB_HOST" != "$ACUMOS_INTERNAL_MARIADB_HOST" ]]; then
+    host=$ACUMOS_MARIADB_DOMAIN
+    port=$ACUMOS_MARIADB_NODEPORT
+  fi
+
+  while ! nc -z $host $port ; do
+    log "Mariadb is not yet listening at $host:$port"
     sleep 10
     t=$((t+10))
     if [[ $t -gt $ACUMOS_SUCCESS_WAIT_TIME ]]; then
       fail "MariaDB failed to respond after $ACUMOS_SUCCESS_WAIT_TIME seconds"
     fi
   done
-  while ! mysql -h $ACUMOS_MARIADB_HOST_IP -P $ACUMOS_MARIADB_PORT --user=root \
+  while ! mysql -h $host -P $port --user=root \
   --password=$ACUMOS_MARIADB_PASSWORD -e "SHOW DATABASES;" ; do
     log "Mariadb server is not yet accepting connections from $ACUMOS_MARIADB_ADMIN_HOST"
     sleep 10
@@ -218,11 +224,10 @@ cd $(dirname "$0")
 if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
 source $AIO_ROOT/utils.sh
 source $AIO_ROOT/acumos_env.sh
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
 action=$1
 if [[ "$action" != 'clean' ]]; then
   export ACUMOS_MARIADB_HOST=$2
-  get_host_ip $ACUMOS_MARIADB_HOST
-  export ACUMOS_MARIADB_HOST_IP=$HOST_IP
   export DEPLOYED_UNDER=k8s
   export K8S_DIST=$3
 fi
@@ -231,8 +236,6 @@ if [[ -e mariadb_env.sh ]]; then
   log "Using prepared mariadb_env.sh for customized environment values"
   source mariadb_env.sh
 fi
-
-set_k8s_env
 
 source setup_mariadb_env.sh
 cp mariadb_env.sh $AIO_ROOT/.

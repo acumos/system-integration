@@ -39,23 +39,24 @@ export ACUMOS_STAGING=nexus3.acumos.org:10004
 export ACUMOS_RELEASE=nexus3.acumos.org:10002
 
 # Images based upon Clio release assembly
-# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_Clio_1909032130
+# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_Clio_1910110930
 # Core components
 export ACUMOS_DELETE_SNAPSHOTS=false
-export AZURE_CLIENT_IMAGE=$ACUMOS_RELEASE/acumos-azure-client:2.0.15
-export PORTAL_BE_IMAGE=$ACUMOS_STAGING/acumos-portal-be:3.0.11
-export PORTAL_FE_IMAGE=$ACUMOS_STAGING/acumos-portal-fe:3.0.11
-export LICENSE_PROFILE_EDITOR_IMAGE=$ACUMOS_SNAPSHOT/license-profile-editor:0.0.3-SNAPSHOT
-export LICENSE_RTU_EDITOR_IMAGE=$ACUMOS_SNAPSHOT/license-rtu-editor:0.0.3-SNAPSHOT
-export COMMON_DATASERVICE_IMAGE=$ACUMOS_STAGING/common-dataservice:2.2.6
-export DESIGNSTUDIO_IMAGE=$ACUMOS_STAGING/ds-compositionengine:2.2.2
-export FEDERATION_IMAGE=$ACUMOS_RELEASE/federation-gateway:2.2.1
-export KUBERNETES_CLIENT_IMAGE=$ACUMOS_RELEASE/kubernetes-client:2.0.11
-export MICROSERVICE_GENERATION_IMAGE=$ACUMOS_STAGING/microservice-generation:3.1.0
-export ONBOARDING_IMAGE=$ACUMOS_STAGING/onboarding-app:3.1.0
+export AZURE_CLIENT_IMAGE=$ACUMOS_STAGING/acumos-azure-client:3.0.0
+export PORTAL_BE_IMAGE=$ACUMOS_STAGING/acumos-portal-be:3.0.18
+export PORTAL_FE_IMAGE=$ACUMOS_STAGING/acumos-portal-fe:3.0.18
+export LICENSE_PROFILE_EDITOR_IMAGE=$ACUMOS_STAGING/acumos/license-profile-editor:0.0.5
+export LICENSE_RTU_EDITOR_IMAGE=$ACUMOS_STAGING/acumos/license-rtu-editor:0.0.5
+export LUM_DATABASE_IMAGE=$ACUMOS_STAGING/acumos/lum-db:0.25.2
+export COMMON_DATASERVICE_IMAGE=$ACUMOS_STAGING/acumos/common-dataservice:3.0.0
+export DESIGNSTUDIO_IMAGE=$ACUMOS_STAGING/ds-compositionengine:3.0.0
+export FEDERATION_IMAGE=$ACUMOS_STAGING/acumos/federation-gateway:3.0.1
+export KUBERNETES_CLIENT_IMAGE=$ACUMOS_STAGING/kubernetes-client:3.0.0
+export MICROSERVICE_GENERATION_IMAGE=$ACUMOS_STAGING/microservice-generation:3.4.0
+export ONBOARDING_IMAGE=$ACUMOS_STAGING/onboarding-app:3.4.0
 export SECURITY_VERIFICATION_IMAGE=$ACUMOS_STAGING/security-verification:1.1.0
-export OPENSTACK_CLIENT_IMAGE=$ACUMOS_RELEASE/openstack-client:2.0.12
-export DEPLOYMENT_CLIENT_IMAGE=$ACUMOS_SNAPSHOT/deployment-client:1.0.0-SNAPSHOT
+export OPENSTACK_CLIENT_IMAGE=$ACUMOS_STAGING/openstack-client:3.0.0
+export DEPLOYMENT_CLIENT_IMAGE=$ACUMOS_STAGING/deployment-client:1.0.0
 
 # Model-execution-components
 export DATABROKER_SQLBROKER_IMAGE=$ACUMOS_RELEASE/sqldatabroker:1.2.0
@@ -83,6 +84,10 @@ export ACUMOS_ADMIN_REGISTRY_PASSWORD=
 export DEPLOY_RESULT=
 export FAIL_REASON=
 
+# Deploy environment options
+export ACUMOS_DEPLOY_AS_POD=false
+export ACUMOS_NAMESPACE=acumos
+
 # External component options
 export ACUMOS_DEPLOY_MARIADB=true
 export ACUMOS_SETUP_DB=true
@@ -91,18 +96,21 @@ export ACUMOS_DEPLOY_JENKINS=true
 export ACUMOS_DEPLOY_DOCKER=true
 export ACUMOS_DEPLOY_DOCKER_DIND=true
 export ACUMOS_DEPLOY_NEXUS=true
+export ACUMOS_DEPLOY_NEXUS_REPOS=true
 export ACUMOS_DEPLOY_ELK=true
 export ACUMOS_DEPLOY_ELK_METRICBEAT=true
 export ACUMOS_DEPLOY_ELK_FILEBEAT=true
 export ACUMOS_DEPLOY_MLWB=true
 export ACUMOS_DEPLOY_INGRESS=true
 export ACUMOS_COUCHDB_DB_NAME=mlwbdb
-export ACUMOS_COUCHDB_DOMAIN=$ACUMOS_DOMAIN
-export ACUMOS_COUCHDB_PORT=
+export ACUMOS_COUCHDB_DOMAIN=$ACUMOS_NAMESPACE-couchdb-svc-couchdb
+export ACUMOS_COUCHDB_PORT=5984
 export ACUMOS_COUCHDB_USER=admin
 export ACUMOS_COUCHDB_PASSWORD=
+export ACUMOS_COUCHDB_VERIFY_READY=true
+export ACUMOS_JENKINS_IMAGE=jenkins/jenkins
 export ACUMOS_JENKINS_API_CONTEXT_PATH=jenkins
-export ACUMOS_JENKINS_API_URL="http://jenkins:8080/$ACUMOS_JENKINS_API_CONTEXT_PATH/"
+export ACUMOS_JENKINS_API_URL="http://$ACUMOS_NAMESPACE-jenkins:8080/$ACUMOS_JENKINS_API_CONTEXT_PATH/"
 export ACUMOS_JENKINS_USER=admin
 export ACUMOS_JENKINS_PASSWORD=
 export ACUMOS_JENKINS_SCAN_JOB=security-verification-scan
@@ -111,28 +119,11 @@ export ACUMOS_JENKINS_COMPOSITE_SOLUTION_DEPLOY_JOB=solution-deploy
 export ACUMOS_JENKINS_NIFI_DEPLOY_JOB=nifi-deploy
 export ACUMOS_DOCKER_API_HOST=docker-dind-service
 export ACUMOS_DOCKER_API_PORT=2375
-export ACUMOS_NEXUS_ADMIN_PASSWORD=admin123
-export ACUMOS_NEXUS_ADMIN_USERNAME=admin
-export ACUMOS_NEXUS_API_PORT=30881
-export ACUMOS_NEXUS_GROUP=org.acumos
-export ACUMOS_NEXUS_DOMAIN=$ACUMOS_DOMAIN
-export ACUMOS_NEXUS_HOST=$ACUMOS_HOST
-export ACUMOS_NEXUS_RO_USER=acumos_ro
-export ACUMOS_NEXUS_RO_USER_PASSWORD=
-export ACUMOS_NEXUS_RW_USER=acumos_rw
-export ACUMOS_NEXUS_RW_USER_PASSWORD=
-export ACUMOS_DOCKER_REGISTRY_USER=$ACUMOS_NEXUS_RW_USER
-export ACUMOS_DOCKER_REGISTRY_PASSWORD=
-export ACUMOS_NEXUS_MAVEN_REPO_PATH=repository
-export ACUMOS_NEXUS_MAVEN_REPO=acumos_model_maven
-export ACUMOS_NEXUS_DOCKER_REPO=docker_model_maven
-export ACUMOS_DOCKER_REGISTRY_HOST=$ACUMOS_NEXUS_HOST
-export ACUMOS_DOCKER_MODEL_PORT=30882
-export ACUMOS_DOCKER_IMAGETAG_PREFIX=
 export ACUMOS_KONG_PROXY_SSL_PORT=443
 export ACUMOS_INGRESS_SERVICE=nginx
 export ACUMOS_INGRESS_HTTP_PORT=30080
 export ACUMOS_INGRESS_HTTPS_PORT=30443
+export ACUMOS_INGRESS_LOADBALANCER=false
 export ACUMOS_INGRESS_MAX_REQUEST_SIZE=1000m
 export ACUMOS_INGRESS_MAX_REQUEST_SIZE=1000m
 export ACUMOS_HTTP_PROXY=
@@ -159,7 +150,7 @@ export ACUMOS_ADMIN_EMAIL=acumos@example.com
 export ACUMOS_CDS_PREVIOUS_VERSION=
 export ACUMOS_CDS_HOST=cds-service
 export ACUMOS_CDS_PORT=8000
-export ACUMOS_CDS_VERSION=3.0-rev2
+export ACUMOS_CDS_VERSION=3.0-rev3
 export ACUMOS_CDS_DB='acumos_cds'
 export ACUMOS_CDS_USER=ccds_client
 export ACUMOS_CDS_PASSWORD=
@@ -184,7 +175,7 @@ export ACUMOS_PORTAL_IMAGE_MAX_SIZE=1000KB
 export ACUMOS_ENABLE_SECURITY_VERIFICATION=true
 export ACUMOS_SECURITY_VERIFICATION_PORT=9082
 export ACUMOS_SECURITY_VERIFICATION_EXTERNAL_SCAN=false
-export ACUMOS_SUCCESS_WAIT_TIME=300
+export ACUMOS_SUCCESS_WAIT_TIME=600
 export PYTHON_EXTRAINDEX=
 export PYTHON_EXTRAINDEX_HOST=
 
@@ -204,6 +195,8 @@ export ACUMOS_TRUSTSTORE_PASSWORD=
 if [[ -e $AIO_ROOT/certs/cert_env.sh ]]; then source $AIO_ROOT/certs/cert_env.sh; fi
 
 # Acumos model deployment options
+export ACUMOS_DEFAULT_SOLUTION_DOMAIN=$ACUMOS_DOMAIN
+export ACUMOS_DEFAULT_SOLUTION_NAMESPACE=$ACUMOS_NAMESPACE
 export ACUMOS_DATA_BROKER_INTERNAL_PORT=8080
 export ACUMOS_DATA_BROKER_PORT=8556
 export ACUMOS_DEPLOYED_SOLUTION_PORT=3330
@@ -214,7 +207,6 @@ export ACUMOS_PROBE_PORT=5006
 # Kubernetes options
 export ACUMOS_K8S_ADMIN_SCOPE=namespace
 export ACUMOS_K8S_DEPLOYMENT_VERSION="apps/v1"
-export ACUMOS_NAMESPACE=acumos
 export ACUMOS_HOST_USER=
 export ACUMOS_DEPLOYMENT_CLIENT_SERVICE_LABEL=acumos
 export ACUMOS_COMMON_DATA_SERVICE_LABEL=acumos
@@ -242,10 +234,7 @@ export ACUMOS_LOGS_PV_SIZE=1Gi
 export ACUMOS_DEPLOYMENT_CONFIG_PVC_NAME="deployment"
 export DOCKER_VOLUME_PVC_NAME="docker-volume"
 export DOCKER_VOLUME_PV_NAME="docker-volume"
-export DOCKER_VOLUME_PV_SIZE=5Gi
-export NEXUS_DATA_PVC_NAME="nexus-data"
-export NEXUS_DATA_PV_NAME="nexus-data"
-export NEXUS_DATA_PV_SIZE=10Gi
+export DOCKER_VOLUME_PV_SIZE=10Gi
 export KONG_DB_PVC_NAME="kong-data"
 export KONG_DB_PV_NAME="kong-data"
 export KONG_DB_PV_SIZE=1Gi
@@ -256,3 +245,4 @@ export ACUMOS_10GI_STORAGECLASSNAME=
 # Supplemental component options
 if [[ -e $AIO_ROOT/mariadb_env.sh ]]; then source $AIO_ROOT/mariadb_env.sh; fi
 if [[ -e $AIO_ROOT/elk_env.sh ]]; then source $AIO_ROOT/elk_env.sh; fi
+if [[ -e $AIO_ROOT/nexus_env.sh ]]; then source $AIO_ROOT/nexus_env.sh; fi

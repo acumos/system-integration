@@ -62,8 +62,9 @@
 
 function stop_acumos_core_in_k8s() {
   trap 'fail' ERR
-  apps=" azure-client cds docker-proxy dsce federation kubernetes-client msg \
-    onboarding portal-be portal-fe sv-scanning license-profile-editor license-rtu-editor"
+  apps="azure-client cds deployment-client dsce federation \
+    kubernetes-client msg license-profile-editor license-rtu-editor \
+    onboarding portal-be portal-fe sv-scanning"
   for app in $apps; do
     if [[ $(kubectl delete deployment -n $ACUMOS_NAMESPACE $app) ]]; then
       log "Deployment deleted for app $app"
@@ -100,7 +101,6 @@ function stop_acumos() {
     if [[ "$MLWB_DEPLOY_JUPYTERHUB" == "true" ]]; then
       bash ../chartsjupyterhub/setup_jupyterhub.sh clean
     fi
-    rm -rf deploy
     stop_acumos_core_in_k8s
   fi
   cleanup_snapshot_images
@@ -131,14 +131,60 @@ function prepare_env() {
 function setup_jenkins() {
   trap 'fail' ERR
   bash $AIO_ROOT/../charts/jenkins/setup_jenkins.sh all $ACUMOS_NAMESPACE $ACUMOS_DOMAIN
+
+  log "Download security-verification-scan config if not already present (and presumably customized)"
   if [[ ! -e deploy/security-verification ]]; then
     git clone https://gerrit.acumos.org/r/security-verification deploy/security-verification
   fi
   mkdir -p deploy/jenkins/acumos
+  cp ~/.kube/config deploy/jenkins/acumos/kube-config
   grep -e ACUMOS_CDS -e ACUMOS_NEXUS acumos_env.sh >deploy/jenkins/acumos/acumos_env.sh
   cp -r deploy/security-verification/jenkins/scan deploy/jenkins/acumos/sv
-  pod=$(kubectl get pods -n $ACUMOS_NAMESPACE | awk '/jenkins/{print $1}')
+  local pod=$(kubectl get pods -n $ACUMOS_NAMESPACE | awk '/jenkins/{print $1}')
   kubectl cp deploy/jenkins/acumos -n $ACUMOS_NAMESPACE $pod:/acumos
+
+  log "Download default jobs if not already present (and presumably customized)"
+  mkdir -p deploy/jenkins/jobs
+  if [[ ! -e deploy/jenkins/jobs/solution-deploy.xml ]]; then
+    wget https://raw.githubusercontent.com/acumos/model-deployments-deployment-client/master/config/jobs/jenkins/solution-deploy.xml \
+      -O deploy/jenkins/jobs/solution-deploy.xml
+    sedi "s/acumos-domain/$ACUMOS_DEFAULT_SOLUTION_DOMAIN/" \
+      deploy/jenkins/jobs/solution-deploy.xml
+    sedi "s/acumos-namespace/$ACUMOS_DEFAULT_SOLUTION_NAMESPACE/" \
+      deploy/jenkins/jobs/solution-deploy.xml
+  fi
+  if [[ ! -e deploy/jenkins/jobs/security-verification-scan.xml ]]; then
+    wget https://raw.githubusercontent.com/acumos/security-verification/master/jenkins/security-verification-scan.xml \
+      -O deploy/jenkins/jobs/security-verification-scan.xml
+  fi
+  if [[ ! -e deploy/jenkins/jobs/initial-setup.xml ]]; then
+    cp $AIO_ROOT/../charts/jenkins/jobs/initial-setup.xml deploy/jenkins/jobs/.
+  fi
+
+  local url="-k https://$ACUMOS_DOMAIN/jenkins/"
+  local auth="-u $ACUMOS_JENKINS_USER:$ACUMOS_JENKINS_PASSWORD"
+  check_name_resolves $ACUMOS_JENKINS_API_URL
+  if [[ "$NAME_RESOLVES" == "true" ]]; then
+    url=$ACUMOS_JENKINS_API_URL
+  fi
+  fs=$(ls -d1 deploy/jenkins/jobs/*)
+  for f in $fs; do
+    local job=$(basename $f | cut -d '.' -f 1)
+    log "Create Jenkins job $job"
+    curl -v -X POST ${url}createItem?name=$job $auth \
+      -H "Content-Type:text/xml" \
+      --data-binary @$f
+  done
+
+  log "Execute Jenkins initial-setup job"
+  local pod=$(kubectl get pods -n $ACUMOS_NAMESPACE | awk '/jenkins/{print $1}')
+  kubectl cp -n $ACUMOS_NAMESPACE ~/.kube/config $pod:/acumos/.
+  curl -v -X POST ${url}job/initial-setup/build $auth
+
+  log "Execute security-verification-scan setup job"
+  curl -v -X POST ${url}job/security-verification-scan/build $auth \
+    --data-urlencode json='{"parameter":[{"name":"solutionId","value":""},{"name":"revisionId","value":""},{"name":"userId","value":""}]}'
+
   update_acumos_env ACUMOS_DEPLOY_JENKINS false force
 }
 
@@ -157,9 +203,9 @@ function setup_acumos() {
   else
     log "Deploy the Acumos core components"
     if [[ ! -e deploy ]]; then mkdir deploy; fi
-    local apps="cds license-profile-editor license-rtu-editor federation \
-portal-fe portal-be onboarding msg dsce \
-kubernetes-client azure-client sv-scanning"
+    apps="cds azure-client deployment-client dsce federation \
+      kubernetes-client msg license-profile-editor license-rtu-editor \
+      onboarding portal-be portal-fe sv-scanning"
     for app in $apps; do
       start_acumos_core_app $app
     done
@@ -175,11 +221,7 @@ function setup_ingress() {
     if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
       if [[ "$ACUMOS_INGRESS_SERVICE" == "nginx" ]]; then
         bash $AIO_ROOT/ingress/setup_ingress.sh
-        if [[ "$K8S_DIST" == "openshift" ]]; then
-          update_acumos_env ACUMOS_ORIGIN $ACUMOS_DOMAIN:$ACUMOS_INGRESS_HTTPS_PORT force
-        else
-          update_acumos_env ACUMOS_ORIGIN $ACUMOS_DOMAIN force
-        fi
+        update_acumos_env ACUMOS_ORIGIN $ACUMOS_DOMAIN force
         echo "Portal: https://$ACUMOS_ORIGIN" >acumos.url
       else
         bash $AIO_ROOT/kong/setup_kong.sh
@@ -193,6 +235,9 @@ function setup_ingress() {
       fi
     else
       update_acumos_env ACUMOS_ORIGIN $ACUMOS_DOMAIN force
+      if [[ "$(kubectl get svc -n $ACUMOS_NAMESPACE $ACUMOS_NAMESPACE-nginx-ingress-controller)" != "" ]]; then
+        bash $AIO_ROOT/ingress/setup_ingress.sh
+      fi
     fi
   else
     bash $AIO_ROOT/kong/setup_kong.sh
@@ -205,15 +250,19 @@ function customize_catalog() {
   local old_name=$1
   local accessTypeCode=$2
   local name=$3
-  local cdsapi="https://$ACUMOS_ORIGIN/ccds"
+  cds_baseurl="-k https://$ACUMOS_DOMAIN/ccds"
+  check_name_resolves cds-service
+  if [[ "$NAME_RESOLVES" == "true" ]]; then
+    cds_baseurl="http://cds-service:8000/ccds"
+  fi
   local creds="$ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD"
-  local cats=$(curl -s -k -u $creds $cdsapi/catalog | jq '.content | length')
+  local cats=$(curl -s -u $creds $cds_baseurl/catalog | jq '.content | length')
   local cat=0
   while [[ $cat -lt $cats ]]; do
-    if [[ "$(curl -s -k -u $creds $cdsapi/catalog | jq -r ".content[$cat].name")" == "$old_name" ]]; then
+    if [[ "$(curl -s -u $creds $cds_baseurl/catalog | jq -r ".content[$cat].name")" == "$old_name" ]]; then
       local jsonin="/tmp/$(uuidgen)"
       local jsonout="/tmp/$(uuidgen)"
-      cid=$(curl -s -k -u $creds $cdsapi/catalog | jq -r ".content[$cat].catalogId")
+      cid=$(curl -s -u $creds $cds_baseurl/catalog | jq -r ".content[$cat].catalogId")
       cat <<EOF >$jsonin
 {
 "catalogId": "$cid",
@@ -226,7 +275,7 @@ function customize_catalog() {
 "url": "https://$ACUMOS_ORIGIN"
 }
 EOF
-      curl -s -k -o $jsonout -u $creds -X PUT $cdsapi/catalog/$cid \
+      curl -s -o $jsonout -u $creds -X PUT $cds_baseurl/catalog/$cid \
         -H "accept: */*" -H "Content-Type: application/json" \
         -d @$jsonin
       if [[ "$(jq '.status' $jsonout)" != "200" ]]; then
@@ -244,24 +293,30 @@ EOF
 function setup_federation() {
   trap 'fail' ERR
   log "Checking for 'self' peer entry for $ACUMOS_ORIGIN"
-  local cdsapi="https://$ACUMOS_ORIGIN/ccds"
+  local cds_baseurl="-k https://$ACUMOS_DOMAIN/ccds"
+  check_name_resolves cds-service
+  if [[ $NAME_RESOLVES == "true" ]]; then
+    cds_baseurl="http://cds-service:8000/ccds"
+  fi
   local creds="$ACUMOS_CDS_USER:$ACUMOS_CDS_PASSWORD"
   local t=0
-  while [[ $(curl -k -u $creds $cdsapi/peer | grep -c numberOfElements) -eq 0 ]]; do
+  local jsonout="/tmp/$(uuidgen)"
+  curl -s -o $jsonout -u $creds $cds_baseurl/peer
+  while [[ $(grep -c numberOfElements $jsonout) -eq 0 ]]; do
     if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
       fail "CDS API is not ready after $ACUMOS_SUCCESS_WAIT_TIME seconds"
     fi
     log "CDS API is not yet ready; waiting 10 seconds"
     t=$((t+10))
     sleep 10
+    curl -s -o $jsonout -u $creds $cds_baseurl/peer
   done
-  local jsonout="/tmp/$(uuidgen)"
-  curl -s -k -o $jsonout -u $creds $cdsapi/peer
-  local peers=$(jq -r '.content | length' $jsonout)
+  cat $jsonout
+  local peers=$(jq '.content | length' $jsonout)
   local peer=0
   local found=no
   while [[ $peer -lt $peers ]]; do
-    if [[ "$(jq -r ".content[$peer].name" $jsonout)" == "$ACUMOS_DOMAIN" ]]; then
+    if [[ "$(jq -r ".content[$peer].name" $jsonout)" == "$ACUMOS_FEDERATION_DOMAIN" ]]; then
       found=yes
     fi
     peer=$((peer+1))
@@ -276,12 +331,12 @@ function setup_federation() {
 "local": false,
 "contact1": "$ACUMOS_ADMIN_EMAIL",
 "subjectName": "$ACUMOS_CERT_SUBJECT_NAME",
-"apiUrl": "https://$ACUMOS_DOMAIN:$ACUMOS_FEDERATION_PORT",
+"apiUrl": "https://$ACUMOS_FEDERATION_DOMAIN:$ACUMOS_FEDERATION_PORT",
 "statusCode": "AC",
 "validationStatusCode": "PS"
 }
 EOF
-    curl -s -k -o $jsonout -u $creds -X POST $cdsapi/peer \
+    curl -s -o $jsonout -u $creds -X POST $cds_baseurl/peer \
       -H "accept: */*" -H "Content-Type: application/json" \
       -d @$jsonin
     if [[ "$(jq -r '.created' $jsonout)" == "null" ]]; then
@@ -321,11 +376,6 @@ get_host_ip $ACUMOS_HOST
 update_acumos_env ACUMOS_HOST_IP $HOST_IP force
 update_acumos_env ACUMOS_JWT_KEY $(uuidgen)
 update_acumos_env ACUMOS_CDS_PASSWORD $(uuidgen)
-update_acumos_env ACUMOS_NEXUS_RO_USER_PASSWORD $(uuidgen)
-update_acumos_env ACUMOS_NEXUS_RW_USER_PASSWORD $(uuidgen)
-update_acumos_env ACUMOS_DOCKER_REGISTRY_PASSWORD $ACUMOS_NEXUS_RW_USER_PASSWORD
-update_acumos_env ACUMOS_DOCKER_PROXY_USERNAME $(uuidgen)
-update_acumos_env ACUMOS_DOCKER_PROXY_PASSWORD $(uuidgen)
 
 log "Apply environment customizations to unset values in acumos_env.sh"
 source acumos_env.sh
@@ -337,17 +387,28 @@ bash $AIO_ROOT/setup_keystore.sh
 if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
   if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
     if [[ "$ACUMOS_INGRESS_SERVICE" == "nginx" ]]; then
+      EXTERNAL_IP=""
+      if [[ "$ACUMOS_INGRESS_LOADBALANCER" == "false" ]]; then
+        EXTERNAL_IP=$ACUMOS_DOMAIN_IP
+      fi
       bash $AIO_ROOT/../charts/ingress/setup_ingress_controller.sh $ACUMOS_NAMESPACE \
-        $ACUMOS_HOST_IP $AIO_ROOT/certs/acumos.crt $AIO_ROOT/certs/acumos.key
+        $AIO_ROOT/certs/acumos.crt $AIO_ROOT/certs/acumos.key $EXTERNAL_IP
     fi
+    update_acumos_env ACUMOS_DEPLOY_INGRESS false force
   fi
 fi
 
 # Acumos components depend upon pre-configuration of Nexus (e.g. ports)
 if [[ "$ACUMOS_DEPLOY_NEXUS" == "true" && "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
-  bash $AIO_ROOT/nexus/setup_nexus.sh
+  bash $AIO_ROOT/nexus/setup_nexus.sh all
   # Prevent redeploy from reinstalling Nexus unless specifically requested
   update_acumos_env ACUMOS_DEPLOY_NEXUS false force
+fi
+
+if [[ "$ACUMOS_DEPLOY_NEXUS_REPOS" == "true" && "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
+  bash $AIO_ROOT/nexus/setup_nexus_repos.sh all
+  # Prevent redeploy from reinstalling Nexus unless specifically requested
+  update_acumos_env ACUMOS_DEPLOY_NEXUS_REPOS false force
 fi
 
 # ELK and Acumos core components depend upon pre-configuration of MariaDB
@@ -390,9 +451,11 @@ fi
 
 if [[ "$ACUMOS_DEPLOY_ELK_FILEBEAT" == "true" ]]; then
   bash $AIO_ROOT/beats/setup_beats.sh filebeat
+  update_acumos_env ACUMOS_DEPLOY_ELK_FILEBEAT false force
 fi
 if [[ "$DEPLOYED_UNDER" == "docker" && "$ACUMOS_DEPLOY_ELK_METRICBEAT" == "true" ]]; then
   bash $AIO_ROOT/beats/setup_beats.sh metricbeat
+  update_acumos_env ACUMOS_DEPLOY_ELK_METRICBEAT false force
 fi
 
 # Acumos components depend upon pre-configuration of the docker-engine
@@ -400,7 +463,9 @@ if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
   if [[ "$ACUMOS_DEPLOY_DOCKER_DIND" == "true" ]]; then
     bash $AIO_ROOT/docker-engine/setup_docker_engine.sh
   else
-    update_acumos_env ACUMOS_DOCKER_API_HOST $ACUMOS_HOST_IP force
+    if [[ "$ACUMOS_DOCKER_API_HOST" == "docker-dind-service" ]]; then
+      update_acumos_env ACUMOS_DOCKER_API_HOST $ACUMOS_HOST_IP force
+    fi
   fi
 else
   update_acumos_env ACUMOS_DOCKER_API_HOST $ACUMOS_HOST_IP force
