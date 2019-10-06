@@ -275,6 +275,12 @@ spec:
                   "url": "https://docs.acumos.org/"
                }
             },
+            "lum": { 
+              "url": "http://lum-service:8080"
+            },
+            "license_profile": {
+              "url": "https://<ACUMOS_HOST>/license-profile-editor/index.html"
+            },
             "image": {
               "size": "<ACUMOS_PORTAL_IMAGE_MAX_SIZE>"
             }
