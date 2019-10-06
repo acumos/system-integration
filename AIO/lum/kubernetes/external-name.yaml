@@ -1,0 +1,12 @@
+# TODO make this part of helm chart for lum
+kind: Service
+apiVersion: v1
+metadata:
+  # friendly name of lum service
+  name: lum-service
+  namespace: <ACUMOS_NAMESPACE>
+spec:
+  type: ExternalName
+  externalName: <LUM_EXTERNAL_NAME>
+  ports:
+  - port: <LUM_EXTERNAL_PORT>
