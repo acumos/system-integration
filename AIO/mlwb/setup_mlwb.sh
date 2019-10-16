@@ -107,6 +107,7 @@ mlwb-model"
     cp kubernetes/mlwb-notebook* deploy/.
     cp kubernetes/mlwb-project* deploy/.
     cp kubernetes/mlwb-model* deploy/.
+	cp kubernetes/mlwb-predictor* deploy/.
 
     if [[ "$MLWB_DEPLOY_PIPELINE" == "true" ]]; then
       apps="$apps mlwb-pipeline mlwb-pipeline-webcomponent mlwb-pipeline-catalog-webcomponent"
