@@ -471,10 +471,12 @@ source acumos_env.sh
 setup_ingress
 setup_acumos
 setup_federation
+bash $AIO_ROOT/lum/setup-lum.sh
 
 if [[ "$ACUMOS_DEPLOY_MLWB" == "true" ]]; then
   bash $AIO_ROOT/mlwb/setup_mlwb.sh
 fi
+
 
 set +x
 
@@ -496,6 +498,7 @@ Portal Swagger UI: https://$ACUMOS_ORIGIN/api/swagger-ui.html
 Onboarding Service Swagger UI: https://$ACUMOS_ORIGIN/onboarding-app/swagger-ui.html
 Kibana: http://$ACUMOS_DOMAIN:$ACUMOS_ELK_KIBANA_PORT/app/kibana
 Nexus: http://$ACUMOS_DOMAIN:$ACUMOS_NEXUS_API_PORT
+License Usage Manager: http://$ACUMOS_DOMAIN/lum/
 EOF
 if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
   echo "Mariadb Admin: http://$ACUMOS_HOST_IP:$ACUMOS_MARIADB_ADMINER_PORT" >>acumos.url
