@@ -1,0 +1,19 @@
+## for all in one
+## need to push changes for nginx proxy
+## need to pull in gerrit repo/ submodule
+## chart
+
+image:
+  pullPolicy: IfNotPresent
+  pullSecrets: acumos-registry
+
+ingress:
+  ## Enable to setup ingress for lum server
+  ## Need to determine how we will secure this ingress service
+  enabled: true
+  hosts:
+    - <ACUMOS_DOMAIN>
+  tls:
+   - secretName: ingress-cert
+     hosts:
+       - <ACUMOS_DOMAIN>
