@@ -60,7 +60,10 @@ services:
           }
         },
         "lum": {
-          "url": "${ACUMOS_LUM_API_URL}"
+          "url": "http://lum-service:8080"
+        },
+        "license_profile": {
+          "url": "https://<ACUMOS_DOMAIN>/license-profile-editor/index.html"
         },
         "qanda": {
           "url": "https://stackoverflow.com/questions/tagged/acumos"

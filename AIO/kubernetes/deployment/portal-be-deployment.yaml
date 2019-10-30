@@ -105,8 +105,11 @@ spec:
             "k8_deploy" : {
               "url" : "http://deployment-client-service:8337"
             },
-            "lum" : {
-              "url" : "http://lum-service:1234"
+            "lum": { 
+              "url": "http://lum-service:8080"
+            },
+            "license_profile": {
+              "url": "https://<ACUMOS_DOMAIN>/license-profile-editor/index.html"
             },
             "microservice": {
               "url": "http://msg-service:8336/microservice-generation/v2/generateMicroservice"
