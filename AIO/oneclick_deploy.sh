@@ -487,10 +487,17 @@ if [[ "$ACUMOS_DEPLOY_CORE" == "true" ]]; then
     sv_baseurl="-k https://$ACUMOS_DOMAIN/sv/"
   fi
   curl $sv_baseurl/update/siteConfig/verification
+  update_acumos_env ACUMOS_DEPLOY_CORE false force
 fi
 
 if [[ "$ACUMOS_DEPLOY_MLWB" == "true" ]]; then
   bash $AIO_ROOT/mlwb/setup_mlwb.sh
+  update_acumos_env ACUMOS_DEPLOY_MLWB false force
+fi
+
+if [[ "$ACUMOS_DEPLOY_LUM" == "true" ]]; then
+  bash $AIO_ROOT/lum/setup-lum.sh
+  update_acumos_env ACUMOS_DEPLOY_LUM false force
 fi
 
 set +x
@@ -511,8 +518,9 @@ cat <<EOF >>acumos.url
 Common Data Service Swagger UI: https://$ACUMOS_ORIGIN/ccds/swagger-ui.html
 Portal Swagger UI: https://$ACUMOS_ORIGIN/api/swagger-ui.html
 Onboarding Service Swagger UI: https://$ACUMOS_ORIGIN/onboarding-app/swagger-ui.html
-Kibana: http://$ACUMOS_DOMAIN:$ACUMOS_ELK_KIBANA_PORT/app/kibana
-Nexus: http://$ACUMOS_DOMAIN:$ACUMOS_NEXUS_API_PORT
+Kibana: http://$ACUMOS_ELK_DOMAIN:$ACUMOS_ELK_KIBANA_PORT/app/kibana
+Nexus: http://$NEXUS_DOMAIN:$ACUMOS_NEXUS_API_PORT
+License Usage Manager: http://$ACUMOS_DOMAIN/lum/
 EOF
 if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
   echo "Mariadb Admin: http://$ACUMOS_HOST_IP:$ACUMOS_MARIADB_ADMINER_PORT" >>acumos.url

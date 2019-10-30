@@ -45,10 +45,10 @@ export ACUMOS_DELETE_SNAPSHOTS=false
 export AZURE_CLIENT_IMAGE=$ACUMOS_STAGING/acumos-azure-client:3.0.0
 export PORTAL_BE_IMAGE=$ACUMOS_SNAPSHOT/acumos-portal-be:3.0.19-SNAPSHOT
 export PORTAL_FE_IMAGE=$ACUMOS_SNAPSHOT/acumos-portal-fe:3.0.19-SNAPSHOT
-export LICENSE_PROFILE_EDITOR_IMAGE=$ACUMOS_STAGING/acumos/license-profile-editor:0.0.5
-export LICENSE_RTU_EDITOR_IMAGE=$ACUMOS_STAGING/acumos/license-rtu-editor:0.0.5
+export LICENSE_PROFILE_EDITOR_IMAGE=$ACUMOS_STAGING/acumos/license-profile-editor:0.0.7
+export LICENSE_RTU_EDITOR_IMAGE=$ACUMOS_STAGING/acumos/license-rtu-editor:0.1.1
 export LUM_DATABASE_IMAGE=$ACUMOS_STAGING/acumos/lum-db:0.25.2
-export COMMON_DATASERVICE_IMAGE=$ACUMOS_STAGING/acumos/common-dataservice:3.0.0
+export COMMON_DATASERVICE_IMAGE=$ACUMOS_STAGING/acumos/common-dataservice:3.0.1
 export DESIGNSTUDIO_IMAGE=$ACUMOS_STAGING/ds-compositionengine:3.0.0
 export FEDERATION_IMAGE=$ACUMOS_STAGING/acumos/federation-gateway:3.0.1
 export KUBERNETES_CLIENT_IMAGE=$ACUMOS_STAGING/kubernetes-client:3.0.0
@@ -88,7 +88,7 @@ export FAIL_REASON=
 export ACUMOS_DEPLOY_AS_POD=false
 export ACUMOS_NAMESPACE=acumos
 
-# External component options
+# Deployment controls enabling use cases: don't deploy / skip on redeploy
 export ACUMOS_DEPLOY_MARIADB=true
 export ACUMOS_SETUP_DB=true
 export ACUMOS_DEPLOY_COUCHDB=true
@@ -102,7 +102,10 @@ export ACUMOS_DEPLOY_ELK_METRICBEAT=true
 export ACUMOS_DEPLOY_ELK_FILEBEAT=true
 export ACUMOS_DEPLOY_CORE=true
 export ACUMOS_DEPLOY_MLWB=true
+export ACUMOS_DEPLOY_LUM=true
 export ACUMOS_DEPLOY_INGRESS=true
+
+# External component options
 export ACUMOS_COUCHDB_DB_NAME=mlwbdb
 export ACUMOS_COUCHDB_DOMAIN=$ACUMOS_NAMESPACE-couchdb-svc-couchdb
 export ACUMOS_COUCHDB_PORT=5984
@@ -127,6 +130,9 @@ export ACUMOS_INGRESS_HTTPS_PORT=30443
 export ACUMOS_INGRESS_LOADBALANCER=false
 export ACUMOS_INGRESS_MAX_REQUEST_SIZE=1000m
 export ACUMOS_INGRESS_MAX_REQUEST_SIZE=1000m
+export LUM_RELEASE_NAME=license-clio
+export LUM_NAMESPACE=$ACUMOS_NAMESPACE
+export LUM_CHART_NAME=lum-helm
 export ACUMOS_HTTP_PROXY=
 export ACUMOS_HTTPS_PROXY=
 
