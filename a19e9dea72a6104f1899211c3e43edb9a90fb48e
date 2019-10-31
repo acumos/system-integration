@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3529f388_46b3eeaa",
+        "filename": "AIO/kubernetes/deployment/portal-be-deployment.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 291
+      },
+      "writtenOn": "2019-10-31T22:05:56Z",
+      "side": 1,
+      "message": "similar change is applicable for federation service configs",
+      "revId": "a19e9dea72a6104f1899211c3e43edb9a90fb48e",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
