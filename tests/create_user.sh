@@ -96,6 +96,7 @@ EOF
   if [[ "$NAME_RESOLVES" == "true" ]]; then
     apiurl="http://portal-fe-service:8085/api/users/register"
   fi
+  trap - ERR
   curl -s -o $jsonout -X POST $apiurl \
     -H "Content-Type: application/json" -d @$jsoninp
   cat $jsonout
@@ -110,6 +111,7 @@ EOF
     curl -s -o $jsonout -X POST $apiurl \
       -H "Content-Type: application/json" -d @$jsoninp
   done
+  trap 'fail' ERR
   rm $jsonout $jsoninp
 }
 
