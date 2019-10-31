@@ -54,7 +54,7 @@ export FEDERATION_IMAGE=$ACUMOS_STAGING/acumos/federation-gateway:3.0.1
 export KUBERNETES_CLIENT_IMAGE=$ACUMOS_STAGING/kubernetes-client:3.0.0
 export MICROSERVICE_GENERATION_IMAGE=$ACUMOS_STAGING/microservice-generation:3.4.0
 export ONBOARDING_IMAGE=$ACUMOS_STAGING/onboarding-app:3.4.0
-export SECURITY_VERIFICATION_IMAGE=$ACUMOS_STAGING/security-verification:1.1.0
+export SECURITY_VERIFICATION_IMAGE=$ACUMOS_STAGING/acumos/security-verification:1.2.0
 export OPENSTACK_CLIENT_IMAGE=$ACUMOS_STAGING/openstack-client:3.0.0
 export DEPLOYMENT_CLIENT_IMAGE=$ACUMOS_STAGING/deployment-client:1.0.1
 

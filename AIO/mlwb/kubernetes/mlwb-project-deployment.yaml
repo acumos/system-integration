@@ -138,11 +138,15 @@ spec:
           value: "http://mlwb-notebook-service:9089/mlWorkbench/v1/notebook"
         - name: pipelinemSURL
           value: "http://mlwb-pipeline-service:9090/mlWorkbench/v1/pipeline"
+        - name: predictormSURL
+          value: "http://mlwb-predictor-service:9096/mlWorkbench/v1/predictor"
         - name: projectWikiURL
           value: "https://wiki.acumos.org/display/TRAIN"
         - name: notebookWikiURL
           value: "https://wiki.acumos.org/display/TRAIN"
         - name: pipelineWikiURL
+          value: "https://wiki.acumos.org/display/TRAIN"
+        - name: predictorWikiURL
           value: "https://wiki.acumos.org/display/TRAIN"
         - name: pipelineFlag
           value: "true"

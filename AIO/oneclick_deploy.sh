@@ -145,6 +145,7 @@ function setup_jenkins() {
   mkdir -p deploy/jenkins/acumos
   cp ~/.kube/config deploy/jenkins/acumos/kube-config
   grep ACUMOS_CDS acumos_env.sh >deploy/jenkins/acumos/acumos_env.sh
+  grep ACUMOS_SECURITY_VERIFICATION_PORT acumos_env.sh >deploy/jenkins/acumos/acumos_env.sh
   grep ACUMOS_NEXUS nexus_env.sh >>deploy/jenkins/acumos/acumos_env.sh
   cp -r deploy/security-verification/jenkins/scan deploy/jenkins/acumos/sv
   local pod=$(kubectl get pods -n $ACUMOS_NAMESPACE | awk '/jenkins/{print $1}')

@@ -125,7 +125,7 @@ services:
             },
             "sv": {
               "enabled": "${ACUMOS_ENABLE_SECURITY_VERIFICATION}",
-              "api": "http://sv-scanning-service:9082/scan"
+              "api": "http://sv-scanning-service:9082"
             },
             "menu": "[
               {\"name\": \" ML Learning Path\",
