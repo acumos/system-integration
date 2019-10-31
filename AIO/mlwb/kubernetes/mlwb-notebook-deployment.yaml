@@ -86,7 +86,7 @@ spec:
         args:
         - set -x;
           cd maven;
-          keytool -import -file certs/<MLWB_JUPYTERHUB_CERT> -alias jupyterhub -keystore /usr/local/openjdk-8/jre/lib/security/cacerts -storepass changeit -noprompt;
+          keytool -import -file certs/<MLWB_JUPYTERHUB_CERT> -alias jupyterhub -keystore /opt/java/openjdk/lib/security/cacerts -storepass changeit -noprompt;
           java -Xms128m -Xmx256m -Djava.security.egd=file:/dev/./urandom -jar notebook-service*.jar;
         ports:
         - containerPort: 9089
