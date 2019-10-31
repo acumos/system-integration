@@ -71,7 +71,8 @@ services:
         "blueprint": {
           "ImageName": "${BLUEPRINT_ORCHESTRATOR_IMAGE}",
           "name": "blueprint-orchestrator",
-          "port": "8555"
+          "port": "8555",
+          "nodePort": "30555"
         },
         "nexus": {
           "url": "http://${ACUMOS_NEXUS_HOST}:${ACUMOS_NEXUS_API_PORT}/${ACUMOS_NEXUS_MAVEN_REPO_PATH}/${ACUMOS_NEXUS_MAVEN_REPO}/",

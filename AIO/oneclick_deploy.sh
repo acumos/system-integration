@@ -62,9 +62,15 @@
 
 function stop_acumos_core_in_k8s() {
   trap 'fail' ERR
-  apps="azure-client cds deployment-client dsce federation \
-    kubernetes-client msg license-profile-editor license-rtu-editor \
-    onboarding portal-be portal-fe sv-scanning"
+  if [[ "$ACUMOS_DEPLOY_FEDERATION" == "true" ]]; then
+    apps="cds azure-client deployment-client dsce federation \
+      kubernetes-client msg license-profile-editor license-rtu-editor \
+      onboarding portal-be portal-fe sv-scanning"
+  else
+    apps="cds azure-client deployment-client dsce \
+      kubernetes-client msg license-profile-editor license-rtu-editor \
+      onboarding portal-be portal-fe sv-scanning"
+  fi
   for app in $apps; do
     if [[ $(kubectl delete deployment -n $ACUMOS_NAMESPACE $app) ]]; then
       log "Deployment deleted for app $app"
@@ -204,9 +210,15 @@ function setup_acumos() {
   else
     log "Deploy the Acumos core components"
     if [[ ! -e deploy ]]; then mkdir deploy; fi
-    apps="cds azure-client deployment-client dsce federation \
-      kubernetes-client msg license-profile-editor license-rtu-editor \
-      onboarding portal-be portal-fe sv-scanning"
+    if [[ "$ACUMOS_DEPLOY_FEDERATION" == "true" ]]; then
+      apps="cds azure-client deployment-client dsce federation \
+        kubernetes-client msg license-profile-editor license-rtu-editor \
+        onboarding portal-be portal-fe sv-scanning"
+    else
+      apps="cds azure-client deployment-client dsce \
+        kubernetes-client msg license-profile-editor license-rtu-editor \
+        onboarding portal-be portal-fe sv-scanning"
+    fi
     for app in $apps; do
       start_acumos_core_app $app
     done
@@ -478,7 +490,6 @@ setup_ingress
 
 if [[ "$ACUMOS_DEPLOY_CORE" == "true" ]]; then
   setup_acumos
-  setup_federation
   log "Setup SV site-config"
   check_name_resolves sv-scanning-service
   if [[ $NAME_RESOLVES == "true" ]]; then
@@ -488,6 +499,10 @@ if [[ "$ACUMOS_DEPLOY_CORE" == "true" ]]; then
   fi
   curl $sv_baseurl/update/siteConfig/verification
   update_acumos_env ACUMOS_DEPLOY_CORE false force
+fi
+
+if [[ "$ACUMOS_DEPLOY_FEDERATION" == "true" ]]; then
+  setup_federation
 fi
 
 if [[ "$ACUMOS_DEPLOY_MLWB" == "true" ]]; then

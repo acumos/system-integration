@@ -74,9 +74,11 @@ function nexus_setup() {
     wait_running nexus $ACUMOS_NEXUS_NAMESPACE
   fi
 
-  port=$ACUMOS_NEXUS_API_PORT
-  host=$ACUMOS_NEXUS_HOST
-  if [[ "$ACUMOS_DEPLOY_AS_POD" == "false" || "$ACUMOS_NEXUS_HOST" != "$ACUMOS_INTERNAL_NEXUS_HOST" ]]; then
+  check_name_resolves nexus-service
+  if [[ $NAME_RESOLVES == "true" ]]; then
+    host=nexus-service
+    port=$ACUMOS_NEXUS_API_PORT
+  else
     host=$ACUMOS_NEXUS_DOMAIN
     port=$ACUMOS_NEXUS_API_NODEPORT
   fi
