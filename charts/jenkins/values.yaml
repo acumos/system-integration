@@ -25,6 +25,9 @@ master:
   serviceType: ClusterIP
   jenkinsUriPrefix: "/jenkins/"
   numExecutors: 10
+  overwriteConfig: false
+  overwritePlugins: false
+  overwriteJobs: false
   authorizationStrategy: |-
     <useSecurity>true</useSecurity>
   hostAliases:

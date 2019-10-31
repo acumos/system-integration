@@ -105,7 +105,7 @@ spec:
             "k8_deploy" : {
               "url" : "http://deployment-client-service:8337"
             },
-            "lum": { 
+            "lum": {
               "url": "http://lum-service:8080"
             },
             "license_profile": {
@@ -251,7 +251,7 @@ spec:
               }
             },
             "gateway": {
-              "url": "https://<ACUMOS_HOST_IP>:<ACUMOS_FEDERATION_LOCAL_PORT>"
+              "url": "https://<ACUMOS_FEDERATION_DOMAIN>:<ACUMOS_FEDERATION_LOCAL_PORT>"
             },
             "dcae": {
               "model": {
