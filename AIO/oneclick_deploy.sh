@@ -145,6 +145,7 @@ function setup_jenkins() {
   mkdir -p deploy/jenkins/acumos
   cp ~/.kube/config deploy/jenkins/acumos/kube-config
   grep ACUMOS_CDS acumos_env.sh >deploy/jenkins/acumos/acumos_env.sh
+  grep ACUMOS_SECURITY_VERIFICATION_PORT acumos_env.sh >>deploy/jenkins/acumos/acumos_env.sh
   grep ACUMOS_NEXUS nexus_env.sh >>deploy/jenkins/acumos/acumos_env.sh
   cp -r deploy/security-verification/jenkins/scan deploy/jenkins/acumos/sv
   local pod=$(kubectl get pods -n $ACUMOS_NAMESPACE | awk '/jenkins/{print $1}')
@@ -228,6 +229,15 @@ function setup_acumos() {
   fi
 }
 
+function add_to_urls() {
+  trap 'fail' ERR
+  if [[ $(grep -c "$1" acumos.url) -eq 0 ]]; then
+    echo "$1: $2" >>acumos.url
+  else
+    sedi "s~/$1:.*~/$1: $2~" acumos.url
+  fi
+}
+
 function setup_ingress() {
   trap 'fail' ERR
   if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
@@ -235,7 +245,7 @@ function setup_ingress() {
       if [[ "$ACUMOS_INGRESS_SERVICE" == "nginx" ]]; then
         bash $AIO_ROOT/ingress/setup_ingress.sh
         update_acumos_env ACUMOS_ORIGIN $ACUMOS_DOMAIN force
-        echo "Portal: https://$ACUMOS_ORIGIN" >acumos.url
+        add_to_urls Portal https://$ACUMOS_ORIGIN
       else
         bash $AIO_ROOT/kong/setup_kong.sh
         if [[ "$ACUMOS_KONG_PROXY_SSL_PORT" == "" ]]; then
@@ -244,7 +254,7 @@ function setup_ingress() {
         fi
         update_acumos_env ACUMOS_PORT $ACUMOS_KONG_PROXY_SSL_PORT force
         update_acumos_env ACUMOS_ORIGIN "$ACUMOS_DOMAIN:$ACUMOS_PORT" force
-        echo "Portal: https://$ACUMOS_ORIGIN" >acumos.url
+        add_to_urls Portal https://$ACUMOS_ORIGIN
       fi
     else
       update_acumos_env ACUMOS_ORIGIN $ACUMOS_DOMAIN force
@@ -255,7 +265,7 @@ function setup_ingress() {
   else
     bash $AIO_ROOT/kong/setup_kong.sh
     update_acumos_env ACUMOS_ORIGIN $ACUMOS_DOMAIN force
-    echo "Portal: https://$ACUMOS_ORIGIN" >acumos.url
+    add_to_urls Portal https://$ACUMOS_ORIGIN
   fi
 }
 
@@ -385,6 +395,7 @@ set_k8s_env
 
 get_host_ip $ACUMOS_DOMAIN
 update_acumos_env ACUMOS_DOMAIN_IP $HOST_IP force
+
 get_host_ip $ACUMOS_HOST
 update_acumos_env ACUMOS_HOST_IP $HOST_IP force
 update_acumos_env ACUMOS_JWT_KEY $(uuidgen)
@@ -416,6 +427,7 @@ if [[ "$ACUMOS_DEPLOY_NEXUS" == "true" && "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]
   bash $AIO_ROOT/nexus/setup_nexus.sh all
   # Prevent redeploy from reinstalling Nexus unless specifically requested
   update_acumos_env ACUMOS_DEPLOY_NEXUS false force
+  add_to_urls Nexus http://$NEXUS_DOMAIN:$ACUMOS_NEXUS_API_PORT
 fi
 
 if [[ "$ACUMOS_DEPLOY_NEXUS_REPOS" == "true" && "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then
@@ -513,6 +525,7 @@ fi
 if [[ "$ACUMOS_DEPLOY_LUM" == "true" ]]; then
   bash $AIO_ROOT/lum/setup-lum.sh
   update_acumos_env ACUMOS_DEPLOY_LUM false force
+  add_to_urls "License Usage Manager" http://$ACUMOS_DOMAIN/lum/
 fi
 
 set +x
@@ -529,15 +542,12 @@ log "Deploy is complete."
 echo "You can access the Acumos portal and other services at the URLs below,"
 echo "assuming hostname \"$ACUMOS_DOMAIN\" is resolvable from your workstation:"
 
-cat <<EOF >>acumos.url
-Common Data Service Swagger UI: https://$ACUMOS_ORIGIN/ccds/swagger-ui.html
-Portal Swagger UI: https://$ACUMOS_ORIGIN/api/swagger-ui.html
-Onboarding Service Swagger UI: https://$ACUMOS_ORIGIN/onboarding-app/swagger-ui.html
-Kibana: http://$ACUMOS_ELK_DOMAIN:$ACUMOS_ELK_KIBANA_PORT/app/kibana
-Nexus: http://$NEXUS_DOMAIN:$ACUMOS_NEXUS_API_PORT
-License Usage Manager: http://$ACUMOS_DOMAIN/lum/
-EOF
+add_to_urls "Common Data Service Swagger UI" https://$ACUMOS_ORIGIN/ccds/swagger-ui.html
+add_to_urls "Portal Swagger UI" https://$ACUMOS_ORIGIN/api/swagger-ui.html
+add_to_urls "Onboarding Service Swagger UI" https://$ACUMOS_ORIGIN/onboarding-app/swagger-ui.html
+add_to_urls Kibana http://$ACUMOS_ELK_DOMAIN:$ACUMOS_ELK_KIBANA_PORT/app/kibana
+
 if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-  echo "Mariadb Admin: http://$ACUMOS_HOST_IP:$ACUMOS_MARIADB_ADMINER_PORT" >>acumos.url
+  add_to_urls "Mariadb Admin" http://$ACUMOS_HOST_IP:$ACUMOS_MARIADB_ADMINER_PORT
 fi
 cat acumos.url
