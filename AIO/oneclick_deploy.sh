@@ -85,7 +85,7 @@ function stop_acumos_core_in_k8s() {
       log "Configmap $cfg deleted"
     fi
   done
-  if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
+  if [[ "$ACUMOS_DEPLOY_INGRESS_RULES" == "true" ]]; then
     ings="cds-ingress kubernetes-client-ingress onboarding-ingress portal-ingress"
     for ing in $ings; do
       if [[ $(kubectl delete ingress -n $ACUMOS_NAMESPACE $ing) ]]; then

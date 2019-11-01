@@ -77,6 +77,7 @@ spec:
             "jwt" : {
               "secretkey": "<ACUMOS_JWT_KEY>"
             },
+            "useexternalpipeline": <MLWB_NIFI_EXTERNAL_PIPELINE_SERVICE>,
             "maxtries": 5,
             "sleeptimems": 30000,
             "nifi": {
@@ -96,8 +97,7 @@ spec:
                 "serviceadmin": "service_admin.yaml",
                 "ingress": "ingress.yaml",
                 "deployment": "deployment.yaml"
-              },
-              "useexternalpipeline": true
+              }
             }
           }'
         command: ["/bin/sh", "-c"]

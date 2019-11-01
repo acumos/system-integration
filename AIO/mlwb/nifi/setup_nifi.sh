@@ -45,7 +45,7 @@ clean_nifi() {
   clean_resource $ACUMOS_NAMESPACE configmap nifi
   clean_resource $ACUMOS_NAMESPACE secret nifi
   clean_resource $ACUMOS_NAMESPACE pvc nifi
-  if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
+  if [[ "$ACUMOS_DEPLOY_INGRESS_RULES" == "true" ]]; then
     clean_resource $ACUMOS_NAMESPACE ingress nifi
   fi
   trap 'fail' ERR
@@ -157,7 +157,7 @@ setup_nifi() {
   setup_pvc $ACUMOS_NAMESPACE $MLWB_NIFI_REGISTRY_PVC_NAME \
     $MLWB_NIFI_REGISTRY_PV_NAME $MLWB_NIFI_REGISTRY_PV_SIZE
 
-  if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
+  if [[ "$ACUMOS_DEPLOY_INGRESS_RULES" == "true" ]]; then
     log "Create NiFi Registry ingress"
     kubectl create -f deploy/ingress-registry.yaml
   fi

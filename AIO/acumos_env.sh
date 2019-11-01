@@ -105,6 +105,7 @@ export ACUMOS_DEPLOY_FEDERATION=true
 export ACUMOS_DEPLOY_MLWB=true
 export ACUMOS_DEPLOY_LUM=true
 export ACUMOS_DEPLOY_INGRESS=true
+export ACUMOS_DEPLOY_INGRESS_RULES=true
 
 # External component options
 export ACUMOS_COUCHDB_DB_NAME=mlwbdb

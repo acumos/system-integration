@@ -57,7 +57,7 @@ function clean_mlwb() {
     clean_resource $ACUMOS_NAMESPACE configmap mlwb
     clean_resource $ACUMOS_NAMESPACE secret mlwb
     clean_resource $ACUMOS_NAMESPACE pvc mlwb
-    if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
+    if [[ "$ACUMOS_DEPLOY_INGRESS_RULES" == "true" ]]; then
       clean_resource $ACUMOS_NAMESPACE ingress mlwb
     fi
   fi
@@ -117,7 +117,7 @@ mlwb-model mlwb-predictor"
 
     log "Deploy the MLWB k8s-based components"
     # Create services first... see https://github.com/kubernetes/kubernetes/issues/16448
-    if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
+    if [[ "$ACUMOS_DEPLOY_INGRESS_RULES" == "true" ]]; then
       for f in  deploy/*-ingress.yaml ; do
         log "Creating ingress from $f"
         kubectl create -f $f

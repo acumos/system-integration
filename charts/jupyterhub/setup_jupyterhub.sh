@@ -71,7 +71,7 @@ function standalone_prep() {
     log "Helm release $NAMESPACE-jupyterhub deleted"
   fi
 
-  if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
+  if [[ "$ACUMOS_DEPLOY_INGRESS_RULES" == "true" ]]; then
     ings=$(kubectl get ingress -n $NAMESPACE | awk '/-ingress/{print $1}')
     for ing in $ings; do
       if [[ $(kubectl delete ingress -n $NAMESPACE $ing) ]]; then
@@ -119,7 +119,7 @@ function clean() {
   if [[ $(helm delete --purge $NAMESPACE-jupyterhub) ]]; then
     log "Helm release $NAMESPACE-jupyterhub deleted"
   fi
-  if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
+  if [[ "$ACUMOS_DEPLOY_INGRESS_RULES" == "true" ]]; then
     if [[ $(kubectl delete ingress -n $NAMESPACE jupyterhub-ingress) ]]; then
       log "Ingress jupyterhub-ingress deleted"
     fi
@@ -277,7 +277,7 @@ EOF
     bash ../ingress/setup_ingress_controller.sh $NAMESPACE $HOST_IP $CERT $CERT_KEY
   fi
 
-  if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
+  if [[ "$ACUMOS_DEPLOY_INGRESS_RULES" == "true" ]]; then
     log "Setup ingress for Jupyterhub"
     cat <<EOF >jupyterhub-ingress.yaml
 apiVersion: extensions/v1beta1
