@@ -133,6 +133,9 @@ spec:
                    "max-request-size": "1024MB"
                 }
               }
+            },
+            "security":{
+              "verificationApiUrl":"http://sv-scanning-service:9082/scan"
             }
           }'
         ports:

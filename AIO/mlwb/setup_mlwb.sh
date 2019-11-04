@@ -110,6 +110,13 @@ mlwb-model mlwb-predictor"
     if [[ "$MLWB_DEPLOY_PIPELINE" == "true" ]]; then
       apps="$apps mlwb-pipeline mlwb-pipeline-webcomponent mlwb-pipeline-catalog-webcomponent"
       cp kubernetes/mlwb-pipeline* deploy/.
+      if [[ "$MLWB_NIFI_EXTERNAL_PIPELINE_SERVICE" != "true" ]]; then
+        log "Remove pipeline service template dependencies on NiFi"
+        sedi '/\/maven\/conf/,/nifi-templates/d' deploy/mlwb-pipeline-deployment.yaml
+        sedi '/- name: nifi-certs-registry/,/secretName: nifi-certs-registry/d' deploy/mlwb-pipeline-deployment.yaml
+        sedi '/- name: nifi-templates/,/name: nifi-templates/d' deploy/mlwb-pipeline-deployment.yaml
+        sedi '/command: /,/java/d' deploy/mlwb-pipeline-deployment.yaml
+      fi
     fi
 
     log "Set variable values in k8s templates"

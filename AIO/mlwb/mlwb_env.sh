@@ -21,11 +21,11 @@
 #
 
 # Images based upon Clio release assembly
-# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_Clio_1910110930
+# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_Clio_1910271600
 # plus latest released images
 export MLWB_MODEL_SERVICE_IMAGE=$ACUMOS_STAGING/model-service:2.0.0
 export MLWB_NOTEBOOK_SERVICE_IMAGE=$ACUMOS_STAGING/notebook-service:2.0.1
-export MLWB_PIPELINE_SERVICE_IMAGE=$ACUMOS_STAGING/pipeline-service:2.0.1
+export MLWB_PIPELINE_SERVICE_IMAGE=$ACUMOS_STAGING/pipeline-service:2.0.2
 export MLWB_PREDICTOR_SERVICE_IMAGE=$ACUMOS_STAGING/predictor-service:1.0.0
 export MLWB_PROJECT_SERVICE_IMAGE=$ACUMOS_STAGING/project-service:2.0.2
 export MLWB_HOME_WEBCOMPONENT_IMAGE=$ACUMOS_STAGING/acumos/home-webcomponent:2.0.5

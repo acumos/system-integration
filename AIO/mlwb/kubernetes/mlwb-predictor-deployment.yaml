@@ -55,7 +55,7 @@ spec:
         - name: SPRING_APPLICATION_JSON
           value: '{
               "server": {
-                  "port": 8085
+                  "port": 9096
               },
               "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
               "resultsetSize": 2000,
