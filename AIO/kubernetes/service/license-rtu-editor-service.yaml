@@ -33,4 +33,4 @@ spec:
   ports:
   - name: license-rtu-editor-port
     port: 8092
-    targetPort: 80
+    targetPort: 8080

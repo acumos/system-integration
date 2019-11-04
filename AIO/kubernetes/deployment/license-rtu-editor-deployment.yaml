@@ -44,7 +44,7 @@ spec:
       - name: license-rtu-editor
         image: <LICENSE_RTU_EDITOR_IMAGE>
         ports:
-        - containerPort: 80
+        - containerPort: 8080
         volumeMounts:
         - mountPath: /maven/logs
           name: logs

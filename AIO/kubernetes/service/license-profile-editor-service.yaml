@@ -33,4 +33,4 @@ spec:
   ports:
   - name: license-profile-editor-port
     port: 8089
-    targetPort: 80
+    targetPort: 8080

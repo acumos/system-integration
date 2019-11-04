@@ -44,7 +44,7 @@ spec:
       - name: license-profile-editor
         image: <LICENSE_PROFILE_EDITOR_IMAGE>
         ports:
-        - containerPort: 80
+        - containerPort: 8080
         volumeMounts:
         - mountPath: /maven/logs
           name: logs
