@@ -226,11 +226,9 @@ source $AIO_ROOT/utils.sh
 source $AIO_ROOT/acumos_env.sh
 if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
 action=$1
-if [[ "$action" != 'clean' ]]; then
-  export ACUMOS_MARIADB_HOST=$2
-  export DEPLOYED_UNDER=k8s
-  export K8S_DIST=$3
-fi
+export ACUMOS_MARIADB_HOST=$2
+export DEPLOYED_UNDER=k8s
+export K8S_DIST=$3
 
 if [[ -e mariadb_env.sh ]]; then
   log "Using prepared mariadb_env.sh for customized environment values"
@@ -241,12 +239,7 @@ source setup_mariadb_env.sh
 cp mariadb_env.sh $AIO_ROOT/.
 if [[ "$action" == "clean" || "$action" == "all" ]]; then mariadb_clean; fi
 if [[ "$action" == "prep" || "$action" == "all" ]]; then mariadb_prep; fi
-if [[ "$action" == "setup" || "$action" == "all" ]]; then
-  mariadb_setup
-  # Prevent ACUMOS_CDS_VERSION in mariadb-env fron overriding acumos_env.sh,
-  # since it may be updated later by acumos_env.sh
-  sed -i -- "s/ACUMOS_CDS_VERSION=/#ACUMOS_CDS_VERSION=/" mariadb_env.sh
-fi
+if [[ "$action" == "setup" || "$action" == "all" ]]; then mariadb_setup; fi
 # Copy any updates from the above functions
 cp mariadb_env.sh $AIO_ROOT/.
 cd $WORK_DIR

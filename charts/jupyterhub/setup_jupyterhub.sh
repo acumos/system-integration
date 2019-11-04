@@ -342,13 +342,14 @@ $ bash setup_jupyterhub.sh <setup|clean|all> <NAMESPACE> <ACUMOS_ORIGIN>
    CERT: filename of certificate
    CERT_KEY: filename of certificate key
 
-   Setting up a standalone JupyterHub requires a dedicated host, on which:
-     - a single-node Kubernetes cluster will be created
-     - an NGINX ingress controller will be created, using self-signed certs or
-       certs as specified, and set to serve requests at "MLWB_JUPYTERHUB_DOMAIN"
+   Setting up a standalone JupyterHub requires:
+     - a pre-existing k8s cluster in which
+     - an NGINX ingress controller (to be created if needed) , using self-signed
+       certs or certs as specified, and set to serve requests at "MLWB_JUPYTERHUB_DOMAIN"
      - set the mlwb_env.sh values for the following, per the target host
        export MLWB_JUPYTERHUB_DOMAIN=<FQDN or hostname>
        export MLWB_JUPYTERHUB_HOST=<hostname>
+       export MLWB_JUPYTERHUB_HOST_IP=<IP address of primary interface>
 EOF
   log "All parameters not provided"
   exit 1
@@ -361,7 +362,10 @@ cd $(dirname "$0")
 if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
 source $AIO_ROOT/utils.sh
 source $AIO_ROOT/acumos_env.sh
+# Set this again in case it was not set in acumos_env.sh
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
 source $AIO_ROOT/mlwb/mlwb_env.sh
+
 action=$1
 NAMESPACE=$2
 update_mlwb_env MLWB_JUPYTERHUB_NAMESPACE $NAMESPACE force
