@@ -68,17 +68,21 @@ services:
         "qanda": {
           "url": "https://stackoverflow.com/questions/tagged/acumos"
         },
+        "concurrency" : {
+          "async" : {
+            "core-pool-size" : 10,
+            "max-pool-size" : 50,
+            "queue-capacity" : 10000
+          }
+        },
         "elk" : {
-          "url" : "http://${ACUMOS_ELK_DOMAIN}:9600/elkclient"
+          "url" : "http://<ACUMOS_ELK_DOMAIN>:9006/elkclient"
         },
         "license_profile" : {
           "url" : "http://lpe-service:8087/license-profile-editor/"
         },
         "k8_deploy" : {
           "url" : "http://deployment-client-service:8337"
-        },
-        "lum" : {
-          "url" : "http://lum-service:1234"
         },
         "microservice": {
           "url": "http://msg-service:8336/microservice-generation/v2/generateMicroservice"

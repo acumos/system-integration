@@ -96,6 +96,13 @@ spec:
             "qanda": {
               "url": "https://stackoverflow.com/questions/tagged/acumos"
             },
+            "concurrency" : {
+              "async" : {
+                "core-pool-size" : 10,
+                "max-pool-size" : 50,
+                "queue-capacity" : 10000
+              }
+            },
             "elk" : {
               "url" : "http://<ACUMOS_ELK_DOMAIN>:30960/elkclient"
             },
