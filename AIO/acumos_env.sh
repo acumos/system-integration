@@ -39,13 +39,13 @@ export ACUMOS_STAGING=nexus3.acumos.org:10004
 export ACUMOS_RELEASE=nexus3.acumos.org:10002
 
 # Images based upon Clio release assembly
-# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_Clio_1910271600
+# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_Clio_1911041800
 # with latest images in specific cases
 # Core components
 export ACUMOS_DELETE_SNAPSHOTS=false
 export AZURE_CLIENT_IMAGE=$ACUMOS_STAGING/acumos-azure-client:3.0.2
-export PORTAL_BE_IMAGE=$ACUMOS_SNAPSHOT/acumos-portal-be:3.0.19-SNAPSHOT
-export PORTAL_FE_IMAGE=$ACUMOS_SNAPSHOT/acumos-portal-fe:3.0.19-SNAPSHOT
+export PORTAL_BE_IMAGE=$ACUMOS_STAGING/acumos-portal-be:3.0.20
+export PORTAL_FE_IMAGE=$ACUMOS_STAGING/acumos-portal-fe:3.0.20
 export LICENSE_PROFILE_EDITOR_IMAGE=$ACUMOS_STAGING/acumos/license-profile-editor:0.0.9
 export LICENSE_RTU_EDITOR_IMAGE=$ACUMOS_STAGING/acumos/license-rtu-editor:0.1.3
 export LUM_IMAGE=$ACUMOS_STAGING/acumos/lum-server:0.28.1
