@@ -134,8 +134,8 @@ spec:
                   "url": "http://onboarding-service:8090/onboarding-app/v2/advancedModel"
                 }
               },
-              "cliPushUrl": "<ACUMOS_ONBOARDING_CLIPUSHURL>",
-              "cliAuthUrl": "<ACUMOS_ONBOARDING_CLIAUTHURL>",
+              "cliPushUrl": "https://<ACUMOS_ORIGIN><ACUMOS_ONBOARDING_CLIPUSHAPI>",
+              "cliAuthUrl": "https://<ACUMOS_ORIGIN><ACUMOS_ONBOARDING_CLIAUTHAPI>",
               "tokenmode": "<ACUMOS_ONBOARDING_TOKENMODE>"
             },
             "model": {
