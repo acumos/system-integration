@@ -39,20 +39,20 @@ export ACUMOS_STAGING=nexus3.acumos.org:10004
 export ACUMOS_RELEASE=nexus3.acumos.org:10002
 
 # Images based upon Clio release assembly
-# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_Clio_1910271600
+# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_Clio_1911041800
 # with latest images in specific cases
 # Core components
 export ACUMOS_DELETE_SNAPSHOTS=false
 export AZURE_CLIENT_IMAGE=$ACUMOS_STAGING/acumos-azure-client:3.0.2
-export PORTAL_BE_IMAGE=$ACUMOS_SNAPSHOT/acumos-portal-be:3.0.19-SNAPSHOT
-export PORTAL_FE_IMAGE=$ACUMOS_SNAPSHOT/acumos-portal-fe:3.0.19-SNAPSHOT
+export PORTAL_BE_IMAGE=$ACUMOS_STAGING/acumos-portal-be:3.0.20
+export PORTAL_FE_IMAGE=$ACUMOS_STAGING/acumos-portal-fe:3.0.20
 export LICENSE_PROFILE_EDITOR_IMAGE=$ACUMOS_STAGING/acumos/license-profile-editor:0.0.9
 export LICENSE_RTU_EDITOR_IMAGE=$ACUMOS_STAGING/acumos/license-rtu-editor:0.1.3
 export LUM_IMAGE=$ACUMOS_STAGING/acumos/lum-server:0.28.1
 export LUM_DATABASE_IMAGE=$ACUMOS_STAGING/acumos/lum-db:0.28.1
 export COMMON_DATASERVICE_IMAGE=$ACUMOS_STAGING/acumos/common-dataservice:3.0.1
 export DESIGNSTUDIO_IMAGE=$ACUMOS_STAGING/ds-compositionengine:3.0.0
-export FEDERATION_IMAGE=$ACUMOS_STAGING/acumos/federation-gateway:3.0.1
+export FEDERATION_IMAGE=$ACUMOS_STAGING/acumos/federation-gateway:3.0.2
 export KUBERNETES_CLIENT_IMAGE=$ACUMOS_STAGING/kubernetes-client:3.0.0
 export MICROSERVICE_GENERATION_IMAGE=$ACUMOS_STAGING/microservice-generation:3.5.1
 export ONBOARDING_IMAGE=$ACUMOS_STAGING/onboarding-app:3.5.0
@@ -175,8 +175,8 @@ export ACUMOS_FEDERATION_LOCAL_PORT=30985
 export ACUMOS_FEDERATION_PORT=30984
 export ACUMOS_ONBOARDING_TOKENMODE=jwtToken
 export ACUMOS_ONBOARDING_API_TIMEOUT=600
-export ACUMOS_ONBOARDING_CLIPUSHURL="https://${ACUMOS_ORIGIN}/onboarding-app/v2/models"
-export ACUMOS_ONBOARDING_CLIAUTHURL="https://${ACUMOS_ORIGIN}/onboarding-app/v2/auth"
+export ACUMOS_ONBOARDING_CLIPUSHAPI="/onboarding-app/v2/models"
+export ACUMOS_ONBOARDING_CLIAUTHAPI="/onboarding-app/v2/auth"
 export ACUMOS_MICROSERVICE_GENERATION_ASYNC=false
 export ACUMOS_OPERATOR_ID=12345678-abcd-90ab-cdef-1234567890ab
 export ACUMOS_PORTAL_PUBLISH_SELF_REQUEST_ENABLED=true
@@ -241,7 +241,7 @@ export ACUMOS_PORTAL_LOGS_PVC_NAME="$ACUMOS_LOGS_PVC_NAME"
 export ACUMOS_ONBOARDING_LOGS_PVC_NAME="$ACUMOS_LOGS_PVC_NAME"
 export ACUMOS_DEPLOYMENT_LOGS_PVC_NAME="$ACUMOS_LOGS_PVC_NAME"
 export ACUMOS_LOGS_PV_NAME="logs"
-export ACUMOS_LOGS_PV_SIZE=1Gi
+export ACUMOS_LOGS_PV_SIZE=10Gi
 export ACUMOS_DEPLOYMENT_CONFIG_PVC_NAME="deployment"
 export DOCKER_VOLUME_PVC_NAME="docker-volume"
 export DOCKER_VOLUME_PV_NAME="docker-volume"

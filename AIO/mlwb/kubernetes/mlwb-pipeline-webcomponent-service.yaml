@@ -20,46 +20,14 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: <ACUMOS_NAMESPACE>
-  name: mlwb-project-service
+  name: mlwb-pipeline-webcomponent-service
   labels:
-    app: mlwb-project
+    app: mlwb-pipeline-webcomponent
 spec:
   selector:
-    app: mlwb-project
+    app: mlwb-pipeline-webcomponent
   type: ClusterIP
   ports:
   - name: service-port
-    port: 9088
-    targetPort: 9088
----
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: <ACUMOS_NAMESPACE>
-  name: mlwb-project-webcomponent-service
-  labels:
-    app: mlwb-project-webcomponent
-spec:
-  selector:
-    app: mlwb-project-webcomponent
-  type: ClusterIP
-  ports:
-  - name: service-port
-    port: 9084
-    targetPort: 9084
----
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: <ACUMOS_NAMESPACE>
-  name: mlwb-project-catalog-webcomponent-service
-  labels:
-    app: mlwb-project-catalog-webcomponent
-spec:
-  selector:
-    app: mlwb-project-catalog-webcomponent
-  type: ClusterIP
-  ports:
-  - name: service-port
-    port: 9085
-    targetPort: 9085
+    port: 9091
+    targetPort: 9091
