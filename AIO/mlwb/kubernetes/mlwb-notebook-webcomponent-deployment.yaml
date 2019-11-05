@@ -1,0 +1,74 @@
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: mlwb-notebook-webcomponent
+  labels:
+    app: mlwb-notebook-webcomponent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlwb-notebook-webcomponent
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mlwb-notebook-webcomponent
+        service: <ACUMOS_MLWB_SERVICE_LABEL>
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: service
+                operator: NotIn
+                values:
+                - <ACUMOS_MLWB_SERVICE_LABEL>
+            topologyKey: "kubernetes.io/node"
+      imagePullSecrets:
+      - name: acumos-registry
+      containers:
+      - name: mlwb-notebook-webcomponent
+        image: <MLWB_NOTEBOOK_WEBCOMPONENT_IMAGE>
+        env:
+        - name: ES_JAVA_OPTS
+          value: "-Xms128m -Xmx256m"
+        - name: ENVIRONMENT
+          value: "deploy"
+        - name: notebookmSURL
+          value: "http://mlwb-notebook-service:9089/mlWorkbench/v1/notebook"
+        - name: notebookWikiURL
+          value: "https://wiki.acumos.org/display/TRAIN"
+        - name: useExternalNotebook
+          value: "<MLWB_JUPYTERHUB_EXTERNAL_NOTEBOOK_SERVICE>"
+        ports:
+        - containerPort: 9086
+        volumeMounts:
+        - mountPath: /maven/logs
+          name: logs
+      restartPolicy: Always
+      volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: <ACUMOS_MLWB_LOGS_PVC_NAME>
