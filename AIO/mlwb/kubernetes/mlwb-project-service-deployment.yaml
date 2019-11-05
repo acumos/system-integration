@@ -1,0 +1,91 @@
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: <ACUMOS_NAMESPACE>
+  name: mlwb-project
+  labels:
+    app: mlwb-project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlwb-project
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mlwb-project
+        service: <ACUMOS_MLWB_SERVICE_LABEL>
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: service
+                operator: NotIn
+                values:
+                - <ACUMOS_MLWB_SERVICE_LABEL>
+            topologyKey: "kubernetes.io/node"
+      imagePullSecrets:
+      - name: acumos-registry
+      containers:
+      - name: mlwb-project
+        image: <MLWB_PROJECT_SERVICE_IMAGE>
+        env:
+        - name: SPRING_APPLICATION_JSON
+          value: '{
+            "server": {
+              "port": 9088
+            },
+            "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
+            "resultsetSize": 2000,
+            "cmndatasvc": {
+              "cmndatasvcendpointurl": "http://<ACUMOS_CDS_HOST>:<ACUMOS_CDS_PORT>/ccds",
+              "cmndatasvcuser": "<ACUMOS_CDS_USER>",
+              "cmndatasvcpwd": "<ACUMOS_CDS_PASSWORD>"
+            },
+            "jwt" : {
+              "secretkey": "<ACUMOS_JWT_KEY>"
+            },
+            "couchdb": {
+              "user": "<ACUMOS_COUCHDB_USER>",
+              "pwd": "<ACUMOS_COUCHDB_PASSWORD>",
+              "name": "<ACUMOS_COUCHDB_DB_NAME>",
+              "createdb": {
+                "if-not-exist": true
+              },
+              "protocol": "http",
+              "host": "<ACUMOS_COUCHDB_DOMAIN>",
+              "port": <ACUMOS_COUCHDB_PORT>
+            }
+          }'
+        ports:
+        - containerPort: 9088
+        volumeMounts:
+        - mountPath: /maven/logs
+          name: logs
+      restartPolicy: Always
+      volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: <ACUMOS_MLWB_LOGS_PVC_NAME>
