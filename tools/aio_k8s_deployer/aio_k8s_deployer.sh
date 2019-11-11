@@ -56,15 +56,17 @@
 #
 # Usage: default options and parameters are as below (customize to your needs)
 #
-#   bash aio_k8s_deployer.sh build [tag]
+#   bash aio_k8s_deployer.sh build [client=kubectl|oc] [tag=<tag>]
 #   build: build the base docker image, with all prerequistes installed
+#   [client]: (optional) build for use with kubectl or oc (openshift)
 #   [tag]: (optional) tag to use for the image, e.g. to build different images
 #     with different kubectl versions, etc
 #
-#   bash aio_k8s_deployer.sh prep <host> <user>
+#   bash aio_k8s_deployer.sh prep <host> <user> [tag]
 #   prep: execute preparation steps on an AIO kubernetes master node
 #   <host>: hostname of the k8s master node to execute the steps on
 #   <user>: sudo user on the k8s master node
+#   [tag]: (optional) docker image tag
 #   Use this action if you want to execute prerequisite steps on the k8s master,
 #   e.g. run the default script "acumos_k8s_prep.sh". By default, this action:
 #   - applies the environment customizations in customize_env.sh
@@ -110,16 +112,20 @@ mkdir $HOME/.kube
 mkdir $HOME/.docker
 cp /deploy/docker-config.json /root/.docker/config.json
 cp /deploy/kube-config ~/.kube/config
-if [[ -e /deploy/tiller ]]; then cp /deploy/tiller /usr/local/bin/tiller; fi
-if [[ -e /deploy/helm ]]; then
-  cp /deploy/helm /usr/local/bin/helm
-  helm init --client-only
-fi
 sed -i -- 's~AIO_ROOT=.*~AIO_ROOT=/deploy/system-integration/AIO~' \
   /deploy/system-integration/AIO/acumos_env.sh
 cd /deploy
 if [[ -e customize_env.sh ]]; then bash customize_env.sh; fi
 cd system-integration/AIO
+source /deploy/system-integration/AIO/acumos_env.sh
+if [[ "$K8S_DIST" == "openshift" && "$ACUMOS_OPENSHIFT_USER" == "admin" ]]; then
+  oc login -u admin -p $ACUMOS_OPENSHIFT_PASSWORD
+fi
+if [[ -e /deploy/tiller ]]; then cp /deploy/tiller /usr/local/bin/tiller; fi
+if [[ -e /deploy/helm ]]; then
+  cp /deploy/helm /usr/local/bin/helm
+  helm init --client-only --upgrade
+fi
 bash oneclick_deploy.sh
 if [[ -e /deploy/post_deploy.sh ]]; then
   bash /deploy/post_deploy.sh
@@ -137,7 +143,7 @@ EOF
     for h in $hosts; do
         name=$(echo $h | cut -d ':' -f 1 | sed 's/--add-host=//')
         ip=$(echo $h | cut -d ':' -f 2)
-        if [[ $(grep -c "\- \"$h\"" deploy/aio_k8s_deployer.yaml) -eq 0 ]]; then
+        if [[ $(grep -c "\- \"$name\"" deploy/aio_k8s_deployer.yaml) -eq 0 ]]; then
           cat <<EOF >>deploy/aio_k8s_deployer.yaml
       - ip: "$ip"
         hostnames:
@@ -168,10 +174,18 @@ set -x -e
 WORK_DIR=$(pwd)
 cd $(dirname "$0")
 tag="latest"
+client="kubectl"
+hosts=""
+for arg; do
+  if [[ "$arg" == *"client="* ]]; then client=$(echo $arg | cut -d '=' -f 2);
+  elif [[ "$arg" == *"tag="* ]]; then tag=$(echo $arg | cut -d '=' -f 2);
+  elif [[ "$arg" == *"add-host="* ]]; then hosts="$hosts --$arg";
+  elif [[ "$arg" == *"as-pod="* ]]; then AS_POD=$(echo $arg | cut -d '=' -f 2);
+  fi
+done
 if [[ "$1" == "build" ]]; then
-  if [[ "$2" != "" ]]; then tag="$2"; fi
   cd deploy
-  docker build -t acumos-deployer:$tag .
+  docker build -t acumos-deployer:$tag $client/.
 elif [[ "$1" == "prep" ]]; then
   cd deploy
   if [[ -e customize_env.sh ]]; then bash customize_env.sh; fi
@@ -205,13 +219,6 @@ elif [[ "$1" == "prep" ]]; then
     system-integration/.
 elif [[ "$1" == "deploy" ]]; then
   ACUMOS_HOST=$2
-  hosts=""
-  for arg; do
-    if [[ "$arg" == *"tag="* ]]; then tag=$(echo $arg | cut -d '=' -f 2);
-    elif [[ "$arg" == *"add-host="* ]]; then hosts="$hosts --$arg";
-    elif [[ "$arg" == *"as-pod="* ]]; then AS_POD=$(echo $arg | cut -d '=' -f 2);
-    fi
-  done
   prepare_env
   prepare_deploy_script
   LOG=/deploy/aio-deploy_$(date +%y%m%d%H%M%S).log

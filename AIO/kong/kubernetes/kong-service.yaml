@@ -29,9 +29,17 @@ metadata:
 spec:
   selector:
     app: kong
-  type: NodePort
+  type: ClusterIP
   ports:
-  - name: kong-proxy-ssl-port
-    nodePort: <ACUMOS_KONG_PROXY_SSL_PORT>
+  - name: kong-proxy-https
     port: 8443
     targetPort: 8443
+  - name: kong-proxy-http
+    port: 8000
+    targetPort: 8000
+  - name: kong-admin-https
+    port: 8444
+    targetPort: 8444
+  - name: kong-admin-http
+    port: 8001
+    targetPort: 8001
