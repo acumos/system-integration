@@ -155,7 +155,8 @@ setup_nifi() {
 
   log "Create NiFi Registry PVC in namespace $ACUMOS_NAMESPACE"
   setup_pvc $ACUMOS_NAMESPACE $MLWB_NIFI_REGISTRY_PVC_NAME \
-    $MLWB_NIFI_REGISTRY_PV_NAME $MLWB_NIFI_REGISTRY_PV_SIZE
+    $MLWB_NIFI_REGISTRY_PV_NAME $MLWB_NIFI_REGISTRY_PV_SIZE \
+    $MLWB_NIFI_REGISTRY_PV_CLASSNAME
 
   if [[ "$ACUMOS_DEPLOY_INGRESS_RULES" == "true" ]]; then
     log "Create NiFi Registry ingress"
@@ -185,7 +186,7 @@ set -x
 trap 'fail' ERR
 WORK_DIR=$(pwd)
 cd $(dirname "$0")
-if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../../AIO; pwd -P)"; fi
 source $AIO_ROOT/utils.sh
 source $AIO_ROOT/acumos_env.sh
 action=$1

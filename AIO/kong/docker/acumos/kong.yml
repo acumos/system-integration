@@ -51,7 +51,7 @@ services:
        expose:
          - 8001
        ports:
-         - "${ACUMOS_KONG_PROXY_SSL_PORT}:8443"
+         - "443:8443"
        command: >
          /bin/bash -c "
              until [[ $$(curl -v http://kong-database:5432 2>&1 | grep -c \"Connected to \") -gt 0 ]]; do
@@ -74,4 +74,4 @@ services:
          - KONG_ADMIN_HOST=kong-service
          - ACUMOS_DOMAIN=${ACUMOS_DOMAIN}
          - ACUMOS_CERT=${ACUMOS_CERT}
-         - ACUMOS_CERT_KEY=${ACUMOS_CERT_KEY}
+         - ACUMOS_KONG_HTTPS_ONLY=${ACUMOS_KONG_HTTPS_ONLY}
