@@ -317,12 +317,8 @@ function prepare_nexus() {
       cd $AIO_ROOT
     fi
     if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
-      create_namespace $ACUMOS_NEXUS_NAMESPACE
-      if [[ "$ACUMOS_CREATE_PVS" == "true" ]]; then
-      bash $AIO_ROOT/../tools/setup_pv.sh all /mnt/$ACUMOS_NEXUS_NAMESPACE \
-        $NEXUS_DATA_PV_NAME $NEXUS_DATA_PV_SIZE \
-        "200:$ACUMOS_HOST_USER"
-      fi
+      bash $WORK_DIR/system-integration/AIO/nexus/setup_nexus.sh clean
+      bash $WORK_DIR/system-integration/AIO/nexus/setup_nexus.sh prep
     else
       setup_docker_volume /mnt/$ACUMOS_NEXUS_NAMESPACE/$NEXUS_DATA_PV_NAME \
         "200:$ACUMOS_HOST_USER"
@@ -419,10 +415,10 @@ function prepare_env() {
     set_k8s_env
     create_namespace $ACUMOS_NAMESPACE
     if [[ "$K8S_DIST" == "openshift" ]]; then
-      log "Workaround: Acumos AIO requires hostpath privilege for volumes"
+      log "Workaround: Acumos AIO requires privilege to set PV permissions"
       oc adm policy add-scc-to-user privileged -z default -n $ACUMOS_NAMESPACE
-      # PV recyclers run in the default namespace and also need hostaccess
-      oc adm policy add-scc-to-user hostaccess -z default -n default
+      # PV recyclers run in the default namespace and need privileged
+      oc adm policy add-scc-to-user privileged -z default -n default
     fi
     setup_utility_pvs 10 "1Gi 5Gi 10Gi"
     prepare_helm
