@@ -51,13 +51,11 @@ function setup_couchdb() {
   trap 'fail' ERR
 
   log "Install couchdb via Helm"
-  # Sometimes get Error: failed to download "stable/couchdb" (hint: running `helm repo update` may help)
-  helm repo update
-  # Per https://github.com/helm/charts/tree/master/stable/couchdb
-  helm repo update
+
+  #  https://github.com/helm/charts/tree/master/stable/couchdb was deprecated
+  helm repo add couchdb https://apache.github.io/couchdb-helm
   helm install --name $NAMESPACE-couchdb --namespace $NAMESPACE \
-    --set service.type=NodePort \
-    stable/couchdb
+    --set service.type=NodePort --set allowAdminParty=true couchdb/couchdb
 
   if [[ "$ACUMOS_COUCHDB_VERIFY_READY" == "true" ]]; then
     log "Wait for couchdb to be ready"

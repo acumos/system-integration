@@ -39,7 +39,7 @@ export ACUMOS_STAGING=nexus3.acumos.org:10004
 export ACUMOS_RELEASE=nexus3.acumos.org:10002
 
 # Images based upon Clio release assembly
-# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_Clio_1911041800
+# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_Clio_1911080900
 # with latest images in specific cases
 # Core components
 export ACUMOS_DELETE_SNAPSHOTS=false
@@ -54,8 +54,8 @@ export COMMON_DATASERVICE_IMAGE=$ACUMOS_STAGING/acumos/common-dataservice:3.0.1
 export DESIGNSTUDIO_IMAGE=$ACUMOS_STAGING/ds-compositionengine:3.0.0
 export FEDERATION_IMAGE=$ACUMOS_STAGING/acumos/federation-gateway:3.0.2
 export KUBERNETES_CLIENT_IMAGE=$ACUMOS_STAGING/kubernetes-client:3.0.0
-export MICROSERVICE_GENERATION_IMAGE=$ACUMOS_STAGING/microservice-generation:3.5.1
-export ONBOARDING_IMAGE=$ACUMOS_STAGING/onboarding-app:3.5.0
+export MICROSERVICE_GENERATION_IMAGE=$ACUMOS_STAGING/acumos/microservice-generation:3.6.0
+export ONBOARDING_IMAGE=$ACUMOS_STAGING/acumos/onboarding-app:3.6.0
 export SECURITY_VERIFICATION_IMAGE=$ACUMOS_STAGING/acumos/security-verification:1.2.0
 export OPENSTACK_CLIENT_IMAGE=$ACUMOS_STAGING/openstack-client:3.0.0
 export DEPLOYMENT_CLIENT_IMAGE=$ACUMOS_STAGING/deployment-client:1.0.1
@@ -117,6 +117,7 @@ export ACUMOS_COUCHDB_USER=admin
 export ACUMOS_COUCHDB_PASSWORD=
 export ACUMOS_COUCHDB_VERIFY_READY=true
 export ACUMOS_JENKINS_IMAGE=jenkins/jenkins
+export ACUMOS_JENKINS_RUNASUSER=
 export ACUMOS_JENKINS_API_CONTEXT_PATH=jenkins
 export ACUMOS_JENKINS_API_URL="http://$ACUMOS_NAMESPACE-jenkins:8080/$ACUMOS_JENKINS_API_CONTEXT_PATH/"
 export ACUMOS_JENKINS_USER=admin
@@ -138,6 +139,8 @@ export LUM_RELEASE_NAME=license-clio
 export LUM_NAMESPACE=$ACUMOS_NAMESPACE
 export LUM_CHART_NAME=lum-helm
 export ACUMOS_HTTP_PROXY=
+export ACUMOS_HTTP_PROXY_PORT=
+export ACUMOS_HTTP_PROXY_PROTOCOL=
 export ACUMOS_HTTPS_PROXY=
 
 # Component options
@@ -242,7 +245,7 @@ export ACUMOS_ONBOARDING_LOGS_PVC_NAME="$ACUMOS_LOGS_PVC_NAME"
 export ACUMOS_DEPLOYMENT_LOGS_PVC_NAME="$ACUMOS_LOGS_PVC_NAME"
 export ACUMOS_LOGS_PV_NAME="logs"
 export ACUMOS_LOGS_PV_SIZE=10Gi
-export ACUMOS_DEPLOYMENT_CONFIG_PVC_NAME="deployment"
+export ACUMOS_JENKINS_PV_SIZE=10Gi
 export DOCKER_VOLUME_PVC_NAME="docker-volume"
 export DOCKER_VOLUME_PV_NAME="docker-volume"
 export DOCKER_VOLUME_PV_SIZE=10Gi

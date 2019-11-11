@@ -32,6 +32,11 @@ services:
           "port": 8083,
           "contextPath": "/"
         },
+        "proxy": {
+          "host": "${ACUMOS_HTTP_PROXY}",
+          "port": "${ACUMOS_HTTP_PROXY_PORT}",
+          "protocol": "${ACUMOS_HTTP_PROXY_PROTOCOL}"
+        },
         "docker": {
           "host": "${ACUMOS_DOCKER_API_HOST}",
           "port": "${ACUMOS_DOCKER_API_PORT}",

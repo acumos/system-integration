@@ -88,7 +88,7 @@ if [[ "$HOST_OS" == "ubuntu" ]]; then
   wait_dpkg; sudo apt-get install -y docker-ce=18.06.3~ce~3-0~ubuntu
 
   echo; echo "prereqs.sh: ($(date)) Get k8s packages"
-  export KUBE_VERSION=1.13.0
+  export KUBE_VERSION=1.13.8
   # per https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
   # Install kubelet, kubeadm, kubectl per https://kubernetes.io/docs/setup/independent/install-kubeadm/
   wait_dpkg
