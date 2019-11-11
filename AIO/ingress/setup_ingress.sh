@@ -43,8 +43,8 @@
 
 function clean_ingress() {
   trap 'fail' ERR
-  apps="cds deployment-client kubernetes-client onboarding portal sv-scanning /
-  license-profile-editor license-rtu-editor zeppelin"
+  apps="cds deployment-client kubernetes-client onboarding portal sv-scanning \
+license-profile-editor license-rtu-editor zeppelin"
   for app in $apps; do
     if [[ $(kubectl get ingress -n $ACUMOS_NAMESPACE $app-ingress) ]]; then
       kubectl delete ingress -n $ACUMOS_NAMESPACE $app-ingress

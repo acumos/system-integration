@@ -22,13 +22,38 @@
 # Prerequisites:
 # - acumos_env.sh script prepared through oneclick_deploy.sh or manually, to
 #   set install options (e.g. docker/k8s)
+# - If you want to specify environment values, set and export them prior
+#   to running this script, e.g. by creating a script named mariadb_env.sh.
+#   See setup_nexus_env.sh for the default values.
+# - If you are deploying Nexus in standalone mode (i.e. running this script
+#   directly), create a nexus_env.sh file including at least a value for
+#     export ACUMOS_NEXUS_DOMAIN=<exernally-resolvable domain name>
+#     export ACUMOS_NEXUS_HOST=<internally-resolvable domain name>
+# - Additionally, for k8s:
+#   - Available PVs with at least 10GiB disk and default storage class
 #
 # Usage:
 # For docker-based deployments, run this script on the AIO host.
 # For k8s-based deployment, run this script on the AIO host or a workstation
 # connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
-# $ bash setup_nexus.sh
 #
+# $ bash setup_nexus.sh <clean|prep|setup|all>
+#   clean|prep|setup|all: action to execute
+#
+
+function nexus_prep() {
+  trap 'fail' ERR
+  create_namespace $ACUMOS_NEXUS_NAMESPACE
+  if [[ "$ACUMOS_CREATE_PVS" == "true" ]]; then
+  bash $AIO_ROOT/../tools/setup_pv.sh all /mnt/$ACUMOS_NEXUS_NAMESPACE \
+    $NEXUS_DATA_PV_NAME $NEXUS_DATA_PV_SIZE \
+    "200:$ACUMOS_HOST_USER"
+  fi
+  if [[ "$K8S_DIST" == "openshift" ]]; then
+    log "Workaround: Acumos AIO requires privilege to set PV permissions"
+    oc adm policy add-scc-to-user privileged -z default -n $ACUMOS_NEXUS_NAMESPACE
+  fi
+}
 
 function nexus_clean() {
   trap 'fail' ERR
@@ -99,9 +124,13 @@ function nexus_setup() {
 
 if [[ $# -lt 1 ]]; then
   cat <<'EOF'
-Usage: from the k8s master or a host setup use kubectl/helm remotely
-  $ bash setup_nexus.sh <clean|prep|setup|all>
-    clean|prep|setup|all: action to execute
+ Usage:
+ For docker-based deployments, run this script on the AIO host.
+ For k8s-based deployment, run this script on the AIO host or a workstation
+ connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
+
+ $ bash setup_nexus.sh <clean|prep|setup|all> <nexus_host>
+   clean|prep|setup|all: action to execute
 EOF
   echo "All parameters not provided"
   exit 1
@@ -124,5 +153,6 @@ source setup_nexus_env.sh
 cp nexus_env.sh $AIO_ROOT/.
 action=$1
 if [[ "$action" == "clean" || "$action" == "all" ]]; then nexus_clean; fi
+if [[ "$action" == "prep" || "$action" == "all" ]]; then nexus_prep; fi
 if [[ "$action" == "setup" || "$action" == "all" ]]; then nexus_setup; fi
 cd $WORK_DIR
