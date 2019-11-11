@@ -53,26 +53,24 @@ spec:
         - containerPort: 5432
         volumeMounts:
         - mountPath: /var/lib/postgresql
-          name: kong-data
+          name: kong-db
       - name: kong
         image: kong:0.11
         env:
-        - name: KONG_LOG_LEVEL
-          value: error
         - name: KONG_DATABASE
           value: postgres
         - name: KONG_PG_HOST
           value: localhost
         - name: KONG_PROXY_ACCESS_LOG
-          value: /dev/stdout
+          value: /var/log/kong/kong.log
         - name: KONG_ADMIN_ACCESS_LOG
-          value: /dev/stdout
+          value: /var/log/kong/kong.log
         - name: KONG_PROXY_ERROR_LOG
-          value: /dev/stderr
+          value: /var/log/kong/kong.log
         - name: KONG_ADMIN_ERROR_LOG
-          value: /dev/stderr
+          value: /var/log/kong/kong.log
         - name: KONG_LOG_LEVEL
-          value: debug
+          value: error
         - name: KONG_ADMIN_LISTEN
           value: 0.0.0.0:8001
         - name: KONG_ADMIN_LISTEN_SSL
@@ -98,10 +96,16 @@ spec:
             fi;
             sleep 3600;
           done;
+        volumeMounts:
+        - mountPath: /var/log/kong
+          name: logs
       volumes:
-      - name: kong-data
-        hostPath:
-          path: /mnt/<ACUMOS_NAMESPACE>/<KONG_DB_PV_NAME>
+      - name: kong-db
+        persistentVolumeClaim:
+         claimName: <KONG_DB_PVC_NAME>
+      - name: logs
+        persistentVolumeClaim:
+         claimName: <ACUMOS_LOGS_PVC_NAME>
 # TODO: debug access issues with PVC
 #        persistentVolumeClaim:
 #         claimName: pvc-<ACUMOS_NAMESPACE>-kong-db

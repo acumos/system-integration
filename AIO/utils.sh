@@ -545,6 +545,9 @@ function wait_completed() {
   status=$(kubectl get job -n $ACUMOS_NAMESPACE -o json $job | jq -r '.status.conditions[0].type')
   while [[ "$status" != "Complete" ]]; do
     t=$((t+10))
+    if [[ "$status" == "Failed" ]]; then
+      fail "Job $1 failed"
+    fi
     if [[ $t -gt $ACUMOS_SUCCESS_WAIT_TIME ]]; then
       fail "Job $1 failed to become completed in $ACUMOS_SUCCESS_WAIT_TIME seconds"
     fi

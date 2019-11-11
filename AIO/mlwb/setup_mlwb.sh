@@ -68,7 +68,7 @@ function setup_jupyterhub_certs_configmap() {
   trap 'fail' ERR
 
   # See prerequisites above if deploying with a standalone JupyterHub service
-  if [[ "$MLWB_JUPYTERHUB_DOMAIN" == "$ACUMOS_DOMAIN" ]]; then
+  if [[ ! -e $AIO_ROOT/../charts/jupyterhub/certs/$MLWB_JUPYTERHUB_CERT ]]; then
     log "Copy Acumos server cert for use as JupyterHub cert"
     mkdir -p $AIO_ROOT/../charts/jupyterhub/certs/
     cp $AIO_ROOT/certs/$ACUMOS_CERT $AIO_ROOT/../charts/jupyterhub/certs/.

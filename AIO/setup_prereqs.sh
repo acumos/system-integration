@@ -421,8 +421,8 @@ function prepare_env() {
     if [[ "$K8S_DIST" == "openshift" ]]; then
       log "Workaround: Acumos AIO requires hostpath privilege for volumes"
       oc adm policy add-scc-to-user privileged -z default -n $ACUMOS_NAMESPACE
-      # PV recyclers run in the default namespace and also need hostaccess
-      oc adm policy add-scc-to-user hostaccess -z default -n default
+      # PV recyclers run in the default namespace and need privileged
+      oc adm policy add-scc-to-user privileged -z default -n default
     fi
     setup_utility_pvs 10 "1Gi 5Gi 10Gi"
     prepare_helm

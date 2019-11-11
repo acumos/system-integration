@@ -49,7 +49,13 @@ spec:
       initContainers:
       - name: volume-mount-hack
         image: busybox
-        command: ["sh", "-c", "chown -R 200:200 /nexus"]
+        command: ['/bin/sh', '-c']
+        args:
+        - set -x;
+          if [ $(chown -R 200 /nexus) ];
+          then echo "Nexus root folder updated";
+          fi;
+          ls -lat /nexus;
         volumeMounts:
         - name: nexus-data
           mountPath: /nexus
