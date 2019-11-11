@@ -84,7 +84,11 @@ function setup_prereqs() {
   else
     # For centos, only deployment under k8s is supported
     # docker is assumed to be pre-installed as part of the k8s install process
-    sudo yum -y update
+    if [[ "$K8S_DIST" == "openshift" ]]; then
+      log "Skipping yum update since that may update docker and break the OpenShift cluster..."
+    else
+      sudo yum -y update
+    fi
     sudo rpm -Fvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
     sudo yum install -y wget git jq bind-utils nmap-ncat
   fi
@@ -119,6 +123,8 @@ setup_keystore() {
 
 function setup_docker_engine_on_host() {
   trap 'fail' ERR
+  update_acumos_env ACUMOS_DOCKER_API_HOST $ACUMOS_HOST force
+
   log "Enable non-secure docker repositories"
   cat <<EOF | sudo tee /etc/docker/daemon.json
 {
@@ -164,48 +170,70 @@ EOF
     log "docker API not ready ... waiting 10 seconds"
     sleep 10
   done
+
+  if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
+    log "Wait for kubernetes API to recover from the restart of docker"
+    t=0
+    until kubectl get nodes; do
+      log "kubernetes API is not ready... waiting 10 seconds"
+      sleep 10
+      t=$((t+10))
+      if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
+        fail "kubernetes API failed to restart after $ACUMOS_SUCCESS_WAIT_TIME seconds"
+      fi
+    done
+  fi
+}
+
+function prepare_docker_engine() {
+  trap 'fail' ERR
+  if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
+    if [[ "$ACUMOS_DEPLOY_DOCKER" == "true" && "$ACUMOS_DEPLOY_DOCKER_DIND" == "false" ]]; then
+      setup_docker_engine_on_host
+    fi
+    if [[ "$ACUMOS_CREATE_PVS" == "true" ]]; then
+      bash $AIO_ROOT/../tools/setup_pv.sh all /mnt/$ACUMOS_NAMESPACE \
+        $DOCKER_VOLUME_PV_NAME $DOCKER_VOLUME_PV_SIZE \
+        "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
+    fi
+  else
+    setup_docker_engine_on_host
+  fi
 }
 
 setup_docker() {
   trap 'fail' ERR
 
-  if [[ "$DEPLOYED_UNDER" = "docker" ]]; then
-    log "Install docker-ce if needed"
-    if [[ "$(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' 'docker-ce')" != "installed" ]]; then
-      # Per https://kubernetes.io/docs/setup/independent/install-kubeadm/
-      log "Install latest docker.ce"
-      # Per https://docs.docker.com/install/linux/docker-ce/ubuntu/
-      wait_dpkg
-      if [[ $(sudo apt-get purge -y docker-ce docker docker-engine docker.io) ]]; then
-        echo "Purged docker-ce docker docker-engine docker.io"
-      fi
-      wait_dpkg; sudo apt-get update
-      wait_dpkg; sudo apt-get install -y \
-        apt-transport-https \
-        ca-certificates \
-        curl \
-        software-properties-common
-      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-      sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-      wait_dpkg; sudo apt-get update
-      apt-cache madison docker-ce
-      wait_dpkg; sudo apt-get install -y docker-ce=18.06.3~ce~3-0~ubuntu
+  log "Install docker-ce if needed"
+  log "Remove any old config in /etc/docker/daemon.json"
+  sudo rm /etc/docker/daemon.json
+  if [[ "$(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' 'docker-ce')" != "installed" ]]; then
+    # Per https://kubernetes.io/docs/setup/independent/install-kubeadm/
+    log "Install latest docker.ce"
+    # Per https://docs.docker.com/install/linux/docker-ce/ubuntu/
+    wait_dpkg
+    if [[ $(sudo apt-get purge -y docker-ce docker docker-engine docker.io) ]]; then
+      echo "Purged docker-ce docker docker-engine docker.io"
     fi
-
-    log "Install latest docker-compose"
-    # Required, to use docker compose version 3.2 templates
-    # Per https://docs.docker.com/compose/install/#install-compose
-    # Current version is listed at https://github.com/docker/compose/releases
-    sudo curl -L -o /usr/local/bin/docker-compose \
-    "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)"
-    sudo chmod +x /usr/local/bin/docker-compose
-
-    setup_docker_engine_on_host
-  else
-    if [[ "$ACUMOS_DEPLOY_DOCKER" == "true" && "$ACUMOS_DEPLOY_DOCKER_DIND" == "false" ]]; then
-      setup_docker_engine_on_host
-    fi
+    wait_dpkg; sudo apt-get update
+    wait_dpkg; sudo apt-get install -y \
+      apt-transport-https \
+      ca-certificates \
+      curl \
+      software-properties-common
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    wait_dpkg; sudo apt-get update
+    apt-cache madison docker-ce
+    wait_dpkg; sudo apt-get install -y docker-ce=18.06.3~ce~3-0~ubuntu
   fi
+  log "Install latest docker-compose"
+  # Required, to use docker compose version 3.2 templates
+  # Per https://docs.docker.com/compose/install/#install-compose
+  # Current version is listed at https://github.com/docker/compose/releases
+  sudo curl -L -o /usr/local/bin/docker-compose \
+  "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)"
+  sudo chmod +x /usr/local/bin/docker-compose
 }
 
 function update_images() {
@@ -223,7 +251,7 @@ function update_images() {
     docker pull $img
   done
   log "Pre-pull Acumos MLWB component images"
-  envs="mlwb/mlwb_env.sh beats/beats_env.sh"
+  envs="$AIO_ROOT/mlwb/mlwb_env.sh $AIO_ROOT/beats/beats_env.sh"
   tmp=/tmp/$(uuidgen)
   for env in $envs; do
     grep -E 'export .*_IMAGE=' $env >>$tmp
@@ -236,8 +264,8 @@ function update_images() {
   for img in $imgs; do
     docker pull $img
   done
-  source mlwb/mlwb_env.sh
-  if [[ "$MLWB_DEPLOY_JUPYTERHUB" == "true" ]]; then
+  source $AIO_ROOT/mlwb/mlwb_env.sh
+  if [[ "$DEPLOYED_UNDER" == "k8s" && "$MLWB_DEPLOY_JUPYTERHUB" == "true" ]]; then
     log "Pre-pull JupyterHub singleuser container images"
     imgs="jupyter/tensorflow-notebook:$MLWB_JUPYTERHUB_IMAGE_TAG \
 jupyter/minimal-notebook:$MLWB_JUPYTERHUB_IMAGE_TAG \
@@ -272,7 +300,7 @@ function prepare_mariadb() {
         prep $(hostname) $K8S_DIST
     else
       bash mariadb/docker_compose.sh down
-      setup_docker_volume /mnt/$ACUMOS_MARIADB_NAMESPACE/$MARIADB_DATA_PV_NAME \
+      setup_docker_volume /mnt/$ACUMOS_MARIADB_NAMESPACE/$ACUMOS_MARIADB_DATA_PV_NAME \
         "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
     fi
   elif [[ ! -e mariadb_env.sh ]]; then
@@ -317,26 +345,11 @@ function prepare_nexus() {
       cd $AIO_ROOT
     fi
     if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
-      create_namespace $ACUMOS_NEXUS_NAMESPACE
-      if [[ "$ACUMOS_CREATE_PVS" == "true" ]]; then
-      bash $AIO_ROOT/../tools/setup_pv.sh all /mnt/$ACUMOS_NEXUS_NAMESPACE \
-        $NEXUS_DATA_PV_NAME $NEXUS_DATA_PV_SIZE \
-        "200:$ACUMOS_HOST_USER"
-      fi
+      bash $WORK_DIR/system-integration/AIO/nexus/setup_nexus.sh clean
+      bash $WORK_DIR/system-integration/AIO/nexus/setup_nexus.sh prep
     else
-      setup_docker_volume /mnt/$ACUMOS_NEXUS_NAMESPACE/$NEXUS_DATA_PV_NAME \
+      setup_docker_volume /mnt/$ACUMOS_NEXUS_NAMESPACE/$ACUMOS_NEXUS_DATA_PV_NAME \
         "200:$ACUMOS_HOST_USER"
-    fi
-  fi
-}
-
-function prepare_docker_engine() {
-  trap 'fail' ERR
-  if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
-    if [[ "$ACUMOS_CREATE_PVS" == "true" ]]; then
-      bash $AIO_ROOT/../tools/setup_pv.sh all /mnt/$ACUMOS_NAMESPACE \
-        $DOCKER_VOLUME_PV_NAME $DOCKER_VOLUME_PV_SIZE \
-        "$ACUMOS_HOST_USER:$ACUMOS_HOST_USER"
     fi
   fi
 }
@@ -414,17 +427,20 @@ function prepare_env() {
   update_acumos_env DEPLOYED_UNDER $1 force
   update_acumos_env ACUMOS_DOMAIN $2 force
   update_acumos_env ACUMOS_HOST_USER $3 force
-  if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
+  if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
+    setup_docker
+  else
     update_acumos_env K8S_DIST "$4" force
     set_k8s_env
-    create_namespace $ACUMOS_NAMESPACE
     if [[ "$K8S_DIST" == "openshift" ]]; then
-      log "Workaround: Acumos AIO requires hostpath privilege for volumes"
+      log "Workaround: Acumos AIO requires privilege to set PV permissions or run as root where needed"
       oc adm policy add-scc-to-user privileged -z default -n $ACUMOS_NAMESPACE
-      # PV recyclers run in the default namespace and also need hostaccess
-      oc adm policy add-scc-to-user hostaccess -z default -n default
+      # PV recyclers run in the default namespace and need privileged also
+      oc adm policy add-scc-to-user privileged -z default -n default
+    else
+      # OpenShift creates a set of PVs - generic k8s does not
+      setup_utility_pvs 10 "1Gi 5Gi 10Gi"
     fi
-    setup_utility_pvs 10 "1Gi 5Gi 10Gi"
     prepare_helm
   fi
 
@@ -465,27 +481,6 @@ verify_ubuntu_or_centos
 
 prepare_env $1 $2 $3 $4
 setup_prereqs
-
-if [[ "$DEPLOYED_UNDER" == "docker" || ("$DEPLOYED_UNDER" == "k8s" && "$ACUMOS_DEPLOY_DOCKER_DIND" == "false") ]]; then
-  if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
-    update_acumos_env ACUMOS_DOCKER_API_HOST $ACUMOS_HOST force
-  fi
-  setup_docker
-  if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
-    log "Wait for kubernetes API to recover from the restart of docker"
-    t=0
-    until kubectl get nodes; do
-      log "kubernetes API is not ready... waiting 10 seconds"
-      sleep 10
-      t=$((t+10))
-      if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
-        fail "kubernetes API failed to restart after $ACUMOS_SUCCESS_WAIT_TIME seconds"
-      fi
-    done
-    prepare_helm
-  fi
-fi
-
 update_images
 prepare_mariadb
 prepare_elk
@@ -493,8 +488,9 @@ bash $AIO_ROOT/../tools/setup_mariadb_client.sh
 setup_keystore
 prepare_ingress
 prepare_acumos
-prepare_docker_engine
+# Nexus has to precede docker-engine prep as it sets ACUMOS_DOCKER_REGISTRY_HOST
 prepare_nexus
+prepare_docker_engine
 prepare_mlwb
 
 mkdir -p $AIO_ROOT/../../acumos/env $AIO_ROOT/../../acumos/certs $AIO_ROOT/../../acumos/logs
