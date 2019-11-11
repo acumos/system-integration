@@ -23,7 +23,7 @@ FROM jenkins/jenkins:lts
 USER root
 RUN apt-get update && apt-get install -y jq uuid-runtime
 # Install kubectl per https://kubernetes.io/docs/setup/independent/install-kubeadm/
-ENV KUBE_VERSION=1.13.0
+ENV KUBE_VERSION=1.13.8
 RUN apt-get install -y apt-transport-https && \
   curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
   echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" >/etc/apt/sources.list.d/kubernetes.list && \
