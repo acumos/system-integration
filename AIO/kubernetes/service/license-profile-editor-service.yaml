@@ -32,5 +32,5 @@ spec:
   type: ClusterIP
   ports:
   - name: license-profile-editor-port
-    port: 8089
+    port: 8093
     targetPort: 8080

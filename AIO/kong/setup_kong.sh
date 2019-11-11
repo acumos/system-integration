@@ -53,10 +53,16 @@ function clean_kong() {
     stop_service deploy/kong-admin-service.yaml
     stop_service deploy/kong-service.yaml
     stop_deployment deploy/kong-deployment.yaml
+    if kubectl delete ingress -n $ACUMOS_NAMESPACE kong-ingress; then
+      log "Ingress kong-ingress deleted"
+    fi
+    if [[ $(kubectl delete secret -n $ACUMOS_NAMESPACE ingress-cert) ]]; then
+      log "Secret ingress-cert deleted"
+    fi
     log "Remove PVC for kong-service"
-    delete_pvc kong-db $ACUMOS_NAMESPACE
+    delete_pvc $KONG_DB_PVC_NAME $ACUMOS_NAMESPACE
     log "Remove configmap kong-config"
-    if [[ $($k8s_cmd get configmap -n $ACUMOS_NAMESPACE kong-config) ]]; then
+    if $k8s_cmd get configmap -n $ACUMOS_NAMESPACE kong-config; then
       $k8s_cmd delete configmap -n $ACUMOS_NAMESPACE kong-config
     fi
   fi
@@ -85,8 +91,20 @@ function setup_kong() {
       fi
     done
   else
-    log "Setup the kong-db PVC"
-    setup_pvc $ACUMOS_NAMESPACE $KONG_DB_PVC_NAME $KONG_DB_PV_NAME $KONG_DB_PV_SIZE
+    log "Setup the $KONG_DB_PVC_NAME PVC"
+    setup_pvc $ACUMOS_NAMESPACE $KONG_DB_PVC_NAME $KONG_DB_PV_NAME \
+      $KONG_DB_PV_SIZE $KONG_DB_PV_CLASSNAME
+    create_ingress_cert_secret $ACUMOS_NAMESPACE config/$ACUMOS_CERT config/$ACUMOS_CERT_KEY
+
+    if [[ "$ACUMOS_KONG_HTTPS_ONLY" == "false" ]]; then
+      log "Update Kong configuration to disable 'https_only' since Kong is deployed behind an ingress controller"
+      local files="$(ls config/*.json)"
+      for f in $files; do
+        sedi 's/\"https_only\": .*/\"https_only\": false,/' $f
+      done
+    fi
+    log "Update internal address of Jenkins as deployed by Helm"
+    sedi "s/jenkins-service/$ACUMOS_NAMESPACE-jenkins/" config/jenkins.json
 
     log "Deploy the k8s based components for kong"
     mkdir -p deploy
@@ -95,11 +113,10 @@ function setup_kong() {
     start_service deploy/kong-admin-service.yaml
     start_service deploy/kong-service.yaml
     start_deployment deploy/kong-deployment.yaml
-    if [[ "$ACUMOS_KONG_PROXY_SSL_PORT" == '' ]]; then
-      local port=$(kubectl get services -n $ACUMOS_NAMESPACE kong-service -o json | jq -r '.spec.ports[0].nodePort')
-      update_acumos_env ACUMOS_KONG_PROXY_SSL_PORT $port force
-    fi
     wait_running kong $ACUMOS_NAMESPACE
+
+    log "Create Kong ingress rule"
+    kubectl create -f deploy/kong-ingress.yaml
 
     log "Create the kong-config configmap"
     $k8s_cmd create configmap -n $ACUMOS_NAMESPACE kong-config --from-file=config
