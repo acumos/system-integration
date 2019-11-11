@@ -21,8 +21,6 @@
 #
 # Prerequisites:
 # - k8s cluster deployed
-# - k8s ingress controller deployed at K8S_INGRESS_DOMAIN and secret
-#   'ingress-cert' created per charts/ingress/setup_ingress_controller.sh.
 # - If installing just CouchDB, set at least these values in
 #   system-integration/AIO/acumos_env.sh
 #     export AIO_ROOT=<absolute path of folder system-integration/AIO>
@@ -31,9 +29,8 @@
 # Usage:
 # For k8s-based deployment, run this script on the k8s master or a workstation
 # connected to the k8s cluster via kubectl.
-# $ bash setup_couchdb.sh <setup|clean|all> <NAMESPACE> <K8S_INGRESS_DOMAIN>
+# $ bash setup_couchdb.sh <setup|clean|all> <NAMESPACE>
 #   setup|clean|all: action to take
-#   K8S_INGRESS_DOMAIN: domain assigned to the k8s cluster ingress controller
 #   NAMESPACE: k8s namespace to deploy under (will be created if not existing)
 #
 
@@ -51,17 +48,32 @@ function setup_couchdb() {
   trap 'fail' ERR
 
   log "Install couchdb via Helm"
-  # Sometimes get Error: failed to download "stable/couchdb" (hint: running `helm repo update` may help)
-  helm repo update
-  # Per https://github.com/helm/charts/tree/master/stable/couchdb
-  helm repo update
+
+  #  https://github.com/helm/charts/tree/master/stable/couchdb was deprecated
+  helm repo add couchdb https://apache.github.io/couchdb-helm
+  ACUMOS_COUCHDB_UUID=$(uuidgen)
+  update_acumos_env ACUMOS_COUCHDB_UUID $ACUMOS_COUCHDB_UUID force
   helm install --name $NAMESPACE-couchdb --namespace $NAMESPACE \
     --set service.type=NodePort \
-    stable/couchdb
+    --set couchdbConfig.couchdb.uuid=$ACUMOS_COUCHDB_UUID \
+    --set couchdbConfig.chttpd.require_valid_user=true \
+    couchdb/couchdb
+
+  ACUMOS_COUCHDB_PASSWORD=$(kubectl get secret -n $NAMESPACE $NAMESPACE-couchdb-couchdb -o go-template='{{ .data.adminPassword }}' | base64 --decode)
+  update_acumos_env ACUMOS_COUCHDB_PASSWORD $ACUMOS_COUCHDB_PASSWORD force
+
+  local t=0
+  while [[ "$(helm list $NAMESPACE-couchdb --output json | jq -r '.Releases[0].Status')" != "DEPLOYED" ]]; do
+    if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
+      fail "couchdb is not ready after $ACUMOS_SUCCESS_WAIT_TIME seconds"
+    fi
+    log "$NAMESPACE-couchdb Helm release is not yet Deployed, waiting 10 seconds"
+    sleep 10
+    t=$((t+10))
+  done
 
   if [[ "$ACUMOS_COUCHDB_VERIFY_READY" == "true" ]]; then
     log "Wait for couchdb to be ready"
-    local t=0
     until kubectl get svc -n $NAMESPACE $NAMESPACE-couchdb-svc-couchdb; do
       if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
         fail "couchdb is not ready after $ACUMOS_SUCCESS_WAIT_TIME seconds"
@@ -81,7 +93,7 @@ function setup_couchdb() {
       host=$ACUMOS_COUCHDB_DOMAIN
       port=$ACUMOS_COUCHDB_PORT
     fi
-    until [[ $(curl -m 5 -v http://$host:$port | grep -c couchdb) -gt 0 ]]; do
+    until [[ $(curl -m 5 -u $ACUMOS_COUCHDB_USER:$ACUMOS_COUCHDB_PASSWORD http://$host:$port | grep -c couchdb) -gt 0 ]]; do
       if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
         fail "couchdb is not ready after $ACUMOS_SUCCESS_WAIT_TIME seconds"
       fi
@@ -96,10 +108,9 @@ if [[ $# -lt 3 ]]; then
 Usage:
  For k8s-based deployment, run this script on the k8s master or a workstation
  connected to the k8s cluster via kubectl.
- $ bash setup_couchdb.sh <setup|clean|all> <NAMESPACE> <K8S_INGRESS_DOMAIN>
+ $ bash setup_couchdb.sh <setup|clean|all> <NAMESPACE>
    setup|clean|all: action to take
    NAMESPACE: k8s namespace to deploy under (will be created if not existing)
-   K8S_INGRESS_DOMAIN: origin (FQDN:port) assigned to the k8s cluster ingress controller
 EOF
   echo "All parameters not provided"
   exit 1
@@ -115,7 +126,6 @@ source $AIO_ROOT/acumos_env.sh
 
 action=$1
 NAMESPACE=$2
-K8S_INGRESS_DOMAIN=$3
 K8S_DIST=generic
 k8s_cmd=kubectl
 k8s_nstype=namespace

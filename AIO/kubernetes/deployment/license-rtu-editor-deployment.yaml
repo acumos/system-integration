@@ -37,7 +37,18 @@ spec:
     metadata:
       labels:
         app: license-rtu-editor
+        <ACUMOS_SERVICE_LABEL_KEY>: <ACUMOS_LICENSE_MGT_SERVICE_LABEL>
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: <ACUMOS_SERVICE_LABEL_KEY>
+                operator: NotIn
+                values:
+                - <ACUMOS_LICENSE_MGT_SERVICE_LABEL>
+            topologyKey: "kubernetes.io/node"
       imagePullSecrets:
       - name: acumos-registry
       containers:
@@ -52,4 +63,4 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: <ACUMOS_LOGS_PVC_NAME>
+          claimName: <ACUMOS_LICENSE_MGT_SERVICE_LABEL>
