@@ -37,14 +37,14 @@ spec:
     metadata:
       labels:
         app: filebeat
-        service: <ACUMOS_FILEBEAT_SERVICE_LABEL>
+        <ACUMOS_SERVICE_LABEL_KEY>: <ACUMOS_FILEBEAT_SERVICE_LABEL>
     spec:
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
-              - key: service
+              - key: <ACUMOS_SERVICE_LABEL_KEY>
                 operator: NotIn
                 values:
                 - <ACUMOS_FILEBEAT_SERVICE_LABEL>
@@ -74,4 +74,4 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-         claimName: <ACUMOS_LOGS_PVC_NAME>
+         claimName: <ACUMOS_FILEBEAT_SERVICE_LABEL>

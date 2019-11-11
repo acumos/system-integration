@@ -37,14 +37,14 @@ spec:
     metadata:
       labels:
         app: docker-proxy
-        service: <ACUMOS_DOCKER_PROXY_SERVICE_LABEL>
+        <ACUMOS_SERVICE_LABEL_KEY>: <ACUMOS_DOCKER_PROXY_SERVICE_LABEL>
     spec:
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
-              - key: service
+              - key: <ACUMOS_SERVICE_LABEL_KEY>
                 operator: NotIn
                 values:
                 - <ACUMOS_DOCKER_PROXY_SERVICE_LABEL>
@@ -105,7 +105,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-         claimName: <ACUMOS_COMMON_LOGS_PVC_NAME>
+         claimName: <ACUMOS_DOCKER_PROXY_SERVICE_LABEL>
       - name: conf-volume
         configMap:
           name: docker-proxy

@@ -96,11 +96,11 @@ setup_docker_proxy() {
 
     log "Update the docker-proxy deployment template and deploy it"
     replace_env deploy/docker-proxy-deployment.yaml
-    start_deployment deploy/docker-proxy-deployment.yaml
     get_host_ip_from_etc_hosts $ACUMOS_DOCKER_PROXY_HOST
     if [[ "$HOST_IP" != "" ]]; then
-      patch_deployment_with_host_alias $ACUMOS_NAMESPACE docker-proxy $ACUMOS_DOCKER_PROXY_HOST $HOST_IP
+      patch_template_with_host_alias deploy/docker-proxy-deployment.yaml $ACUMOS_DOCKER_PROXY_HOST $HOST_IP
     fi
+    start_deployment deploy/docker-proxy-deployment.yaml
     wait_running docker-proxy $ACUMOS_NAMESPACE
   fi
 }
