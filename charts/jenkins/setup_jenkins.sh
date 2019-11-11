@@ -71,10 +71,12 @@ function setup_jenkins() {
   helm repo update
   helm install --name $ACUMOS_NAMESPACE-jenkins -f deploy/values.yaml stable/jenkins
 
-  log "Setup ingress for Jenkins"
-  cp jenkins-ingress.yaml deploy/.
-  replace_env deploy/jenkins-ingress.yaml
-  kubectl create -f deploy/jenkins-ingress.yaml
+  if [[ "$ACUMOS_DEPLOY_INGRESS_RULES" == "true" ]]; then
+    log "Setup ingress for Jenkins"
+    cp jenkins-ingress.yaml deploy/.
+    replace_env deploy/jenkins-ingress.yaml
+    kubectl create -f deploy/jenkins-ingress.yaml
+  fi
 
   log "Wait for Jenkins to be ready"
   local url="-k https://$K8S_INGRESS_DOMAIN/jenkins/api/"

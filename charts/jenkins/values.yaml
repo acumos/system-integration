@@ -21,13 +21,17 @@
 namespaceOverride: <NAMESPACE>
 master:
   image: <ACUMOS_JENKINS_IMAGE>
+  runAsUser: <ACUMOS_JENKINS_RUNASUSER>
   adminPassword: <ACUMOS_JENKINS_PASSWORD>
   serviceType: ClusterIP
-  jenkinsUriPrefix: "/jenkins/"
+  jenkinsUriPrefix: "/<ACUMOS_JENKINS_API_CONTEXT_PATH>/"
   numExecutors: 10
   overwriteConfig: false
   overwritePlugins: false
   overwriteJobs: false
+  persistence:
+    enabled: true
+    size: <ACUMOS_JENKINS_PV_SIZE>
   authorizationStrategy: |-
     <useSecurity>true</useSecurity>
   hostAliases:
