@@ -185,7 +185,7 @@ set -x
 trap 'fail' ERR
 WORK_DIR=$(pwd)
 cd $(dirname "$0")
-if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../../AIO; pwd -P)"; fi
 source $AIO_ROOT/utils.sh
 source $AIO_ROOT/acumos_env.sh
 action=$1

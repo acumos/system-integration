@@ -88,7 +88,8 @@ if [[ "$HOST_OS" == "ubuntu" ]]; then
   wait_dpkg; sudo apt-get install -y docker-ce=18.06.3~ce~3-0~ubuntu
 
   echo; echo "prereqs.sh: ($(date)) Get k8s packages"
-  export KUBE_VERSION=1.13.0
+  export KUBE_VERSION=1.13.8
+  export KUBE_CNI_VERSION=0.7.5
   # per https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
   # Install kubelet, kubeadm, kubectl per https://kubernetes.io/docs/setup/independent/install-kubeadm/
   wait_dpkg
@@ -109,8 +110,7 @@ deb http://apt.kubernetes.io/ kubernetes-xenial main
 EOF
   wait_dpkg; sudo apt-get update
   echo; echo "prereqs.sh: ($(date)) Install kubectl, kubelet, kubeadm"
-  # Added kubernetes-cni to fix issue https://github.com/kubernetes/kubernetes/issues/75683
-  wait_dpkg; sudo apt-get -y install --allow-downgrades kubernetes-cni=0.6.0-00 \
+  wait_dpkg; sudo apt-get -y install --allow-downgrades kubernetes-cni=${KUBE_CNI_VERSION}-00 \
     kubectl=${KUBE_VERSION}-00 kubelet=${KUBE_VERSION}-00 kubeadm=${KUBE_VERSION}-00
   wait_dpkg; sudo apt-mark hold kubelet kubeadm kubectl
   # end of instructions per https://kubernetes.io/docs/setup/independent/install-kubeadm/
@@ -195,7 +195,14 @@ function start_k8s_master() {
   trap 'fail' ERR
   log "Starting kubernetes master"
   tmp="/home/$USER/$(uuidgen)"
-  sudo kubeadm init --pod-network-cidr=192.168.0.0/16 >>$tmp
+  # Ignore report of superfluous kernel compatibility issue for Azure
+  # https://github.com/clearlinux/distribution/issues/528
+  KERNEL_VERSION=$(uname -r)
+  if [[ "$KERNEL_VERSION" == "5.0.0-1014-azure" ]]; then
+    IGNORE="--ignore-preflight-errors=all"
+  fi
+
+  sudo kubeadm init $IGNORE --pod-network-cidr=192.168.0.0/16 >>$tmp
   cat $tmp
   export k8s_joincmd=$(grep "kubeadm join" $tmp)
   echo $k8s_joincmd >~/k8s_joincmd

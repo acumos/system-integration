@@ -91,8 +91,10 @@ function upgrade_db() {
 function setup_acumosdb() {
   trap 'fail' ERR
   server="-h $ACUMOS_MARIADB_HOST -P 3306"
-  if [[ "$ACUMOS_DEPLOY_AS_POD" == "false" || "$ACUMOS_MARIADB_HOST" != "$ACUMOS_INTERNAL_MARIADB_HOST" ]]; then
-    server="-h $ACUMOS_MARIADB_DOMAIN -P $ACUMOS_MARIADB_NODEPORT"
+  if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
+    if [[ "$ACUMOS_DEPLOY_AS_POD" == "false" || "$ACUMOS_MARIADB_HOST" != "$ACUMOS_INTERNAL_MARIADB_HOST" ]]; then
+      server="-h $ACUMOS_MARIADB_DOMAIN -P $ACUMOS_MARIADB_NODEPORT"
+    fi
   fi
 
   if [[ "$ACUMOS_CDS_PREVIOUS_VERSION" == "" ]]; then

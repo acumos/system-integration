@@ -1,0 +1,15 @@
+{
+  "strip_uri": true,
+  "name": "license-rtu-editor",
+  "http_if_terminated": false,
+  "https_only": true,
+  "upstream_url": "http://license-rtu-editor-service:8092",
+  "uris": [
+    "/license-rtu-editor"
+  ],
+  "preserve_host": false,
+  "upstream_connect_timeout": 60000,
+  "upstream_read_timeout": 60000,
+  "upstream_send_timeout": 60000,
+  "retries": 5
+}

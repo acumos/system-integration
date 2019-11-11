@@ -403,17 +403,17 @@ function start_acumos_core_app() {
   log "Update the $app deployment template and deploy it"
   cp kubernetes/deployment/$app-deployment.yaml deploy/.
   replace_env deploy/$app-deployment.yaml
-  start_deployment deploy/$app-deployment.yaml
   get_host_ip_from_etc_hosts $ACUMOS_DOMAIN
   if [[ "$HOST_IP" != "" ]]; then
-    patch_deployment_with_host_alias $ACUMOS_NAMESPACE $app $ACUMOS_HOST $HOST_IP
+    patch_template_with_host_alias deploy/$app-deployment.yaml $ACUMOS_HOST $HOST_IP
   fi
   if [[ "$app" == "cds" && "$ACUMOS_MARIADB_HOST" != "$ACUMOS_HOST" ]]; then
     get_host_ip_from_etc_hosts $ACUMOS_MARIADB_HOST
     if [[ "$HOST_IP" != "" ]]; then
-      patch_deployment_with_host_alias $ACUMOS_NAMESPACE $app $ACUMOS_MARIADB_HOST $HOST_IP
+      patch_template_with_host_alias deploy/$app-deployment.yaml $ACUMOS_MARIADB_HOST $HOST_IP
     fi
   fi
+  start_deployment deploy/$app-deployment.yaml
   wait_running $app $ACUMOS_NAMESPACE
 }
 
@@ -433,6 +433,24 @@ function stop_acumos_core_app() {
         log "Configmap $cfg deleted"
       fi
     done
+  fi
+}
+
+function patch_template_with_host_alias() {
+  trap 'fail' ERR
+  template=$1
+  name=$2
+  ip=$3
+  if [[ $(grep -c "\- ip: \"$ip\"" $template) -eq 0 ]]; then
+    log "Patch deployment template $template with hostAlias $name=$ip"
+    cat <<EOF >>$template
+      hostAliases:
+      - ip: "$ip"
+        hostnames:
+        - "$name"
+EOF
+  else
+    log "hostAlias $name=$ip already exists in deployment template $template"
   fi
 }
 
@@ -545,6 +563,9 @@ function wait_completed() {
   status=$(kubectl get job -n $ACUMOS_NAMESPACE -o json $job | jq -r '.status.conditions[0].type')
   while [[ "$status" != "Complete" ]]; do
     t=$((t+10))
+    if [[ "$status" == "Failed" ]]; then
+      fail "Job $1 failed"
+    fi
     if [[ $t -gt $ACUMOS_SUCCESS_WAIT_TIME ]]; then
       fail "Job $1 failed to become completed in $ACUMOS_SUCCESS_WAIT_TIME seconds"
     fi
@@ -785,6 +806,44 @@ function get_host_ip() {
       log "Please ensure $1 is resolvable thru DNS or hosts file"
       fail "IP address of $1 cannot be determined."
     fi
+  fi
+}
+
+function get_openshift_uid() {
+  trap 'fail' ERR
+  OPENSHIFT_UID=$(oc describe project $1 | grep 'sa.scc.uid-range' | cut -d '=' -f 2 | cut -d '/' -f 1)
+}
+
+function create_ingress_cert_secret() {
+  trap 'fail' ERR
+  log "Create ingress-cert secret"
+  local NAMESPACE=$1
+  local CERT=$2
+  local KEY=$3
+  if [[ "$(kubectl get secret -n $ACUMOS_NAMESPACE ingress-cert)" == "" ]]; then
+    get_host_info
+    if [[ "$HOST_OS" == "macos" ]]; then
+      b64crt=$(cat $CERT | base64)
+      b64key=$(cat $KEY | base64)
+    else
+      b64crt=$(cat $CERT | base64 -w 0)
+      b64key=$(cat $KEY | base64 -w 0)
+    fi
+    cat <<EOF >ingress-cert-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ingress-cert
+  namespace: $NAMESPACE
+data:
+  tls.crt: $b64crt
+  tls.key: $b64key
+type: kubernetes.io/tls
+EOF
+    kubectl create -f ingress-cert-secret.yaml
+  else
+    log "ingress-cert secret already exists"
+    kubectl describe secret -n $NAMESPACE ingress-cert
   fi
 }
 

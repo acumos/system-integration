@@ -52,14 +52,17 @@ function setup_docker_engine() {
   mkdir -p deploy
   cp -r kubernetes/* deploy/.
   replace_env deploy
+  get_host_ip_from_etc_hosts $ACUMOS_DOMAIN
+  if [[ "$HOST_IP" != "" ]]; then
+    patch_template_with_host_alias deploy/docker-deployment.yaml $ACUMOS_HOST $HOST_IP
+  fi
+  get_host_ip_from_etc_hosts $ACUMOS_DOCKER_REGISTRY_HOST
+  if [[ "$HOST_IP" != "" ]]; then
+    patch_template_with_host_alias deploy/docker-deployment.yaml $ACUMOS_DOCKER_REGISTRY_HOST $HOST_IP
+  fi
 
   start_service deploy/docker-service.yaml
   start_deployment deploy/docker-deployment.yaml
-  get_host_ip_from_etc_hosts $ACUMOS_DOCKER_REGISTRY_HOST
-  if [[ "$HOST_IP" != "" ]]; then
-    patch_deployment_with_host_alias $ACUMOS_NAMESPACE docker-dind $ACUMOS_DOCKER_REGISTRY_HOST $HOST_IP
-  fi
-
   wait_running docker-dind $ACUMOS_NAMESPACE
 }
 
