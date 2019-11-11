@@ -30,15 +30,16 @@ RUN add-apt-repository "deb [arch=amd64] \
   apt-get update && \
   apt-cache madison docker-ce && \
   apt-get install -y docker-ce=18.06.3~ce~3-0~ubuntu
-RUN curl -o /usr/local/bin/kubectl \
-  -LO https://storage.googleapis.com/kubernetes-release/release/v1.13.8/bin/linux/amd64/kubectl && \
-  chmod +x /usr/local/bin/kubectl
-ENV DESIRED_VERSION ''
-RUN curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
-RUN chmod 700 get_helm.sh && ./get_helm.sh $DESIRED_VERSION && helm init --client-only
 ENV MARIADB_MIRROR sfo1.mirrors.digitalocean.com
 ENV MARIADB_VERSION 10.2
 RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8 && \
   add-apt-repository "deb [arch=amd64,arm64,ppc64el] http://$MARIADB_MIRROR/mariadb/repo/$MARIADB_VERSION/ubuntu bionic main" && \
   apt-get update -y && apt-get install -y mariadb-client
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y tshark
+ENV DESIRED_VERSION '--version v2.12.3'
+RUN curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
+RUN chmod 700 get_helm.sh && ./get_helm.sh $DESIRED_VERSION && helm init --client-only
+RUN curl -LO https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz && \
+  tar xf openshift-origin-client-tools-*.tar.gz && \
+  cd openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit && \
+  mv kubectl oc /usr/local/sbin/.

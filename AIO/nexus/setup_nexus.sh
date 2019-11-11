@@ -22,13 +22,49 @@
 # Prerequisites:
 # - acumos_env.sh script prepared through oneclick_deploy.sh or manually, to
 #   set install options (e.g. docker/k8s)
+# - If you want to specify environment values, set and export them prior
+#   to running this script, e.g. by creating a script named mariadb_env.sh.
+#   See setup_nexus_env.sh for the default values.
+# - If you are deploying Nexus in standalone mode (i.e. running this script
+#   directly), create a nexus_env.sh file including at least a value for
+#     export ACUMOS_NEXUS_DOMAIN=<exernally-resolvable domain name>
+#     export ACUMOS_NEXUS_HOST=<internally-resolvable domain name>
+# - Additionally, for k8s:
+#   - Available PVs with at least 10GiB disk and default storage class
 #
 # Usage:
 # For docker-based deployments, run this script on the AIO host.
 # For k8s-based deployment, run this script on the AIO host or a workstation
 # connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
-# $ bash setup_nexus.sh
 #
+# $ bash setup_nexus.sh <clean|prep|setup|all>
+#   clean|prep|setup|all: action to execute
+#
+
+function nexus_prep() {
+  trap 'fail' ERR
+  create_namespace $ACUMOS_NEXUS_NAMESPACE
+  if [[ "$ACUMOS_CREATE_PVS" == "true" ]]; then
+  bash $AIO_ROOT/../tools/setup_pv.sh all /mnt/$ACUMOS_NEXUS_NAMESPACE \
+    $ACUMOS_NEXUS_DATA_PV_NAME $ACUMOS_NEXUS_DATA_PV_SIZE \
+    "200:$ACUMOS_HOST_USER"
+  fi
+  if [[ "$K8S_DIST" == "openshift" ]]; then
+    log "Workaround: Acumos AIO requires privilege to set PV permissions"
+    oc adm policy add-scc-to-user privileged -z default -n $ACUMOS_NEXUS_NAMESPACE
+  fi
+  # Update the Nexus config only if the default host (internal)
+  # For k8s. if not deploying dockder-dind, ensure docker can access Nexus from outside
+  if [[ "$ACUMOS_DEPLOY_DOCKER_DIND" == "false" && "$ACUMOS_NEXUS_HOST" == "$ACUMOS_INTERNAL_NEXUS_HOST" ]]; then
+    update_nexus_env ACUMOS_NEXUS_HOST $ACUMOS_NEXUS_DOMAIN force
+    update_nexus_env ACUMOS_DOCKER_REGISTRY_HOST $ACUMOS_DOCKER_REGISTRY_DOMAIN force
+    if [[ "$(kubectl get service -n $ACUMOS_NEXUS_NAMESPACE nexus-service)" == "" ]]; then
+      deploy_nexus_service
+    fi
+    update_nexus_env ACUMOS_NEXUS_API_PORT $ACUMOS_NEXUS_API_NODEPORT force
+    update_nexus_env ACUMOS_DOCKER_MODEL_PORT $ACUMOS_DOCKER_MODEL_NODEPORT force
+  fi
+}
 
 function nexus_clean() {
   trap 'fail' ERR
@@ -45,30 +81,48 @@ function nexus_clean() {
     stop_service deploy/nexus-service.yaml
     stop_deployment deploy/nexus-deployment.yaml
     log "Remove PVC for nexus-service"
-    delete_pvc $ACUMOS_NEXUS_NAMESPACE $NEXUS_DATA_PVC_NAME
+    delete_pvc $ACUMOS_NEXUS_NAMESPACE $ACUMOS_NEXUS_DATA_PVC_NAME
   fi
+}
+
+function deploy_nexus_service() {
+  trap 'fail' ERR
+  log "Update the nexus-service template and deploy the service"
+  mkdir -p deploy
+  cp -r kubernetes/nexus-service.yaml deploy/.
+  replace_env deploy/nexus-service.yaml
+  start_service deploy/nexus-service.yaml
+  ACUMOS_NEXUS_API_NODEPORT=$(kubectl get services -n $ACUMOS_NEXUS_NAMESPACE nexus-service -o json | jq -r '.spec.ports[0].nodePort')
+  update_nexus_env ACUMOS_NEXUS_API_NODEPORT $ACUMOS_NEXUS_API_NODEPORT force
+  ACUMOS_DOCKER_MODEL_NODEPORT=$(kubectl get services -n $ACUMOS_NEXUS_NAMESPACE nexus-service -o json | jq -r '.spec.ports[1].nodePort')
+  update_nexus_env ACUMOS_DOCKER_MODEL_NODEPORT $ACUMOS_DOCKER_MODEL_NODEPORT force
 }
 
 function nexus_setup() {
   trap 'fail' ERR
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
+    # If not set explictly, the default value will be for k8s based deployment...
+    if [[ "$ACUMOS_NEXUS_HOST" == "$ACUMOS_INTERNAL_NEXUS_HOST" ]]; then
+      update_nexus_env ACUMOS_NEXUS_HOST $ACUMOS_DOMAIN force
+      update_nexus_env ACUMOS_DOCKER_REGISTRY_HOST $ACUMOS_DOMAIN force
+    fi
     bash docker_compose.sh up -d --build --force-recreate
     wait_running nexus-service
+    update_nexus_env ACUMOS_NEXUS_API_NODEPORT $ACUMOS_NEXUS_API_PORT force
+    update_nexus_env ACUMOS_DOCKER_MODEL_NODEPORT $ACUMOS_DOCKER_MODEL_PORT force
   else
     log "Setup the nexus-data PVC"
-    setup_pvc $ACUMOS_NEXUS_NAMESPACE $NEXUS_DATA_PVC_NAME $NEXUS_DATA_PV_NAME $NEXUS_DATA_PV_SIZE
+    setup_pvc $ACUMOS_NEXUS_NAMESPACE $ACUMOS_NEXUS_DATA_PVC_NAME \
+      $ACUMOS_NEXUS_DATA_PV_NAME $ACUMOS_NEXUS_DATA_PV_SIZE \
+      $ACUMOS_NEXUS_DATA_PV_CLASSNAME
 
-    mkdir -p deploy
-    cp -r kubernetes/* deploy/.
-    log "Update the nexus-service template and deploy the service"
-    replace_env deploy/nexus-service.yaml
-    start_service deploy/nexus-service.yaml
-    ACUMOS_NEXUS_API_NODEPORT=$(kubectl get services -n $ACUMOS_NEXUS_NAMESPACE nexus-service -o json | jq -r '.spec.ports[0].nodePort')
-    update_nexus_env ACUMOS_NEXUS_API_NODEPORT $ACUMOS_NEXUS_API_NODEPORT force
-    ACUMOS_DOCKER_MODEL_NODEPORT=$(kubectl get services -n $ACUMOS_NEXUS_NAMESPACE nexus-service -o json | jq -r '.spec.ports[1].nodePort')
-    update_nexus_env ACUMOS_DOCKER_MODEL_NODEPORT $ACUMOS_DOCKER_MODEL_NODEPORT force
+    if [[ "$(kubectl get service -n $ACUMOS_NEXUS_NAMESPACE nexus-service)" == "" ]]; then
+      deploy_nexus_service
+    fi
 
     log "Update the nexus deployment template and deploy it"
+    mkdir -p deploy
+    cp -r kubernetes/nexus-deployment.yaml deploy/.
     replace_env deploy/nexus-deployment.yaml
     start_deployment deploy/nexus-deployment.yaml
     wait_running nexus $ACUMOS_NEXUS_NAMESPACE
@@ -99,9 +153,13 @@ function nexus_setup() {
 
 if [[ $# -lt 1 ]]; then
   cat <<'EOF'
-Usage: from the k8s master or a host setup use kubectl/helm remotely
-  $ bash setup_nexus.sh <clean|prep|setup|all>
-    clean|prep|setup|all: action to execute
+ Usage:
+ For docker-based deployments, run this script on the AIO host.
+ For k8s-based deployment, run this script on the AIO host or a workstation
+ connected to the k8s cluster via kubectl (e.g. via tools/setup_kubectl.sh)
+
+ $ bash setup_nexus.sh <clean|prep|setup|all> <nexus_host>
+   clean|prep|setup|all: action to execute
 EOF
   echo "All parameters not provided"
   exit 1
@@ -124,5 +182,6 @@ source setup_nexus_env.sh
 cp nexus_env.sh $AIO_ROOT/.
 action=$1
 if [[ "$action" == "clean" || "$action" == "all" ]]; then nexus_clean; fi
+if [[ "$action" == "prep" || "$action" == "all" ]]; then nexus_prep; fi
 if [[ "$action" == "setup" || "$action" == "all" ]]; then nexus_setup; fi
 cd $WORK_DIR

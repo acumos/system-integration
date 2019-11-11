@@ -54,7 +54,20 @@ spec:
       containers:
       - name: portal-fe
         image: <PORTAL_FE_IMAGE>
+        command: ["/bin/sh", "-c"]
+        args:
+        - set -x;
+          cd maven;
+          java $JAVA_OPTS -Dhttp.proxyHost=$ACUMOS_HTTP_PROXY_HOST -Dhttp.proxyPort=$ACUMOS_HTTP_PROXY_PORT -Dhttp.nonProxyHosts=$ACUMOS_HTTP_NON_PROXY_HOSTS -Dhttps.proxyHost=$ACUMOS_HTTP_PROXY_HOST -Dhttps.proxyPort=$ACUMOS_HTTP_PROXY_PORT -Dhttps.nonProxyHosts=$ACUMOS_HTTP_NON_PROXY_HOSTS -Djava.security.egd=file:/dev/./urandom -jar *.war
         env:
+        - name: ACUMOS_HTTP_NON_PROXY_HOSTS
+          value: "<ACUMOS_HTTP_NON_PROXY_HOSTS>|portal-be-service|onboarding-service|msg-service|sv-scanning-service|deployment-client-service|lpe-service|lum-service"
+        - name: ACUMOS_HTTP_PROXY_HOST
+          value: "<ACUMOS_HTTP_PROXY_HOST>"
+        - name: ACUMOS_HTTP_PROXY_PORT
+          value: "<ACUMOS_HTTP_PROXY_PORT>"
+        - name: JAVA_OPTS
+          value: "-Xms512m -Xmx1024m"
         - name: SPRING_APPLICATION_JSON
           value: '{
             "logging": {
