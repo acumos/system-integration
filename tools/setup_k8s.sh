@@ -87,8 +87,15 @@ if [[ "$HOST_OS" == "ubuntu" ]]; then
   apt-cache madison docker-ce
   wait_dpkg; sudo apt-get install -y docker-ce=18.06.3~ce~3-0~ubuntu
 
+  echo; echo "prereqs.sh: ($(date)) Move /var/lib/docker to /mnt/docker to avoid out of space issues on root volume"
+  sudo service docker stop
+  sudo mv /var/lib/docker /mnt/docker
+  sudo ln -s /mnt/docker /var/lib/docker
+  sudo service docker start
+
   echo; echo "prereqs.sh: ($(date)) Get k8s packages"
-  export KUBE_VERSION=1.13.0
+  export KUBE_VERSION=1.13.8
+  export KUBE_CNI_VERSION=0.7.5
   # per https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
   # Install kubelet, kubeadm, kubectl per https://kubernetes.io/docs/setup/independent/install-kubeadm/
   wait_dpkg
@@ -98,6 +105,7 @@ if [[ "$HOST_OS" == "ubuntu" ]]; then
   # workaround for [preflight] Some fatal errors occurred:
   #                /etc/kubernetes/manifests is not empty
   sudo rm -rf /etc/kubernetes/manifests/*
+
   echo; echo "prereqs.sh: ($(date)) Disable swap to workaround k8s incompatibility with swap"
   # per https://github.com/kubernetes/kubeadm/issues/610
   sudo swapoff -a
@@ -109,8 +117,7 @@ deb http://apt.kubernetes.io/ kubernetes-xenial main
 EOF
   wait_dpkg; sudo apt-get update
   echo; echo "prereqs.sh: ($(date)) Install kubectl, kubelet, kubeadm"
-  # Added kubernetes-cni to fix issue https://github.com/kubernetes/kubernetes/issues/75683
-  wait_dpkg; sudo apt-get -y install --allow-downgrades kubernetes-cni=0.6.0-00 \
+  wait_dpkg; sudo apt-get -y install --allow-downgrades kubernetes-cni=${KUBE_CNI_VERSION}-00 \
     kubectl=${KUBE_VERSION}-00 kubelet=${KUBE_VERSION}-00 kubeadm=${KUBE_VERSION}-00
   wait_dpkg; sudo apt-mark hold kubelet kubeadm kubectl
   # end of instructions per https://kubernetes.io/docs/setup/independent/install-kubeadm/
@@ -195,7 +202,14 @@ function start_k8s_master() {
   trap 'fail' ERR
   log "Starting kubernetes master"
   tmp="/home/$USER/$(uuidgen)"
-  sudo kubeadm init --pod-network-cidr=192.168.0.0/16 >>$tmp
+  # Ignore report of superfluous kernel compatibility issue for Azure
+  # https://github.com/clearlinux/distribution/issues/528
+  KERNEL_VERSION=$(uname -r)
+  if [[ "$KERNEL_VERSION" == "5.0.0-1014-azure" ]]; then
+    IGNORE="--ignore-preflight-errors=all"
+  fi
+
+  sudo kubeadm init $IGNORE --pod-network-cidr=192.168.0.0/16 >>$tmp
   cat $tmp
   export k8s_joincmd=$(grep "kubeadm join" $tmp)
   echo $k8s_joincmd >~/k8s_joincmd

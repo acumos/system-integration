@@ -36,17 +36,17 @@ spec:
     metadata:
       labels:
         app: nifi-registry
-        service: <MLWB_NIFI_REGISTRY_SERVICE_LABEL>
+        <ACUMOS_SERVICE_LABEL_KEY>: <MLWB_PIPELINE_SERVICE_LABEL>
     spec:
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
-              - key: service
+              - key: <ACUMOS_SERVICE_LABEL_KEY>
                 operator: NotIn
                 values:
-                - <MLWB_NIFI_REGISTRY_SERVICE_LABEL>
+                - <MLWB_PIPELINE_SERVICE_LABEL>
             topologyKey: "kubernetes.io/node"
       containers:
       - name: apache
@@ -146,7 +146,7 @@ spec:
           claimName: <MLWB_NIFI_REGISTRY_PVC_NAME>
       - name: logs
         persistentVolumeClaim:
-          claimName: <ACUMOS_LOGS_PVC_NAME>
+          claimName: <MLWB_PIPELINE_SERVICE_LABEL>
       - name: nifi-certs
         secret:
           secretName: nifi-certs-registry

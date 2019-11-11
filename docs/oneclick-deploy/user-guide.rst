@@ -1,7 +1,7 @@
 .. ===============LICENSE_START=======================================================
 .. Acumos CC-BY-4.0
 .. ===================================================================================
-.. Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+.. Copyright (C) 2017-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
 .. ===================================================================================
 .. This Acumos documentation file is distributed by AT&T and Tech Mahindra
 .. under the Creative Commons Attribution 4.0 International License (the "License");
@@ -15,8 +15,8 @@
 .. limitations under the License.
 .. ===============LICENSE_END=========================================================
 
-Introduction
-============
+Acumos OneClick / All-in-One (AIO) User Guide
+=============================================
 
 This user guide describes how to deploy Acumos platforms using the
 "One Click deploy" tools designed for those who want a simple and automated way
@@ -44,18 +44,18 @@ The resulting Acumos platform is illustrated in the following two figures, the
 first representing the overall architecture, and the second the architecture of
 the MLWB (Machine-Learning Workbench) subsystem.
 
-.. image:: images/acumos-architecture-detail-boreas.png
+.. image:: images/acumos-architecture-detail.png
    :width: 100 %
 
 .. image:: images/mlwb.png
    :width: 100 %
 
 Quickstart Guide to Platform Deployment (TL;DR)
-===============================================
+-----------------------------------------------
 
 NOTICE:
 
-* this process will remove/install software on your host, and configure
+* this process will remove/install software on your target host, and configure
   it e.g. firewall and security rules. Only execute this process if you understand
   the implications or are executing the process in a VM/host that you can easily
   re-create.
@@ -89,15 +89,21 @@ See these specific sections based upon how you want to deploy the platform:
   supported under docker-compose.
 
 Kubernetes Based Deployment
----------------------------
+...........................
 
 The process below will support deployment under either a generic kubernetes
 distribution, or the OpenShift kubernetes distribution. The scripts will detect
 which distribution is installed and deploy per the requirements of that
 distribution.
 
-Deploying from Your Workstation, via the AIO Deployer Tool
-..........................................................
+Note: the following k8s versions are explicitly supported and tested by these
+tools. Other versions may work, but may require further tool customization.
+
+* "generic" `kubernetes 1.13.8 <https://github.com/kubernetes/kubernetes/releases/tag/v1.13.8>`_
+* `OpenShift Origin 3.11 ("OKD") <https://docs.okd.io/3.11/install/running_install.html>`_
+
+Deploying from Your Workstation, via the aio_k8s_deployer
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 This process supports users with the role of either a cluster admin (full rights
 to manage cluster resources) or namespace admin (rights to manage resources
@@ -112,15 +118,15 @@ prerequisites have been arranged by the cluster admin:
 * allocation of a namespace
 * allocation of a platform FQDN (with DNS registration), external IP,
   and setup of an ingress controller for the namespace/FQDN
-* setup of persistent volume (PV) resources per Acumos requirements (default
-  recommended allocations are shown below)
+* setup of persistent volume (PV) resources per Acumos requirements
+  (recommended minimum allocations are shown below)
 
   * logs: 1Gi
   * if deployed as part of the platform, vs use of external instances of these services
 
     * MariaDB: 10Gi
     * Nexus (Maven repos and docker registry): 10Gi
-    * docker-in-docker cache: 5Gi
+    * docker-in-docker cache: 10Gi
     * NiFi Registry: 5Gi
     * NiFi users: 5Gi (for each user)
     * JupyterHub: 1Gi
@@ -139,77 +145,104 @@ folder is used, with these prerequisite steps:
   external IP address to be used by the ingress controller is registered in DNS
   or configured in the hosts file of their workstation.
 * the user has installed a bash shell and docker on their workstation
-* the user has copied the aio_k8s_deployer folder contents (e.g. from a
-  system-integration repo clone) to their workstation, and cloned/copied the
-  system-integration repo into the "deploy" subfolder. For example:
+* the user has created a folder (referred to here as the "staging" folder)
+  to contain any customizations to be used in this process, as described below
+* the user cloned the system-integration repo into a subfolder folder of the
+  staging folder
+* the user has prepared any desired customizations in the staging folder,
+  as described under `Customizing the aio_k8s_deployer environment`_
+* if not providing a k8s config file in the staging folder as described
+  in `Customizing the aio_k8s_deployer environment`_, the user has logged into
+  the k8s cluster using the applicable client (kubectl or oc), so that the
+  correct k8s config is present in ~/.kube/config
 
-  .. code-block:: bash
-
-    $ mkdir ~/acumos
-    $ git clone "https://gerrit.acumos.org/r/system-integration"
-    $ cp -r system-integration/tools/aio_k8s_deployer/* ~/acumos/.
-    $ cp -r system-integration ~/acumos/deploy/.
-  ..
-
-    * the deploy subfolder will be later mapped into the root folder of the
-      acumos-deploy docker container image by the aio_k8s_deployer.sh script.
-
-  * the aio_k8s_deployer.sh script and the files in the deploy subfolder have been
-    customized as desired, including these files in the "deploy" subfolder
-
-    * k8s configuration file "kube-config"; this will be used in the
-      container, to access the cluster via kubectl
-    * (optional) an environment customization script "customize_env.sh",
-      based upon the sample script customize_env.sh, to override the
-      default environment variables for Acumos, MLWB, MariaDB, and ELK
-    * (optional) updated the Dockerfile, as desired
-    * (optional) a post-deploy script, which can include any actions the user
-      wants to automatically occur after the platform is installed, e.g.
-      creation of user accounts, model onboarding; by default the
-      aio_k8s_deployer.sh script will invoke a script named 'post_deploy.sh'
-      if present in the deploy subfolder.
-
-To prepare the k8s environment and install using the aio_k8s_deployer:
-
-* using bash, the user runs the following command to create the "acumos-deploy"
-  docker image
+Given those prerequisites, in the simplest case the deployment can be launched
+with the single command below:
 
 .. code-block:: bash
 
-  $ bash aio_k8s_deployer.sh build
+  $ bash system-integration/tools/AIO/oneclick_deploy.sh aio_k8s_deployer \
+    <host> <user> <distribution>
 ..
 
-* if the user has a cluster admin role, the user can run the setup_prereqs.sh
-  script via the aio_k8s_deployer.sh script, to setup typical prerequisites on
-  the k8s master, e.g.
+where:
 
-  * apply the environment customizations in customize_env.sh
-  * cleans the ~/system-integration folder on the sudo user's account
-  * copies just the needed system-integration folders to that account
-  * executes the setup_prereqs.sh script, and saves a log on the local host
-  * copies the updated system-integration folders/env back to the local host
+* host: hostname of k8s cluster master node
+* user: SSH-enabled sudo user on the platform
+* k8s distribution: type of k8s cluster (generic|openshift)
 
-.. code-block:: bash
+When oneclick_deploy.sh is called with "aio_k8s_deployer" as the first
+parameter, it will create a folder by default named ~/acumos/<host>, and copy
+all of the files in the staging folder there. Any customizations to be
+applied in the deployment should be provided through the staging folder
+as described below.
 
-  $ bash aio_k8s_deployer.sh prep <host> <user>
-..
+Customizing the aio_k8s_deployer environment
+********************************************
 
-  * where:
+Following are examples of customizations that are possible for the
+aio_k8s_deployer and the files/configurations it uses. In summary, all aspects
+of the deployment process are customizable, but the most common are described
+below. These customizations are made by providing files in the staging
+folder, or in the system-integration clone under it.
 
-    * <host>: hostname of the k8s master node to execute the steps on
-    * <user>: sudo user on the k8s master node
+* updating the aio_k8s_deployer.sh script
 
-* if the cluster prerequisites were setup *without* running setup_prereqs.sh,
-  ensure that the following environment variables are specified in
-  system-integration/AIO/acumos_env.sh:
+  * you may find that the script needs to be adapted to your specific docker
+    build or execution environment, thus if a aio_k8s_deployer.sh exists in the
+    staging folder, it will be used in this process
 
-  * DEPLOYED_UNDER: k8s|docker
-  * ACUMOS_DOMAIN: DNS or hosts-file resolvable FQDN of the Acumos platform
-  * K8S_DIST: openshift|generic
-  * ACUMOS_HOST: DNS or hosts-file resolvable hostname of the Acumos host
+* providing a k8s config file
 
-* once the cluster prerequisites have been setup, the user can deploy the
-  platform via the following command, which
+  * by default, aio_k8s_deployer.sh will copy the user's ~/.kube/config file
+    for use in the acumos_deployer container; in cases which the user cannot
+    use a k8s client directly on their workstation (or doesn't want to), a
+    k8s config file can be provided in advance in the staging folder, as
+    kube-config.
+
+* providing a customize_env.sh script
+
+  * by default, aio_k8s_deployer.sh will customize the default customize_env.sh
+    script to set the three parameters to it, as described above
+    (<host> <user> <distribution>). Any other values in the various environment
+    files (acumos_env.sh, mlwb_env.sh) or environment file creation scripts
+    (setup_mariadb_env.sh, setup_nexus_env.sh, setup_elk_env.sh) can also be
+    updated by using the functions in customize_env.sh to pre-set a non-default
+    value for any of the values in those files.
+  * alternatively, the user can prepare the following files in the folders below,
+    which will be supplemented with any unspecified parameters when the related
+    environment setup script is run:
+
+    * mariadb_env.sh in system-integration/charts/mariadb
+    * elk_env.sh in system-integration/charts/elk-stack
+    * nexus_env.sh in system-integration/AIO/nexus
+
+  * the complete set of customizable environment parameters is described in
+    `Configuration`_
+
+* providing a Dockerfile for the desired k8s client
+
+  * by default, aio_k8s_deployer.sh will build a docker image that contains
+    the k8s client for the selected k8s distribution, and other tools needed by
+    the OneClick toolset. You can customize the Dockerfile to be used by
+    providing an updated one based upon the default in
+    system-integration/tools/aio_k8s_deployer/deploy/kubectl (for generic k8s)
+    or system-integration/tools/aio_k8s_deployer/deploy/oc (for OpenShift). Once
+    you have customized the Dockerfile, copy the parent folder (kubectl or oc)
+    to your staging folder.
+
+* providing a post_deploy.sh script
+
+  * aio_k8s_deploery.sh will execute a script named post_deploy.sh in the
+    deploy folder, if present. Such a script can be used for any arbitrary
+    purpose, e.g. to create user accounts, onboard default models, further
+    configure the platform though the available APIs, etc.
+
+* other customizations to the system-integration clone
+
+  * you can provide any other customizations by updating the various scripts,
+    templates, Helm charts, etc in the system-integration clone in the install
+    base folder.
 
   * starts the acumos-deployer container
   * updates the AIO tools environment to run under the container
@@ -219,22 +252,24 @@ To prepare the k8s environment and install using the aio_k8s_deployer:
     workstation deploy subfolder, incuding the log files and all updated files
     under the system-integration repo
 
-.. code-block:: bash
+Deploying via the Prep-Deploy process
++++++++++++++++++++++++++++++++++++++
 
-  $ bash aio_k8s_deployer.sh deploy <host> [add-host]
-..
+The "Prep-Deploy" process is the original two-stage process which has been
+automated by the aio_k8s_deployer for k8s based deployments. It still can be
+used for k8s-based deployments, and is required for docker based deployments.
 
-  * where:
+The process is called Prep-Deploy as it is broken down into two stages:
 
-    * <host>: name to suffix to the docker container, to identify the
-      customized container for use with a specific deployment instance
-    * [add-host]: (optional) value to pass to docker as add-host option
+* host/cluster preparation, executed by a host/cluster admin (sudo user) through
+  the system-integration/AIO/setup_prereqs.sh script
+* platform deployment, executed by a normal user through the oneclick_deploy.sh
+  script
 
-* See `When Deployment is Complete`_ for further steps
+These steps are described below.
 
-
-Deploying as a Privileged (sudo) User
-.....................................
+Using the Prep-Deploy process as a privileged (sudo) user
+*********************************************************
 
 This process is for a user that wants to execute all steps in the deployment
 process using their host account. To deploy the Acumos platform with the default
@@ -260,7 +295,14 @@ permission, follow the process below.
     command above again. Once you do not see the message above, logout and re-login.
 
 * if you don't have an existing k8s cluster, run the following command to setup
-  a cluster.
+  a cluster
+
+  * NOTE: this command will setup a single-node k8s cluster using the
+    generic k8s distribution (for Ubuntu) or OpenShift (for Centos). It also
+    installs docker-ce and links /var/lib/docker to /mnt/docker to avoid out
+    of space issues on the root volume, which can destabilize your k8s cluster.
+    Make sure you have the /mnt folder on a device with adequate disk, e.g. at
+    least 256GB.
 
   .. code-block:: bash
 
@@ -298,7 +340,7 @@ permission, follow the process below.
 
 
 Preparation by Host Admin with Platform Deployment by Normal (non-sudo) User
-............................................................................
+****************************************************************************
 
 This process is for a host Admin (sudo user) to prepare the host for a normal
 (non-sudo) user that will complete the platform deployment, under their account
@@ -334,7 +376,7 @@ on the host.
 
 
 Docker Based Deployment
------------------------
+.......................
 
 NOTE: Not all Acumos features will work as expected under docker, so those will
 not be deployed. Examples include the new services in support of model training.
@@ -343,7 +385,7 @@ To deploy the components that do work under docker, follow the instructions in
 the sections below.
 
 Prerequisites for Docker Based Deployment
-.........................................
++++++++++++++++++++++++++++++++++++++++++
 
 Prerequisites for docker based deployment:
 
@@ -364,8 +406,7 @@ Prerequisites for docker based deployment:
   * has customized or created as needed
 
     * the main environment file system-integration/AIO/acumos-env
-    * ELK-stack environment: see
-      system-integration/charts/elk-stack/setup_elk_env.sh as a guide to what
+    * ELK-stack environment: see `ELK Stack configuration`_ as a guide to what
       environment values can be customized. Customize the default values in
       that script, by changing the values after ':-" e.g. to change "true" to
       "false" replace the first line below with the second
@@ -378,7 +419,7 @@ Prerequisites for docker based deployment:
 
 
 Deploying for Yourself, as a Host Admin (sudo user)
-...................................................
++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 NOTE: If you are deploying into an Azure-based VM, pay attention to this
 special configuration need for the docker-engine; update the acumos_env.sh
@@ -409,7 +450,7 @@ If deploying the platform for yourself, run these commands:
 
 
 Preparing as a Host Admin, with Platform Deployment as a Normal User
-....................................................................
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 If a Host Admin needs to run the privileged-user steps for a normal user that
 will take it from there:
@@ -479,7 +520,7 @@ functions), use the create_user.sh script in the system-integration/tests folder
 Release Scope
 =============
 
-Current Release (Boreas)
+Current Release (Clio)
 ------------------------
 
 The `Acumos wiki <https://wiki.acumos.org/display/OAM/System+Integration>`_
@@ -524,16 +565,12 @@ In AIO/certs:
 
 * setup_certs.sh: creates self-signed certificates (CA and server), keystore,
   and truststore for use by core platform components.
-
-In AIO/docker/acumos:
-
-* docker-compose yaml files and deployment script for Acumos core components.
-
-In AIO/certs:
-
-* setup_certs.sh: script to create self-signed CA and server certs.
 * This folder is also used to stage user-provided certs to be used in Acumos
   platform deployment.
+
+In AIO/docker:
+
+* docker-compose yaml files and deployment script for Acumos core components.
 
 In AIO/docker-engine:
 
@@ -555,10 +592,15 @@ In AIO/ingress:
   `NGINX Ingress Controller for Kubernetes <https://github.com/kubernetes/ingress-nginx>`_,
   and ingress rules for Acumos core components.
 
+In AIO/jenkins:
+
+* script to deploy Jenkins as a service under k8s, supporting solution
+  deployment and security verification functions for the Acumos platform.
+
 In AIO/kong:
 
 * scripts and templates to deploy the Kong service as an ingress controller for
-  the Acumos platform, as deployed under docker
+  the Acumos platform, as deployed under docker or k8s
 
 In AIO/kubernetes:
 
@@ -568,10 +610,18 @@ In AIO/kubernetes:
 * under rbac, kubernetes role-based access control templates enabling system
   components to invoke kubernetes cluster operations
 
+In AIO/lum:
+
+* scripts and templates to deploy the License Management components under k8s
+
 In AIO/mariadb:
 
-* scripts and templates to deploy the MariaDB under docker, as the Acumos
-  platform database backend service
+* scripts and templates to deploy MariaDB, as the Acumos platform database
+  backend service
+
+In AIO/mlwb:
+
+* scripts and templates to deploy the MWLB components of the Acumos platform
 
 In AIO/nexus:
 
@@ -582,11 +632,14 @@ In charts:
 * scripts and templates to deploy the following components for k8s-based
   deployments, using Helm as deployment tool
 
+  * couchdb: CouchDB service as used by the MLWB
   * elk-stack: ELK stack core components
+  * ingress: Nginx-ingress controller
+  * jenkins: the Jenkins service as used by the Deployment Client and SV Scanning
+    Service
   * jupyterhub: the JupterHub/JupyterLab services for notebook-based model
     development
   * mariadb: MariaDB service
-  * nifi: the NiFi service for data pipeline development
   * zeppelin: the Zeppelin service for notebook-based model development
 
     * NOTE: Zeppelin deployment is a single, multi-user instance which is
@@ -595,20 +648,21 @@ In charts:
 
 In tests:
 
-* peer_test.sh: Peering and marketplace subsciptions setup for two AIO platforms.
-  Used to test federation use cases.
+* bootstrap_models.sh: Model package onboarding via curl, for all models in
+  a folder.
 * create_peer.sh: Automated setup of a peer relationship between two Acumos
-  AIO deployments. Used by peer_test.sh.
+  AIO deployments.
+* create_subscription.sh: creates a federation subscription for all models
+  published by a federated Acumos platform.
 * create_user.sh: Automated user provisioning and role assignment. Used by
   scripts in this repo to create default admin accounts. Can also be used to
   create user accounts for testing or platform use.
-* create_subscription.sh: creates a federation subscription for all models
-  published by a federated Acumos platform.
-* bootstrap_models.sh: Model package onboarding via curl, for all models in
-  a folder.
-* onboard_model.sh: Model package onboarding via curl.
+* delete_user.sh: deletion of a user account
 * license_scan.sh: invokes a license scan for a solution, using the Security
   Verification Scanning Service.
+* onboard_model.sh: Model package onboarding via curl.
+* peer_test.sh: Peering and marketplace subsciptions setup for two AIO platforms.
+  Used to test federation use cases.
 
 In tools:
 
@@ -636,6 +690,10 @@ In tools:
     folder.
   * setup_pv.sh: deploys host-based persistent volumes for use with
     docker and k8s-based platform deployments.
+  * trust_cert.sh: Adds a cert to the Acumos truststore under k8s
+  * update_env.sh: Compares the environment variable set between two
+    AIO versions, and updates the latter version with the values as set in
+    the previous version, for use in upgrading a platform to the new version
 
 Deployment Step-by-Step Guide
 =============================
@@ -643,20 +701,22 @@ Deployment Step-by-Step Guide
 The steps in this process are illustrated by the following figure. Note this
 figure refers to kubernetes, but the same basic process applies for docker.
 
-Prerequisites for each step are described for the step, under
-`Pre-Arrangement of Ingress Certs`_, `Install Host Preparation by Admin`_, and
-`Platform Deployment`_.
+1) Host Admin prepares the platform host environment, per
+   `Host/VM Preparation`_ and `Install Host Preparation by Admin`_
+2) Host Admin clones the system-integration repo, or uses a local/customized
+   clone, and runs the applicable host/environment preparation script(s) as
+   described in `Install Host Preparation by Admin`_
+3) The user (Admin, if installing for their self) customizes the environment
+   files and/or certs (per `Pre-Arrangement of Ingress Certs`_) as desired,
+   either  manually or through a 'customize_env.sh' script as described in
+   `Deploying from Your Workstation, via the AIO Deployer Tool`_,
+4) The user deploys the platform components via the 'aio_k8s_deployer.sh' script
+   or via the 'oneclick_deploy.sh' script
 
-1) Host Admin clones the system-integration repo, or uses a local/customized
-   clone.
-2) Host Admin customizes the environment files and/or certs as desired, per
-   `Pre-Arrangement of Ingress Certs`_
-3) The Admin runs the applicable host preparation script(s) as described in
-   `Install Host Preparation by Admin`_
-4) The user (Admin, if installing for their self) further updates the
-   environment files and certs as desired, per `Platform Deployment`_
-5) The user deploys the rest of the platform components via script
-   'oneclick_deploy.sh', per `Platform Deployment`_
+   * 'aio_k8s_deployer.sh' provides a convenient docker-based wrapper environment
+     for running 'oneclick_deploy.sh', making it easy to execute k8s-based
+     Acumos platform deployment on any type of workstation, and snapshot the
+     resulting deployment tools state for later use/sharing.
 
 .. image:: images/aio-k8s-deployment.png
    :width: 100 %
@@ -697,6 +757,102 @@ Following are basic requirements for single-node/AIO machines:
     "6443", "kubernetes API",
     "30000-32767", "direct service access, e.g. k8s nodeports"
 ..
+
+Install Host Preparation by Admin
+---------------------------------
+
+NOTE: If you are deploying under k8s into an Azure-based VM, pay attention to the
+special configuration need for the docker-engine, as described below.
+
+Prerequisites:
+
+* Ubuntu Xenial/Bionic or Centos 7 server
+* All hostnames specified in acumos_env.sh must be DNS-resolvable on all hosts
+  (entries in /etc/hosts or in an actual DNS server)
+* For deployments behind proxies, set ACUMOS_HTTP_PROXY and ACUMOS_HTTPS_PROXY in acumos_env.sh
+* Admin user running this script has:
+
+  * Installed docker per system-integration/tools/setup_docker.sh
+  * Added themselves to the docker group (sudo usermod -aG docker $USER)
+  * Logged out and back in, to activate docker group membership
+
+* Initial basic setup (manual)
+
+  * If you are an Admin and deploying the platform for a normal user, assuming
+    the non-sudo user is "acumos"
+
+    .. code-block:: bash
+
+      sudo useradd -m acumos
+    ..
+
+This process prepares the host with prerequisites that normal users do not have
+permission to arrange. This includes:
+
+* installing software packages
+* configuring host settings
+* creating folders for host-mapped volumes
+
+The Admin user will follow this process:
+
+* 'install root folder' refers to the Admin user's home folder. Installation
+  in other root folders is a work in progress, and not yet fully verified.
+* create in the install root folder a subfolder "acumos" and folders "env",
+  "logs", "certs" under it.
+* in the install root folder, clone the system-integration repo (branch, tag,
+  commit, or master), and make any desired updates to it (e.g. checkout a
+  specific patch)
+* if you are installing under k8s and don't have a pre-installed k8s cluster,
+  install a cluster e.g. using the setup_k8s_stack.sh script
+  (in system-integration/tools).
+* If you are deploying the platform under k8s in an Azure VM, update acumos_env.sh
+  (in system-integration/AIO) script to set the ACUMOS_DEPLOY_DOCKER_DIND flag to
+  "false", which will ensure that the docker-dind service is not installed.
+  Docker-dind has known issues under Azure.
+
+  .. code-block:: bash
+
+    export ACUMOS_DEPLOY_DOCKER_DIND=false
+  ..
+
+* If you are deploying under docker, run the command
+
+.. code-block:: bash
+
+  bash setup_prereqs.sh <under> <domain> <user>
+..
+
+  * under: docker (install prereqs for docker or k8s based deployment)
+  * domain: FQDN of platform
+  * user: user that will be completing Acumos platform setup via
+          oneclick_deploy.sh (if installing for yourself, use $USER)
+
+* If you are deploying under k8s, and do not have an existing k8s cluster or
+  need to deploy a new cluster e.g. an AIO cluster on a VM, run the command
+  below on the host for the new cluster
+
+  .. code-block:: bash
+
+    bash system-integration/tools/setup_k8s_stack.sh setup
+  ..
+
+* If you are deploying under k8s, run the command
+
+  .. code-block:: bash
+
+    bash system-integration/AIO/setup_prereqs.sh k8s <domain> $USER <generic|openshift>
+  ..
+
+  * k8s: indicates deployment under k8s
+  * user: non-sudo user account (use $USER if deploying for yourself)
+  * domain: domain name of Acumos platorm (resolves to this host)
+  * generic|openshift: use generic k8s or openshift
+
+When the process is complete, the updated system-integration clone and environment
+will have been copied to the platform deployment user's home folder. If you are
+deploying the platform for yourself, proceed to the next section. If preparing
+the platform for a normal user, the user should execute the process in the next
+section.
 
 Pre-Arrangement of Ingress Certs
 --------------------------------
@@ -794,99 +950,6 @@ To use commercial certs with the Acumos AIO platform, follow these steps:
       -storepass $TRUSTSTORE_PASSWORD -noprompt
 
   ..
-
-Install Host Preparation by Admin
----------------------------------
-
-NOTE: If you are deploying under k8s into an Azure-based VM, pay attention to the
-special configuration need for the docker-engine, as described below.
-
-Prerequisites:
-
-* Ubuntu Xenial/Bionic or Centos 7 server
-* All hostnames specified in acumos_env.sh must be DNS-resolvable on all hosts
-  (entries in /etc/hosts or in an actual DNS server)
-* For deployments behind proxies, set ACUMOS_HTTP_PROXY and ACUMOS_HTTPS_PROXY in acumos_env.sh
-* Admin user running this script has:
-
-  * Installed docker per system-integration/tools/setup_docker.sh
-  * Added themselves to the docker group (sudo usermod -aG docker $USER)
-  * Logged out and back in, to activate docker group membership
-
-* Initial basic setup (manual)
-
-  * If you are an Admin and deploying the platform for a normal user, assuming
-    the non-sudo user is "acumos"
-
-    .. code-block:: bash
-
-      sudo useradd -m acumos
-    ..
-
-This process prepares the host with prerequisites that normal users do not have
-permission to arrange. This includes:
-
-* installing software packages
-* configuring host settings
-* creating folders for host-mapped volumes
-
-The Admin user will follow this process:
-
-* 'install root folder' refers to the Admin user's home folder. Installation
-  in other root folders is a work in progress, and not yet fully verified.
-* create in the install root folder a subfolder "acumos" and folders "env",
-  "logs", "certs" under it.
-* in the install root folder, clone the system-integration repo (branch, tag,
-  commit, or master), and make any desired updates to it (e.g. checkout a
-  specific patch)
-* If you are deploying the platform under k8s in an Azure VM, update acumos_env.sh
-  (in system-integration/AIO) script to set the ACUMOS_DEPLOY_DOCKER_DIND flag to
-  "false", which will ensure that the docker-dind service is not installed.
-  Docker-dind has known issues under Azure.
-
-  .. code-block:: bash
-
-    export ACUMOS_DEPLOY_DOCKER_DIND=false
-  ..
-
-* If you are deploying under docker, run the command
-
-.. code-block:: bash
-
-  bash setup_prereqs.sh <under> <domain> <user>
-..
-
-  * under: docker (install prereqs for docker or k8s based deployment)
-  * domain: FQDN of platform
-  * user: user that will be completing Acumos platform setup via
-          oneclick_deploy.sh (if installing for yourself, use $USER)
-
-* If you are deploying under k8s, and do not have an existing k8s cluster or
-  need to deploy a new cluster e.g. an AIO cluster on a VM, run the command
-  below on the host for the new cluster
-
-  .. code-block:: bash
-
-    bash system-integration/tools/setup_k8s_stack.sh setup
-  ..
-
-* If you are deploying under k8s, run the command
-
-  .. code-block:: bash
-
-    bash system-integration/AIO/setup_prereqs.sh k8s <domain> $USER <generic|openshift>
-  ..
-
-  * k8s: indicates deployment under k8s
-  * user: non-sudo user account (use $USER if deploying for yourself)
-  * domain: domain name of Acumos platorm (resolves to this host)
-  * generic|openshift: use generic k8s or openshift
-
-When the process is complete, the updated system-integration clone and environment
-will have been copied to the platform deployment user's home folder. If you are
-deploying the platform for yourself, proceed to the next section. If preparing
-the platform for a normal user, the user should execute the process in the next
-section.
 
 Platform Deployment
 -------------------
@@ -1076,7 +1139,6 @@ command:
 If you just need to stop a component, use the following command and reference the
 related "app" label:
 
-
 .. code-block:: bash
 
   kubectl delete deployment -n acumos -l app=<app>
@@ -1095,9 +1157,143 @@ described above.
 Logs Location
 =============
 
-Logs are easily accessible on the AIO host under /mnt/<ACUMOS_NAMESPACE>/logs
-directory ('<ACUMOS_NAMESPACE>' is by default 'acumos'). That directory is
-mounted by most Acumos components as their log directory.
+If the ELK stack is deployed, logs should be available through the Kibana UI.
+If you want to look at the logs on the platform or through the k8s client
+API, use one of the methods below. Note that while generally the Acumos logs
+design pattern is to create logs under a subfolder of the logs folder, not all
+components yet support that fully. So you will see some miscellaneous log files
+associated with those components.
+
+* for docker-based deployments, the logs are easily accessible on the AIO host
+  under /mnt/<ACUMOS_NAMESPACE>/logs directory ('<ACUMOS_NAMESPACE>' is by
+  default 'acumos'). That directory is mounted by most Acumos components as
+  their log directory.
+* for k8s-based deployments, logs in most cases will be available through one
+  or more PVCs.
+
+  * If you did not customize the SERVICE_LABEL values for the
+    components, by default the logs can be located under the "logs" PVC, e.g.:
+
+    .. code-block:: bash
+
+      kubectl get pvc logs -o yaml | awk '/volumeName/{print $2}'
+      pv-10gi-3
+    ..
+
+    * In the example above, if you are using the default hostPath-based PV
+      service setup by the OneClick tools for a single-node k8s cluster, and
+      you have access to the k8s master node, you can find the logs under
+      /mnt/$ACUMOS_NAMESPACE/<pv name>, e.g.
+
+      .. code-block:: bash
+
+        $ pvdir=$(kubectl get pvc logs -n $ACUMOS_NAMESPACE -o yaml | awk '/volumeName/{print $2}')
+        $ ls -lat /mnt/$ACUMOS_NAMESPACE/$pvdir
+        total 176
+        drwxr-xr-x  2 root   root    4096 Nov 27 00:28 portal-fe
+        drwxr-xr-x  3 root   root    4096 Nov 27 00:28 on-boarding
+        drwxr-xr-x  3 root   root    4096 Nov 27 00:28 microservice-generation
+        drwxr-xr-x  2 root   root    4096 Nov 27 00:28 federation-gateway
+        drwxr-xr-x  2 root   root    4096 Nov 27 00:28 ds-compositionengine
+        drwxr-xr-x  2 root   root    4096 Nov 27 00:27 project-service
+        drwxr-xr-x  2 root   root    4096 Nov 27 00:27 predictor-service
+        drwxr-xr-x  2 root   root    4096 Nov 27 00:27 pipeline-service
+        drwxr-xr-x  2 root   root    4096 Nov 27 00:27 model-service
+        drwxr-xr-x  2 root   root    4096 Nov 27 00:04 notebook-service
+        -rw-r--r--  1 ubuntu ubuntu 19085 Nov 26 22:11 nifi-registry-app.log
+        -rw-r--r--  1 ubuntu ubuntu 10870 Nov 26 22:11 nifi-registry-bootstrap.log
+        drwxrwxrwx 15 ubuntu ubuntu  4096 Nov 26 22:11 .
+        -rw-r--r--  1 root   root    4750 Nov 26 22:10 docker-proxy.log
+        -rw-r--r--  1 ubuntu ubuntu 19087 Nov 26 19:27 nifi-registry-app_2019-11-26_19.0.log
+        drwxr-xr-x  2 root   root    4096 Nov 26 19:24 portal-be
+        drwxr-xr-x  2 root   root    4096 Nov 26 19:22 cmn-data-svc
+        -rw-r--r--  1 ubuntu ubuntu  5435 Nov 25 04:42 nifi-registry-bootstrap_2019-11-25.log
+        -rw-r--r--  1 ubuntu ubuntu  5435 Nov 24 17:33 nifi-registry-bootstrap_2019-11-24.log
+        -rw-r--r--  1 ubuntu ubuntu  5435 Nov 23 19:10 nifi-registry-bootstrap_2019-11-23.log
+        -rw-r--r--  1 ubuntu ubuntu 27175 Nov 22 19:23 nifi-registry-bootstrap_2019-11-22.log
+        -rw-r--r--  1 ubuntu ubuntu     0 Nov 22 00:40 nifi-registry-event.log
+        -rw-r--r--  1 root   root       0 Nov 22 00:40 access.log
+        -rw-r--r--  1 root   root       0 Nov 22 00:40 docker-proxy-access.log
+        -rw-r--r--  1 root   root       0 Nov 22 00:40 docker-proxy-error.log
+        drwxr-xr-x  5 root   root    4096 Nov 22 00:37 deployment
+        drwxr-xr-x 32 ubuntu ubuntu  4096 Nov 22 00:02 ..
+      ..
+
+    * You can also access the logs though one of the containers that has mounted
+      the logs PVC, e.g. as in the following example which uses an aio_k8s_deployer
+      container to access the cluster information remotely. In this case you see
+      that specifying the namespace is not required, since that is automatically
+      scoped per the kube-config file provided when the container was created.
+
+      .. code-block:: bash
+
+        $ docker exec -it acumos-deploy-opnfv04 bash
+        root@a29adaebcc84:/# pod=$(kubectl get pods | awk '/portal-be/{print $1}')
+        root@a29adaebcc84:/# kubectl exec -it $pod -- ls -lat /maven/logs
+        total 164
+        -rw-r--r--    1 1000     1000         19087 Nov 29 02:56 nifi-registry-app.log
+        -rw-r--r--    1 1000     1000          5435 Nov 29 02:56 nifi-registry-bootstrap.log
+        drwxrwxrwx   15 1000     1000          4096 Nov 29 02:56 .
+        -rw-r--r--    1 root     root          2850 Nov 29 02:56 docker-proxy.log
+        drwxr-xr-x    2 root     root          4096 Nov 29 02:38 portal-fe
+        drwxr-xr-x    3 root     root          4096 Nov 29 02:38 on-boarding
+        drwxr-xr-x    3 root     root          4096 Nov 29 02:38 microservice-generation
+        drwxr-xr-x    2 root     root          4096 Nov 29 02:38 federation-gateway
+        drwxr-xr-x    2 root     root          4096 Nov 29 02:38 ds-compositionengine
+        drwxr-xr-x    2 root     root          4096 Nov 29 02:37 project-service
+        drwxr-xr-x    2 root     root          4096 Nov 29 02:37 predictor-service
+        drwxr-xr-x    2 root     root          4096 Nov 29 02:37 notebook-service
+        drwxr-xr-x    2 root     root          4096 Nov 29 02:37 model-service
+        drwxr-xr-x    2 root     root          4096 Nov 29 02:13 cmn-data-svc
+        drwxr-xr-x    2 root     root          4096 Nov 29 02:13 portal-be
+        drwxr-xr-x    2 root     root          4096 Nov 29 00:01 pipeline-service
+        -rw-r--r--    1 1000     1000         19085 Nov 28 04:03 nifi-registry-app_2019-11-28_04.0.log
+        -rw-r--r--    1 1000     1000          5435 Nov 28 04:03 nifi-registry-bootstrap_2019-11-28.log
+        -rw-r--r--    1 1000     1000         19084 Nov 27 21:45 nifi-registry-app_2019-11-27_21.0.log
+        -rw-r--r--    1 1000     1000         21740 Nov 27 21:45 nifi-registry-bootstrap_2019-11-27.log
+        -rw-r--r--    1 1000     1000             0 Nov 27 01:27 nifi-registry-event.log
+        -rw-r--r--    1 root     root             0 Nov 27 01:00 access.log
+        -rw-r--r--    1 root     root             0 Nov 27 01:00 docker-proxy-access.log
+        -rw-r--r--    1 root     root             0 Nov 27 01:00 docker-proxy-error.log
+        drwxr-xr-x    5 root     root          4096 Nov 27 00:39 deployment
+        drwxrwxrwx    1 root     root          4096 Nov  7 11:16 ..
+
+      ..
+
+  * If you did customize the SERVICE_LABEL values, the logs will be associated
+    with PVCs named per the SERVICE_LABEL values you chose. Each PVC will host
+    the logs for the components that you associated with the same SERVICE_LABEL
+    value.
+
+  * If instead of an AIO deployment, you are using a multi-node k8s cluster
+    for which you don't have direct access to the logs PV, the only way to
+    access the logs without using a pod running under the same cluster and
+    mounting the same PVC folder, is to execute a command that runs in one
+    of the pods that is mounting the PVC. This is pretty easy, e.g.:
+
+    .. code-block:: bash
+
+      root@7b13a31255f2:/# source /deploy/system-integration/AIO/acumos_env.sh
+      root@7b13a31255f2:/# pod=$(kubectl get pods -n $ACUMOS_NAMESPACE | awk '/portal-be/{print $1}')
+      root@7b13a31255f2:/# kubectl exec -it -n $ACUMOS_NAMESPACE $pod -- ls -lat /maven/logs
+      total 20
+      drwxr-sr-x    2 root     1000          4096 Nov 28 03:26 portal-fe
+      drwxr-sr-x    2 root     1000          4096 Nov 28 01:16 portal-be
+      drwxr-sr-x    3 root     1000          4096 Nov 27 16:36 on-boarding
+      drwxrwsr-x    5 root     1000          4096 Nov 27 02:51 .
+      drwxrwxrwx    1 root     root          4096 Nov 26 12:12 ..
+
+    ..
+
+    * The example above accessing the logs from within the aio_k8s_deployer
+      container, but will also work in other envs, just use the correct path
+      for your acumos_env.sh script.
+    * In the example above you also see that not all of the log folders in the
+      previous (AIO) example are shown; this is because in this case the
+      SERVICE_LABEL values in acumos_env.sh have been configured to distribute
+      the components across the nodes of the k8s cluster in a cluster that
+      only supports hostPath PVs, and thus a separate PVC has been used for
+      each set of components scheduled on a node.
 
 Security Considerations
 =======================

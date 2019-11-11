@@ -38,7 +38,7 @@ apt-get update
 apt-get install -y jq uuid-runtime
 
 # Install kubectl per https://kubernetes.io/docs/setup/independent/install-kubeadm/
-KUBE_VERSION=1.10.0
+KUBE_VERSION=1.13.8
 apt-get install -y apt-transport-https
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 cat &lt;&lt;EOF | tee /etc/apt/sources.list.d/kubernetes.list
@@ -46,8 +46,7 @@ deb http://apt.kubernetes.io/ kubernetes-xenial main
 EOF
 apt-get update
 apt-get -y install --allow-downgrades kubectl=${KUBE_VERSION}-00
-mkdir ~/.kube
-cp /acumos/kube-config ~/.kube/config</command>
+      </command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>

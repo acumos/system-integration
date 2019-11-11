@@ -39,7 +39,7 @@ services:
         source: /mnt/${ACUMOS_NAMESPACE}/logs
         target: /maven/logs
       - type: bind
-        source: /mnt/${ACUMOS_NAMESPACE}/nexus-data
+        source: /mnt/${ACUMOS_NEXUS_NAMESPACE}/nexus-data
         target: /nexus-data
     logging:
       driver: json-file

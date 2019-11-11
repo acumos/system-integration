@@ -69,6 +69,10 @@ function redeploy_core_component() {
   else
     if [[ "$(grep -l "app: $app" kubernetes/service/*)" != "" ]]; then
       stop_acumos_core_app $app
+      while kubectl get pods -n $ACUMOS_NAMESPACE -l app=$app; do
+        log "Waiting 10 seconds for app pod to be terminated"
+        sleep 10
+      done
       start_acumos_core_app $app
     else
       fail "$app not found; verify the 'app:' label in the template"
