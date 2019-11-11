@@ -1,10 +1,10 @@
-apiVersion: v1
+apiVersion: extensions/v1beta1
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
-# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# Copyright (C) 2019 AT&T Intellectual Property. All rights reserved.
 # ===================================================================================
-# This Acumos software file is distributed by AT&T and Tech Mahindra
+# This Acumos software file is distributed by AT&T
 # under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -16,30 +16,22 @@ apiVersion: v1
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
-
-# What this is: kubernetes template for Acumos portal-fe service
-# How to use:
-
-kind: Service
+kind: Ingress
 metadata:
   namespace: <ACUMOS_NAMESPACE>
-  name: kong-service
-  labels:
-    app: kong
+  name: kong-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
 spec:
-  selector:
-    app: kong
-  type: ClusterIP
-  ports:
-  - name: kong-proxy-https
-    port: 8443
-    targetPort: 8443
-  - name: kong-proxy-http
-    port: 8000
-    targetPort: 8000
-  - name: kong-admin-https
-    port: 8444
-    targetPort: 8444
-  - name: kong-admin-http
-    port: 8001
-    targetPort: 8001
+  tls:
+  - hosts:
+    - <ACUMOS_DOMAIN>
+    secretName: ingress-cert
+  rules:
+  - host: <ACUMOS_DOMAIN>
+    http:
+      paths:
+      - path: "/"
+        backend:
+          serviceName: kong-service
+          servicePort: 8000

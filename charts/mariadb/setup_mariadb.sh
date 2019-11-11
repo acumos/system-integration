@@ -26,6 +26,9 @@
 # - If you want to specify environment values, set and export them prior
 #   to running this script, e.g. by creating a script named mariadb_env.sh.
 #   See setup_mariadb_env.sh for the default values.
+# - If you are deploying MariaDB in standalone mode (i.e. running this script
+#   directly), create a mariadb_env.sh file including at least a value for
+#     export ACUMOS_MARIADB_DOMAIN=<DNS or /etc/hosts-resolvable domain name>
 #
 # Usage: from the k8s master or a host setup use kubectl/helm remotely
 # $ bash setup_mariadb.sh <clean|prep|setup|all> <mariadb_host> <k8s_dist>
@@ -110,8 +113,10 @@ function mariadb_setup() {
   log "Create the values.yaml input for the Helm chart"
   # have to break out hierarchial values for master... does not work as a.b.c
   cat <<EOF >values.yaml
+volumePermissions.enabled: true
 service.type: NodePort
 image.tag: 10.2.22
+image.debug: true
 rootUser.password: $ACUMOS_MARIADB_PASSWORD
 rootUser.forcePassword: true
 db.user: $ACUMOS_MARIADB_USER
@@ -137,7 +142,9 @@ EOF
     log "Add for openshift: 'securityContext.enabled: false'"
     cat <<EOF >>values.yaml
 securityContext:
-  enabled: false
+  enabled: true
+  fsGroup: $ACUMOS_MARIADB_RUNASUSER
+  runAsUser: $ACUMOS_MARIADB_RUNASUSER
 EOF
   fi
 
@@ -161,6 +168,17 @@ EOF
   setup_pvc $ACUMOS_MARIADB_NAMESPACE $MARIADB_DATA_PVC_NAME $MARIADB_DATA_PV_NAME \
     $MARIADB_DATA_PV_SIZE
   mariadb_deploy_chart /tmp/charts/stable/mariadb/.
+
+  local t=0
+  while [[ "$(helm list $ACUMOS_MARIADB_NAMESPACE-mariadb --output json | jq -r '.Releases[0].Status')" != "DEPLOYED" ]]; do
+    if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
+      fail "$ACUMOS_MARIADB_NAMESPACE-mariadb is not ready after $ACUMOS_SUCCESS_WAIT_TIME seconds"
+    fi
+    log "$ACUMOS_MARIADB_NAMESPACE-mariadb Helm release is not yet Deployed, waiting 10 seconds"
+    sleep 10
+    t=$((t+10))
+  done
+
   wait_running mariadb $ACUMOS_MARIADB_NAMESPACE
 
   ACUMOS_MARIADB_NODEPORT=$(kubectl get services -n $ACUMOS_MARIADB_NAMESPACE $ACUMOS_MARIADB_NAMESPACE-mariadb -o json | jq -r '.spec.ports[0].nodePort')
