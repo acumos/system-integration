@@ -26,6 +26,8 @@ System Integration
 
        release-notes
        oneclick-deploy/index
+       oneclick-deploy/configuration
+       oneclick-deploy/developer-guide
 
 
 * :ref:`search`

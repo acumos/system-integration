@@ -75,6 +75,8 @@ function setup_elk() {
     log "Stop any existing docker based components for elk-stack"
     bash docker_compose.sh down
     build_images
+    get_host_ip $ACUMOS_MARIADB_HOST
+    export ACUMOS_MARIADB_HOST_IP=$HOST_IP
     bash docker_compose.sh up -d --build --force-recreate
   fi
 

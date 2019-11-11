@@ -51,7 +51,7 @@ services:
                 "version": "1.23"
             },
             "imagetag": {
-                "prefix": "${ACUMOS_DOCKER_REGISTRY_HOST}:${ACUMOS_DOCKER_MODEL_PORT}"
+                "prefix": "${ACUMOS_DOCKER_REGISTRY_DOMAIN}:${ACUMOS_DOCKER_MODEL_NODEPORT}${ACUMOS_DOCKER_IMAGETAG_PREFIX}"
             },
             "max_total_connections": "1",
             "max_per_route_connections": "1"
@@ -93,11 +93,13 @@ services:
                 }
             }
         },
-        "security":{
-          "verificationApiUrl":"http://sv-scanning-service:9082/scan"
+        "security": {
+          "verificationEnableFlag": "${ACUMOS_ENABLE_SECURITY_VERIFICATION}",
+          "verificationApiUrl": "http://sv-scanning-service:9082/scan"
         },
         "modelrunnerVersion": {
-          "javaSpark":"1.0.2"
+          "javaSpark": "1.0.2",
+          "H2O": "2.2.3"
         }
       }'
     expose:

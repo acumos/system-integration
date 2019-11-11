@@ -21,15 +21,20 @@
 namespaceOverride: <NAMESPACE>
 master:
   image: <ACUMOS_JENKINS_IMAGE>
+  usePodSecurityContext: true
+  runAsUser: <ACUMOS_JENKINS_RUNASUSER>
+  fsGroup: <ACUMOS_JENKINS_RUNASUSER>
   adminPassword: <ACUMOS_JENKINS_PASSWORD>
   serviceType: ClusterIP
-  jenkinsUriPrefix: "/jenkins/"
+  jenkinsUriPrefix: "/<ACUMOS_JENKINS_API_CONTEXT_PATH>/"
   numExecutors: 10
   overwriteConfig: false
   overwritePlugins: false
   overwriteJobs: false
-  authorizationStrategy: |-
-    <useSecurity>true</useSecurity>
+  persistence:
+    enabled: true
+    size: <ACUMOS_JENKINS_PV_SIZE>
+  useSecurity: false
   hostAliases:
     - ip: "<HOST_IP>"
       hostnames:
@@ -37,3 +42,12 @@ master:
   csrf:
     defaultCrumbIssuer:
       enabled: false
+  containerEnv:
+    - name: HTTP_PROXY
+      value: "<HTTP_PROXY>"
+    - name: HTTPS_PROXY
+      value: "<HTTPS_PROXY>"
+    - name: NO_PROXY
+      value: "127.0.0.1,localhost,.svc.cluster.local,cds-service,sv-scanning-service,<ACUMOS_NEXUS_HOST>"
+  podAnnotations:
+    openshift.io/scc: privileged

@@ -61,3 +61,4 @@ update_acumos_env K8S_DIST generic
 update_acumos_env ACUMOS_DOMAIN acumos.example.org
 update_acumos_env ACUMOS_HOST acumos
 update_acumos_env ACUMOS_HOST_USER ubuntu
+update_acumos_env ACUMOS_NAMESPACE acumos
