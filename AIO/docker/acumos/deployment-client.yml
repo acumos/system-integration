@@ -33,9 +33,7 @@ services:
           "port": 8337
         },
         "siteConfig": "[
-          { \"name\": \"cluster1\" },
-          { \"name\": \"cluster2\" },
-          { \"name\": \"cluster3\" }
+          { \"name\": \"cluster1\" }
         ]",
         "jenkins": {
           "url": "${ACUMOS_JENKINS_API_URL}",

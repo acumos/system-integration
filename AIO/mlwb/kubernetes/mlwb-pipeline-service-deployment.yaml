@@ -34,17 +34,17 @@ spec:
     metadata:
       labels:
         app: mlwb-pipeline
-        service: <ACUMOS_MLWB_SERVICE_LABEL>
+        <ACUMOS_SERVICE_LABEL_KEY>: <MLWB_PIPELINE_SERVICE_LABEL>
     spec:
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
-              - key: service
+              - key: <ACUMOS_SERVICE_LABEL_KEY>
                 operator: NotIn
                 values:
-                - <ACUMOS_MLWB_SERVICE_LABEL>
+                - <MLWB_PIPELINE_SERVICE_LABEL>
             topologyKey: "kubernetes.io/node"
       imagePullSecrets:
       - name: acumos-registry
@@ -83,7 +83,7 @@ spec:
             "sleeptimems": 30000,
             "nifi": {
               "waittime": "120000",
-              "createpod": true,
+              "createpod": <MLWB_NIFI_CREATE_USER_POD>,
               "adminusername" : "<MLWB_NIFI_REGISTRY_INITIAL_ADMIN>",
               "serviceurl": "http://nifi-service-{0}:8080",
               "registryurl": "http://nifi-registry-service:8080",
@@ -123,7 +123,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: <ACUMOS_MLWB_LOGS_PVC_NAME>
+          claimName: <MLWB_PIPELINE_SERVICE_LABEL>
       - name: nifi-certs-registry
         secret:
           secretName: nifi-certs-registry

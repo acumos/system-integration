@@ -170,7 +170,6 @@ cert=$7
 key=$8
 set +x
 export AIO_ROOT="$(cd ../AIO; pwd -P)"
-source $AIO_ROOT/utils.sh
 source $env
 set -x
 cds_baseurl="-k https://$ACUMOS_DOMAIN/ccds"

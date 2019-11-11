@@ -33,14 +33,14 @@ spec:
     metadata:
       labels:
         app: nifi-$USER
-        service: <MLWB_NIFI_USER_SERVICE_LABEL>
+        <ACUMOS_SERVICE_LABEL_KEY>: <MLWB_NIFI_USER_SERVICE_LABEL>
     spec:
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
-              - key: service
+              - key: <ACUMOS_SERVICE_LABEL_KEY>
                 operator: NotIn
                 values:
                 - <MLWB_NIFI_USER_SERVICE_LABEL>
