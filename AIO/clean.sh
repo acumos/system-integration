@@ -38,8 +38,27 @@ cd $(dirname "$0")
 source utils.sh
 source acumos_env.sh
 source mlwb/mlwb_env.sh
+
+update_acumos_env ACUMOS_DEPLOY_MARIADB true force
+update_acumos_env ACUMOS_SETUP_DB true force
+update_acumos_env ACUMOS_DEPLOY_COUCHDB true force
+update_acumos_env ACUMOS_DEPLOY_JENKINS true force
+update_acumos_env ACUMOS_DEPLOY_DOCKER true force
+update_acumos_env ACUMOS_DEPLOY_DOCKER_DIND true force
+update_acumos_env ACUMOS_DEPLOY_NEXUS true force
+update_acumos_env ACUMOS_DEPLOY_NEXUS_REPOS true force
+update_acumos_env ACUMOS_DEPLOY_ELK true force
+update_acumos_env ACUMOS_DEPLOY_ELK_METRICBEAT true force
+update_acumos_env ACUMOS_DEPLOY_ELK_FILEBEAT true force
+update_acumos_env ACUMOS_DEPLOY_CORE true force
+update_acumos_env ACUMOS_DEPLOY_FEDERATION true force
+update_acumos_env ACUMOS_DEPLOY_MLWB true force
+update_acumos_env ACUMOS_DEPLOY_LUM true force
+update_acumos_env ACUMOS_DEPLOY_INGRESS true force
+update_acumos_env ACUMOS_DEPLOY_INGRESS_RULES true force
+
 if [[ $(kubectl get namespaces) ]]; then
-  releases="mariadb elk couchdb jenkins jupyterhub nginx-ingress zeppelin"
+  releases="mariadb elk couchdb jenkins jupyterhub nginx-ingress zeppelin license-clio"
   for release in $releases; do
     rlss=$(helm list | grep $release | awk '{print $1}')
     for rls in $rlss; do

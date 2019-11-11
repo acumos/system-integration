@@ -37,14 +37,14 @@ spec:
     metadata:
       labels:
         app: federation
-        service: <ACUMOS_FEDERATION_SERVICE_LABEL>
+        <ACUMOS_SERVICE_LABEL_KEY>: <ACUMOS_FEDERATION_SERVICE_LABEL>
     spec:
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
-              - key: service
+              - key: <ACUMOS_SERVICE_LABEL_KEY>
                 operator: NotIn
                 values:
                 - <ACUMOS_FEDERATION_SERVICE_LABEL>
@@ -56,7 +56,20 @@ spec:
         image: <FEDERATION_IMAGE>
         securityContext:
           privileged: <ACUMOS_PRIVILEGED_ENABLE>
+        command: ["/bin/sh", "-c"]
+        args:
+        - set -x;
+          cd maven;
+          java $JAVA_OPTS -Dhttp.proxyHost=$ACUMOS_HTTP_PROXY_HOST -Dhttp.proxyPort=$ACUMOS_HTTP_PROXY_PORT -Dhttp.nonProxyHosts=$ACUMOS_HTTP_NON_PROXY_HOSTS -Dhttps.proxyHost=$ACUMOS_HTTP_PROXY_HOST -Dhttps.proxyPort=$ACUMOS_HTTP_PROXY_PORT -Dhttps.nonProxyHosts=$ACUMOS_HTTP_NON_PROXY_HOSTS -Djava.security.egd=file:/dev/./urandom -jar *.jar
         env:
+        - name: ACUMOS_HTTP_NON_PROXY_HOSTS
+          value: "<ACUMOS_HTTP_NON_PROXY_HOSTS>|cds-service|sv-scanning-service|lum-service"
+        - name: ACUMOS_HTTP_PROXY_HOST
+          value: "<ACUMOS_HTTP_PROXY_HOST>"
+        - name: ACUMOS_HTTP_PROXY_PORT
+          value: "<ACUMOS_HTTP_PROXY_PORT>"
+        - name: JAVA_OPTS
+          value: "-Xms256m -Xmx2g"
         - name: SPRING_APPLICATION_JSON
           value: '{
             "logging": {
@@ -146,7 +159,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: <ACUMOS_LOGS_PVC_NAME>
+          claimName: <ACUMOS_FEDERATION_SERVICE_LABEL>
       - name: certs-volume
         configMap:
           name: acumos-certs

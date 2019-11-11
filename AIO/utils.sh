@@ -192,13 +192,14 @@ function setup_pvc() {
   local name=$2
   local pv_name=$3
   local size=$4
-  local storageClassName=$ACUMOS_1GI_STORAGECLASSNAME
+  local storageClassName=$5
   trap 'fail' ERR
 
+  if [[ "$(kubectl get pvc -n $namespace $name)" != "" && "$ACUMOS_RECREATE_PVC" == "true" ]]; then
+     delete_pvc $namespace $name
+  fi
+
   if [[ "$(kubectl get pvc -n $namespace $name)" == "" ]]; then
-    if  [[ "$size" = '5Gi' ]]; then storageClassName=$ACUMOS_5GI_STORAGECLASSNAME;
-    elif  [[ "$size" = '10Gi' ]]; then storageClassName=$ACUMOS_10GI_STORAGECLASSNAME;
-    fi
     log "Creating PVC $name"
     # Add volumeName: to ensure the PVC selects a specific volume as data
     # may be pre-configured there
@@ -226,7 +227,7 @@ EOF
     kubectl get pvc -n $namespace $name
     rm $tmp
   else
-    log "$namespace PVC $name already exists"
+    log "$namespace PVC $name already exists, and ACUMOS_RECREATE_PVC=$ACUMOS_RECREATE_PVC"
   fi
 }
 
@@ -239,7 +240,7 @@ function delete_pvc() {
     kubectl patch pvc -n $namespace $name -p '{"metadata":{"finalizers": []}}' --type=merge
     kubectl delete pvc -n $namespace $name
     while kubectl get pvc -n $namespace $name ; do
-     log "Waiting for $namespace PVC $name to be deleted"
+      log "Waiting for $namespace PVC $name to be deleted"
       sleep 10
     done
   fi
@@ -403,17 +404,17 @@ function start_acumos_core_app() {
   log "Update the $app deployment template and deploy it"
   cp kubernetes/deployment/$app-deployment.yaml deploy/.
   replace_env deploy/$app-deployment.yaml
-  start_deployment deploy/$app-deployment.yaml
   get_host_ip_from_etc_hosts $ACUMOS_DOMAIN
   if [[ "$HOST_IP" != "" ]]; then
-    patch_deployment_with_host_alias $ACUMOS_NAMESPACE $app $ACUMOS_HOST $HOST_IP
+    patch_template_with_host_alias deploy/$app-deployment.yaml $ACUMOS_HOST $HOST_IP
   fi
   if [[ "$app" == "cds" && "$ACUMOS_MARIADB_HOST" != "$ACUMOS_HOST" ]]; then
     get_host_ip_from_etc_hosts $ACUMOS_MARIADB_HOST
     if [[ "$HOST_IP" != "" ]]; then
-      patch_deployment_with_host_alias $ACUMOS_NAMESPACE $app $ACUMOS_MARIADB_HOST $HOST_IP
+      patch_template_with_host_alias deploy/$app-deployment.yaml $ACUMOS_MARIADB_HOST $HOST_IP
     fi
   fi
+  start_deployment deploy/$app-deployment.yaml
   wait_running $app $ACUMOS_NAMESPACE
 }
 
@@ -433,6 +434,24 @@ function stop_acumos_core_app() {
         log "Configmap $cfg deleted"
       fi
     done
+  fi
+}
+
+function patch_template_with_host_alias() {
+  trap 'fail' ERR
+  template=$1
+  name=$2
+  ip=$3
+  if [[ $(grep -c "\- ip: \"$ip\"" $template) -eq 0 ]]; then
+    log "Patch deployment template $template with hostAlias $name=$ip"
+    cat <<EOF >>$template
+      hostAliases:
+      - ip: "$ip"
+        hostnames:
+        - "$name"
+EOF
+  else
+    log "hostAlias $name=$ip already exists in deployment template $template"
   fi
 }
 
@@ -545,6 +564,9 @@ function wait_completed() {
   status=$(kubectl get job -n $ACUMOS_NAMESPACE -o json $job | jq -r '.status.conditions[0].type')
   while [[ "$status" != "Complete" ]]; do
     t=$((t+10))
+    if [[ "$status" == "Failed" ]]; then
+      fail "Job $1 failed"
+    fi
     if [[ $t -gt $ACUMOS_SUCCESS_WAIT_TIME ]]; then
       fail "Job $1 failed to become completed in $ACUMOS_SUCCESS_WAIT_TIME seconds"
     fi
@@ -748,12 +770,22 @@ function verify_ubuntu_or_centos() {
     fail "Sorry, only Ubuntu or Centos is supported."
   fi
 
-  if [[ "$HOST_OS" == "centos" ]]; then
-    export K8S_DIST=openshift
+  if [[ "$K8S_DIST" == "" ]]; then
+    if [[ "$HOST_OS" == "centos" ]]; then
+      export K8S_DIST=openshift
+      k8s_cmd=oc
+      k8s_nstype=project
+    else
+      export K8S_DIST=generic
+      k8s_cmd=kubectl
+      k8s_nstype=namespace
+    fi
+    update_acumos_env K8S_DIST $K8S_DIST
+  fi
+  if [[ "$K8S_DIST" == "openshift" ]]; then
     k8s_cmd=oc
     k8s_nstype=project
   else
-    export K8S_DIST=generic
     k8s_cmd=kubectl
     k8s_nstype=namespace
   fi
@@ -785,6 +817,44 @@ function get_host_ip() {
       log "Please ensure $1 is resolvable thru DNS or hosts file"
       fail "IP address of $1 cannot be determined."
     fi
+  fi
+}
+
+function get_openshift_uid() {
+  trap 'fail' ERR
+  OPENSHIFT_UID=$(oc describe project $1 | grep 'sa.scc.uid-range' | cut -d '=' -f 2 | cut -d '/' -f 1)
+}
+
+function create_ingress_cert_secret() {
+  trap 'fail' ERR
+  log "Create ingress-cert secret"
+  local NAMESPACE=$1
+  local CERT=$2
+  local KEY=$3
+  if [[ "$(kubectl get secret -n $ACUMOS_NAMESPACE ingress-cert)" == "" ]]; then
+    get_host_info
+    if [[ "$HOST_OS" == "macos" ]]; then
+      b64crt=$(cat $CERT | base64)
+      b64key=$(cat $KEY | base64)
+    else
+      b64crt=$(cat $CERT | base64 -w 0)
+      b64key=$(cat $KEY | base64 -w 0)
+    fi
+    cat <<EOF >ingress-cert-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ingress-cert
+  namespace: $NAMESPACE
+data:
+  tls.crt: $b64crt
+  tls.key: $b64key
+type: kubernetes.io/tls
+EOF
+    kubectl create -f ingress-cert-secret.yaml
+  else
+    log "ingress-cert secret already exists"
+    kubectl describe secret -n $NAMESPACE ingress-cert
   fi
 }
 
