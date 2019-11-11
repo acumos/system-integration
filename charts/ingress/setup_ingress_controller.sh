@@ -116,6 +116,16 @@ fi
   helm install --name ${NAMESPACE}-nginx-ingress --namespace $NAMESPACE \
     --set-string controller.config.proxy-body-size="0" \
     -f ingress-values.yaml stable/nginx-ingress
+
+  local t=0
+  while [[ "$(helm list ${NAMESPACE}-nginx-ingress --output json | jq -r '.Releases[0].Status')" != "DEPLOYED" ]]; do
+    if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
+      fail "${NAMESPACE}-nginx-ingress is not ready after $ACUMOS_SUCCESS_WAIT_TIME seconds"
+    fi
+    log "${NAMESPACE}-nginx-ingress Helm release is not yet Deployed, waiting 10 seconds"
+    sleep 10
+    t=$((t+10))
+  done
 }
 
 if [[ $# -lt 3 ]]; then
