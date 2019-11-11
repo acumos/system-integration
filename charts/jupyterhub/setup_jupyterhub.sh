@@ -60,7 +60,6 @@
 #         certs as specified, and set to serve requests at "MLWB_JUPYTERHUB_DOMAIN"
 #       - set the mlwb_env.sh values for the following, per the target host
 #         export MLWB_JUPYTERHUB_DOMAIN=<FQDN or hostname>
-#         export MLWB_JUPYTERHUB_HOST=<hostname>
 #
 # To release a failed PV:
 # kubectl patch pv/pv-5 --type json -p '[{ "op": "remove", "path": "/spec/claimRef" }]'
@@ -272,6 +271,16 @@ EOF
     --version=v0.8.2 --values $tmp
   rm $tmp
 
+  local t=0
+  while [[ "$(helm list $RELEASE --output json | jq -r '.Releases[0].Status')" != "DEPLOYED" ]]; do
+    if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
+      fail "$RELEASE is not ready after $ACUMOS_SUCCESS_WAIT_TIME seconds"
+    fi
+    log "$RELEASE Helm release is not yet Deployed, waiting 10 seconds"
+    sleep 10
+    t=$((t+10))
+  done
+
   if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" && "$STANDALONE" == "standalone" && "$ACUMOS_K8S_ADMIN_SCOPE" == "cluster" ]]; then
     HOST_IP=$(/sbin/ip route get 8.8.8.8 | head -1 | sed 's/^.*src //' | awk '{print $1}')
     bash ../ingress/setup_ingress_controller.sh $NAMESPACE $HOST_IP $CERT $CERT_KEY
@@ -348,8 +357,6 @@ $ bash setup_jupyterhub.sh <setup|clean|all> <NAMESPACE> <ACUMOS_ORIGIN>
        certs or certs as specified, and set to serve requests at "MLWB_JUPYTERHUB_DOMAIN"
      - set the mlwb_env.sh values for the following, per the target host
        export MLWB_JUPYTERHUB_DOMAIN=<FQDN or hostname>
-       export MLWB_JUPYTERHUB_HOST=<hostname>
-       export MLWB_JUPYTERHUB_HOST_IP=<IP address of primary interface>
 EOF
   log "All parameters not provided"
   exit 1

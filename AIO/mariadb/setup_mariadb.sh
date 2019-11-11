@@ -32,6 +32,10 @@
 function setup_mariadb() {
   trap 'fail' ERR
   if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
+    # If not set explictly, the default value will be for k8s based deployment...
+    if [[ "$ACUMOS_MARIADB_HOST" == "$ACUMOS_INTERNAL_MARIADB_HOST" ]]; then
+      update_mariadb_env ACUMOS_MARIADB_HOST $ACUMOS_HOST force
+    fi
     log "Stop any existing docker based components for mariadb-service"
     bash docker_compose.sh down
     bash docker_compose.sh up -d --build --force-recreate

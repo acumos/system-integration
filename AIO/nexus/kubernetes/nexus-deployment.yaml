@@ -48,8 +48,16 @@ spec:
     spec:
       initContainers:
       - name: volume-mount-hack
+        securityContext:
+          privileged: <ACUMOS_PRIVILEGED_ENABLE>
         image: busybox
-        command: ["sh", "-c", "chown -R 200:200 /nexus"]
+        command: ['/bin/sh', '-c']
+        args:
+        - set -x;
+          if [ $(chown -R 200 /nexus) ];
+          then echo "Nexus root folder updated";
+          fi;
+          ls -lat /nexus;
         volumeMounts:
         - name: nexus-data
           mountPath: /nexus
@@ -69,4 +77,4 @@ spec:
       volumes:
       - name: nexus-data
         persistentVolumeClaim:
-         claimName: <NEXUS_DATA_PVC_NAME>
+         claimName: <ACUMOS_NEXUS_DATA_PVC_NAME>
