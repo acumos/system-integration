@@ -63,6 +63,10 @@ function prep_elk() {
       $ACUMOS_ELASTICSEARCH_DATA_PV_SIZE "1000:1000"
   fi
   create_namespace $ACUMOS_ELK_NAMESPACE
+  if [[ "$K8S_DIST" == "openshift" ]]; then
+    log "Workaround: Acumos AIO requires privilege to set PV permissions"
+    oc adm policy add-scc-to-user privileged -z default -n $ACUMOS_ELK_NAMESPACE
+  fi
 }
 
 function setup_elk() {
