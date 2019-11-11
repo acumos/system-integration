@@ -125,8 +125,8 @@ setup_nifi() {
   sedi "s/<MLWB_NIFI_TRUSTSTORE_PASSWORD>/$MLWB_NIFI_TRUSTSTORE_PASSWORD/g" deploy/nifi-registry-deployment.yaml
   sedi "s/<MLWB_NIFI_REGISTRY_INITIAL_ADMIN>/$MLWB_NIFI_REGISTRY_INITIAL_ADMIN/g" deploy/nifi-registry-deployment.yaml
   sedi "s~<MLWB_NIFI_REGISTRY_PVC_NAME>~$MLWB_NIFI_REGISTRY_PVC_NAME~g" deploy/nifi-registry-deployment.yaml
-  sedi "s~<ACUMOS_LOGS_PVC_NAME>~$ACUMOS_LOGS_PVC_NAME~g" deploy/nifi-registry-deployment.yaml
-  sedi "s~<MLWB_NIFI_REGISTRY_SERVICE_LABEL>~$MLWB_NIFI_REGISTRY_SERVICE_LABEL~g" deploy/nifi-registry-deployment.yaml
+  sedi "s~<ACUMOS_SERVICE_LABEL_KEY>~$ACUMOS_SERVICE_LABEL_KEY~g" deploy/nifi-registry-deployment.yaml
+  sedi "s~<MLWB_PIPELINE_SERVICE_LABEL>~$MLWB_PIPELINE_SERVICE_LABEL~g" deploy/nifi-registry-deployment.yaml
   replace_env deploy/ingress-registry.yaml
   replace_env deploy/namespace-admin-role.yaml
   replace_env deploy/namespace-admin-rolebinding.yaml
@@ -155,7 +155,8 @@ setup_nifi() {
 
   log "Create NiFi Registry PVC in namespace $ACUMOS_NAMESPACE"
   setup_pvc $ACUMOS_NAMESPACE $MLWB_NIFI_REGISTRY_PVC_NAME \
-    $MLWB_NIFI_REGISTRY_PV_NAME $MLWB_NIFI_REGISTRY_PV_SIZE
+    $MLWB_NIFI_REGISTRY_PV_NAME $MLWB_NIFI_REGISTRY_PV_SIZE \
+    $MLWB_NIFI_REGISTRY_PV_CLASSNAME
 
   if [[ "$ACUMOS_DEPLOY_INGRESS_RULES" == "true" ]]; then
     log "Create NiFi Registry ingress"
@@ -185,7 +186,7 @@ set -x
 trap 'fail' ERR
 WORK_DIR=$(pwd)
 cd $(dirname "$0")
-if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
+if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../../AIO; pwd -P)"; fi
 source $AIO_ROOT/utils.sh
 source $AIO_ROOT/acumos_env.sh
 action=$1

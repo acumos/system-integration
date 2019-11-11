@@ -52,7 +52,7 @@ function setup_keystore() {
     else
       extra_ips="$ACUMOS_DOMAIN_IP $ACUMOS_HOST_IP"
     fi
-    bash setup_certs.sh $ACUMOS_CERT_PREFIX $ACUMOS_DOMAIN \
+    bash setup_certs.sh $ACUMOS_CERT_PREFIX $ACUMOS_CERT_SUBJECT_NAME \
       "$ACUMOS_HOST" "$extra_ips"
     cd ..
   fi

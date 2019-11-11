@@ -37,14 +37,14 @@ spec:
     metadata:
       labels:
         app: portal-be
-        service: <ACUMOS_PORTAL_SERVICE_LABEL>
+        <ACUMOS_SERVICE_LABEL_KEY>: <ACUMOS_PORTAL_SERVICE_LABEL>
     spec:
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
-              - key: service
+              - key: <ACUMOS_SERVICE_LABEL_KEY>
                 operator: NotIn
                 values:
                 - <ACUMOS_PORTAL_SERVICE_LABEL>
@@ -54,7 +54,20 @@ spec:
       containers:
       - name: portal-be
         image: <PORTAL_BE_IMAGE>
+        command: ["/bin/sh", "-c"]
+        args:
+        - set -x;
+          cd maven;
+          java $JAVA_OPTS -Dhttp.proxyHost=$ACUMOS_HTTP_PROXY_HOST -Dhttp.proxyPort=$ACUMOS_HTTP_PROXY_PORT -Dhttp.nonProxyHosts=$ACUMOS_HTTP_NON_PROXY_HOSTS -Dhttps.proxyHost=$ACUMOS_HTTP_PROXY_HOST -Dhttps.proxyPort=$ACUMOS_HTTP_PROXY_PORT -Dhttps.nonProxyHosts=$ACUMOS_HTTP_NON_PROXY_HOSTS -Djava.security.egd=file:/dev/./urandom -jar *.jar
         env:
+        - name: ACUMOS_HTTP_NON_PROXY_HOSTS
+          value: "<ACUMOS_HTTP_NON_PROXY_HOSTS>|docker-dind-service|cds-service|deployment-client-service|onboarding-service|msg-service|sv-scanning-service|lpe-service|lum-service"
+        - name: ACUMOS_HTTP_PROXY_HOST
+          value: "<ACUMOS_HTTP_PROXY_HOST>"
+        - name: ACUMOS_HTTP_PROXY_PORT
+          value: "<ACUMOS_HTTP_PROXY_PORT>"
+        - name: JAVA_OPTS
+          value: "-Xms512m -Xmx1024m"
         - name: SPRING_APPLICATION_JSON
           value: '{
             "logging": {
@@ -65,6 +78,11 @@ spec:
             "server": {
               "port": 8083,
               "contextPath": "/"
+            },
+            "proxy": {
+              "host": "<ACUMOS_HTTP_PROXY>",
+              "port": "<ACUMOS_HTTP_PROXY_PORT>",
+              "protocol": "<ACUMOS_HTTP_PROXY_PROTOCOL>"
             },
             "docker": {
               "host": "<ACUMOS_DOCKER_API_HOST>",
@@ -318,7 +336,7 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: <ACUMOS_LOGS_PVC_NAME>
+          claimName: <ACUMOS_PORTAL_SERVICE_LABEL>
       - name: certs-volume
         configMap:
           name: acumos-certs
