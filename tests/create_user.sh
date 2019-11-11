@@ -205,7 +205,9 @@ if [[ $# -ge 6 ]]; then
   cd $(dirname "$0")
   export AIO_ROOT="$(cd ../AIO; pwd -P)"
   source $AIO_ROOT/utils.sh
+  set +x
   source $env
+  set -x
   cds_baseurl="-k https://$ACUMOS_DOMAIN/ccds"
   check_name_resolves cds-service
   if [[ "$NAME_RESOLVES" == "true" ]]; then
