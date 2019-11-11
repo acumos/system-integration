@@ -1,0 +1,63 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<!---
+  ===============LICENSE_START=======================================================
+  Acumos Apache-2.0
+  ===================================================================================
+  Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+  ===================================================================================
+  This Acumos software file is distributed by AT&T and Tech Mahindra
+  under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  This file is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  ===============LICENSE_END=========================================================
+-->
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>OLDER_THAN_DAYS</name>
+          <description>Enter a number; all scan data folders older than that number of days will be deleted.</description>
+          <defaultValue>5</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+#set -x
+cd /var/jenkins_home/workspace/security-verification-scan/sv
+echo; echo &quot;Files/folders of /var/jenkins_home/workspace/security-verification-scan/sv&quot;
+ls -lat
+echo; echo &quot;Cleaning these folders&quot;
+find ./ -maxdepth 1 -type d -mtime +$OLDER_THAN_DAYS -print | grep -E &quot;[a-fA-F0-9]{8}-([a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}-[0-9]{15}&quot;
+ds=$(find ./ -maxdepth 1 -type d -mtime +$OLDER_THAN_DAYS -print | grep -Eo &quot;[a-fA-F0-9]{8}-([a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}-[0-9]{15}&quot;)
+for d in $ds; do
+  rm -rf $d
+done
+echo; echo &quot;Remaining files/folders of /var/jenkins_home/workspace/security-verification-scan/sv&quot;
+ls -lat</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

@@ -39,10 +39,10 @@ spec:
   type: NodePort
   ports:
   - name: nexus-api
-    nodePort: <ACUMOS_NEXUS_API_NODEPORT>
+    nodePort: <ACUMOS_NEXUS_API_PORT>
     port: 8081
     targetPort: 8081
   - name: nexus-model-docker
-    nodePort: <ACUMOS_DOCKER_MODEL_NODEPORT>
+    nodePort: <ACUMOS_DOCKER_MODEL_PORT>
     port: 8082
     targetPort: 8082

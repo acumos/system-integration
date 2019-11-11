@@ -18,5 +18,8 @@
 .. ===============LICENSE_END=========================================================
 -->
 
-For information on the contents of this folder, see the
-"One Click Deploy User Guide" at https://docs.acumos.org.
+# Acumos OneClick / All-in-One (AIO) deployment toolset
+
+This folder contains tools and component configurations for deploying the Acumos
+platform as a collection of docker containers (via docker-compose) or as a
+collection of components under a kubernetes cluster.

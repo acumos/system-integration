@@ -34,17 +34,17 @@ spec:
     metadata:
       labels:
         app: mlwb-pipeline-webcomponent
-        service: <ACUMOS_MLWB_SERVICE_LABEL>
+        <ACUMOS_SERVICE_LABEL_KEY>: <MLWB_PIPELINE_SERVICE_LABEL>
     spec:
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
-              - key: service
+              - key: <ACUMOS_SERVICE_LABEL_KEY>
                 operator: NotIn
                 values:
-                - <ACUMOS_MLWB_SERVICE_LABEL>
+                - <MLWB_PIPELINE_SERVICE_LABEL>
             topologyKey: "kubernetes.io/node"
       imagePullSecrets:
       - name: acumos-registry
@@ -61,7 +61,7 @@ spec:
         - name: pipelineWikiURL
           value: "https://wiki.acumos.org/display/TRAIN"
         - name: useExternalPipeline
-          value: "true"
+          value: "<MLWB_NIFI_EXTERNAL_PIPELINE_SERVICE>"
         ports:
         - containerPort: 9091
         volumeMounts:
@@ -71,4 +71,4 @@ spec:
       volumes:
       - name: logs
         persistentVolumeClaim:
-          claimName: <ACUMOS_MLWB_LOGS_PVC_NAME>
+          claimName: <MLWB_PIPELINE_SERVICE_LABEL>

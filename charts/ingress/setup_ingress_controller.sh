@@ -62,27 +62,7 @@ function clean_ingress() {
 
 function setup_ingress() {
   trap 'fail' ERR
-  log "Create ingress-cert secret"
-  get_host_info
-  if [[ "$HOST_OS" == "macos" ]]; then
-    b64crt=$(cat $CERT | base64)
-    b64key=$(cat $KEY | base64)
-  else
-    b64crt=$(cat $CERT | base64 -w 0)
-    b64key=$(cat $KEY | base64 -w 0)
-  fi
-  cat <<EOF >ingress-cert-secret.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: ingress-cert
-  namespace: $NAMESPACE
-data:
-  tls.crt: $b64crt
-  tls.key: $b64key
-type: kubernetes.io/tls
-EOF
-  kubectl create -f ingress-cert-secret.yaml
+  create_ingress_cert_secret $NAMESPACE $CERT $KEY
 
   log "Install nginx ingress controller via Helm"
   cat <<EOF >ingress-values.yaml
@@ -92,30 +72,40 @@ controller:
   extraArgs:
     default-ssl-certificate: "$NAMESPACE/ingress-cert"
     enable-ssl-passthrough: ""
-EOF
-
-if [[ "$EXTERNAL_IP" != "" ]]; then
-  if [[ "$ACUMOS_INGRESS_LOADBALANCER" == "true" ]]; then
-    cat <<EOF >>ingress-values.yaml
-  service:
-    loadBalancerIP: $EXTERNAL_IP
-EOF
-  else
-    cat <<EOF >>ingress-values.yaml
   service:
     type: NodePort
     nodePorts:
       http: $ACUMOS_INGRESS_HTTP_PORT
       https: $ACUMOS_INGRESS_HTTPS_PORT
-    externalIPs: [$EXTERNAL_IP]
 EOF
-  fi
+
+if [[ "$ACUMOS_INGRESS_LOADBALANCER" == "true" ]]; then
+  cat <<EOF >>ingress-values.yaml
+    loadBalancerIP: $EXTERNAL_IP
+  kind: Deployment
+EOF
+else
+  cat <<EOF >>ingress-values.yaml
+  kind: DaemonSet
+  daemonset:
+    useHostPort: true
+EOF
 fi
 
   helm repo update
   helm install --name ${NAMESPACE}-nginx-ingress --namespace $NAMESPACE \
     --set-string controller.config.proxy-body-size="0" \
     -f ingress-values.yaml stable/nginx-ingress
+
+  local t=0
+  while [[ "$(helm list ${NAMESPACE}-nginx-ingress --output json | jq -r '.Releases[0].Status')" != "DEPLOYED" ]]; do
+    if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
+      fail "${NAMESPACE}-nginx-ingress is not ready after $ACUMOS_SUCCESS_WAIT_TIME seconds"
+    fi
+    log "${NAMESPACE}-nginx-ingress Helm release is not yet Deployed, waiting 10 seconds"
+    sleep 10
+    t=$((t+10))
+  done
 }
 
 if [[ $# -lt 3 ]]; then

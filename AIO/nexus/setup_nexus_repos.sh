@@ -74,14 +74,8 @@ function setup_nexus_repos() {
   update_nexus_env ACUMOS_DOCKER_PROXY_USERNAME $(uuidgen)
   update_nexus_env ACUMOS_DOCKER_PROXY_PASSWORD $(uuidgen)
 
-  check_name_resolves nexus-service
-  if [[ $NAME_RESOLVES == "true" ]]; then
-    host=nexus-service
-    port=$ACUMOS_NEXUS_API_PORT
-  else
-    host=$ACUMOS_NEXUS_DOMAIN
-    port=$ACUMOS_NEXUS_API_NODEPORT
-  fi
+  host=$ACUMOS_NEXUS_DOMAIN
+  port=$ACUMOS_NEXUS_API_PORT
 
   setup_nexus_repo $ACUMOS_NEXUS_MAVEN_REPO 'Maven'
   setup_nexus_repo $ACUMOS_NEXUS_DOCKER_REPO 'Docker' 8082
