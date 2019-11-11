@@ -23,9 +23,24 @@
 System Integration Release Notes
 ================================
 
----------------------------
-Version 3.0.0, 25 July 2019
----------------------------
+--------------------------
+Version 3.0.1, 10 Dec 2019
+--------------------------
+
+* `ACUMOS-3755: Add docker-compose files for License Profile and RTU editors <https://jira.acumos.org/browse/ACUMOS-3755>`_
+* `ACUMOS-3710: AIO update for Acumos_Clio_1911291230 <https://jira.acumos.org/browse/ACUMOS-3710>`_
+* `ACUMOS-3658: mlwb-notebook - not starting with AIO <https://jira.acumos.org/browse/ACUMOS-3658>`_
+* `ACUMOS-3648: Pods must be capable of running in non-privileged mode <https://jira.acumos.org/browse/ACUMOS-3648>`_
+* `ACUMOS-3469: RTU Editor as service <https://jira.acumos.org/browse/ACUMOS-3469>`_
+* `ACUMOS-3208: Improved support for multi-node k8s clusters and component distribution <https://jira.acumos.org/browse/ACUMOS-3208>`_
+* `ACUMOS-3205: Platform deployment usability/reliability enhancements <https://jira.acumos.org/browse/ACUMOS-3205>`_
+* `ACUMOS-3177: ML Workbench Model Mapping Service <https://jira.acumos.org/browse/ACUMOS-3177>`_
+* `ACUMOS-3134: Jenkins as a workflow engine as a standing or on-demand k8s service <https://jira.acumos.org/browse/ACUMOS-3134>`_
+* `ACUMOS-3133: Migrate Solution/Pipeline deployment to Jenkins-based process <https://jira.acumos.org/browse/ACUMOS-3133>`_
+
+--------------------------
+Version 3.0.0, 13 Sep 2019
+--------------------------
 
 * monitoring resource utilization in kubernetes (`ACUMOS-3069 <https://jira.acumos.org/browse/ACUMOS-3069>`_)
 * Monitor resource usage in K8 (`ACUMOS-3162 <https://jira.acumos.org/browse/ACUMOS-3162>`_)

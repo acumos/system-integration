@@ -1,0 +1,71 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<!---
+  ===============LICENSE_START=======================================================
+  Acumos Apache-2.0
+  ===================================================================================
+  Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+  ===================================================================================
+  This Acumos software file is distributed by AT&T and Tech Mahindra
+  under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  This file is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  ===============LICENSE_END=========================================================
+-->
+<project>
+  <actions/>
+  <description>Shows the logs of an Acumos component.</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>COMPONENT</name>
+          <description></description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>portal-be</string>
+              <string>portal-fe</string>
+              <string>cds</string>
+              <string>federation</string>
+              <string>onboarding</string>
+              <string>msg</string>
+              <string>sv-scanning</string>
+              <string>azure-client</string>
+              <string>deployment-client</string>
+              <string>kubernetes-client</string>
+              <string>dsce</string>
+              <string>mlwb-model</string>
+              <string>mlwb-notebook</string>
+              <string>mlwb-pipeline</string>
+              <string>mlwb-predictor</string>
+              <string>mlwb-project</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+kubectl exec $(kubectl get pods | awk &quot;/$COMPONENT/{print \$1}&quot;) -- env | grep SPRING_APPLICATION_JSON | cut -d &quot;=&quot; -f 2 | jq .
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

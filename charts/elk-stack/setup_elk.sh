@@ -57,12 +57,16 @@ function clean_elk() {
 function prep_elk() {
   trap 'fail' ERR
   verify_ubuntu_or_centos
-  if [[ "$ACUMOS_CREATE_PVS" == "true" ]]; then
+  if [[ "$ACUMOS_CREATE_PVS" == "true" && "$ACUMOS_PVC_TO_PV_BINDING" == "true" ]]; then
     bash $AIO_ROOT/../tools/setup_pv.sh all /mnt/$ACUMOS_ELK_NAMESPACE \
       $ACUMOS_ELASTICSEARCH_DATA_PV_NAME \
       $ACUMOS_ELASTICSEARCH_DATA_PV_SIZE "1000:1000"
   fi
   create_namespace $ACUMOS_ELK_NAMESPACE
+  if [[ "$K8S_DIST" == "openshift" ]]; then
+    log "Workaround: Acumos AIO requires privilege to set PV permissions"
+    oc adm policy add-scc-to-user privileged -z default -n $ACUMOS_ELK_NAMESPACE
+  fi
 }
 
 function setup_elk() {
@@ -81,12 +85,10 @@ function setup_elk() {
   get_host_ip $ACUMOS_MARIADB_DOMAIN
   ACUMOS_MARIADB_IP=$HOST_IP
   cp *.yaml deploy/.
-  replace_env deploy/values.yaml
-
-  if [[ "$K8S_DIST" == "openshift" ]]; then
-    log "Workaround: Acumos AIO requires privilege for elasticsearch"
-    oc adm policy add-scc-to-user privileged -z default -n $ACUMOS_ELK_NAMESPACE
+  if [[ "$ACUMOS_PVC_TO_PV_BINDING" != "true" ]]; then
+    export ACUMOS_ELASTICSEARCH_DATA_PV_NAME=
   fi
+  replace_env deploy/values.yaml
 
   log "Create the elk Helm release"
   helm repo update
@@ -129,12 +131,13 @@ WORK_DIR=$(pwd)
 cd $(dirname "$0")
 if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
 source $AIO_ROOT/utils.sh
+update_acumos_env AIO_ROOT $AIO_ROOT force
 source $AIO_ROOT/acumos_env.sh
-if [[ -z "$AIO_ROOT" ]]; then export AIO_ROOT="$(cd ../../AIO; pwd -P)"; fi
 action=$1
 export ACUMOS_ELK_DOMAIN=$2
 export DEPLOYED_UNDER=k8s
 export K8S_DIST=$3
+set_k8s_env
 
 if [[ -e elk_env.sh ]]; then
   source elk_env.sh
