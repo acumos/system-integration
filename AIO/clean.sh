@@ -39,7 +39,7 @@ source utils.sh
 source acumos_env.sh
 source mlwb/mlwb_env.sh
 if [[ $(kubectl get namespaces) ]]; then
-  releases="mariadb elk couchdb jenkins jupyterhub nginx-ingress zeppelin"
+  releases="mariadb elk couchdb jenkins jupyterhub nginx-ingress zeppelin license-clio"
   for release in $releases; do
     rlss=$(helm list | grep $release | awk '{print $1}')
     for rls in $rlss; do

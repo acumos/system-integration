@@ -34,4 +34,4 @@ spec:
       - path: "/license-profile-editor/"
         backend:
           serviceName: license-profile-editor-service
-          servicePort: 8089
+          servicePort: 8093
