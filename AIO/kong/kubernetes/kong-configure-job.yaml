@@ -36,11 +36,11 @@ spec:
         - name: KONG_ADMIN_PORT
           value: "8001"
         - name: ACUMOS_DOMAIN
-          value: <ACUMOS_DOMAIN>
+          value: "<ACUMOS_DOMAIN>"
         - name: ACUMOS_CERT
-          value: <ACUMOS_CERT>
+          value: "<ACUMOS_CERT>"
         - name: ACUMOS_CERT_KEY
-          value: <ACUMOS_CERT_KEY>
+          value: "<ACUMOS_CERT_KEY>"
         volumeMounts:
         - mountPath: /var/acumos/config
           name: kong-config

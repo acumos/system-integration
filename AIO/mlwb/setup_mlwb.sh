@@ -26,8 +26,6 @@
 #   system-integration/charts/jupyterhub/certs
 #     export MLWB_DEPLOY_JUPYTERHUB=false
 #     export MLWB_JUPYTERHUB_DOMAIN=<FQDN of JupyterHub>
-#     export MLWB_JUPYTERHUB_HOST=<hostname of JupyterHub>
-#     export MLWB_JUPYTERHUB_HOST_IP=<IP address of JupyterHub>
 #     export MLWB_JUPYTERHUB_CERT=<JupyterHub cert filename>
 #     export MLWB_JUPYTERHUB_API_TOKEN=<JupyterHub API token>
 #
@@ -68,7 +66,7 @@ function setup_jupyterhub_certs_configmap() {
   trap 'fail' ERR
 
   # See prerequisites above if deploying with a standalone JupyterHub service
-  if [[ "$MLWB_JUPYTERHUB_DOMAIN" == "$ACUMOS_DOMAIN" ]]; then
+  if [[ ! -e $AIO_ROOT/../charts/jupyterhub/certs/$MLWB_JUPYTERHUB_CERT ]]; then
     log "Copy Acumos server cert for use as JupyterHub cert"
     mkdir -p $AIO_ROOT/../charts/jupyterhub/certs/
     cp $AIO_ROOT/certs/$ACUMOS_CERT $AIO_ROOT/../charts/jupyterhub/certs/.
@@ -92,6 +90,11 @@ setup_mlwb() {
     setup_jupyterhub_certs_configmap
     log "Apply updates to mlwb_env.sh"
     source mlwb_env.sh
+
+    if [[ "$ACUMOS_MLWB_LOGS_PVC_NAME" != "$ACUMOS_LOGS_PVC_NAME" ]]; then
+      setup_pvc $ACUMOS_NAMESPACE $ACUMOS_MLWB_LOGS_PVC_NAME \
+        $ACUMOS_MLWB_LOGS_PV_NAME $ACUMOS_LOGS_PV_SIZE $ACUMOS_LOGS_PV_CLASSNAME
+    fi
 
     if [[ ! -e deploy ]]; then mkdir deploy; fi
 
@@ -121,6 +124,11 @@ mlwb-model mlwb-predictor"
 
     log "Set variable values in k8s templates"
     replace_env deploy
+    get_host_ip_from_etc_hosts $MLWB_JUPYTERHUB_DOMAIN
+    if [[ "$HOST_IP" != "" ]]; then
+      patch_template_with_host_alias deploy/mlwb-notebook-service-deployment.yaml \
+       $MLWB_JUPYTERHUB_DOMAIN $HOST_IP
+    fi
 
     log "Deploy the MLWB k8s-based components"
     # Create services first... see https://github.com/kubernetes/kubernetes/issues/16448
@@ -138,11 +146,6 @@ mlwb-model mlwb-predictor"
       log "Creating deployment from $f"
       kubectl create -f $f
     done
-    get_host_ip_from_etc_hosts $MLWB_JUPYTERHUB_DOMAIN
-    if [[ "$HOST_IP" != "" ]]; then
-      patch_deployment_with_host_alias $ACUMOS_NAMESPACE mlwb-notebook \
-       $MLWB_JUPYTERHUB_DOMAIN $HOST_IP
-    fi
 
     log "Wait for all MLWB core pods to be Running"
     for app in $apps; do
@@ -161,8 +164,6 @@ source $AIO_ROOT/acumos_env.sh
 source mlwb_env.sh
 # Hard-set these values in case JupyterHub setup is run later
 update_mlwb_env MLWB_JUPYTERHUB_DOMAIN $MLWB_JUPYTERHUB_DOMAIN force
-update_mlwb_env MLWB_JUPYTERHUB_HOST $MLWB_JUPYTERHUB_HOST force
-update_mlwb_env MLWB_JUPYTERHUB_HOST_IP $MLWB_JUPYTERHUB_HOST_IP force
 
 action=$1
 if [[ "$action" == "" ]]; then action=all; fi
