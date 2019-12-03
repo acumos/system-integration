@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f48ba587_505b89da",
+        "filename": "AIO/acumos_env.sh",
+        "patchSetId": 23
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 273
+      },
+      "writtenOn": "2019-12-03T08:52:19Z",
+      "side": 1,
+      "message": "refering to staging repo instead of release ? (latest is $ACUMOS_RELEASE/acumos/security-verification:1.2.0)",
+      "range": {
+        "startLine": 59,
+        "startChar": 35,
+        "endLine": 59,
+        "endChar": 50
+      },
+      "revId": "b089c8c473283c84d341f6dd2a7dd68006f39221",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e42e5086_37959e39",
+        "filename": "AIO/acumos_env.sh",
+        "patchSetId": 23
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 273
+      },
+      "writtenOn": "2019-12-03T08:52:19Z",
+      "side": 1,
+      "message": "refering to staging repo instead of release ? (latest is $ACUMOS_RELEASE/deployment-client:1.0.0)",
+      "range": {
+        "startLine": 61,
+        "startChar": 31,
+        "endLine": 61,
+        "endChar": 70
+      },
+      "revId": "b089c8c473283c84d341f6dd2a7dd68006f39221",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7f7bdfe4_09f66c64",
+        "filename": "AIO/acumos_env.sh",
+        "patchSetId": 23
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 273
+      },
+      "writtenOn": "2019-12-03T08:52:19Z",
+      "side": 1,
+      "message": "doesn\u0027t exist, but $ACUMOS_RELEASE/databroker-zipbroker:1.0.0",
+      "range": {
+        "startLine": 69,
+        "startChar": 34,
+        "endLine": 69,
+        "endChar": 76
+      },
+      "revId": "b089c8c473283c84d341f6dd2a7dd68006f39221",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
