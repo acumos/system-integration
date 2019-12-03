@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "185d88d7_9b605965",
+        "filename": "AIO/mlwb/mlwb_env.sh",
+        "patchSetId": 25
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 273
+      },
+      "writtenOn": "2019-12-03T14:35:26Z",
+      "side": 1,
+      "message": "Missing MLWB_CREATE_NIFI_USER_POD env variable ? (needed for mlwb-pipeline k8s deployment, otherwise the mlwb-pipeline will fail to start due to an invalid json (\"createpod\" attribute with no value))",
+      "revId": "d318cfe5bec959f5bc558e932c6fb6d1101b4bf2",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
