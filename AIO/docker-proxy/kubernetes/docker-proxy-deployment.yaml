@@ -93,6 +93,7 @@ spec:
             do sleep 10;
                echo "Waiting for temporary DNS resolution issue to be fixed";
             done;
+          mkdir -p /var/log/acumos;
           (python /etc/nginx/conf.d/acumos_auth.py &);
           echo 'Acumos authentication proxy started';
           nginx -g "daemon off;"

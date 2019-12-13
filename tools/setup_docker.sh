@@ -44,7 +44,9 @@ setup() {
     if [[ $(sudo apt-get purge -y docker-ce docker docker-engine docker.io) ]]; then
       echo "Purged docker-ce docker docker-engine docker.io"
     fi
-    sudo rm /etc/docker/daemon.json
+    if [[ -e /etc/docker/daemon.json ]]; then
+      sudo rm /etc/docker/daemon.json
+    fi
     wait_dpkg; sudo apt-get update
     wait_dpkg; sudo apt-get install -y \
       apt-transport-https \
