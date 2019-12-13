@@ -184,12 +184,8 @@ function setup_ingress_controller() {
   if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
     if [[ "$ACUMOS_DEPLOY_INGRESS" == "true" ]]; then
       if [[ "$ACUMOS_INGRESS_SERVICE" == "nginx" ]]; then
-        EXTERNAL_IP=""
-        if [[ "$ACUMOS_INGRESS_LOADBALANCER" == "false" ]]; then
-          EXTERNAL_IP=$ACUMOS_DOMAIN_IP
-        fi
         bash $AIO_ROOT/../charts/ingress/setup_ingress_controller.sh $ACUMOS_NAMESPACE \
-          $AIO_ROOT/certs/acumos.crt $AIO_ROOT/certs/acumos.key $EXTERNAL_IP
+          $AIO_ROOT/certs/acumos.crt $AIO_ROOT/certs/acumos.key $ACUMOS_DOMAIN_IP
       else
         bash $AIO_ROOT/kong/setup_kong.sh
       fi

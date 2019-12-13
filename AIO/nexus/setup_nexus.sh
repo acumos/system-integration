@@ -123,10 +123,18 @@ function nexus_setup() {
     wait_running nexus $ACUMOS_NEXUS_NAMESPACE
   fi
 
+  check_name_resolves nexus-service
+  if [[ $NAME_RESOLVES == "true" ]]; then
+    host=nexus-service
+    port=8081
+  else
+    host=$ACUMOS_NEXUS_DOMAIN
+    port=$ACUMOS_NEXUS_API_PORT
+  fi
   # Add -m 10 since for some reason curl seems to hang waiting for a response
   cmd="curl -v -m 10 \
     -u $ACUMOS_NEXUS_ADMIN_USERNAME:$ACUMOS_NEXUS_ADMIN_PASSWORD \
-    http://$ACUMOS_NEXUS_DOMAIN:$ACUMOS_NEXUS_API_PORT/service/rest/v1/script"
+    http://$host:$port/service/rest/v1/script"
   local i=0
   while [[ ! $($cmd) ]]; do
     log "Nexus API is not ready... waiting 10 seconds"
