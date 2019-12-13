@@ -36,6 +36,9 @@ function setup_jenkins() {
   if [[ "$ACUMOS_DEFAULT_SOLUTION_KUBE_CONFIG" != "" ]]; then
     kubectl cp $ACUMOS_DEFAULT_SOLUTION_KUBE_CONFIG -n $ACUMOS_NAMESPACE \
       $pod:/var/jenkins_home/kube-config-$ACUMOS_DEFAULT_SOLUTION_DOMAIN
+  else
+    kubectl cp ~/.kube/config -n $ACUMOS_NAMESPACE \
+      $pod:/var/jenkins_home/kube-config-$ACUMOS_DEFAULT_SOLUTION_DOMAIN
   fi
   kubectl cp ~/.kube/config -n $ACUMOS_NAMESPACE $pod:/var/jenkins_home/kube-config
 
