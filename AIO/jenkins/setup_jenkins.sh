@@ -36,6 +36,9 @@ function setup_jenkins() {
   if [[ "$ACUMOS_DEFAULT_SOLUTION_KUBE_CONFIG" != "" ]]; then
     kubectl cp $ACUMOS_DEFAULT_SOLUTION_KUBE_CONFIG -n $ACUMOS_NAMESPACE \
       $pod:/var/jenkins_home/kube-config-$ACUMOS_DEFAULT_SOLUTION_DOMAIN
+  else
+    kubectl cp ~/.kube/config -n $ACUMOS_NAMESPACE \
+      $pod:/var/jenkins_home/kube-config-$ACUMOS_DEFAULT_SOLUTION_DOMAIN
   fi
   kubectl cp ~/.kube/config -n $ACUMOS_NAMESPACE $pod:/var/jenkins_home/kube-config
 
@@ -65,7 +68,7 @@ function setup_jenkins() {
 
   local url="-k https://$ACUMOS_DOMAIN/jenkins/"
   local auth="-u $ACUMOS_JENKINS_USER:$ACUMOS_JENKINS_PASSWORD"
-  check_name_resolves $ACUMOS_JENKINS_API_URL
+  check_name_resolves $ACUMOS_JENKINS_API_HOST
   if [[ "$NAME_RESOLVES" == "true" ]]; then
     url=$ACUMOS_JENKINS_API_URL
   fi
