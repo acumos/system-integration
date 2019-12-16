@@ -80,19 +80,40 @@ function deploy_nexus_service() {
   log "Update the nexus-service template and deploy the service"
   mkdir -p deploy
   cp -r kubernetes/nexus-service.yaml deploy/.
-  # Use dynamically assigned nodeports if port values are the default for docker
-  if [[ "$ACUMOS_NEXUS_API_PORT" == "8081" ]]; then
-    ACUMOS_NEXUS_API_PORT=
+
+  if [[ "$ACUMOS_INGRESS_LOADBALANCER" == "true" ]]; then
+    log "Update Nexus service template to use LoadBalancer service type"
+    sedi 's/type: NodePort/type: LoadBalancer/' deploy/nexus-service.yaml
+    sedi '/nodePort/d' deploy/nexus-service.yaml
+  else
+    # Use dynamically assigned nodeports if port values are the default for docker
+    if [[ "$ACUMOS_NEXUS_API_PORT" == "8081" ]]; then
+      ACUMOS_NEXUS_API_PORT=
+    fi
+    if [[ "$ACUMOS_DOCKER_MODEL_PORT" == "8082" ]]; then
+      ACUMOS_DOCKER_MODEL_PORT=
+    fi
   fi
-  if [[ "$ACUMOS_DOCKER_MODEL_PORT" == "8082" ]]; then
-    ACUMOS_DOCKER_MODEL_PORT=
-  fi
+
   replace_env deploy/nexus-service.yaml
   start_service deploy/nexus-service.yaml
-  ACUMOS_NEXUS_API_PORT=$(kubectl get services -n $ACUMOS_NEXUS_NAMESPACE nexus-service -o json | jq -r '.spec.ports[0].nodePort')
-  update_nexus_env ACUMOS_NEXUS_API_PORT $ACUMOS_NEXUS_API_PORT force
-  ACUMOS_DOCKER_MODEL_PORT=$(kubectl get services -n $ACUMOS_NEXUS_NAMESPACE nexus-service -o json | jq -r '.spec.ports[1].nodePort')
-  update_nexus_env ACUMOS_DOCKER_MODEL_PORT $ACUMOS_DOCKER_MODEL_PORT force
+  if [[ "$ACUMOS_INGRESS_LOADBALANCER" == "true" ]]; then
+    local t=0
+    while [[ $(kubectl get svc nexus-service | grep -c "pending") -gt 0 ]]; do
+      t=$((t+10))
+      if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
+        fail "Nexus loadbalancer IP not assigned in $ACUMOS_SUCCESS_WAIT_TIME seconds"
+      fi
+      sleep 10
+    done
+    ACUMOS_NEXUS_HOST_IP=$(kubectl get svc nexus-service -o json | jq -r '.status.loadBalancer.ingress[0].ip')
+    update_nexus_env ACUMOS_NEXUS_HOST_IP $ACUMOS_NEXUS_HOST_IP force
+  else
+    ACUMOS_NEXUS_API_PORT=$(kubectl get services -n $ACUMOS_NEXUS_NAMESPACE nexus-service -o json | jq -r '.spec.ports[0].nodePort')
+    update_nexus_env ACUMOS_NEXUS_API_PORT $ACUMOS_NEXUS_API_PORT force
+    ACUMOS_DOCKER_MODEL_PORT=$(kubectl get services -n $ACUMOS_NEXUS_NAMESPACE nexus-service -o json | jq -r '.spec.ports[1].nodePort')
+    update_nexus_env ACUMOS_DOCKER_MODEL_PORT $ACUMOS_DOCKER_MODEL_PORT force
+  fi
 }
 
 function nexus_setup() {
