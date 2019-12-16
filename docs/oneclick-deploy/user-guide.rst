@@ -55,10 +55,11 @@ Quickstart Guide to Platform Deployment (TL;DR)
 
 NOTICE:
 
-* this process will remove/install software on your target host, and configure
-  it e.g. firewall and security rules. Only execute this process if you understand
-  the implications or are executing the process in a VM/host that you can easily
-  re-create.
+* if you are deploying to a host/VM and will be executing the prerequisites step
+  of this process, be aware that the process will remove/install software on your
+  target host, and configure it e.g. firewall and security rules. Only execute
+  this process if you understand the implications or are executing the process
+  in a VM/host that you can easily re-create.
 * by default, the Acumos platform is deployed with service exposure options
   typical for development environments. Production environments and especially
   public environments will need additional planning and restrictions on exposed
@@ -94,7 +95,8 @@ Kubernetes Based Deployment
 The process below will support deployment under either a generic kubernetes
 distribution, or the OpenShift kubernetes distribution. The scripts will detect
 which distribution is installed and deploy per the requirements of that
-distribution.
+distribution. For additional notes on deploying into specific k8s cluster types
+(e.g. Azure-AKS), see `Deployment notes for specific k8s distributions`_.
 
 Note: the following k8s versions are explicitly supported and tested by these
 tools. Other versions may work, but may require further tool customization.
@@ -162,7 +164,7 @@ with the single command below:
 .. code-block:: bash
 
   $ bash system-integration/tools/tools/aio_k8s_deployer/aio_k8s_deployer.sh \
-    all <host> <user> <k8s distribution>
+    all <host> <user> <k8s distribution> [as-pod=<docker image>]
 ..
 
 where:
@@ -171,9 +173,19 @@ where:
 * host: hostname of k8s cluster master node
 * user: SSH-enabled sudo user on the platform
 * k8s distribution: type of k8s cluster (generic|openshift)
+* as-pod: (optional) run the oneclick_deploy.sh script from within the cluster
+  as an acumos-deployer pod
 
-When aio_k8s_deployer.sh is called with "all" as the first
-parameter, it will:
+  * as-pod provides the advantage of being able to run the deployer under the
+    platform, and use it later as a platform maintenance/debug tool, containing
+    all the customized and configured data for the deployment, as well as any
+    additional tools/data you want to package in it
+  * you can specify the image "acumos-deployer" which will be built locally by
+    aio_k8s_deployer.sh, or a pre-built/customized image in a docker registry,
+    e.g. blsaws/acumos-deployer in Docker Hub, which offers tags for use with
+    generic k8s (tag: latest or kubectl) or OpenShift (tag: oc)
+
+When aio_k8s_deployer.sh is called with "all" as the first parameter, it will:
 
 * archive any earlier deployment in folder "aio_k8s_deployer" into a timestamped
   subfolder of "archived"
@@ -1166,6 +1178,194 @@ You can see all the component-related "app" labels via the command:
 
 After stopping the component, you can redeploy it as needed using the methods
 described above.
+
+Deployment notes for specific k8s distributions
+-----------------------------------------------
+
+Azure-AKS
++++++++++
+
+Azure supports its own variant of the generic k8s distribution, and has some
+features that require the following prerequisites, adaptations, and specific
+steps in Acumos platform deployment, at least as tested/supported so far with
+the OneClick toolset.
+
+* creation of namespace(s) as needed for the Acumos core platform and Nexus
+  (if not externally deployed already)
+* (recommended) pre-registered DNS names (A-records) for the Acumos platform
+  services below, associated with IP addresses in the Azure resource group for
+  the target k8s cluster:
+
+  * Acumos nginx-ingress controller service
+  * Federation service
+  * Nexus service (if deployed as part of the platform)
+
+Recommended base options for Acumos deployment in Azure-AKS
+***********************************************************
+
+In all cases, if using the aio_k8s_deployer, the following settings are
+recommended to be provided in customize_env.sh:
+
+.. code-block:: bash
+
+  ...
+  update_acumos_env ACUMOS_DEPLOY_AS_POD true
+  update_acumos_env ACUMOS_NAMESPACE <namespace>
+  update_acumos_env DEPLOYED_UNDER k8s
+  update_acumos_env K8S_DIST generic
+  update_acumos_env ACUMOS_HOST_USER $USER
+  update_acumos_env ACUMOS_DOMAIN <Acumos Portal FQDN>
+  update_acumos_env ACUMOS_HOST $ACUMOS_DOMAIN
+  # Use controller.service.loadBalancerIP	for nginx-ingress helm chart
+  update_acumos_env ACUMOS_INGRESS_LOADBALANCER true
+  # Azure provides dynamic PV allocation, so no need to create PVs explicitly
+  update_acumos_env ACUMOS_CREATE_PVS false
+  update_acumos_env ACUMOS_PVC_TO_PV_BINDING false
+  # Set to true to clean any existing PV data for related PVCs (default: false)
+  update_acumos_env ACUMOS_RECREATE_PVC false
+
+  update_nexus_env ACUMOS_NEXUS_DATA_PV_SIZE 100Gi
+
+  # Azure-AKS is incompatible with Acumos log collection design (for now)
+  update_acumos_env ACUMOS_DEPLOY_ELK false
+  update_acumos_env ACUMOS_DEPLOY_ELK_FILEBEAT false
+  # Disable use of log PVs
+
+  function clean_yaml() {
+    for f in $fs; do
+      for s in $ss; do
+        sed -i -- "/$s/d" $1/$f.yaml
+      done
+    done
+  }
+  ss="volumeMounts logs volumes persistentVolumeClaim claimName"
+  fs="azure-client-deployment cds-deployment deployment-client-deployment dsce-deployment kubernetes-client-deployment license-profile-editor-deployment license-rtu-editor-deployment msg-deployment onboarding-deployment portal-fe-deployment sv-scanning-deployment"
+  clean_yaml system-integration/AIO/kubernetes/deployment
+  fs="mlwb-dashboard-webcomponent-deployment mlwb-model-service-deployment mlwb-predictor-service-deployment mlwb-home-webcomponent-deployment mlwb-notebook-webcomponent-deployment mlwb-pipeline-catalog-webcomponent-deployment mlwb-pipeline-webcomponent-deployment mlwb-project-service-deployment mlwb-project-catalog-webcomponent-deployment mlwb-project-webcomponent-deployment"
+  clean_yaml system-integration/AIO/mlwb/kubernetes
+  ss="logs persistentVolumeClaim claimName"
+  fs="portal-be-deployment federation-deployment"
+  clean_yaml system-integration/AIO/kubernetes/deployment
+  fs="nifi-registry-deployment"
+  clean_yaml system-integration/AIO/mlwb/nifi/kubernetes
+  fs="mlwb-notebook-service-deployment mlwb-pipeline-service-deployment"
+  clean_yaml system-integration/AIO/mlwb/kubernetes
+
+  ss="logs persistentVolumeClaim claimName"
+  fs="docker-proxy-deployment"
+  clean_yaml system-integration/AIO/docker-proxy/kubernetes
+  sed -i -- '/mountPath: \/var\/log\/acumos/d' system-integration/AIO/docker-proxy/kubernetes/docker-proxy-deployment.yaml
+..
+
+Acumos deployment in Azure-AKS with pre-registered FQDNs
+********************************************************
+
+If using the aio_k8s_deployer, the pre-registered domain names for the services
+describe above just need to be included along with the following other
+recommended options in customize_env.sh, as shown below.
+
+.. code-block:: bash
+
+  ...
+  update_acumos_env ACUMOS_FEDERATION_DOMAIN <Acumos Federation service FQDN>
+  update_nexus_env ACUMOS_NEXUS_DOMAIN <Nexus FQDN>
+..
+
+Given those settings and the base options for customize_env.sh described above,
+an example scripted process for a clean install of the Acumos platform is:
+
+.. code-block:: bash
+
+  #!/bin/bash
+  set -x -e
+  WORK_DIR=$(pwd)
+  mkdir -p deploy
+  cp customize_env.sh deploy/customize_env.sh
+  echo "Copy kube-config"
+  cp ~/.kube/config deploy/kube-config
+  # Prerequisite: save helm/tiller version compatible with your Azure-AKS
+  echo "Copy helm"
+  wget https://get.helm.sh/helm-v2.12.3-linux-amd64.tar.gz | unzip
+  tar -xvf helm-v2.12.3-linux-amd64.tar
+  cp linux-amd64/helm deploy/.
+  cp linux-amd64/tiller deploy/.
+  echo "Clone system-integration"
+  rm -rf deploy/system-integration
+  git clone "https://gerrit.acumos.org/r/system-integration" deploy/system-integration
+  # optional: env scripts to be copied into system-integration/AIO/ by customize_env.sh
+  rm deploy/env/*
+  cp -r env deploy/.
+  # optional: pre-arranged certs to be copied into system-integration/AIO/certs by customize_env.sh
+  cp -r certs deploy/.
+  cp deploy/system-integration/tools/aio_k8s_deployer/aio_k8s_deployer.sh .
+  bash aio_k8s_deployer.sh deploy as-pod=blsaws/acumos-deployer:latest
+..
+
+Acumos deployment in Azure-AKS without pre-registered FQDNs
+***********************************************************
+
+This process is appropriate for test environments or platforms for which you
+will register FQDNs for the allocated loadBalancer IP addresses, after
+deployment of the platform. The example process below modifies the example
+above by:
+
+* pre-creating certs for the platform, without specifying the allocated IP
+  address in the cert (optional, anyway). This is required since:
+
+  * the assigned ingress IP address is not known until it is allocated, and
+  * it will not be allocated until the nginx-ingress controller is deployed, but
+  * the deployment of the controller depends upon the applicable cert/key
+    being specified in the deployment process... a "catch-22"
+
+* installing the ingress controller first, so that the chosen platform
+  domain name and allocated ingress IP address can be used in adding hostAlias
+  entries for all platform components that need to access the platform via
+  the ingress controller; this happens though use of the "add-host" option of
+  aio_k8s_deployer.sh.
+
+.. code-block:: bash
+
+  #!/bin/bash
+  set -x -e
+  ACUMOS_NAMESPACE=acumos-prod
+  ACUMOS_DOMAIN=acumos-prod.westus.cloudapp.azure.com
+  ACUMOS_FEDERATION_DOMAIN=federation-$ACUMOS_DOMAIN
+  WORK_DIR=$(pwd)
+  mkdir -p deploy
+  cp customize_env.sh deploy/customize_env.sh
+  echo "Copy kube-config"
+  cp ~/.kube/config deploy/kube-config
+  # Prerequisite: save helm/tiller version compatible with your Azure-AKS
+  echo "Copy helm"
+  wget https://get.helm.sh/helm-v2.12.3-linux-amd64.tar.gz | unzip
+  tar -xvf helm-v2.12.3-linux-amd64.tar
+  cp linux-amd64/helm deploy/.
+  cp linux-amd64/tiller deploy/.
+  echo "Clone system-integration"
+  rm -rf deploy/system-integration
+  git clone "https://gerrit.acumos.org/r/system-integration" deploy/system-integration
+  # optional: env scripts to be copied into system-integration/AIO/ by customize_env.sh
+  rm deploy/env/*
+  cp -r env deploy/.
+  cd deploy/system-integration/AIO/certs/
+  bash setup_certs.sh $ACUMOS_DOMAIN "$ACUMOS_FEDERATION_DOMAIN"
+  cd $WORK_DIR
+  cp -r deploy/system-integration/AIO/certs deploy/.
+  sed -i -- 's/ACUMOS_INGRESS_LOADBALANCER=false/ACUMOS_INGRESS_LOADBALANCER=true/' \
+    deploy/system-integration/AIO/acumos_env.sh
+  certs="$(pwd)/deploy/system-integration/AIO/certs"
+  bash deploy/system-integration/charts/ingress/setup_ingress_controller.sh \
+    $ACUMOS_NAMESPACE $certs/$ACUMOS_DOMAIN.crt $certs/$ACUMOS_DOMAIN.key
+  while [[ "$(kubectl get svc -n $ACUMOS_NAMESPACE $ACUMOS_NAMESPACE-nginx-ingress-controller -o json | jq -r ".status.loadBalancer.ingress[0].ip")" == 'null' ]]; do
+    sleep 10
+  done
+  ACUMOS_DOMAIN_IP=$(kubectl get svc -n $ACUMOS_NAMESPACE $ACUMOS_NAMESPACE-nginx-ingress-controller -o json | jq -r ".status.loadBalancer.ingress[0].ip")
+  sed -i -- 's/ACUMOS_DEPLOY_INGRESS true/ACUMOS_DEPLOY_INGRESS false/' deploy/customize_env.sh
+  # env scripts to be copied into system-integration/AIO/. by customize_env.sh
+  cp -r env deploy/.
+  cp deploy/system-integration/tools/aio_k8s_deployer/aio_k8s_deployer.sh .
+  bash aio_k8s_deployer.sh deploy as-pod=blsaws/acumos-deployer:latest add-host=$ACUMOS_DOMAIN:$ACUMOS_DOMAIN_IP
+..
 
 Logs Location
 =============
