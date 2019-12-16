@@ -53,10 +53,6 @@ function clean_ingress() {
     if [[ $(kubectl delete secret -n $NAMESPACE ingress-cert) ]]; then
       log "Secret ingress-cert deleted"
     fi
-    ings=$(kubectl get ingress -n $NAMESPACE | awk '/-ingress/{print $1}')
-    for ing in $ings; do
-      kubectl delete ingress -n $NAMESPACE $ing
-    done
   fi
 }
 
