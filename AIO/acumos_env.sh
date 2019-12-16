@@ -26,7 +26,7 @@
 #
 
 # Version of the AIO toolset
-export ACUMOS_AIO_VERSION=3.0.1
+export ACUMOS_AIO_VERSION=3.0.2
 
 # Acumos project Registries
 export ACUMOS_PROJECT_NEXUS_USERNAME=docker
