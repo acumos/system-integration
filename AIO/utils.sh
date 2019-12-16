@@ -404,14 +404,34 @@ function start_acumos_core_app() {
   local app=$1
   log "Update the $app-service template and deploy the service"
   cp kubernetes/service/$app-service.yaml deploy/.
+  if [[ "$app" == "federation" && "$ACUMOS_INGRESS_LOADBALANCER" == "true" ]]; then
+    log "Update Federation service template to use LoadBalancer service type"
+    sedi 's/type: NodePort/type: LoadBalancer/' deploy/federation-service.yaml
+    sedi '/nodePort/d' deploy/federation-service.yaml
+    update_acumos_env ACUMOS_FEDERATION_PORT 9084
+    update_acumos_env ACUMOS_FEDERATION_LOCAL_PORT 9011
+  fi
   replace_env deploy/$app-service.yaml
   start_service deploy/$app-service.yaml
 
   if [[ "$app" == "federation" ]]; then
+    if [[ "$ACUMOS_INGRESS_LOADBALANCER" == "false" ]]; then
     ACUMOS_FEDERATION_PORT=$(kubectl get services -n $ACUMOS_NAMESPACE federation-service -o json | jq -r '.spec.ports[0].nodePort')
     update_acumos_env ACUMOS_FEDERATION_PORT $ACUMOS_FEDERATION_PORT force
     ACUMOS_FEDERATION_LOCAL_PORT=$(kubectl get services -n $ACUMOS_NAMESPACE federation-service -o json | jq -r '.spec.ports[1].nodePort')
     update_acumos_env ACUMOS_FEDERATION_LOCAL_PORT $ACUMOS_FEDERATION_LOCAL_PORT force
+    else
+      local t=0
+      while [[ $(kubectl get svc federation-service | grep -c "pending") -gt 0 ]]; do
+        t=$((t+10))
+        if [[ $t -eq $ACUMOS_SUCCESS_WAIT_TIME ]]; then
+          fail "Federation loadbalancer IP not assigned in $ACUMOS_SUCCESS_WAIT_TIME seconds"
+        fi
+        sleep 10
+      done
+      ACUMOS_FEDERATION_HOST_IP=$(kubectl get svc federation-service -o json | jq -r '.status.loadBalancer.ingress[0].ip')
+      update_acumos_env ACUMOS_FEDERATION_HOST_IP $ACUMOS_FEDERATION_HOST_IP force
+    fi
   fi
 
   log "Update the $app deployment template and deploy it"
@@ -419,12 +439,22 @@ function start_acumos_core_app() {
   replace_env deploy/$app-deployment.yaml
   get_host_ip_from_etc_hosts $ACUMOS_DOMAIN
   if [[ "$HOST_IP" != "" ]]; then
-    patch_template_with_host_alias deploy/$app-deployment.yaml $ACUMOS_HOST $HOST_IP
+    patch_template_with_host_alias deploy/$app-deployment.yaml \
+      $ACUMOS_HOST $HOST_IP
+  fi
+  if [[ "$ACUMOS_NEXUS_HOST_IP" != "" ]]; then
+    patch_template_with_host_alias deploy/$app-deployment.yaml \
+      $ACUMOS_NEXUS_DOMAIN $ACUMOS_NEXUS_HOST_IP
+  fi
+  if [[ "$app" == "portal-be" && "$ACUMOS_FEDERATION_HOST_IP" != "" ]]; then
+    patch_template_with_host_alias deploy/portal-be-deployment.yaml \
+      $ACUMOS_FEDERATION_DOMAIN $ACUMOS_FEDERATION_HOST_IP
   fi
   if [[ "$app" == "cds" && "$ACUMOS_MARIADB_HOST" != "$ACUMOS_HOST" ]]; then
     get_host_ip_from_etc_hosts $ACUMOS_MARIADB_HOST
     if [[ "$HOST_IP" != "" ]]; then
-      patch_template_with_host_alias deploy/$app-deployment.yaml $ACUMOS_MARIADB_HOST $HOST_IP
+      patch_template_with_host_alias deploy/$app-deployment.yaml \
+        $ACUMOS_MARIADB_HOST $HOST_IP
     fi
   fi
   start_deployment deploy/$app-deployment.yaml
