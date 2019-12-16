@@ -80,7 +80,8 @@ spec:
         - containerPort: 8443
         command: ["/bin/bash", "-c"]
         args:
-        - cp /etc/nginx/conf.d/nginx.conf /etc/nginx/nginx.conf;
+        - set -x;
+          cp /etc/nginx/conf.d/nginx.conf /etc/nginx/nginx.conf;
           while ! apt-get update;
             do sleep 10;
                echo "Waiting for temporary DNS resolution issue to be fixed";
