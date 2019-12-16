@@ -141,8 +141,8 @@ function setup_acumos() {
     docker_login https://nexus3.acumos.org:10002
 
     # Federation port updated since mlwb-project-webcomponent conflicts on port
-    update_acumos_env ACUMOS_FEDERATION_LOCAL_PORT 9074
-    update_acumos_env ACUMOS_FEDERATION_PORT 9011
+    update_acumos_env ACUMOS_FEDERATION_LOCAL_PORT 9011
+    update_acumos_env ACUMOS_FEDERATION_PORT 9074
 
     log "Deploy Acumos core docker-based components"
     bash $AIO_ROOT/docker_compose.sh up -d --build
@@ -151,13 +151,13 @@ function setup_acumos() {
     log "Deploy the Acumos core components"
     if [[ ! -e deploy ]]; then mkdir deploy; fi
     if [[ "$ACUMOS_DEPLOY_FEDERATION" == "true" ]]; then
-      apps="cds azure-client deployment-client dsce federation \
-        kubernetes-client msg license-profile-editor license-rtu-editor \
-        onboarding portal-be portal-fe sv-scanning"
+      apps="cds portal-be portal-fe federation onboarding msg sv-scanning dsce \
+        azure-client deployment-client kubernetes-client \
+        license-profile-editor license-rtu-editor"
     else
-      apps="cds azure-client deployment-client dsce \
-        kubernetes-client msg license-profile-editor license-rtu-editor \
-        onboarding portal-be portal-fe sv-scanning"
+      apps="cds portal-be portal-fe onboarding msg sv-scanning dsce \
+        azure-client deployment-client kubernetes-client \
+        license-profile-editor license-rtu-editor"
     fi
     for app in $apps; do
       start_acumos_core_app $app
