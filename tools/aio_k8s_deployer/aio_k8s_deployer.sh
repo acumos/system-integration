@@ -193,6 +193,7 @@ EOF
 }
 
 function prepare_deployer_yaml() {
+  cp deploy/system-integration/tools/aio_k8s_deployer/deploy/aio_k8s_deployer.yaml deploy/.
   sedi "s/<ACUMOS_NAMESPACE>/$NAMESPACE/" deploy/aio_k8s_deployer.yaml
   sedi "s~<AIO_K8S_DEPLOYER_IMAGE>~$AS_POD~" deploy/aio_k8s_deployer.yaml
   if [[ "$add_hosts" != "" ]]; then

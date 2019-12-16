@@ -159,6 +159,7 @@ Acumos core platform components and their default values:
     "ACUMOS_DOCKER_PROXY_HOST", "hostname/FQDN", "$ACUMOS_DOMAIN", ""
     "ACUMOS_DOCKER_PROXY_PORT", "TCP port", "", ""
     "ACUMOS_FEDERATION_DOMAIN", "hostname/FQDN", "$ACUMOS_DOMAIN", ""
+    "ACUMOS_FEDERATION_HOST_IP", "IP address for Federation service", "set automatically", "used in Federation loadBalancer ingress cases"
     "ACUMOS_FEDERATION_LOCAL_PORT", "TCP port for platform-internal API", "", ""
     "ACUMOS_FEDERATION_PORT", "TCP port for platform-external API", "", ""
     "ACUMOS_ONBOARDING_TOKENMODE", "", "jwtToken", "jwtToken|apiToken"
