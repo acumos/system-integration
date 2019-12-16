@@ -141,8 +141,8 @@ function setup_acumos() {
     docker_login https://nexus3.acumos.org:10002
 
     # Federation port updated since mlwb-project-webcomponent conflicts on port
-    update_acumos_env ACUMOS_FEDERATION_LOCAL_PORT 9074
-    update_acumos_env ACUMOS_FEDERATION_PORT 9011
+    update_acumos_env ACUMOS_FEDERATION_LOCAL_PORT 9011
+    update_acumos_env ACUMOS_FEDERATION_PORT 9074
 
     log "Deploy Acumos core docker-based components"
     bash $AIO_ROOT/docker_compose.sh up -d --build
@@ -151,13 +151,13 @@ function setup_acumos() {
     log "Deploy the Acumos core components"
     if [[ ! -e deploy ]]; then mkdir deploy; fi
     if [[ "$ACUMOS_DEPLOY_FEDERATION" == "true" ]]; then
-      apps="cds azure-client deployment-client dsce federation \
-        kubernetes-client msg license-profile-editor license-rtu-editor \
-        onboarding portal-be portal-fe sv-scanning"
+      apps="cds portal-be portal-fe federation onboarding msg sv-scanning dsce \
+        azure-client deployment-client kubernetes-client \
+        license-profile-editor license-rtu-editor"
     else
-      apps="cds azure-client deployment-client dsce \
-        kubernetes-client msg license-profile-editor license-rtu-editor \
-        onboarding portal-be portal-fe sv-scanning"
+      apps="cds portal-be portal-fe onboarding msg sv-scanning dsce \
+        azure-client deployment-client kubernetes-client \
+        license-profile-editor license-rtu-editor"
     fi
     for app in $apps; do
       start_acumos_core_app $app
@@ -480,6 +480,7 @@ echo "assuming hostname \"$ACUMOS_DOMAIN\" is resolvable from your workstation:"
 add_to_urls "Common Data Service Swagger UI" https://$ACUMOS_ORIGIN/ccds/swagger-ui.html
 add_to_urls "Portal Swagger UI" https://$ACUMOS_ORIGIN/api/swagger-ui.html
 add_to_urls "Onboarding Service Swagger UI" https://$ACUMOS_ORIGIN/onboarding-app/swagger-ui.html
+add_to_urls "Jenkins UI" https://$ACUMOS_ORIGIN/jenkins/
 if [[ "$ACUMOS_ELK_DOMAIN" != "" ]]; then
   add_to_urls Kibana http://$ACUMOS_ELK_DOMAIN:$ACUMOS_ELK_KIBANA_PORT/app/kibana
 fi
@@ -487,4 +488,17 @@ fi
 if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
   add_to_urls "Mariadb Admin" http://$ACUMOS_HOST_IP:$ACUMOS_MARIADB_ADMINER_PORT
 fi
+
+if [[ "$ACUMOS_INGRESS_LOADBALANCER" == "true" ]]; then
+  cat <<EOF >>acumos.url
+Since the platform has been deployed with $ACUMOS_INGRESS_LOADBALANCER=true,
+you may need to add hosts file entries for any client system that needs to
+access these services (e.g. your workstation, federated platforms, solution
+deplpoyment k8s clusters, ...) unless/until the domain names below are registered
+in DNS with the IP addresses shown:
+Acumos Portal: $ACUMOS_DOMAIN_IP $ACUMOS_DOMAIN
+Acumos Federation: $ACUMOS_FEDERATION_HOST_IP $ACUMOS_FEDERATION_DOMAIN
+Nexus: $ACUMOS_NEXUS_HOST_IP $ACUMOS_NEXUS_DOMAIN
+EOF
+
 cat acumos.url

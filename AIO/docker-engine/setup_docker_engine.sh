@@ -55,11 +55,17 @@ function setup_docker_engine() {
   replace_env deploy
   get_host_ip_from_etc_hosts $ACUMOS_DOMAIN
   if [[ "$HOST_IP" != "" ]]; then
-    patch_template_with_host_alias deploy/docker-deployment.yaml $ACUMOS_HOST $HOST_IP
+    patch_template_with_host_alias deploy/docker-deployment.yaml \
+      $ACUMOS_HOST $HOST_IP
   fi
   get_host_ip_from_etc_hosts $ACUMOS_DOCKER_REGISTRY_HOST
   if [[ "$HOST_IP" != "" ]]; then
-    patch_template_with_host_alias deploy/docker-deployment.yaml $ACUMOS_DOCKER_REGISTRY_HOST $HOST_IP
+    patch_template_with_host_alias deploy/docker-deployment.yaml \
+      $ACUMOS_DOCKER_REGISTRY_HOST $HOST_IP
+  fi
+  if [[ "$ACUMOS_NEXUS_HOST_IP" != "" ]]; then
+    patch_template_with_host_alias deploy/docker-deployment.yaml \
+      $ACUMOS_NEXUS_DOMAIN $ACUMOS_NEXUS_HOST_IP
   fi
 
   start_service deploy/docker-service.yaml
