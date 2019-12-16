@@ -100,6 +100,10 @@ setup_docker_proxy() {
     if [[ "$HOST_IP" != "" ]]; then
       patch_template_with_host_alias deploy/docker-proxy-deployment.yaml $ACUMOS_DOCKER_PROXY_HOST $HOST_IP
     fi
+    if [[ "$ACUMOS_NEXUS_HOST_IP" != "" ]]; then
+      patch_template_with_host_alias deploy/docker-proxy-deployment.yaml \
+        $ACUMOS_NEXUS_DOMAIN $ACUMOS_NEXUS_HOST_IP
+    fi
     start_deployment deploy/docker-proxy-deployment.yaml
     wait_running docker-proxy $ACUMOS_NAMESPACE
   fi
