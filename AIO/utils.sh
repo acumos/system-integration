@@ -404,16 +404,23 @@ function start_acumos_core_app() {
   local app=$1
   log "Update the $app-service template and deploy the service"
   cp kubernetes/service/$app-service.yaml deploy/.
+  if [[ "$app" == "federation" && "$ACUMOS_INGRESS_LOADBALANCER" == "true" ]]; then
+    log "Update Federation service template to use LoadBalancer service type"
+    sedi 's/type: NodePort/type: LoadBalancer/' deploy/federation-service.yaml
+    sedi '/nodePort/d' deploy/federation-service.yaml
+    update_acumos_env ACUMOS_FEDERATION_PORT 9084
+    update_acumos_env ACUMOS_FEDERATION_LOCAL_PORT 9011
+  fi
   replace_env deploy/$app-service.yaml
   start_service deploy/$app-service.yaml
 
-  if [[ "$app" == "federation" ]]; then
+  if [[ "$app" == "federation" && "$ACUMOS_INGRESS_LOADBALANCER" == "false" ]]; then
     ACUMOS_FEDERATION_PORT=$(kubectl get services -n $ACUMOS_NAMESPACE federation-service -o json | jq -r '.spec.ports[0].nodePort')
     update_acumos_env ACUMOS_FEDERATION_PORT $ACUMOS_FEDERATION_PORT force
     ACUMOS_FEDERATION_LOCAL_PORT=$(kubectl get services -n $ACUMOS_NAMESPACE federation-service -o json | jq -r '.spec.ports[1].nodePort')
     update_acumos_env ACUMOS_FEDERATION_LOCAL_PORT $ACUMOS_FEDERATION_LOCAL_PORT force
   fi
-
+  
   log "Update the $app deployment template and deploy it"
   cp kubernetes/deployment/$app-deployment.yaml deploy/.
   replace_env deploy/$app-deployment.yaml
