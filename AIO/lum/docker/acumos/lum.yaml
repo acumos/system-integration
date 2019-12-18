@@ -1,0 +1,41 @@
+version: '3.2'
+# ===============LICENSE_START================================================
+# Acumos Apache-2.0
+# ============================================================================
+# Copyright (C) 2019 Nordix Foundation.
+# ============================================================================
+#  This Acumos software file is distributed by Nordix Foundation
+#  under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#  This file is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#  ===============LICENSE_END==================================================
+
+# docker-compose for License Usage Manager (LUM)
+services:
+  lum-database:
+    image: ${LUM_DATABASE_IMAGE}
+    environment:
+      POSTGRES_USER: ${LUM_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${LUM_POSTGRES_PASSWORD}
+    expose:
+      - 5432
+    restart: on-failure
+  lum-server:
+    # replace username/repo:tag with your name and image details
+    image: ${LUM_IMAGE}
+    depends_on:
+      - lum-database
+    volumes:
+      - ../config/lum-config.json:/opt/app/lum/etc/config.json
+    environment:
+      DATABASE_PASSWORD: ${LUM_POSTGRES_PASSWORD}
+    ports:
+      - "2080:2080"
+    restart: on-failure
