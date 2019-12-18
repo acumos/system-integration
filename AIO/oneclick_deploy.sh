@@ -336,6 +336,7 @@ get_host_ip $ACUMOS_HOST
 update_acumos_env ACUMOS_HOST_IP $HOST_IP force
 update_acumos_env ACUMOS_JWT_KEY $(uuidgen)
 update_acumos_env ACUMOS_CDS_PASSWORD $(uuidgen)
+update_acumos_env LUM_POSTGRES_PASSWORD $(uuidgen)
 
 log "Apply environment customizations to unset values in acumos_env.sh"
 source acumos_env.sh

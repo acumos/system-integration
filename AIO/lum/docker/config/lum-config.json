@@ -1,0 +1,14 @@
+{
+    "lumServer": {
+        "database": {
+            "user": "lum-user",
+            "host": "lum-database",
+            "database": "lumdb",
+            "port": 5432,
+            "max": 10,
+            "idleTimeoutMillis": 30000
+        },
+        "serverName": "lum-server",
+        "maxTxRetryCount": 10
+    }
+}
