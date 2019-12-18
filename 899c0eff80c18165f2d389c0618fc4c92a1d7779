@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bab083ef_0a6f937e",
+        "filename": "AIO/lum/docker/config/lum-config.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 278
+      },
+      "writtenOn": "2019-12-18T18:31:13Z",
+      "side": 1,
+      "message": "has to match to CREATE USER in lum-db/initdb/00_initdb_lumdb.sql \nand \\connect lumdb lumdb in other sql files",
+      "range": {
+        "startLine": 4,
+        "startChar": 21,
+        "endLine": 4,
+        "endChar": 29
+      },
+      "revId": "899c0eff80c18165f2d389c0618fc4c92a1d7779",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
