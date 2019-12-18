@@ -24,46 +24,65 @@
 # - Intended to be called from oneclick_deploy.sh and other scripts in this repo
 #
 
-function prep_lum_k8(){
+function prep_lum(){
   trap 'fail' ERR
-  if [[ $(kubectl create namespace $LUM_NAMESPACE) ]]; then
-    log "Namespace $LUM_NAMESPACE created"
+  if [[ "$DEPLOYED_UNDER" == "k8s" ]]; then
+    if [[ $(kubectl create namespace $LUM_NAMESPACE) ]]; then
+      log "Namespace $LUM_NAMESPACE created"
+    fi
   fi
 }
 
-function cleanup_lum_k8(){
+function cleanup_lum(){
   trap 'fail' ERR
-  if [[ $(helm delete --purge $LUM_RELEASE_NAME) ]]; then
-      log "Helm release $LUM_RELEASE_NAME deleted"
+  if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
+    log "Stop any existing docker based components for lum-service"
+    cs=$(docker ps -a | awk '/lum/{print $1}')
+    for c in $cs; do
+      docker stop $c
+      docker rm $c
+    done
+  else
+    log "Remove LUM release"
+    if [[ $(helm delete --purge $LUM_RELEASE_NAME) ]]; then
+        log "Helm release $LUM_RELEASE_NAME deleted"
+    fi
+    if [[ $(kubectl delete pvc data-${LUM_RELEASE_NAME}-postgresql-0 -n ${LUM_NAMESPACE};) ]]; then
+      log "pvc ${LUM_RELEASE_NAME}-postgresql-0 deleted"
+    fi
+    if [[ $(kubectl wait --for=delete pvc/data-${LUM_RELEASE_NAME}-postgresql-0 -n ${LUM_NAMESPACE} --timeout=60s;) ]]; then
+      log "pvc ${LUM_RELEASE_NAME}-postgresql-0 deleted wait finished"
+    fi
   fi
-  if [[ $(kubectl delete pvc data-${LUM_RELEASE_NAME}-postgresql-0 -n ${LUM_NAMESPACE};) ]]; then
-    log "pvc ${LUM_RELEASE_NAME}-postgresql-0 deleted"
-  fi
-  if [[ $(kubectl wait --for=delete pvc/data-${LUM_RELEASE_NAME}-postgresql-0 -n ${LUM_NAMESPACE} --timeout=60s;) ]]; then
-    log "pvc ${LUM_RELEASE_NAME}-postgresql-0 deleted wait finished"
-  fi
+
 }
 
-function setup_lum_k8() {
+function setup_lum() {
   trap 'fail' ERR
 
-  # Get license-usage-manager repo here
-  # point to path where cloned repo exists
-  ## TODO change to master once merged in
-  ## TODO use a helm registry -- would be better location
-  rm -frd kubernetes/license-usage-manager
-  git clone "https://gerrit.acumos.org/r/license-usage-manager" \
-    kubernetes/license-usage-manager
-  pathToLumHelmChart=./kubernetes/license-usage-manager/lum-helm
-  create_acumos_registry_secret ${LUM_NAMESPACE}
-  replace_env kubernetes/values.yaml
-  # TEMP fix for external name - making it easier for portal to consume in acumos namespace
-  replace_env kubernetes/external-name.yaml
-  # ## copy in dependencies
-  helm dependency build ${pathToLumHelmChart}
-  helm install -f kubernetes/values.yaml --name $LUM_RELEASE_NAME  \
-    --namespace ${LUM_NAMESPACE} --debug  ${pathToLumHelmChart}
-  kubectl apply -f kubernetes/external-name.yaml
+  if [[ "$DEPLOYED_UNDER" == "docker" ]]; then
+    log "Deploy the docker based components for lum"
+    bash docker_compose.sh up -d --build --force-recreate
+    wait_running lum-server
+  else
+    # Get license-usage-manager repo here
+    # point to path where cloned repo exists
+    ## TODO change to master once merged in
+    ## TODO use a helm registry -- would be better location
+    rm -frd kubernetes/license-usage-manager
+    git clone "https://gerrit.acumos.org/r/license-usage-manager" \
+      kubernetes/license-usage-manager
+    pathToLumHelmChart=./kubernetes/license-usage-manager/lum-helm
+    create_acumos_registry_secret ${LUM_NAMESPACE}
+    replace_env kubernetes/values.yaml
+    # TEMP fix for external name - making it easier for portal to consume in acumos namespace
+    replace_env kubernetes/external-name.yaml
+    # ## copy in dependencies
+    helm dependency build ${pathToLumHelmChart}
+    helm install -f kubernetes/values.yaml --name $LUM_RELEASE_NAME  \
+      --namespace ${LUM_NAMESPACE} --debug  ${pathToLumHelmChart}
+    kubectl apply -f kubernetes/external-name.yaml
+  fi
 }
 
 set -x
@@ -83,13 +102,13 @@ LUM_EXTERNAL_NAME=$LUM_RELEASE_NAME-$LUM_CHART_NAME.$LUM_NAMESPACE.svc.cluster.l
 LUM_EXTERNAL_PORT=8080
 
 if [[ "$action" == "clean" || "$action" == "all" ]];
-  then cleanup_lum_k8 $LUM_RELEASE_NAME
+  then cleanup_lum $LUM_RELEASE_NAME
 fi
 if [[ "$action" == "prep" || "$action" == "all" ]];
-  then prep_lum_k8 $LUM_RELEASE_NAME
+  then prep_lum $LUM_RELEASE_NAME
 fi
 if [[ "$action" == "setup" || "$action" == "all" ]];
-  then setup_lum_k8  $LUM_RELEASE_NAME
+  then setup_lum  $LUM_RELEASE_NAME
 fi
 
 cd $WORK_DIR
