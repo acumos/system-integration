@@ -149,7 +149,7 @@ spec:
             },
             "security": {
               "verificationEnableFlag": "<ACUMOS_ENABLE_SECURITY_VERIFICATION>",
-              "verificationApiUrl":"http://sv-scanning-service:9082/scan"
+              "verificationApiUrl":"http://sv-scanning-service:9082"
             }
           }'
         ports:
