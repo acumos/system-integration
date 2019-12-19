@@ -21,21 +21,20 @@
 #
 
 # Images based upon Clio release assembly
-# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_Clio_1910271600
-# plus latest released images
-export MLWB_MODEL_SERVICE_IMAGE=$ACUMOS_RELEASE/model-service:2.0.0
-export MLWB_NOTEBOOK_SERVICE_IMAGE=$ACUMOS_RELEASE/notebook-service:2.0.1
-export MLWB_PIPELINE_SERVICE_IMAGE=$ACUMOS_RELEASE/pipeline-service:2.0.2
-export MLWB_PREDICTOR_SERVICE_IMAGE=$ACUMOS_RELEASE/predictor-service:1.0.0
-export MLWB_PROJECT_SERVICE_IMAGE=$ACUMOS_RELEASE/project-service:2.0.2
-export MLWB_HOME_WEBCOMPONENT_IMAGE=$ACUMOS_RELEASE/acumos/home-webcomponent:2.0.5
-export MLWB_DASHBOARD_WEBCOMPONENT_IMAGE=$ACUMOS_RELEASE/acumos/dashboard-webcomponent:2.0.6
-export MLWB_PROJECT_WEBCOMPONENT_IMAGE=$ACUMOS_RELEASE/acumos/project-webcomponent:2.0.6
-export MLWB_NOTEBOOK_WEBCOMPONENT_IMAGE=$ACUMOS_RELEASE/acumos/notebook-webcomponent:2.0.6
-export MLWB_PIPELINE_WEBCOMPONENT_IMAGE=$ACUMOS_RELEASE/acumos/pipeline-webcomponent:2.0.6
-export MLWB_PROJECT_CATALOG_WEBCOMPONENT_IMAGE=$ACUMOS_RELEASE/acumos/project-catalog-webcomponent:2.0.7
-export MLWB_NOTEBOOK_CATALOG_WEBCOMPONENT_IMAGE=$ACUMOS_RELEASE/acumos/notebook-catalog-webcomponent:2.0.7
-export MLWB_PIPELINE_CATALOG_WEBCOMPONENT_IMAGE=$ACUMOS_RELEASE/acumos/pipeline-catalog-webcomponent:2.0.7
+# https://wiki.acumos.org/display/REL/Weekly+Assembly+Acumos_Clio_1912161300
+export MLWB_MODEL_SERVICE_IMAGE=$ACUMOS_STAGING/model-service:2.0.2
+export MLWB_NOTEBOOK_SERVICE_IMAGE=$ACUMOS_STAGING/notebook-service:2.0.2
+export MLWB_PIPELINE_SERVICE_IMAGE=$ACUMOS_STAGING/pipeline-service:2.0.3
+export MLWB_PREDICTOR_SERVICE_IMAGE=$ACUMOS_STAGING/predictor-service:1.0.2
+export MLWB_PROJECT_SERVICE_IMAGE=$ACUMOS_STAGING/project-service:2.0.3
+export MLWB_HOME_WEBCOMPONENT_IMAGE=$ACUMOS_STAGING/acumos/home-webcomponent:2.0.8
+export MLWB_DASHBOARD_WEBCOMPONENT_IMAGE=$ACUMOS_STAGING/acumos/dashboard-webcomponent:2.0.8
+export MLWB_PROJECT_WEBCOMPONENT_IMAGE=$ACUMOS_STAGING/acumos/project-webcomponent:2.0.8
+export MLWB_NOTEBOOK_WEBCOMPONENT_IMAGE=$ACUMOS_STAGING/acumos/notebook-webcomponent:2.0.8
+export MLWB_PIPELINE_WEBCOMPONENT_IMAGE=$ACUMOS_STAGING/acumos/pipeline-webcomponent:2.0.8
+export MLWB_PROJECT_CATALOG_WEBCOMPONENT_IMAGE=$ACUMOS_STAGING/acumos/project-catalog-webcomponent:2.0.8
+export MLWB_NOTEBOOK_CATALOG_WEBCOMPONENT_IMAGE=$ACUMOS_STAGING/acumos/notebook-catalog-webcomponent:2.0.8
+export MLWB_PIPELINE_CATALOG_WEBCOMPONENT_IMAGE=$ACUMOS_STAGING/acumos/pipeline-catalog-webcomponent:2.0.8
 
 export MLWB_PROJECT_SERVICE_PORT=9088
 export MLWB_NOTEBOOK_SERVICE_PORT=9089

@@ -77,6 +77,10 @@ function setup_jenkins() {
       sed -i -- "/  hostAliases:/a\ \ \ \ - ip: \"$HOST_IP\"\n\ \ \ \ \ \ hostnames:\n\ \ \ \ \ \ - \"$ACUMOS_DEFAULT_SOLUTION_DOMAIN\"" deploy/values.yaml
     fi
   fi
+  if [[ "$ACUMOS_NEXUS_HOST_IP" != "" ]]; then
+    log "Adding hostAlias for $ACUMOS_NEXUS_DOMAIN to Jenkins"
+    sed -i -- "/  hostAliases:/a\ \ \ \ - ip: \"$ACUMOS_NEXUS_HOST_IP\"\n\ \ \ \ \ \ hostnames:\n\ \ \ \ \ \ - \"$ACUMOS_NEXUS_DOMAIN\"" deploy/values.yaml
+  fi
 
   K8S_INGRESS_DOMAIN=$(echo $K8S_INGRESS_ORIGIN | cut -d ':' -f 1)
   get_host_ip $K8S_INGRESS_DOMAIN
