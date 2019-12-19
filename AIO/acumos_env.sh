@@ -26,7 +26,7 @@
 #
 
 # Version of the AIO toolset
-export ACUMOS_AIO_VERSION=3.0.2
+export ACUMOS_AIO_VERSION=3.0.3
 
 # Acumos project Registries
 export ACUMOS_PROJECT_NEXUS_USERNAME=docker
@@ -39,26 +39,25 @@ export ACUMOS_STAGING=nexus3.acumos.org:10004
 export ACUMOS_RELEASE=nexus3.acumos.org:10002
 
 # Images based upon Clio release assembly
-# https://wiki.acumos.org/display/REL/Acumos_Clio_1911291230
-# with latest images in specific cases
+# https://wiki.acumos.org/display/REL/Acumos_Clio_1912161300
 # Core components
 export ACUMOS_DELETE_SNAPSHOTS=false
-export AZURE_CLIENT_IMAGE=$ACUMOS_RELEASE/acumos-azure-client:3.0.2
-export PORTAL_BE_IMAGE=$ACUMOS_STAGING/acumos-portal-be:3.0.23
-export PORTAL_FE_IMAGE=$ACUMOS_STAGING/acumos-portal-fe:3.0.23
+export AZURE_CLIENT_IMAGE=$ACUMOS_STAGING/acumos-azure-client:3.0.3
+export PORTAL_BE_IMAGE=$ACUMOS_STAGING/acumos-portal-be:3.0.24
+export PORTAL_FE_IMAGE=$ACUMOS_STAGING/acumos-portal-fe:3.0.24
 export LICENSE_PROFILE_EDITOR_IMAGE=$ACUMOS_RELEASE/acumos/license-profile-editor:0.0.10
-export LICENSE_RTU_EDITOR_IMAGE=$ACUMOS_RELEASE/acumos/license-rtu-editor:0.1.3
+export LICENSE_RTU_EDITOR_IMAGE=$ACUMOS_RELEASE/acumos/license-rtu-editor:0.1.4
 export LUM_IMAGE=$ACUMOS_RELEASE/acumos/lum-server:0.28.1
 export LUM_DATABASE_IMAGE=$ACUMOS_RELEASE/acumos/lum-db:0.28.1
-export COMMON_DATASERVICE_IMAGE=$ACUMOS_RELEASE/acumos/common-dataservice:3.0.0
-export DESIGNSTUDIO_IMAGE=$ACUMOS_RELEASE/ds-compositionengine:3.0.0
-export FEDERATION_IMAGE=$ACUMOS_RELEASE/acumos/federation-gateway:3.0.2
-export KUBERNETES_CLIENT_IMAGE=$ACUMOS_RELEASE/kubernetes-client:3.0.0
-export MICROSERVICE_GENERATION_IMAGE=$ACUMOS_RELEASE/acumos/microservice-generation:3.6.0
-export ONBOARDING_IMAGE=$ACUMOS_RELEASE/acumos/onboarding-app:3.6.0
-export SECURITY_VERIFICATION_IMAGE=$ACUMOS_STAGING/acumos/security-verification:1.2.1
-export OPENSTACK_CLIENT_IMAGE=$ACUMOS_RELEASE/openstack-client:3.0.0
-export DEPLOYMENT_CLIENT_IMAGE=$ACUMOS_RELEASE/acumos/deployment-client:1.0.1
+export COMMON_DATASERVICE_IMAGE=$ACUMOS_RELEASE/acumos/common-dataservice:3.1.0
+export DESIGNSTUDIO_IMAGE=$ACUMOS_STAGING/ds-compositionengine:3.0.2
+export FEDERATION_IMAGE=$ACUMOS_RELEASE/acumos/federation-gateway:3.1.0
+export KUBERNETES_CLIENT_IMAGE=$ACUMOS_STAGING/kubernetes-client:3.0.1
+export MICROSERVICE_GENERATION_IMAGE=$ACUMOS_STAGING/acumos/microservice-generation:3.8.0
+export ONBOARDING_IMAGE=$ACUMOS_STAGING/acumos/onboarding-app:3.8.0
+export SECURITY_VERIFICATION_IMAGE=$ACUMOS_RELEASE/acumos/security-verification:1.2.2
+export OPENSTACK_CLIENT_IMAGE=$ACUMOS_STAGING/openstack-client:3.0.1
+export DEPLOYMENT_CLIENT_IMAGE=$ACUMOS_STAGING/acumos/deployment-client:1.0.2
 
 # Model-execution-components
 export DATABROKER_SQLBROKER_IMAGE=$ACUMOS_RELEASE/sqldatabroker:1.2.0
@@ -167,7 +166,7 @@ export ACUMOS_ADMIN_EMAIL=acumos@example.com
 export ACUMOS_CDS_PREVIOUS_VERSION=
 export ACUMOS_CDS_HOST=cds-service
 export ACUMOS_CDS_PORT=8000
-export ACUMOS_CDS_VERSION=3.0-rev3
+export ACUMOS_CDS_VERSION=3.1-rev1
 export ACUMOS_CDS_DB='acumos_cds'
 export ACUMOS_CDS_USER=ccds_client
 export ACUMOS_CDS_PASSWORD=
