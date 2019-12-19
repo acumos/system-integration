@@ -20,7 +20,7 @@
 -->
 <project>
   <actions/>
-  <description>Shows the logs of an Acumos component.</description>
+  <description>Runs a command in a pod.</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
@@ -69,6 +69,18 @@
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>COMMAND</name>
+          <description></description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>CONTAINER</name>
+          <description>If a multi-container pod, specify the name of a specific container.</description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -84,10 +96,12 @@
       <command>#!/bin/bash
 set -x
 export KUBECONFIG=/var/jenkins_home/kube-config
-pods=$(kubectl get pods | awk &quot;/$COMPONENT/{print \$1}&quot;)
-for pod in $pods; do
-  kubectl logs $pod
-done</command>
+pod=$(kubectl get pods | grep -v Failed | grep -v Evicted | awk &quot;/$COMPONENT/{print \$1}&quot; | sort | head -1)
+if [[ &quot;$CONTAINER&quot; != &quot;&quot; ]]; then
+  CONTAINER=&quot;-c $CONTAINER&quot;
+fi
+kubectl exec -it $pod $CONTAINER -- $COMMAND
+</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
