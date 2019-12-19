@@ -86,6 +86,7 @@ function setup_jenkins() {
   cat deploy/values.yaml
 
   log "Install Jenkins via Helm via upstream chart"
+  helm repo add stable https://kubernetes-charts.storage.googleapis.com
   helm repo update
   helm install --name $ACUMOS_NAMESPACE-jenkins -f deploy/values.yaml stable/jenkins
 

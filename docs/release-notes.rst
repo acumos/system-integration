@@ -24,11 +24,12 @@ System Integration Release Notes
 ================================
 
 --------------------------
-Version 3.0.2, 18 Dec 2019
+Version 3.0.2, 19 Dec 2019
 --------------------------
 
 * `ACUMOS-3842: Fix Azure-AKS deployment <https://jira.acumos.org/browse/ACUMOS-3842>`_
 
+  * `6159: Support Azure CLI env for install <https://gerrit.acumos.org/r/#/c/system-integration/+/6159/>`_
   * `6132: Federation via LoadBalancer for Azure-AKS <https://gerrit.acumos.org/r/#/c/system-integration/+/6132/>`_
   * `6117: Fix Azure-AKS deployment regression <https://gerrit.acumos.org/r/#/c/system-integration/+/6117/>`_
 
