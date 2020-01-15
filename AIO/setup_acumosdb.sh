@@ -69,7 +69,7 @@ function new_db() {
   # NOTE: Naming convention change in sql scripts as of 3.0-rev2 !
   # See https://github.com/acumos/common-dataservice/tree/master/cmn-data-svc-server/db-scripts
   if [[ $(ls cmn-data-svc-ddl-dml-*) != "" ]]; then rm cmn-data-svc-ddl-dml-*; fi
-  wget https://raw.githubusercontent.com/acumos/common-dataservice/master/cmn-data-svc-server/db-scripts/cmn-data-svc-ddl-dml-$ACUMOS_CDS_VERSION.sql
+  wget https://raw.githubusercontent.com/acumos/common-dataservice/master/cmn-data-svc/cmn-data-svc-server/db-scripts/cmn-data-svc-ddl-dml-$ACUMOS_CDS_VERSION.sql
   sedi "1s/^/use $ACUMOS_CDS_DB;\n/" cmn-data-svc-ddl-dml-$ACUMOS_CDS_VERSION.sql
   mysql $server --user=$ACUMOS_MARIADB_USER --password=$ACUMOS_MARIADB_USER_PASSWORD < cmn-data-svc-ddl-dml-$ACUMOS_CDS_VERSION.sql
 }
@@ -79,7 +79,7 @@ function upgrade_db() {
   log "Upgrading database from CDS version $ACUMOS_CDS_PREVIOUS_VERSION to $ACUMOS_CDS_VERSION"
   upgrade="cmn-data-svc-upgrade-${ACUMOS_CDS_PREVIOUS_VERSION}-to-${ACUMOS_CDS_VERSION}.sql"
   if [[ $(ls ${upgrade}*) != "" ]]; then rm ${upgrade}*; fi
-  wget https://raw.githubusercontent.com/acumos/common-dataservice/master/cmn-data-svc-server/db-scripts/$upgrade
+  wget https://raw.githubusercontent.com/acumos/common-dataservice/master/cmn-data-svc/cmn-data-svc-server/db-scripts/$upgrade
   if [[ -e $upgrade ]]; then
     sedi "1s/^/use $ACUMOS_CDS_DB;\n/" $upgrade
     mysql $server --user=$ACUMOS_MARIADB_USER --password=$ACUMOS_MARIADB_USER_PASSWORD < $upgrade
