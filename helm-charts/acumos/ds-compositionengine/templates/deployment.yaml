@@ -1,0 +1,108 @@
+#
+#============LICENSE_START=======================================================
+# 
+#================================================================================
+# Copyright (C) 2020 AT&T
+#================================================================================
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============LICENSE_END=========================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: {{.Values.global.dsComposition.podName}}
+ namespace: "{{ .Values.global.namespace }}"
+ labels:
+   app: {{.Values.global.dsComposition.name}}
+spec:
+ selector:
+   matchLabels:
+     app: {{.Values.global.dsComposition.name}} 
+ replicas: 1
+ revisionHistoryLimit: 10
+ template:
+   metadata:
+     labels:
+       app: {{.Values.global.dsComposition.name}}
+   spec:
+     containers:
+       - name: ds-compositionengine
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosDesignStudioImage }}
+         ports:
+           - containerPort: {{ .Values.global.acumosPortalDsCompositionPort }}
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{ "server": {
+                    "port": {{ .Values.global.acumosPortalDsCompositionPort }} 
+                    },
+                    "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
+                    "solutionResultsetSize": "2000",
+                    "gdmJarName":"gdmservice-1.2.0.jar",
+                    "cdsCheckInterval": 20000,
+                    "cdsCheckAttempt": 7,
+                    "imagedatabrokerURI":"{{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.global.acumosDataBrokerImage }}",
+                    "csvdatabrokerURI":"{{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.global.acumosCsvDataBrokerImage }}",                    
+                    "sqldatabrokerURI": "{{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.global.acumosSqlDataBrokerImage }}",
+                    "jsondatabrokerURI": "NA",
+                    "lib":"/maven/",
+                    "tosca": { "outputfolder": "/temp/output/" },
+                "nexus": { 
+                         "nexusendpointurl": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}/repository/acumos-k8-models-maven/",
+                         "nexusproxy": "",
+                         "nexuspassword": "{{ .Values.global.acumosNexusPassword }}",
+                         "nexususername": "{{ .Values.global.acumosNexusUsername }}",
+                         "nexusgroupid": "com.artifact" 
+                         },
+                "cmndatasvc": { 
+                              "cmndatasvcendpoinurl": "http://{{.Values.global.cds.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
+                              "cmndatasvcuser": "{{ .Values.global.acumosCdsUser }}",
+                              "cmndatasvcpwd": "{{ .Values.global.acumosCdsPassword }}" 
+                              },
+                "docker": {
+                           "host": "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
+                           "port": {{ .Values.global.acumosDockerPort }},
+                           "config": "/docker_host/.docker",
+                           "registry": {
+                                        "url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
+                                        "username": "{{ .Values.global.acumosNexusUsername }}",
+                                        "password": "{{ .Values.global.acumosNexusPassword }}",
+                                        "email": "{{ .Values.global.acumosDockerRegistryEmail }}"
+                                            },
+                            "tls": {"verify": "false"},
+                            "api": {"version": "1.23"},
+                            "imagetag": {
+                                        "prefix": "{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}"
+                                            },
+                            "max_total_connections": "1",
+                            "max_per_route_connections": "1"
+                            } }'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: acumos-ds-composition-logs 
+       - name: filebeat
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosFilebeatImage }}
+         ports:
+           - containerPort: {{ .Values.global.acumosFilebeatPort }}
+         env:
+           - name: LOGSTASH_HOST
+             value: {{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}
+           - name: LOGSTASH_PORT
+             value: "{{ .Values.global.acumosLogstashPort }}"
+         volumeMounts:
+           - mountPath: /filebeat-logs
+             name: acumos-ds-composition-logs 
+     volumes:
+       - name: acumos-ds-composition-logs   
+         emptyDir: {}
+     imagePullSecrets:
+       - name: acumossecret
