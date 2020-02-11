@@ -1,0 +1,121 @@
+#
+#============LICENSE_START=======================================================
+#
+#================================================================================
+# Copyright (C) 2020 AT&T
+#================================================================================
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============LICENSE_END=========================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: {{.Values.global.portal.portalFe.podName}}
+ namespace: "{{ .Values.global.namespace }}"
+ labels:
+   app: {{.Values.global.portal.portalFe.name}}
+spec:
+ selector:
+   matchLabels:
+     app: {{.Values.global.portal.portalFe.name}}
+ replicas: 1
+ revisionHistoryLimit: 10
+ template:
+   metadata:
+     labels:
+       app: {{.Values.global.portal.portalFe.name}}
+   spec:
+     containers:
+       - name: acumos
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosPortalFeImage }}
+         ports:
+          - containerPort: {{ .Values.global.acumosPortalFePort }}
+            name: acumos
+         env:
+           - name: ACUMOS_DB_HOST
+             value: acumos-mysql.{{ .Values.global.namespace }}
+           - name: ACUMOS_DB_PASSWORD
+             value: {{ .Values.global.acumosMariaDbRootPassword }}
+           - name: SPRING_APPLICATION_JSON
+             value: '{ "server" : {
+                    "port" : {{ .Values.global.acumosPortalFePort }}
+                },
+               "qanda" : {
+                        "url" : "https://stackoverflow.com/questions/tagged/acumos"
+                    },
+               "zuul" : {
+                   "routes" : {
+                      "api" : {
+                        "url": "http://{{.Values.global.portal.portalBe.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalBePort }}"
+                      },
+                      "dsce": {
+                        "url": "http://{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalDsCompositionPort }}"
+                      },
+                      "cmnt" : {
+                         "url" : "http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosPlatOnPort }}"
+                      },
+                      "workbench" : {
+                         "path" : "/workbench/**",
+                         "url" : "http://acumos.{{ .Values.global.namespace }}:9087",
+                         "sensitiveHeaders" : ""
+                      },
+                      "azure" : {
+                          "url" : "http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosAzureClientPort }}"
+                      },
+                      "openstack" : {
+                          "path": "/openstack/**",
+                          "url": "http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosOpenStackClientPort }}",
+                          "stripPrefix": "false",
+                          "sensitiveHeaders": ""
+                        },
+                      "package": {
+                          "path": "/package/**",
+                          "url": "http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosKubernetesClientPort }}",
+                          "stripPrefix": "true",
+                          "sensitiveHeaders": ""
+                        }
+                   },
+                   "host" : {
+                      "connect-timeout-millis" : 300000,
+                      "socket-timeout-millis" : 300000
+                   }
+               },
+               "spring" : {
+                  "http" : {
+                     "multipart" : {
+                        "max-file-size": -1,
+                        "max-request-size": -1
+                     }
+                  }
+               }
+               }'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: portal-fe-logs
+       - name: filebeat
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosFilebeatImage }}
+         ports:
+           - containerPort: {{ .Values.global.acumosFilebeatPort }}
+         env:
+           - name: LOGSTASH_HOST
+             value: {{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}
+           - name: LOGSTASH_PORT
+             value: "{{ .Values.global.acumosLogstashPort }}"
+         volumeMounts:
+           - mountPath: /filebeat-logs
+             name: portal-fe-logs
+     volumes:
+       - name: portal-fe-logs
+         emptyDir: {}
+     imagePullSecrets:
+       - name: acumossecret
