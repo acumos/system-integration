@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "57ccb9eb_14f53ba9",
+        "filename": "helm-charts/global_value.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2020-02-12T16:31:12Z",
+      "side": 1,
+      "message": "this is NOT the release registry - this is the staging registry. The release registry uses port 10002. I don\u0027t think you want me to merge incorrect stuff like this?",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 4
+      },
+      "revId": "e506358b23b1467482b8defaac2dce5dc92868dc",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
