@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e560bea0_22d64b18",
+        "filename": "helm-charts/acumos/common-data-svc/Chart.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2020-02-12T16:07:49Z",
+      "side": 1,
+      "message": "usually this must be AT\u0026T Intellectual Property\n\npls fix everywhere",
+      "range": {
+        "startLine": 5,
+        "startChar": 21,
+        "endLine": 5,
+        "endChar": 25
+      },
+      "revId": "214bf95ed225f81fe9e7ba8a8aca2f6481fc5600",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "682e496d_ca0a4eb0",
+        "filename": "helm-charts/global_value.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2020-02-12T16:07:49Z",
+      "side": 1,
+      "message": "pls add lic header",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 1
+      },
+      "revId": "214bf95ed225f81fe9e7ba8a8aca2f6481fc5600",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
