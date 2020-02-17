@@ -1,0 +1,35 @@
+# Default values for elasticsearch.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+appVersion: "1.0.0"
+
+kibana:
+  image:
+    repository: "nexus3.acumos.org:10004/acumos-kibana"
+    tag: "2.2.2"
+    pullPolicy: "IfNotPresent"
+  tls:
+    crt: 
+    key: 
+  ingress:
+    enabled: false
+    host: ""
+    whitelist:
+      enabled: false
+      ranges: ""
+    letsencrypt:
+      enabled: false
+  initResources: 
+    limits:
+      cpu: "0.25"
+      memory: "128Mi"
+    requests:
+      cpu: "0.1"
+      memory: "128Mi"
+  resources:
+    limits:
+      cpu: "1.0"
+      memory: "512Mi"
+    requests:
+      cpu: "0.25"
+      memory: "512Mi"
