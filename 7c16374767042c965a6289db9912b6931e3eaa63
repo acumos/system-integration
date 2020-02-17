@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a4f2bc4c_649883d5",
+        "filename": "helm-charts/dependencies/k8s-noncore-chart/charts/k8s-noncore-elasticsearch/values.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-02-17T19:57:43Z",
+      "side": 1,
+      "message": "maybe we can remove all the none used value files",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 31
+      },
+      "revId": "7c16374767042c965a6289db9912b6931e3eaa63",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "102bbfb1_d10ff355",
+        "filename": "helm-charts/dependencies/k8s-noncore-chart/charts/k8s-noncore-kibana/templates/configmap.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-02-17T19:57:43Z",
+      "side": 1,
+      "message": "please remove the comment out code",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 34
+      },
+      "revId": "7c16374767042c965a6289db9912b6931e3eaa63",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
