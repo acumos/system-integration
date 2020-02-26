@@ -1,0 +1,107 @@
+{{- /*
+* ===============LICENSE_START=======================================================
+* Acumos Apache-2.0
+* ===================================================================================
+* Copyright (C) 2019-2020  Nordix Foundation & AT&T Intellectual Property
+* ===================================================================================
+* This Acumos software file is distributed by Nordix Foundation & AT&T
+* under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* This file is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+* ===============LICENSE_END=========================================================
+*/ -}}
+
+{{- /*
+Lum service deployment
+*/ -}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "lum-helm.fullname" . }}
+  labels:
+    app: {{ template "lum-helm.name" . }}
+    chart: {{ template "lum-helm.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "lum-helm.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "lum-helm.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      {{ if .Values.image.pullSecrets -}}
+      imagePullSecrets:
+      - name: {{ .Values.image.pullSecrets }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-postgresql
+                  key: postgresql-password
+            - name: NODE
+          initContainers:
+            - name: wait-for-db
+              image: "{{ .Values.initContainerImage }}"
+              command:
+              - 'sh'
+              - '-c'
+              - >
+                until nc -z -w 2 {{ .Release.Name }}-postgresql {{ .Values.postgresql.servicePort }} && echo postgresql ok;
+                  do sleep 2;
+                done
+          volumeMounts:
+          - name: config-volume
+            mountPath: /opt/app/lum/etc/config.json
+            subPath: lum-config.json
+          ports:
+            - name: http
+              containerPort: 2080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: '/api/healthcheck'
+              port: http
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          failureThreshold: 10
+          readinessProbe:
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          failureThreshold: 10
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ .Release.Name }}-configmap
