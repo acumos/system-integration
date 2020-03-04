@@ -73,6 +73,11 @@ global:
     acumosProxyPort: "3128"
     acumosSecurityVerificationPort: "9099"
     acumosValidationPort: "9603"
+    acumosProjectServicePort: "9088"
+    acumosNotebookServicePort: "9089"
+    acumosPipelineServicePort: "9090"
+    acumosModelServicePort: "9091"
+    acumosPredictorServicePort: "9094"
 
     # Images
     acumosAzureClientImage: "acumos-azure-client:2.0.15"
@@ -104,6 +109,11 @@ global:
     acumosProtoViewerImage: "acumos_proto_viewer:1.5.7"
     acumosSecurityVerificationImage: "security-verification:0.0.24"
     acumosSqlDataBrokerImage: "sqldatabroker:1.2.0"
+    acumosProjectServiceImage: "project-service:2.0.4"
+    acumosNotebookServiceImage: "notebook-service:2.0.3"
+    acumosPipelineServiceImage: "pipeline-service:2.0.4"
+    acumosModelServiceImage: "model-service:2.0.3"
+    acumosPredictorServiceImage: "predictor-service:1.0.3"
 
     # Azure client
     acumosAzureContainerNamePrefix: "******"
@@ -217,3 +227,28 @@ global:
         name: 'acumos-ds-composition'
         podName: 'acumos-k8s-ds-composition'
         svcName: 'ds-composition'
+    
+    mlwb:
+        useexternalpipeline: true
+        useexternalnotebook: true
+        projectService:
+            name: 'acumos-mlwb-project-service'
+            podName: 'acumos-k8s-mlwb-project-service' 
+            svcName: 'mlwb-project-service'
+        notebookService:
+            name: 'acumos-mlwb-notebook-service'
+            podName: 'acumos-k8s-mlwb-notebook-service' 
+            svcName: 'mlwb-notebook-service'
+        pipelineService:
+            name: 'acumos-mlwb-pipeline-service'
+            podName: 'acumos-k8s-mlwb-pipeline-service' 
+            svcName: 'mlwb-pipeline-service'
+        modelService:
+            name: 'acumos-mlwb-model-service'
+            podName: 'acumos-k8s-mlwb-model-service' 
+            svcName: 'mlwb-model-service'
+        predictorService:
+            name: 'acumos-mlwb-predictor-service'
+            podName: 'acumos-k8s-mlwb-predictor-service' 
+            svcName: 'mlwb-predictor-service'
+        
