@@ -33,7 +33,6 @@ global:
     acumosBluePrintPort: "8555"
     acumosCmsPort: "9080"
     acumosCommonDataSvcPort: "8000"
-    acumosDashboardWebComponentPort: "9083"
     acumosDataBrokerInternalPort: "8080"
     acumosDataBrokerPort: "8556"
     acumosDeployedSolutionPort: "3330"
@@ -44,7 +43,6 @@ global:
     acumosFederationGatewayPort: "9084"
     acumosFederationLocalPort: "9884"
     acumosFilebeatPort: "5000"
-    acumosHomeWebComponentPort: "9082"
     acumosKibanaPort: "5601"
     acumosKongAdmSslPort: "8444"
     acumosKongAdminPort: "8001"
@@ -58,8 +56,6 @@ global:
     acumosMicroServiceGenerationPort: "8333"
     acumosNexusEndpointPort: "8081"
     acumosNexusPort: "8001"
-    acumosNotebookCatalogWebComponentPort: "9087"
-    acumosNotebookWebComponentPort: "9086"
     acumosOnboardingAppPort: "8090"
     acumosOpenStackClientPort: "8007"
     acumosOpenStackSolutionPort: "8336"
@@ -68,11 +64,22 @@ global:
     acumosPortalDsCompositionPort: "8088"
     acumosPortalFePort: "8085"
     acumosProbePort: "5006"
-    acumosProjectCatalogWebComponentPort: "9085"
-    acumosProjectWebComponentPort: "9088"
     acumosProxyPort: "3128"
     acumosSecurityVerificationPort: "9099"
     acumosValidationPort: "9603"
+    acumosProjectServicePort: "9088"
+    acumosNotebookServicePort: "9089"
+    acumosPipelineServicePort: "9090"
+    acumosModelServicePort: "9091"
+    acumosPredictorServicePort: "9094"
+    acumosDashboardWebcomponentPort: "9083"
+    acumosHomeWebcomponentPort: "9082"
+    acumosNotebookCatalogWebcomponentPort: "9087"
+    acumosNotebookWebcomponentPort: "9086"
+    acumosPipelineCatalogWebcomponentPort: "9092"
+    acumosPipelineWebcomponentPort: "9091"
+    acumosProjectCatalogWebcomponentPort: "9085"
+    acumosProjectWebcomponentPort: "9084"
 
     # Images
     acumosAzureClientImage: "acumos-azure-client:2.0.15"
@@ -104,6 +111,19 @@ global:
     acumosProtoViewerImage: "acumos_proto_viewer:1.5.7"
     acumosSecurityVerificationImage: "security-verification:0.0.24"
     acumosSqlDataBrokerImage: "sqldatabroker:1.2.0"
+    acumosProjectServiceImage: "project-service:2.0.4"
+    acumosNotebookServiceImage: "notebook-service:2.0.3"
+    acumosPipelineServiceImage: "pipeline-service:2.0.4"
+    acumosModelServiceImage: "model-service:2.0.3"
+    acumosPredictorServiceImage: "predictor-service:1.0.3"
+    acumosDashboardWebcomponentImage: "dashboard-webcomponent:2.0.9"
+    acumosHomeWebcomponentImage: "home-webcomponent:2.0.9"
+    acumosNotebookCatalogWebcomponentImage: "notebook-catalog-webcomponent:2.0.9"
+    acumosNotebookWebcomponentImage: "notebook-webcomponent:2.0.9"
+    acumosPipelineCatalogWebcomponentImage: "pipeline-catalog-webcomponent:2.0.9"
+    acumosPipelineWebcomponentImage: "pipeline-webcomponent:2.0.9"
+    acumosProjectCatalogWebcomponentImage: "project-catalog-webcomponent:2.0.9"
+    acumosProjectWebcomponentImage: "project-webcomponent:2.0.9"
 
     # Azure client
     acumosAzureContainerNamePrefix: "******"
@@ -183,6 +203,34 @@ global:
     acumosQandAUrl: "******"
     acumosTrustStorePwd: "******"
 
+    # Jupyter
+    acumosJupyterHub:
+        url: "******"
+        token: "******"
+        storepass: "******"
+        installcert: "false" 
+	acumosJupyterNotebook: 
+        url: "******"
+
+    #NIFI
+    acumosNifi:
+        createpod: false
+        adminuser: "******"
+        serviceurl: "******"
+        registryurl: "******"
+        registryname: "******"
+        namespace: "default"
+
+    #CouchDB
+    acumosCouchDB:
+        user: "******"
+        pwd: "******"
+        dbname: "******"
+        createdb: true
+        protocol: "http"
+        host: "******"
+        port: "30385"
+
     cds:
         name: 'acumos-common-data-svc'
         podName: 'acumos-k8s-cds'
@@ -217,3 +265,59 @@ global:
         name: 'acumos-ds-composition'
         podName: 'acumos-k8s-ds-composition'
         svcName: 'ds-composition'
+    
+    mlwb:
+        useexternalpipeline: true
+        useexternalnotebook: true
+        projectService:
+            name: 'acumos-mlwb-project-service'
+            podName: 'acumos-k8s-mlwb-project-service'
+            svcName: 'mlwb-project-service'
+        notebookService:
+            name: 'acumos-mlwb-notebook-service'
+            podName: 'acumos-k8s-mlwb-notebook-service'
+            svcName: 'mlwb-notebook-service'
+        pipelineService:
+            name: 'acumos-mlwb-pipeline-service'
+            podName: 'acumos-k8s-mlwb-pipeline-service'
+            svcName: 'mlwb-pipeline-service'
+        modelService:
+            name: 'acumos-mlwb-model-service'
+            podName: 'acumos-k8s-mlwb-model-service'
+            svcName: 'mlwb-model-service'
+        predictorService:
+            name: 'acumos-mlwb-predictor-service'
+            podName: 'acumos-k8s-mlwb-predictor-service'
+            svcName: 'mlwb-predictor-service'
+        dashboardWebcomponent:
+            name: 'acumos-mlwb-dashboard-webcomponent'
+            podName: 'acumos-k8s-mlwb-dashboard-webcomponent'
+            svcName: 'mlwb-dashboard-webcomponent'
+        homeWebcomponent:
+            name: 'acumos-mlwb-home-webcomponent'
+            podName: 'acumos-k8s-mlwb-home-webcomponent'
+            svcName: 'mlwb-home-webcomponent'
+        notebookCatalogWebcomponent:
+            name: 'acumos-mlwb-notebook-catalog-webcomponent'
+            podName: 'acumos-k8s-mlwb-notebook-catalog-webcomponent'
+            svcName: 'mlwb-notebook-catalog-webcomponent'
+        notebookWebcomponent:
+            name: 'acumos-mlwb-notebook-webcomponent'
+            podName: 'acumos-k8s-mlwb-notebook-webcomponent'
+            svcName: 'mlwb-notebook-webcomponent'
+        pipelineCatalogWebcomponent:
+            name: 'acumos-mlwb-pipeline-catalog-webcomponent'
+            podName: 'acumos-k8s-mlwb-pipeline-catalog-webcomponent'
+            svcName: 'mlwb-pipeline-catalog-webcomponent'
+        pipelineWebcomponent:
+            name: 'acumos-mlwb-pipeline-webcomponent'
+            podName: 'acumos-k8s-mlwb-pipeline-webcomponent'
+            svcName: 'mlwb-pipeline-webcomponent'
+        projectCatalogWebcomponent:
+            name: 'acumos-mlwb-project-catalog-webcomponent'
+            podName: 'acumos-k8s-mlwb-project-catalog-webcomponent'
+            svcName: 'mlwb-project-catalog-webcomponent'
+        projectWebcomponent:
+            name: 'acumos-mlwb-project-webcomponent'
+            podName: 'acumos-k8s-mlwb-project-webcomponent'
+            svcName: 'mlwb-project-webcomponent'

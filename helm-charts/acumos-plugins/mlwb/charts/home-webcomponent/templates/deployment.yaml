@@ -1,0 +1,74 @@
+#
+#============LICENSE_START=======================================================
+# Acumos Apache-2.0
+#================================================================================
+# Copyright (C) 2020 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+#================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============LICENSE_END=========================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: {{ .Values.global.mlwb.homeWebcomponent.podName }}
+ namespace: "{{ .Values.global.namespace }}"
+ labels:
+   app: {{ .Values.global.mlwb.homeWebcomponent.name }}
+spec:
+ selector:
+   matchLabels:
+     app: {{ .Values.global.mlwb.homeWebcomponent.name }}
+ replicas: 1
+ revisionHistoryLimit: 10
+ template:
+   metadata:
+     labels:
+       app: {{ .Values.global.mlwb.homeWebcomponent.name }}
+   spec:
+     containers:
+       - name: home-webcomponent
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosHomeWebcomponentImage }}
+         ports:
+           - containerPort: {{ .Values.global.acumosHomeWebcomponentPort }}
+         env:
+           - name: ES_JAVA_OPTS
+             value: "-Xmx256m -Xms256m"
+           - name: ENVIRONMENT
+             value: "deploy"
+           - name: dashboardComponent
+             value: "http://{{ .Values.global.mlwb.dashboardWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosDashboardWebcomponentPort }}"
+           - name: projectComponent
+             value: "http://{{ .Values.global.mlwb.projectWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosProjectWebcomponentPort }}"
+           - name: projectCatalogComponent
+             value: "http://{{ .Values.global.mlwb.projectCatalogWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosProjectCatalogWebcomponentPort }}"
+           - name: notebookComponent
+             value: "http://{{ .Values.global.mlwb.notebookWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNotebookWebcomponentPort }}"
+           - name: notebookCatalogComponent
+             value: "http://{{ .Values.global.mlwb.notebookCatalogWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNotebookCatalogWebcomponentPort }}"
+           - name: pipelineComponent
+             value: "http://{{ .Values.global.mlwb.pipelineWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPipelineWebcomponentPort }}"
+           - name: pipelineCatalogComponent
+             value: "http://{{ .Values.global.mlwb.pipelineCatalogWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPipelineCatalogWebcomponentPort }}"
+           - name: portalFEURL
+             value: "http://{{ .Values.global.portal.portalFe.svcName }}.{{ .Values.global.namespace }}"
+           - name: menuItems
+             value: '[{"title": "Dashboard", "icon": "fa fa-tachometer-alt", "link": "/pages/dashboard", "home": true}, {"title": "Projects", "icon": "fa fa-project-diagram", "link": "/pages/projects/catalog"}, {"title": "Notebooks", "icon": "fas fa-book-open", "link": "/pages/notebook/catalog"}, {"title": "Data Pipelines", "icon": "fa fa-code-branch", "link": "/pages/pipeline/catalog"}, {"title": "AcuCompose", "icon": "fas fa-crop-alt", "link": "/pages/acuCompose"}]'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: home-webcomponent-logs
+     volumes:
+       - name: home-webcomponent-logs
+         emptyDir: {}
+     imagePullSecrets:
+       - name: acumossecret
