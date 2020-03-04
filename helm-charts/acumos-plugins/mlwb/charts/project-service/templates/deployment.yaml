@@ -1,0 +1,77 @@
+#
+#============LICENSE_START=======================================================
+# Acumos Apache-2.0
+#================================================================================
+# Copyright (C) 2020 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+#================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============LICENSE_END=========================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: {{.Values.global.mlwb.projectService.podName}}
+ namespace: "{{ .Values.global.namespace }}"
+ labels:
+   app: {{.Values.global.mlwb.projectService.name}}
+spec:
+ selector:
+   matchLabels:
+     app: {{.Values.global.mlwb.projectService.name}}
+ replicas: 1
+ revisionHistoryLimit: 10
+ template:
+   metadata:
+     labels:
+       app: {{.Values.global.mlwb.projectService.name}}
+   spec:
+     containers:
+       - name: {{.Values.global.mlwb.projectService.svcName}}
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosProjectServiceImage }}
+         ports:
+           - containerPort: {{ .Values.global.acumosProjectServicePort }}
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{
+                "server":{
+                    "port":{{ .Values.global.acumosProjectServicePort }}
+                },
+                "resultsetSize":"2000",
+                "cmndatasvc" : {
+                    "cmndatasvcendpointurl":"http://{{ .Values.global.cds.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
+                    "cmndatasvcuser":"{{ .Values.global.acumosCdsUser }}",
+                    "cmndatasvcpwd":"{{ .Values.global.acumosCdsPassword }}"
+                },
+                "couchdb":{
+                    "user":{{ .Values.global.acumosCouchDB.user }},
+                    "pwd":{{ .Values.global.acumosCouchDB.pwd }},
+                    "name":{{ .Values.global.acumosCouchDB.dbname }},
+                    "createdb":{
+                        "if-not-exist":{{ .Values.global.acumosCouchDB.createdb }}
+                    },
+                    "protocol":{{ .Values.global.acumosCouchDB.protocol }},
+                    "host":{{ .Values.global.acumosCouchDB.host }},
+                    "port":{{ .Values.global.acumosCouchDB.port }}
+                },
+                "jwt" : {
+                    "secretkey":"secret"
+                }}'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: project-service-logs
+     volumes:
+       - name: project-service-logs
+         emptyDir: {}
+     imagePullSecrets:
+       - name: acumossecret
