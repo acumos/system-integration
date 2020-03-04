@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d9561110_e6c07e20",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/model-service/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-04T15:20:58Z",
+      "side": 1,
+      "message": "The white spaces need to be cleaned.",
+      "range": {
+        "startLine": 59,
+        "startChar": 18,
+        "endLine": 59,
+        "endChar": 22
+      },
+      "revId": "b005b6aafb736c04399bf6509f0c254259a3e658",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "38cb0ceb_27f318e5",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/model-service/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-04T15:20:58Z",
+      "side": 1,
+      "message": "white space",
+      "range": {
+        "startLine": 65,
+        "startChar": 43,
+        "endLine": 65,
+        "endChar": 44
+      },
+      "revId": "b005b6aafb736c04399bf6509f0c254259a3e658",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bc033362_1a001611",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/notebook-service/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-04T15:20:58Z",
+      "side": 1,
+      "message": "Do not push any internal URLs and secrets. Please parameterize those information.",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 89
+      },
+      "revId": "b005b6aafb736c04399bf6509f0c254259a3e658",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f7f11599_4176954c",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/pipeline-service/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-04T15:20:58Z",
+      "side": 1,
+      "message": "We should use Kunbernetes service DNS name to access the NiFi service.",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 61
+      },
+      "revId": "b005b6aafb736c04399bf6509f0c254259a3e658",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fd8ece50_82f59ca6",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/predictor-service/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-04T15:20:58Z",
+      "side": 1,
+      "message": "Do not push any internal URLs and secrets. Please parameterize those information.",
+      "range": {
+        "startLine": 57,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 18
+      },
+      "revId": "b005b6aafb736c04399bf6509f0c254259a3e658",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "daee68f3_67391125",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/project-service/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-04T15:20:58Z",
+      "side": 1,
+      "message": "Do not push any internal URLs and secrets. Please parameterize those information.",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 66,
+        "endChar": 19
+      },
+      "revId": "b005b6aafb736c04399bf6509f0c254259a3e658",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
