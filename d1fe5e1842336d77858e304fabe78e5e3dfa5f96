@@ -1,0 +1,188 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4a2fead6_ae421420",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/dashboard-webcomponent/templates/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-05T15:48:06Z",
+      "side": 1,
+      "message": "white space",
+      "range": {
+        "startLine": 45,
+        "startChar": 31,
+        "endLine": 45,
+        "endChar": 32
+      },
+      "revId": "d1fe5e1842336d77858e304fabe78e5e3dfa5f96",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a3ec7cf9_bc1e1322",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/dashboard-webcomponent/templates/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-05T15:48:06Z",
+      "side": 1,
+      "message": "why all those URL point to same service end point?  {{ .Values.global.cds.svcName }}",
+      "range": {
+        "startLine": 49,
+        "startChar": 10,
+        "endLine": 59,
+        "endChar": 31
+      },
+      "revId": "d1fe5e1842336d77858e304fabe78e5e3dfa5f96",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "62925523_f286dee1",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/home-webcomponent/templates/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-05T15:48:06Z",
+      "side": 1,
+      "message": "why all those URL point to same service end point?  {{ .Values.global.cds.svcName }}",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 92
+      },
+      "revId": "d1fe5e1842336d77858e304fabe78e5e3dfa5f96",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8ea51a73_b20b7113",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/notebook-catalog-webcomponent/templates/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-05T15:48:06Z",
+      "side": 1,
+      "message": "please check the URL, why cds service has acumosPipelineServicePort?",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 163
+      },
+      "revId": "d1fe5e1842336d77858e304fabe78e5e3dfa5f96",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3a6b8863_d6904c50",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/notebook-webcomponent/templates/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-05T15:48:06Z",
+      "side": 1,
+      "message": "please check the URL",
+      "range": {
+        "startLine": 49,
+        "startChar": 10,
+        "endLine": 50,
+        "endChar": 163
+      },
+      "revId": "d1fe5e1842336d77858e304fabe78e5e3dfa5f96",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7d594f3f_2d23aa25",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/predictor-service/templates/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-05T15:48:06Z",
+      "side": 1,
+      "message": "Please parameterize those information. Hard code configuration will not work if we deploy this chart to another env.",
+      "range": {
+        "startLine": 57,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 18
+      },
+      "revId": "d1fe5e1842336d77858e304fabe78e5e3dfa5f96",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cc453274_d54b0992",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/project-catalog-webcomponent/templates/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-05T15:48:06Z",
+      "side": 1,
+      "message": "Please check URL",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 162
+      },
+      "revId": "d1fe5e1842336d77858e304fabe78e5e3dfa5f96",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "788c10f2_4c33133d",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/project-service/templates/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-05T15:48:06Z",
+      "side": 1,
+      "message": "Please parameterize those information.",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 66,
+        "endChar": 19
+      },
+      "revId": "d1fe5e1842336d77858e304fabe78e5e3dfa5f96",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
