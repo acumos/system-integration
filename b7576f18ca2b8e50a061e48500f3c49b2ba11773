@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eac1acde_ee2702f7",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/dashboard-webcomponent/templates/deployment.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-06T15:14:03Z",
+      "side": 1,
+      "message": "{{ .Values.global.mlwb.dashboardWebcomponent.svcName }} is the value of kubernetes service name. But here you used that value to assign to the container name.",
+      "range": {
+        "startLine": 40,
+        "startChar": 9,
+        "endLine": 40,
+        "endChar": 70
+      },
+      "revId": "b7576f18ca2b8e50a061e48500f3c49b2ba11773",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
