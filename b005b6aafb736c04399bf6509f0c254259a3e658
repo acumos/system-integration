@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "8bc0f5fb_b06c8183",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/model-service/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 11
+      },
+      "writtenOn": "2020-03-06T13:16:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d9561110_e6c07e20",
+      "range": {
+        "startLine": 59,
+        "startChar": 18,
+        "endLine": 59,
+        "endChar": 22
+      },
+      "revId": "b005b6aafb736c04399bf6509f0c254259a3e658",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "38cb0ceb_27f318e5",
         "filename": "helm-charts/acumos-plugins/mlwb/charts/model-service/templates/deployment.yaml",
         "patchSetId": 1
@@ -45,6 +69,30 @@
       "revId": "b005b6aafb736c04399bf6509f0c254259a3e658",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "42bf7564_ed748b45",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/model-service/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 11
+      },
+      "writtenOn": "2020-03-06T13:16:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "38cb0ceb_27f318e5",
+      "range": {
+        "startLine": 65,
+        "startChar": 43,
+        "endLine": 65,
+        "endChar": 44
+      },
+      "revId": "b005b6aafb736c04399bf6509f0c254259a3e658",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     },
     {
       "key": {
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "10e96864_87ef13c3",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/notebook-service/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 11
+      },
+      "writtenOn": "2020-03-06T13:16:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc033362_1a001611",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 89
+      },
+      "revId": "b005b6aafb736c04399bf6509f0c254259a3e658",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f7f11599_4176954c",
         "filename": "helm-charts/acumos-plugins/mlwb/charts/pipeline-service/templates/deployment.yaml",
         "patchSetId": 1
@@ -91,6 +163,30 @@
       "revId": "b005b6aafb736c04399bf6509f0c254259a3e658",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4ae4729e_b8ee78ec",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/pipeline-service/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 11
+      },
+      "writtenOn": "2020-03-06T13:16:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7f11599_4176954c",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 61
+      },
+      "revId": "b005b6aafb736c04399bf6509f0c254259a3e658",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     },
     {
       "key": {
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "340df336_0e98921f",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/predictor-service/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 11
+      },
+      "writtenOn": "2020-03-06T13:16:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fd8ece50_82f59ca6",
+      "range": {
+        "startLine": 57,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 18
+      },
+      "revId": "b005b6aafb736c04399bf6509f0c254259a3e658",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "daee68f3_67391125",
         "filename": "helm-charts/acumos-plugins/mlwb/charts/project-service/templates/deployment.yaml",
         "patchSetId": 1
@@ -137,6 +257,30 @@
       "revId": "b005b6aafb736c04399bf6509f0c254259a3e658",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "46df748a_3c53a484",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/project-service/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 11
+      },
+      "writtenOn": "2020-03-06T13:16:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "daee68f3_67391125",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 66,
+        "endChar": 19
+      },
+      "revId": "b005b6aafb736c04399bf6509f0c254259a3e658",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
