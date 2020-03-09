@@ -22,6 +22,30 @@
       "revId": "b7576f18ca2b8e50a061e48500f3c49b2ba11773",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4037bd66_0a8d2c24",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/dashboard-webcomponent/templates/deployment.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 11
+      },
+      "writtenOn": "2020-03-09T11:37:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eac1acde_ee2702f7",
+      "range": {
+        "startLine": 40,
+        "startChar": 9,
+        "endLine": 40,
+        "endChar": 70
+      },
+      "revId": "b7576f18ca2b8e50a061e48500f3c49b2ba11773",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
