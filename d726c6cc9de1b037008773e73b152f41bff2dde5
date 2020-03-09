@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5dbf7df9_6acbdf66",
+        "filename": "helm-charts/acumos-plugins/mlwb/charts/project-webcomponent/templates/deployment.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 3
+      },
+      "writtenOn": "2020-03-09T20:22:03Z",
+      "side": 1,
+      "message": "Will these URLs change in future?\nIf not, then why do we need multiple key/value pairs, we can just use projectWikiURL and remove others.",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 59
+      },
+      "revId": "d726c6cc9de1b037008773e73b152f41bff2dde5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
