@@ -40,7 +40,7 @@ spec:
    spec:
      containers:
        - name:  federation-gateway
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosFederationImage }}
+         image: {{ .Values.global.image.repository }}/acumos/{{ .Values.global.acumosFederationImage }}
          ports:
            - containerPort: {{ .Values.global.acumosFederationGatewayPort }}
          env:
@@ -101,7 +101,7 @@ spec:
            - mountPath: /app/certs
              name: acumos-certs
        - name: filebeat
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosFilebeatImage }}
+         image: {{ .Values.global.image.repository }}/acumos/{{ .Values.global.acumosFilebeatImage }}
          ports:
            - containerPort: {{ .Values.global.acumosFilebeatPort }}
          env:
@@ -118,5 +118,7 @@ spec:
            secretName: acumos-certs
        - name: acumos-federation-logs
          emptyDir: {}
+     {{ if .Values.global.image.pullSecrets-}}
      imagePullSecrets:
-       - name: acumossecret
+       - name: {{ .Values.global.image.pullSecrets }}
+     {{- end }}

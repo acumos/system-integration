@@ -37,7 +37,7 @@ spec:
    spec:
      containers:
        - name:  cds
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosCdsImage }}
+         image: {{ .Values.global.image.repository }}/acumos/{{ .Values.global.acumosCdsImage }}
          ports:
            - containerPort: {{ .Values.global.acumosCommonDataSvcPort }}
          env:
@@ -69,7 +69,7 @@ spec:
            - mountPath: /maven/logs
              name: common-data-svc-logs
        - name: filebeat
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosFilebeatImage }}
+         image: {{ .Values.global.image.repository }}/acumos/{{ .Values.global.acumosFilebeatImage }}
          ports:
            - containerPort: {{ .Values.global.acumosFilebeatPort }}
          env:
@@ -83,5 +83,7 @@ spec:
      volumes:
        - name: common-data-svc-logs
          emptyDir: {}
+     {{ if .Values.global.image.pullSecrets-}}
      imagePullSecrets:
-       - name: acumossecret
+       - name: {{ .Values.global.image.pullSecrets }}
+     {{- end }}

@@ -37,7 +37,7 @@ spec:
    spec:
      containers:
        - name: onboarding-app
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosOnboardingImage }}
+         image: {{.Values.global.image.repository }}/acumos/{{ .Values.global.acumosOnboardingImage }}
          ports:
            - containerPort: {{ .Values.global.acumosOnboardingAppPort }}
          env:
@@ -103,13 +103,13 @@ spec:
                        }
                      }
                    },
-                 "base_image": { "rimage": "{{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.global.acumosOnboardingBaseRImage }}","dockerusername": "{{ .Values.global.acumosDockerUsername }}","dockerpassword": "{{ .Values.global.acumosDockerPassword }}"}
+                 "base_image": { "rimage": "{{.Values.global.image.repository }}/{{ .Values.global.acumosOnboardingBaseRImage }}","dockerusername": "{{ .Values.global.acumosDockerUsername }}","dockerpassword": "{{ .Values.global.acumosDockerPassword }}"}
                  }'
          volumeMounts:
            - mountPath: /maven/logs
              name: acumos-onboarding-logs
        - name: filebeat
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosFilebeatImage }}
+         image: {{.Values.global.image.repository }}/acumos/{{ .Values.global.acumosFilebeatImage }}
          ports:
            - containerPort: {{ .Values.global.acumosFilebeatPort }}
          env:
@@ -123,5 +123,7 @@ spec:
      volumes:
        - name: acumos-onboarding-logs
          emptyDir: {}
+     {{ if .Values.global.image.pullSecrets-}}
      imagePullSecrets:
-       - name: acumossecret
+       - name: {{ .Values.global.image.pullSecrets }}
+     {{- end }}
