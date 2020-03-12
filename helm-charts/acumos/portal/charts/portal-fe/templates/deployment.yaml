@@ -38,7 +38,7 @@ spec:
    spec:
      containers:
        - name: acumos
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosPortalFeImage }}
+         image: {{.Values.global.image.repository }}/acumos/{{ .Values.global.acumosPortalFeImage }}
          ports:
           - containerPort: {{ .Values.global.acumosPortalFePort }}
             name: acumos
@@ -100,7 +100,7 @@ spec:
            - mountPath: /maven/logs
              name: portal-fe-logs
        - name: filebeat
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosFilebeatImage }}
+         image: {{.Values.global.image.repository }}/acumos/{{ .Values.global.acumosFilebeatImage }}
          ports:
            - containerPort: {{ .Values.global.acumosFilebeatPort }}
          env:
@@ -114,5 +114,7 @@ spec:
      volumes:
        - name: portal-fe-logs
          emptyDir: {}
+     {{ if .Values.global.image.pullSecrets -}}
      imagePullSecrets:
-       - name: acumossecret
+       - name: {{ .Values.global.image.pullSecrets }}
+     {{- end }}

@@ -38,7 +38,7 @@ spec:
    spec:
      containers:
        - name: acumos-portal-be
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosPortalBeImage }}
+         image: {{.Values.global.image.repository }}/acumos/{{ .Values.global.acumosPortalBeImage }}
          ports:
            - containerPort: {{ .Values.global.acumosPortalBePort }}
          env:
@@ -196,7 +196,7 @@ spec:
            - mountPath: /app/certs
              name: acumos-certs
        - name: filebeat
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosFilebeatImage }}
+         image: {{.Values.global.image.repository }}/acumos/{{ .Values.global.acumosFilebeatImage }}
          ports:
            - containerPort: {{ .Values.global.acumosFilebeatPort }}
          env:
@@ -216,6 +216,7 @@ spec:
        - name: acumos-certs
          secret:
            secretName: acumos-certs
-
+     {{ if .Values.global.image.pullSecrets -}}
      imagePullSecrets:
-       - name: acumossecret
+       - name: {{ .Values.global.image.pullSecrets }}
+     {{- end }}
