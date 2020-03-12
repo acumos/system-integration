@@ -23,6 +23,13 @@ global:
     namespace: "******"
     clusterName: "******"
 
+    image:
+        repository: "nexus3.acumos.org:10002"
+        #enable this session  if the docker repository has credentials
+#       pullSecrets: acumos-registry
+#       username: docker
+#       password: docker
+
     # Linux Foundation Component Image Location
     nexus3ReleaseRegistryLf: "nexus3.acumos.org:10002"
     nexus3StagingRegistryLf: "nexus3.acumos.org:10004"
@@ -209,7 +216,7 @@ global:
         token: "******"
         storepass: "******"
         installcert: "false" 
-	acumosJupyterNotebook: 
+    :acumosJupyterNotebook: 
         url: "******"
 
     #NIFI

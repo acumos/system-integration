@@ -38,7 +38,7 @@ spec:
    spec:
      containers:
        - name: acumos-portal-be
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosPortalBeImage }}
+         image: {{.Values.global.image.repository }}/acumos/{{ .Values.global.acumosPortalBeImage }}
          ports:
            - containerPort: {{ .Values.global.acumosPortalBePort }}
          env:
@@ -191,12 +191,10 @@ spec:
          volumeMounts:
            - mountPath: /maven/logs
              name: portal-be-logs
-           - mountPath: /images/sidebar-icons
-             name: acumos-images
            - mountPath: /app/certs
              name: acumos-certs
        - name: filebeat
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosFilebeatImage }}
+         image: {{.Values.global.image.repository }}/acumos/{{ .Values.global.acumosFilebeatImage }}
          ports:
            - containerPort: {{ .Values.global.acumosFilebeatPort }}
          env:
@@ -210,12 +208,10 @@ spec:
      volumes:
        - name: portal-be-logs
          emptyDir: {}
-       - name: acumos-images
-         configMap:
-           name: acumos-image-configmap
        - name: acumos-certs
          secret:
            secretName: acumos-certs
-
+     {{ if .Values.global.image.pullSecrets -}}
      imagePullSecrets:
-       - name: acumossecret
+       - name: {{ .Values.global.image.pullSecrets }}
+     {{- end }}

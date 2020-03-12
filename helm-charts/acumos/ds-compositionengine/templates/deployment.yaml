@@ -38,7 +38,7 @@ spec:
    spec:
      containers:
        - name: ds-compositionengine
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosDesignStudioImage }}
+         image: {{ .Values.global.image.repository }}/acumos/{{ .Values.global.acumosDesignStudioImage }}
          ports:
            - containerPort: {{ .Values.global.acumosPortalDsCompositionPort }}
          env:
@@ -51,9 +51,9 @@ spec:
                     "gdmJarName":"gdmservice-1.2.0.jar",
                     "cdsCheckInterval": 20000,
                     "cdsCheckAttempt": 7,
-                    "imagedatabrokerURI":"{{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.global.acumosDataBrokerImage }}",
-                    "csvdatabrokerURI":"{{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.global.acumosCsvDataBrokerImage }}",
-                    "sqldatabrokerURI": "{{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.global.acumosSqlDataBrokerImage }}",
+                    "imagedatabrokerURI":"{{ .Values.global.image.repository }}/{{ .Values.global.acumosDataBrokerImage }}",
+                    "csvdatabrokerURI":"{{ .Values.global.image.repository }}/{{ .Values.global.acumosCsvDataBrokerImage }}",
+                    "sqldatabrokerURI": "{{ .Values.global.image.repository }}/{{ .Values.global.acumosSqlDataBrokerImage }}",
                     "jsondatabrokerURI": "NA",
                     "lib":"/maven/",
                     "tosca": { "outputfolder": "/temp/output/" },
@@ -91,7 +91,7 @@ spec:
            - mountPath: /maven/logs
              name: acumos-ds-composition-logs
        - name: filebeat
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosFilebeatImage }}
+         image: {{ .Values.global.image.repository }}/acumos/{{ .Values.global.acumosFilebeatImage }}
          ports:
            - containerPort: {{ .Values.global.acumosFilebeatPort }}
          env:
@@ -105,5 +105,7 @@ spec:
      volumes:
        - name: acumos-ds-composition-logs
          emptyDir: {}
+     {{ if .Values.global.image.pullSecrets -}}
      imagePullSecrets:
-       - name: acumossecret
+       - name: {{ .Values.global.image.pullSecrets }}
+     {{- end }}
