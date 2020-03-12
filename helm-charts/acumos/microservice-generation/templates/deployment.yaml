@@ -1,22 +1,20 @@
-#
-#============LICENSE_START=======================================================
+# ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
-#================================================================================
-# Copyright (C) 2020 AT&T Intellectual Property. All rights reserved.
-#================================================================================
-# This Acumos software file is distributed by AT&T
-# Licensed under the Apache License, Version 2.0 (the "License");
+# ===================================================================================
+# Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
+# This file is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# ============LICENSE_END=========================================================
+# ===============LICENSE_END=========================================================
 
 apiVersion: apps/v1
 kind: Deployment
@@ -38,7 +36,7 @@ spec:
    spec:
      containers:
        - name: microservice-generation
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosMicroServiceGenerationImage }}
+         image: {{.Values.global.image.repository }}/acumos/{{ .Values.global.acumosMicroServiceGenerationImage }}
          ports:
            - containerPort: {{ .Values.global.acumosMicroServiceGenerationPort }}
          env:
@@ -103,7 +101,7 @@ spec:
                      "H2O" : "2.2.3"
                    },
                    "base_image": {
-                     "rimage": "{{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.global.acumosmicroserviceGenerationBaseRImage }}",
+                     "rimage": "{{.Values.global.image.repository }}/{{ .Values.global.acumosmicroserviceGenerationBaseRImage }}",
                      "dockerusername": "{{ .Values.global.acumosDockerUsername }}",
                      "dockerpassword": "{{ .Values.global.acumosDockerPassword }}"
                    },
@@ -120,7 +118,7 @@ spec:
            - mountPath: /maven/logs
              name: acumos-microservice-generation-logs
        - name: filebeat
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosFilebeatImage }}
+         image: {{.Values.global.image.repository }}/acumos/{{ .Values.global.acumosFilebeatImage }}
          ports:
            - containerPort: {{ .Values.global.acumosFilebeatPort }}
          env:
@@ -134,5 +132,7 @@ spec:
      volumes:
        - name: acumos-microservice-generation-logs
          emptyDir: {}
+     {{ if .Values.global.image.pullSecrets -}}
      imagePullSecrets:
-       - name: acumossecret
+       - name: {{ .Values.global.image.pullSecrets }}
+     {{- end }}

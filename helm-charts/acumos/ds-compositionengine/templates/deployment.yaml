@@ -1,22 +1,20 @@
-#
-#============LICENSE_START=======================================================
+# ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
-#================================================================================
-# Copyright (C) 2020 AT&T Intellectual Property. All rights reserved.
-#================================================================================
-# This Acumos software file is distributed by AT&T
-# Licensed under the Apache License, Version 2.0 (the "License");
+# ===================================================================================
+# Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
+# This file is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# ============LICENSE_END=========================================================
+# ===============LICENSE_END=========================================================
 
 apiVersion: apps/v1
 kind: Deployment
@@ -38,7 +36,7 @@ spec:
    spec:
      containers:
        - name: ds-compositionengine
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosDesignStudioImage }}
+         image: {{ .Values.global.image.repository }}/acumos/{{ .Values.global.acumosDesignStudioImage }}
          ports:
            - containerPort: {{ .Values.global.acumosPortalDsCompositionPort }}
          env:
@@ -51,9 +49,9 @@ spec:
                     "gdmJarName":"gdmservice-1.2.0.jar",
                     "cdsCheckInterval": 20000,
                     "cdsCheckAttempt": 7,
-                    "imagedatabrokerURI":"{{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.global.acumosDataBrokerImage }}",
-                    "csvdatabrokerURI":"{{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.global.acumosCsvDataBrokerImage }}",
-                    "sqldatabrokerURI": "{{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.global.acumosSqlDataBrokerImage }}",
+                    "imagedatabrokerURI":"{{ .Values.global.image.repository }}/{{ .Values.global.acumosDataBrokerImage }}",
+                    "csvdatabrokerURI":"{{ .Values.global.image.repository }}/{{ .Values.global.acumosCsvDataBrokerImage }}",
+                    "sqldatabrokerURI": "{{ .Values.global.image.repository }}/{{ .Values.global.acumosSqlDataBrokerImage }}",
                     "jsondatabrokerURI": "NA",
                     "lib":"/maven/",
                     "tosca": { "outputfolder": "/temp/output/" },
@@ -91,7 +89,7 @@ spec:
            - mountPath: /maven/logs
              name: acumos-ds-composition-logs
        - name: filebeat
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosFilebeatImage }}
+         image: {{ .Values.global.image.repository }}/acumos/{{ .Values.global.acumosFilebeatImage }}
          ports:
            - containerPort: {{ .Values.global.acumosFilebeatPort }}
          env:
@@ -105,5 +103,7 @@ spec:
      volumes:
        - name: acumos-ds-composition-logs
          emptyDir: {}
+     {{ if .Values.global.image.pullSecrets -}}
      imagePullSecrets:
-       - name: acumossecret
+       - name: {{ .Values.global.image.pullSecrets }}
+     {{- end }}
