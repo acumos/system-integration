@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "01e3da64_755a4a85",
+        "filename": "helm-charts/acumos/prerequisite/templates/ccds_client_secret.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-18T20:04:46Z",
+      "side": 1,
+      "message": "please add logic let user can assign username via value file also.",
+      "range": {
+        "startLine": 8,
+        "startChar": 1,
+        "endLine": 8,
+        "endChar": 38
+      },
+      "revId": "fb7d2bb162e9e95e2283c167dd4339702b2b55b5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ac6d7f6b_c6ab7b4e",
+        "filename": "helm-charts/acumos/prerequisite/templates/ccds_client_secret.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-18T20:04:46Z",
+      "side": 1,
+      "message": "why you add this logic here? Is that user can only assign password equal to \"ccds_client\"?",
+      "range": {
+        "startLine": 9,
+        "startChar": 47,
+        "endLine": 9,
+        "endChar": 97
+      },
+      "revId": "fb7d2bb162e9e95e2283c167dd4339702b2b55b5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
