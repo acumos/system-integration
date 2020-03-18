@@ -40,6 +40,14 @@ spec:
          ports:
            - containerPort: {{ .Values.global.acumosPortalBePort }}
          env:
+           - name: "cdms.client.url"
+             value: "http://acumos-cds:{{ .Values.acumosCommonDataSvcPort }}/ccds"
+           - name: "cdms.client.username"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: username }
+           - name: "cdms.client.password"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: password }
            - name: SPRING_APPLICATION_JSON
              value: '{ "server" : {
                    "port" : {{ .Values.global.acumosPortalBePort }}
@@ -51,13 +59,13 @@ spec:
                         "username": "{{ .Values.global.acumosNexusUsername }}",
                         "groupid": "com.artifact"
                 },
-                "cdms" : {
-                  "client" : {
-                     "url": "http://{{.Values.global.cds.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
-                     "username": "{{ .Values.global.acumosCdsUser }}",
-                     "password": "{{ .Values.global.acumosCdsPassword }}"
-                     }
-                },
+#                "cdms" : {
+#                  "client" : {
+#                     "url": "http://{{.Values.global.cds.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
+#                     "username": "{{ .Values.global.acumosCdsUser }}",
+#                     "password": "{{ .Values.global.acumosCdsPassword }}"
+#                     }
+#                },
                 "docker" : {
                    "host" : "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
                    "registry" : {

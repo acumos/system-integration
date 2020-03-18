@@ -40,6 +40,14 @@ spec:
          ports:
            - containerPort: {{ .Values.global.acumosMicroServiceGenerationPort }}
          env:
+           - name: "cmndatasvc.cmnDataSvcEndPoinURL"
+		     value: "http://{{.Values.global.cds.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds"
+		   - name: "cmndatasvc.cmnDataSvcUser"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: username }
+		   - name: "cmndatasvc.cmnDataSvcPwd"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: password }
            - name: SPRING_APPLICATION_JSON
              value: '{
                    "server":{
@@ -76,11 +84,11 @@ spec:
                             "nexusproxy": "",
                             "nexusGroupId": "com.artifact"
                            },
-                   "cmndatasvc": {
-                                "cmnDataSvcEndPoinURL": "http://{{.Values.global.cds.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
-                                "cmnDataSvcUser": "{{ .Values.global.acumosCdsUser }}",
-                                "cmnDataSvcPwd": "{{ .Values.global.acumosCdsPassword }}"
-                               },
+#                   "cmndatasvc": {
+#                                "cmnDataSvcEndPoinURL": "http://{{.Values.global.cds.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
+#                                "cmnDataSvcUser": "{{ .Values.global.acumosCdsUser }}",
+#                                "cmnDataSvcPwd": "{{ .Values.global.acumosCdsPassword }}"
+#                               },
                    "mktPlace": {
                      "mktPlaceEndPointURL": "http://{{.Values.global.portal.portalBe.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalBePort }}"
                    },
