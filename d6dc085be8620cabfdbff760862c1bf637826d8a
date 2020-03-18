@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "77e52fef_c4d52b1a",
+        "filename": "helm-charts/acumos/prerequisite/templates/ccds_client_secret.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-18T20:41:10Z",
+      "side": 1,
+      "message": "where is else?",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 55
+      },
+      "revId": "d6dc085be8620cabfdbff760862c1bf637826d8a",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "06eaba50_5005bcd6",
+        "filename": "helm-charts/acumos/prerequisite/templates/ccds_client_secret.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-18T20:41:10Z",
+      "side": 1,
+      "message": "clean!",
+      "range": {
+        "startLine": 12,
+        "startChar": 9,
+        "endLine": 12,
+        "endChar": 62
+      },
+      "revId": "d6dc085be8620cabfdbff760862c1bf637826d8a",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
