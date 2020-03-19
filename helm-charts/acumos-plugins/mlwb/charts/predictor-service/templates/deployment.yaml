@@ -21,31 +21,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{.Values.global.mlwb.predictorService.podName}}
+ name: {{.Values.mlwb.predictorService.podName}}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{.Values.global.mlwb.predictorService.name}}
+   app: {{.Values.mlwb.predictorService.name}}
 spec:
  selector:
    matchLabels:
-     app: {{.Values.global.mlwb.predictorService.name}}
+     app: {{.Values.mlwb.predictorService.name}}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{.Values.global.mlwb.predictorService.name}}
+       app: {{.Values.mlwb.predictorService.name}}
    spec:
      containers:
        - name: predictor-service
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosPredictorServiceImage }}
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.acumosNotebookServicePort }}
          ports:
-           - containerPort: {{ .Values.global.acumosPredictorServicePort }}
+           - containerPort: {{ .Values.acumosPredictorServicePort }}
          env:
            - name: SPRING_APPLICATION_JSON
              value: '{
                 "server":{
-                    "port":{{ .Values.global.acumosPredictorServicePort }}
+                    "port":{{ .Values.acumosPredictorServicePort }}
                 },
                 "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
                 "resultsetSize":"2000",
@@ -54,25 +54,25 @@ spec:
                     "user":"{{ .Values.global.acumosCdsUser }}",
                     "pwd":"{{ .Values.global.acumosCdsPassword }}"
                 },
-                "couchdb":{ 
-                    "user":{{ .Values.global.acumosCouchDB.user }}, 
-                    "pwd":{{ .Values.global.acumosCouchDB.pwd }}, 
-                    "name":{{ .Values.global.acumosCouchDB.dbname }}, 
-                    "createdb":{ 
-                        "if-not-exist":{{ .Values.global.acumosCouchDB.createdb }}
-                    }, 
-                    "protocol":{{ .Values.global.acumosCouchDB.protocol }}, 
-                    "host":{{ .Values.global.acumosCouchDB.host }}, 
-                    "port":{{ .Values.global.acumosCouchDB.port }}
+                "couchdb":{
+                    "user":{{ .Values.acumosCouchDB.user }},
+                    "pwd":{{ .Values.acumosCouchDB.pwd }},
+                    "name":{{ .Values.acumosCouchDB.dbname }},
+                    "createdb":{
+                        "if-not-exist":{{ .Values.acumosCouchDB.createdb }}
+                    },
+                    "protocol":{{ .Values.acumosCouchDB.protocol }},
+                    "host":{{ .Values.acumosCouchDB.host }},
+                    "port":{{ .Values.acumosCouchDB.port }}
                 },
                 "projectservice": {
-                    "url": "http://{{.Values.global.mlwb.projectService.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosProjectServicePort }}/mlWorkbench/v1/project"
+                    "url": "http://{{.Values.mlwb.projectService.svcName}}.{{ .Values.global.namespace }}:{{ .Values.acumosProjectServicePort }}/mlWorkbench/v1/project"
                 },
                 "modelservice": {
-                    "url": "http://{{.Values.global.mlwb.modelService.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosModelServicePort }}/mlWorkbench/v1/modelservice"
+                    "url": "http://{{.Values.mlwb.modelService.svcName}}.{{ .Values.global.namespace }}:{{ .Values.acumosModelServicePort }}/mlWorkbench/v1/modelservice"
                 },
                 "jwt" : {
-                    "secretkey":"secret" 
+                    "secretkey":"secret"
                 }}'
          volumeMounts:
            - mountPath: /maven/logs

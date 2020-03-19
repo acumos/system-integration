@@ -21,16 +21,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.global.mlwb.homeWebcomponent.svcName }}
+  name: {{ .Values.mlwb.homeWebcomponent.svcName }}
   namespace: "{{ .Values.namespace }}"
   labels:
-    app: {{ .Values.global.mlwb.homeWebcomponent.name }}
+    app: {{ .Values.mlwb.homeWebcomponent.name }}
 spec:
   type: ClusterIP
   ports:
-    - port: {{ .Values.global.acumosHomeWebcomponentPort }}
-      targetPort: {{ .Values.global.acumosHomeWebcomponentPort }}
+    - port: {{ .Values.acumosHomeWebcomponentPort }}
+      targetPort: {{ .Values.acumosHomeWebcomponentPort }}
       protocol: TCP
-      name: {{ .Values.global.mlwb.homeWebcomponent.svcName }}
+      name: {{ .Values.mlwb.homeWebcomponent.svcName }}
   selector:
-    app: {{ .Values.global.mlwb.homeWebcomponent.name }}
+    app: {{ .Values.mlwb.homeWebcomponent.name }}

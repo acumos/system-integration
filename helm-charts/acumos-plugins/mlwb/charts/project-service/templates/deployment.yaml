@@ -21,31 +21,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{.Values.global.mlwb.projectService.podName}}
+ name: {{.Values.mlwb.projectService.podName}}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{.Values.global.mlwb.projectService.name}}
+   app: {{.Values.mlwb.projectService.name}}
 spec:
  selector:
    matchLabels:
-     app: {{.Values.global.mlwb.projectService.name}}
+     app: {{.Values.mlwb.projectService.name}}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{.Values.global.mlwb.projectService.name}}
+       app: {{.Values.mlwb.projectService.name}}
    spec:
      containers:
        - name: project-service
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosProjectServiceImage }}
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.acumosProjectServiceImage }}
          ports:
-           - containerPort: {{ .Values.global.acumosProjectServicePort }}
+           - containerPort: {{ .Values.acumosProjectServicePort }}
          env:
            - name: SPRING_APPLICATION_JSON
              value: '{
                 "server":{
-                    "port":{{ .Values.global.acumosProjectServicePort }}
+                    "port":{{ .Values.acumosProjectServicePort }}
                 },
                 "resultsetSize":"2000",
                 "cmndatasvc" : {
@@ -54,15 +54,15 @@ spec:
                     "cmndatasvcpwd":"{{ .Values.global.acumosCdsPassword }}"
                 },
                 "couchdb":{
-                    "user":{{ .Values.global.acumosCouchDB.user }},
-                    "pwd":{{ .Values.global.acumosCouchDB.pwd }},
-                    "name":{{ .Values.global.acumosCouchDB.dbname }},
+                    "user":{{ .Values.acumosCouchDB.user }},
+                    "pwd":{{ .Values.acumosCouchDB.pwd }},
+                    "name":{{ .Values.acumosCouchDB.dbname }},
                     "createdb":{
-                        "if-not-exist":{{ .Values.global.acumosCouchDB.createdb }}
+                        "if-not-exist":{{ .Values.acumosCouchDB.createdb }}
                     },
-                    "protocol":{{ .Values.global.acumosCouchDB.protocol }},
-                    "host":{{ .Values.global.acumosCouchDB.host }},
-                    "port":{{ .Values.global.acumosCouchDB.port }}
+                    "protocol":{{ .Values.acumosCouchDB.protocol }},
+                    "host":{{ .Values.acumosCouchDB.host }},
+                    "port":{{ .Values.acumosCouchDB.port }}
                 },
                 "jwt" : {
                     "secretkey":"secret"
