@@ -22,6 +22,30 @@
       "revId": "56e9d86bf9431f356d32da7fc220483794d01273",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bc208742_55666748",
+        "filename": "helm-charts/acumos/common-data-svc/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 24
+      },
+      "writtenOn": "2020-03-19T17:18:24Z",
+      "side": 1,
+      "message": "That\u0027s how it will work and i have showed in the demo.",
+      "parentUuid": "49f2fca5_54cae61e",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 30
+      },
+      "revId": "56e9d86bf9431f356d32da7fc220483794d01273",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
     }
   ]
 }
