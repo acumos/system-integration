@@ -21,16 +21,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{.Values.global.mlwb.predictorService.svcName}}
+  name: {{.Values.mlwb.predictorService.svcName}}
   namespace: "{{ .Values.namespace }}"
   labels:
-    app: {{.Values.global.mlwb.predictorService.name}}
+    app: {{.Values.mlwb.predictorService.name}}
 spec:
   type: ClusterIP
   ports:
-    - port: {{ .Values.global.acumosPredictorServicePort }}
-      targetPort: {{ .Values.global.acumosPredictorServicePort }}
+    - port: {{ .Values.acumosPredictorServicePort }}
+      targetPort: {{ .Values.acumosPredictorServicePort }}
       protocol: TCP
-      name: {{.Values.global.mlwb.predictorService.svcName}}
+      name: {{.Values.mlwb.predictorService.svcName}}
   selector:
-    app: {{.Values.global.mlwb.predictorService.name}}
+    app: {{.Values.mlwb.predictorService.name}}

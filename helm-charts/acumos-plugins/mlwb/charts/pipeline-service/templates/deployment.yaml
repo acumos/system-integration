@@ -21,54 +21,54 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{.Values.global.mlwb.pipelineService.podName}}
+ name: {{.Values.mlwb.pipelineService.podName}}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{.Values.global.mlwb.pipelineService.name}}
+   app: {{.Values.mlwb.pipelineService.name}}
 spec:
  selector:
    matchLabels:
-     app: {{.Values.global.mlwb.pipelineService.name}}
+     app: {{.Values.mlwb.pipelineService.name}}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{.Values.global.mlwb.pipelineService.name}}
+       app: {{.Values.mlwb.pipelineService.name}}
    spec:
      containers:
        - name: pipeline-service
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosPipelineServiceImage }}
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.acumosPipelineServiceImage }}
          ports:
-           - containerPort: {{ .Values.global.acumosPipelineServicePort }}
+           - containerPort: {{ .Values.acumosPipelineServicePort }}
          env:
            - name: SPRING_APPLICATION_JSON
              value: '{
                 "server":{
-                    "port":{{ .Values.global.acumosPipelineServicePort }}
+                    "port":{{ .Values.acumosPipelineServicePort }}
                 },
                 "resultsetSize":"2000",
                 "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
                 "projectservice": {
-                    "url" : "http://{{ .Values.global.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosProjectServicePort }}/mlWorkbench/v1/project"
+                    "url" : "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosProjectServicePort }}/mlWorkbench/v1/project"
                 },
                 "cmndatasvc" : {
                     "url":"http://{{ .Values.global.cds.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
                     "user":"{{ .Values.global.acumosCdsUser }}",
-                    "pwd":"{{ .Values.global.acumosCdsPassword }}" 
+                    "pwd":"{{ .Values.global.acumosCdsPassword }}"
                 },
                 "jwt" : {
                     "secretkey":"secret"
                 },
                 "nifi": {
-                    "createpod": {{ .Values.global.acumosNifi.createpod }},
-                    "adminusername": {{ .Values.global.acumosNifi.adminuser }},
-                    "serviceurl": {{ .Values.global.acumosNifi.serviceurl }},
-                    "registryurl": {{ .Values.global.acumosNifi.registryurl }},
-                    "registryname": {{ .Values.global.acumosNifi.registryname }},
-                    "namespace": {{ .Values.global.acumosNifi.namespace }}
+                    "createpod": {{ .Values.acumosNifi.createpod }},
+                    "adminusername": {{ .Values.acumosNifi.adminuser }},
+                    "serviceurl": {{ .Values.acumosNifi.serviceurl }},
+                    "registryurl": {{ .Values.acumosNifi.registryurl }},
+                    "registryname": {{ .Values.acumosNifi.registryname }},
+                    "namespace": {{ .Values.acumosNifi.namespace }}
                 },
-                "useexternalpipeline": {{ .Values.global.mlwb.useexternalpipeline }}
+                "useexternalpipeline": {{ .Values.mlwb.useexternalpipeline }}
                 }'
          volumeMounts:
            - mountPath: /maven/logs

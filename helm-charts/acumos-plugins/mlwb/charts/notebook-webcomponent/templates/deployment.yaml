@@ -21,37 +21,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{ .Values.global.mlwb.notebookWebcomponent.podName }}
+ name: {{ .Values.mlwb.notebookWebcomponent.podName }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{ .Values.global.mlwb.notebookWebcomponent.name }}
+   app: {{ .Values.mlwb.notebookWebcomponent.name }}
 spec:
  selector:
    matchLabels:
-     app: {{ .Values.global.mlwb.notebookWebcomponent.name }}
+     app: {{ .Values.mlwb.notebookWebcomponent.name }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{ .Values.global.mlwb.notebookWebcomponent.name }}
+       app: {{ .Values.mlwb.notebookWebcomponent.name }}
    spec:
      containers:
        - name: notebook-webcomponent
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosNotebookWebcomponentImage }}
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.acumosNotebookWebcomponentImage }}
          ports:
-           - containerPort: {{ .Values.global.acumosNotebookWebcomponentPort }}
+           - containerPort: {{ .Values.acumosNotebookWebcomponentPort }}
          env:
            - name: ES_JAVA_OPTS
              value: "-Xmx256m -Xms256m"
            - name: ENVIRONMENT
              value: "deploy"
            - name: notebookmSURL
-             value: "http://{{ .Values.global.mlwb.notebookService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNotebookServicePort }}/mlWorkbench/v1/notebook"
+             value: "http://{{ .Values.mlwb.notebookService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosNotebookServicePort }}/mlWorkbench/v1/notebook"
            - name: notebookWikiURL
              value: "https://wiki.acumos.org/display/TRAIN"
            - name: useExternalNotebook
-             value: "{{ .Values.global.mlwb.useexternalnotebook }}"
+             value: "{{ .Values.mlwb.useexternalnotebook }}"
          volumeMounts:
            - mountPath: /maven/logs
              name: notebook-webcomponent-logs
