@@ -40,6 +40,14 @@ spec:
          ports:
            - containerPort: {{ .Values.global.acumosPortalDsCompositionPort }}
          env:
+           - name: "cmndatasvc.cmndatasvcendpoinurl"
+             value: "http://{{.Values.global.cds.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds"
+           - name: "cmndatasvc.cmndatasvcuser": 
+	     valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: username }
+           - name: "cmndatasvc.cmndatasvcpwd"
+	     valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: password }
            - name: SPRING_APPLICATION_JSON
              value: '{ "server": {
                     "port": {{ .Values.global.acumosPortalDsCompositionPort }}
@@ -62,11 +70,6 @@ spec:
                          "nexususername": "{{ .Values.global.acumosNexusUsername }}",
                          "nexusgroupid": "com.artifact"
                          },
-                "cmndatasvc": {
-                              "cmndatasvcendpoinurl": "http://{{.Values.global.cds.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
-                              "cmndatasvcuser": "{{ .Values.global.acumosCdsUser }}",
-                              "cmndatasvcpwd": "{{ .Values.global.acumosCdsPassword }}"
-                              },
                 "docker": {
                            "host": "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
                            "port": {{ .Values.global.acumosDockerPort }},
