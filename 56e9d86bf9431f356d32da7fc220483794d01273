@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "49f2fca5_54cae61e",
+        "filename": "helm-charts/acumos/common-data-svc/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-03-19T13:32:06Z",
+      "side": 1,
+      "message": "why you remove this ?",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 30
+      },
+      "revId": "56e9d86bf9431f356d32da7fc220483794d01273",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
