@@ -214,7 +214,7 @@ global:
         token: "******"
         storepass: "******"
         installcert: "false" 
-    :acumosJupyterNotebook: 
+    acumosJupyterNotebook: 
         url: "******"
 
     #NIFI

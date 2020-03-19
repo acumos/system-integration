@@ -37,6 +37,8 @@ spec:
      containers:
        - name: microservice-generation
          image: {{.Values.global.image.repository }}/acumos/{{ .Values.global.acumosMicroServiceGenerationImage }}
+         resources:
+           {{- toYaml .Values.resources | nindent 10 }}
          ports:
            - containerPort: {{ .Values.global.acumosMicroServiceGenerationPort }}
          env:

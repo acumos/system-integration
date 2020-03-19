@@ -37,6 +37,8 @@ spec:
      containers:
        - name:  cds
          image: {{ .Values.global.image.repository }}/acumos/{{ .Values.global.acumosCdsImage }}
+         resources:
+           {{- toYaml .Values.resources | nindent 10 }}
          ports:
            - containerPort: {{ .Values.global.acumosCommonDataSvcPort }}
          env:

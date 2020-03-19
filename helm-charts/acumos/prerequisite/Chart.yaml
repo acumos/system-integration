@@ -16,6 +16,7 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 
+apiVersion: v1
 name: prerequisite
 home:
 source:
