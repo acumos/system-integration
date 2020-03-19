@@ -40,6 +40,14 @@ spec:
          ports:
            - containerPort: {{ .Values.global.acumosOnboardingAppPort }}
          env:
+           - name: "cmndatasvc.cmnDataSvcEndPoinURL"
+		     value: "http://{{.Values.global.cds.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds"
+		   - name: "cmndatasvc.cmnDataSvcUser"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: username }
+		   - name: "cmndatasvc.cmnDataSvcPwd"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: password }
            - name: SPRING_APPLICATION_JSON
              value: '{ "server" :{
                    "port" : {{ .Values.global.acumosOnboardingAppPort }},
@@ -70,11 +78,6 @@ spec:
                             "nexusproxy": "",
                             "nexusGroupId": "com.artifact"
                            },
-                 "cmndatasvc": {
-                                "cmnDataSvcEndPoinURL": "http://{{.Values.global.cds.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
-                                "cmnDataSvcUser": "{{ .Values.global.acumosCdsUser }}",
-                                "cmnDataSvcPwd": "{{ .Values.global.acumosCdsPassword }}"
-                               },
                  "tosca": {
                             "OutputFolder" : "/temp/",
                             "GeneratorEndPointURL": "http://acumos.acumos-ns01:8080/model_create"

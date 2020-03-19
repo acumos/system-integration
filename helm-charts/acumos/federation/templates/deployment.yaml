@@ -42,6 +42,14 @@ spec:
          ports:
            - containerPort: {{ .Values.global.acumosFederationGatewayPort }}
          env:
+           - name: "cdms.client.url"
+		     value: "http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds"
+		   - name: "cdms.client.username"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: username }
+           - name: "cdms.client.password"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: password }
            - name: SPRING_APPLICATION_JSON
              value: '{ "federation" : {
                "instance" : "gateway",
@@ -85,13 +93,7 @@ spec:
                "jobchecker": {
                  "interval": 300
                }
-             },
-             "cdms" : {
-               "client" : {
-                 "url": "http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
-                 "username": "{{ .Values.global.acumosCdsUser }}",
-                 "password": "{{ .Values.global.acumosCdsPassword }}"
-               }
+             }
              }}'
          volumeMounts:
            - mountPath: /maven/logs
