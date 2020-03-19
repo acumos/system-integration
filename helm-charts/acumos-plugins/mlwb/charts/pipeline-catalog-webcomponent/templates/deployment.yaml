@@ -21,43 +21,43 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{ .Values.global.mlwb.pipelineCatalogWebcomponent.podName }}
+ name: {{ .Values.mlwb.pipelineCatalogWebcomponent.podName }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{ .Values.global.mlwb.pipelineCatalogWebcomponent.name }}
+   app: {{ .Values.mlwb.pipelineCatalogWebcomponent.name }}
 spec:
  selector:
    matchLabels:
-     app: {{ .Values.global.mlwb.pipelineCatalogWebcomponent.name }}
+     app: {{ .Values.mlwb.pipelineCatalogWebcomponent.name }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{ .Values.global.mlwb.pipelineCatalogWebcomponent.name }}
+       app: {{ .Values.mlwb.pipelineCatalogWebcomponent.name }}
    spec:
      containers:
        - name: pipeline-catalog-webcomponent
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosPipelineCatalogWebcomponentImage }}
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.acumosPipelineCatalogWebcomponentImage: }}
          ports:
-           - containerPort: {{ .Values.global.acumosPipelineCatalogWebcomponentPort }}
+           - containerPort: {{ .Values.acumosPipelineCatalogWebcomponentPort }}
          env:
            - name: ES_JAVA_OPTS
              value: "-Xmx256m -Xms256m"
            - name: ENVIRONMENT
              value: "deploy"
            - name: projectmSURL
-             value: "http://{{ .Values.global.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosProjectServicePort }}/mlWorkbench/v1/project"
+             value: "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosProjectServicePort }}/mlWorkbench/v1/project"
            - name: notebookmSURL
-             value: "http://{{ .Values.global.mlwb.notebookService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNotebookServicePort }}/mlWorkbench/v1/notebook"
+             value: "http://{{ .Values.mlwb.notebookService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosNotebookServicePort }}/mlWorkbench/v1/notebook"
            - name: pipelinemSURL
-             value: "http://{{ .Values.global.mlwb.notebookService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPipelineServicePort }}/mlWorkbench/v1/pipeline"
+             value: "http://{{ .Values.mlwb.notebookService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosPipelineServicePort }}/mlWorkbench/v1/pipeline"
            - name: pipelineWikiURL
              value: "https://wiki.acumos.org/display/TRAIN"
            - name: createTimeout
              value: 60000
            - name: useExternalPipeline
-             value: "{{ .Values.global.mlwb.useexternalpipeline }}"
+             value: "{{ .Values.mlwb.useexternalpipeline }}"
          volumeMounts:
            - mountPath: /maven/logs
              name: pipeline-catalog-webcomponent-logs

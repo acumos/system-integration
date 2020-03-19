@@ -21,31 +21,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{.Values.global.mlwb.notebookService.podName}}
+ name: {{.Values.mlwb.notebookService.podName}}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{.Values.global.mlwb.notebookService.name}}
+   app: {{.Values.mlwb.notebookService.name}}
 spec:
  selector:
    matchLabels:
-     app: {{.Values.global.mlwb.notebookService.name}}
+     app: {{.Values.mlwb.notebookService.name}}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{.Values.global.mlwb.notebookService.name}}
+       app: {{.Values.mlwb.notebookService.name}}
    spec:
      containers:
        - name: notebook-service
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosNotebookServiceImage }}
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.acumosNotebookServiceImage }}
          ports:
-           - containerPort: {{ .Values.global.acumosNotebookServicePort }}
+           - containerPort: {{ .Values.acumosNotebookServicePort }}
          env:
            - name: SPRING_APPLICATION_JSON
              value: '{
                 "server":{
-                    "port":{{ .Values.global.acumosNotebookServicePort }}
+                    "port":{{ .Values.acumosNotebookServicePort }}
                 },
                 "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
                 "resultsetSize" : 2000,
@@ -56,13 +56,13 @@ spec:
                     "pwd": "{{ .Values.global.acumosCdsPassword }}"
                 },
                 "projectservice": {
-                    "url" : "http://{{ .Values.global.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosProjectServicePort }}/mlWorkbench/v1/project"
+                    "url" : "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosProjectServicePort }}/mlWorkbench/v1/project"
                 },
                 "jupyterhub": {
-                    "url" : {{ .Values.global.acumosJupyterHub.url }},
-                    "token" : {{ .Values.global.acumosJupyterHub.url }},
-                    "storepass": {{ .Values.global.acumosJupyterHub.storepass }},
-                    "installcert": {{ .Values.global.acumosJupyterHub.installcert }}
+                    "url" : {{ .Values.acumosJupyterHub.url }},
+                    "token" : {{ .Values.acumosJupyterHub.url }},
+                    "storepass": {{ .Values.acumosJupyterHub.storepass }},
+                    "installcert": {{ .Values.acumosJupyterHub.installcert }}
                 },
                 "jupyternotebook":{
                     "url": {{ .Values.global.acumosJupyterNotebook.url }}
@@ -70,7 +70,7 @@ spec:
                 "jwt": {
                     "secretkey":"secret"
                 },
-                "useexternalnotebook": {{ .Values.global.mlwb.useexternalnotebook }}
+                "useexternalnotebook": {{ .Values.mlwb.useexternalnotebook }}
                 }'
          volumeMounts:
            - mountPath: /maven/logs
