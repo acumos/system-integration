@@ -40,6 +40,16 @@ spec:
          ports:
            - containerPort: {{ .Values.global.acumosCommonDataSvcPort }}
          env:
+           - name: spring_security_user_name
+             valueFrom:
+               secretKeyRef:
+                  name: ccdsclientsecret
+                  key: username
+           - name: spring_security_user_password
+             valueFrom:
+               secretKeyRef:
+                  name: ccdsclientsecret
+                  key: password
            - name: SPRING_APPLICATION_JSON
              value: '{ "server" : {
                  "port" : {{ .Values.global.acumosCommonDataSvcPort }} },
@@ -56,12 +66,12 @@ spec:
                                              },
                                           "show-sql" : false
                                      },
-                             "security" : {
-                             "user" : {
-                                      "name": "{{ .Values.global.acumosCdsUser }}",
-                                      "password": "{{ .Values.global.acumosCdsPassword }}"
-                                      }
-                             }
+                              "security" : {
+                              "user" : {
+                                       "name": "${spring_security_user_name}",
+                                       "password": "${spring_security_user_password}"
+                                       }
+                              }
                              }
                      }'
          volumeMounts:
