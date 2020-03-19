@@ -37,6 +37,8 @@ spec:
      containers:
        - name: ds-compositionengine
          image: {{ .Values.global.image.repository }}/acumos/{{ .Values.global.acumosDesignStudioImage }}
+         resources:
+           {{- toYaml .Values.resources | nindent 10 }}
          ports:
            - containerPort: {{ .Values.global.acumosPortalDsCompositionPort }}
          env:

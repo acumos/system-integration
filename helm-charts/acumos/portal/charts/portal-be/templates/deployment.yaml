@@ -37,6 +37,8 @@ spec:
      containers:
        - name: acumos-portal-be
          image: {{.Values.global.image.repository }}/acumos/{{ .Values.global.acumosPortalBeImage }}
+         resources:
+           {{- toYaml .Values.resources | nindent 10 }}
          ports:
            - containerPort: {{ .Values.global.acumosPortalBePort }}
          env:

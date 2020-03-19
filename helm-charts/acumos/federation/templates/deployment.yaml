@@ -39,6 +39,8 @@ spec:
      containers:
        - name:  federation-gateway
          image: {{ .Values.global.image.repository }}/acumos/{{ .Values.global.acumosFederationImage }}
+         resources:
+           {{- toYaml .Values.resources | nindent 10 }}
          ports:
            - containerPort: {{ .Values.global.acumosFederationGatewayPort }}
          env:

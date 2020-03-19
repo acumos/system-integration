@@ -37,6 +37,8 @@ spec:
      containers:
        - name: onboarding-app
          image: {{.Values.global.image.repository }}/acumos/{{ .Values.global.acumosOnboardingImage }}
+         resources:
+           {{- toYaml .Values.resources | nindent 10 }}
          ports:
            - containerPort: {{ .Values.global.acumosOnboardingAppPort }}
          env:
