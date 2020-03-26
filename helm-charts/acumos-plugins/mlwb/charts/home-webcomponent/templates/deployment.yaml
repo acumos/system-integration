@@ -21,45 +21,45 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{ .Values.global.mlwb.homeWebcomponent.podName }}
+ name: {{ .Values.mlwb.homeWebcomponent.podName }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{ .Values.global.mlwb.homeWebcomponent.name }}
+   app: {{ .Values.mlwb.homeWebcomponent.name }}
 spec:
  selector:
    matchLabels:
-     app: {{ .Values.global.mlwb.homeWebcomponent.name }}
+     app: {{ .Values.mlwb.homeWebcomponent.name }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{ .Values.global.mlwb.homeWebcomponent.name }}
+       app: {{ .Values.mlwb.homeWebcomponent.name }}
    spec:
      containers:
        - name: home-webcomponent
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosHomeWebcomponentImage }}
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.acumosHomeWebcomponentImage }}
          ports:
-           - containerPort: {{ .Values.global.acumosHomeWebcomponentPort }}
+           - containerPort: {{ .Values.acumosHomeWebcomponentPort }}
          env:
            - name: ES_JAVA_OPTS
              value: "-Xmx256m -Xms256m"
            - name: ENVIRONMENT
              value: "deploy"
            - name: dashboardComponent
-             value: "http://{{ .Values.global.mlwb.dashboardWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosDashboardWebcomponentPort }}"
+             value: "http://{{ .Values.mlwb.dashboardWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosDashboardWebcomponentPort }}"
            - name: projectComponent
-             value: "http://{{ .Values.global.mlwb.projectWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosProjectWebcomponentPort }}"
+             value: "http://{{ .Values.mlwb.projectWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosProjectWebcomponentPort }}"
            - name: projectCatalogComponent
-             value: "http://{{ .Values.global.mlwb.projectCatalogWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosProjectCatalogWebcomponentPort }}"
+             value: "http://{{ .Values.mlwb.projectCatalogWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosProjectCatalogWebcomponentPort }}"
            - name: notebookComponent
-             value: "http://{{ .Values.global.mlwb.notebookWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNotebookWebcomponentPort }}"
+             value: "http://{{ .Values.mlwb.notebookWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosNotebookWebcomponentPort }}"
            - name: notebookCatalogComponent
-             value: "http://{{ .Values.global.mlwb.notebookCatalogWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNotebookCatalogWebcomponentPort }}"
+             value: "http://{{ .Values.mlwb.notebookCatalogWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosNotebookCatalogWebcomponentPort }}"
            - name: pipelineComponent
-             value: "http://{{ .Values.global.mlwb.pipelineWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPipelineWebcomponentPort }}"
+             value: "http://{{ .Values.mlwb.pipelineWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosPipelineWebcomponentPort }}"
            - name: pipelineCatalogComponent
-             value: "http://{{ .Values.global.mlwb.pipelineCatalogWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPipelineCatalogWebcomponentPort }}"
+             value: "http://{{ .Values.mlwb.pipelineCatalogWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosPipelineCatalogWebcomponentPort }}"
            - name: portalFEURL
              value: "http://{{ .Values.global.portal.portalFe.svcName }}.{{ .Values.global.namespace }}"
            - name: menuItems

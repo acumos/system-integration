@@ -21,37 +21,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{ .Values.global.mlwb.pipelineWebcomponent.podName }}
+ name: {{ .Values.mlwb.pipelineWebcomponent.podName }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{ .Values.global.mlwb.pipelineWebcomponent.name }}
+   app: {{ .Values.mlwb.pipelineWebcomponent.name }}
 spec:
  selector:
    matchLabels:
-     app: {{ .Values.global.mlwb.pipelineWebcomponent.name }}
+     app: {{ .Values.mlwb.pipelineWebcomponent.name }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{ .Values.global.mlwb.pipelineWebcomponent.name }}
+       app: {{ .Values.mlwb.pipelineWebcomponent.name }}
    spec:
      containers:
        - name: pipeline-webcomponent
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.global.acumosPipelineWebcomponentImage }}
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.acumosPipelineWebcomponentImage }}
          ports:
-           - containerPort: {{ .Values.global.acumosPipelineWebcomponentPort }}
+           - containerPort: {{ .Values.acumosPipelineWebcomponentPort }}
          env:
            - name: ES_JAVA_OPTS
              value: "-Xmx256m -Xms256m"
            - name: ENVIRONMENT
              value: "deploy"
            - name: pipelinemSURL
-             value: "http://{{ .Values.global.mlwb.pipelineService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPipelineServicePort }}/mlWorkbench/v1/pipeline"
+             value: "http://{{ .Values.mlwb.pipelineService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosPipelineServicePort }}/mlWorkbench/v1/pipeline"
            - name: pipelineWikiURL
              value: "https://wiki.acumos.org/display/TRAIN"
            - name: useExternalPipeline
-             value: "{{ .Values.global.mlwb.useexternalpipeline }}"
+             value: "{{ .Values.mlwb.useexternalpipeline }}"
          volumeMounts:
            - mountPath: /maven/logs
              name: pipeline-webcomponent-logs
