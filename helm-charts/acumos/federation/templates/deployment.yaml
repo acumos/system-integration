@@ -53,6 +53,11 @@ spec:
                "server" : {
                  "port" : {{ .Values.global.acumosFederationGatewayPort }}
                },
+                "logging":{
+                    "level":{
+                        "root": "{{.Values.logLevel}}"
+                    }
+                 },
                "ssl" : {
                  "key-store" : "/app/certs/acumos-k8s.pkcs12",
                  "key-store-password" : "{{ .Values.global.acumosKeyStorePwd }}",
