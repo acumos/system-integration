@@ -45,7 +45,13 @@ spec:
            - containerPort: {{ .Values.global.acumosFederationGatewayPort }}
          env:
            - name: SPRING_APPLICATION_JSON
-             value: '{ "federation" : {
+             value: '{
+            "logging":{
+               "level":{
+                  "root": "{{.Values.logLevel}}"
+               }
+             },
+            "federation" : {
                "instance" : "gateway",
                "instance.name" : "k8",
                "operator" : "d468656f-57d0-46e3-9f94-7ffa4f66dc03",
