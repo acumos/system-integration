@@ -46,6 +46,11 @@ spec:
              value: '{ "server": {
                     "port": {{ .Values.global.acumosPortalDsCompositionPort }}
                     },
+                   "logging":{
+                      "level":{
+                          "root": "{{ .Values.logLevel }}"
+                      }
+                    },
                     "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
                     "solutionResultsetSize": "2000",
                     "gdmJarName":"gdmservice-1.2.0.jar",

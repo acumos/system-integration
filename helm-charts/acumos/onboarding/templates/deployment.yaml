@@ -49,6 +49,11 @@ spec:
                             "context-path": "/onboarding-app"
                                }
                       },
+                 "logging":{
+                    "level":{
+                        "root": "{{ .Values.logLevel }}"
+                    }
+                 },
                  "docker" : {
                             "host" : "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
                             "port": {{ .Values.global.acumosDockerPort }} ,

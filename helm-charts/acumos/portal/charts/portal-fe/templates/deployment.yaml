@@ -47,6 +47,11 @@ spec:
              value: '{ "server" : {
                     "port" : {{ .Values.global.acumosPortalFePort }}
                 },
+                 "logging":{
+                    "level":{
+                        "root": "{{ .Values.logLevel }}"
+                    }
+                 },
                "qanda" : {
                         "url" : "https://stackoverflow.com/questions/tagged/acumos"
                     },

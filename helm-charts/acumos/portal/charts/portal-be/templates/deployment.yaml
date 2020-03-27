@@ -46,6 +46,11 @@ spec:
              value: '{ "server" : {
                    "port" : {{ .Values.global.acumosPortalBePort }}
                 },
+                 "logging":{
+                    "level":{
+                        "root": "{{ .Values.logLevel }}"
+                    }
+                 },
                 "nexus": {
                         "url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}/repository/acumos-k8-models-maven",
                         "proxy": "",

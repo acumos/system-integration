@@ -45,7 +45,12 @@ spec:
            - name: SPRING_APPLICATION_JSON
              value: '{ "server" : {
                  "port" : {{ .Values.global.acumosCommonDataSvcPort }} },
-                "spring" : {
+                 "logging":{
+                    "level":{
+                        "root": "{{ .Values.logLevel }}"
+                    }
+                 },
+                 "spring" : {
                             "datasource" : {
                                         "jdbc-url" : "jdbc:mariadb://acumos-mysql.{{ .Values.global.namespace }}:{{ .Values.global.acumosMariaDbPort }}/{{ .Values.global.acumosCdsDb }}?useLegacyDatetimeCode=false&useSSL=false",
                                         "username" : "{{ .Values.global.acumosMariaDbUser }}",
