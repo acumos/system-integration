@@ -36,16 +36,11 @@ spec:
       - image: sonatype/nexus3
         imagePullPolicy: IfNotPresent
         name: acumos-nexus-container
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
         ports:
         - containerPort: {{ .Values.global.acumosNexusEndpointPort }}
         - containerPort: {{ .Values.global.acumosNexusPort }}
-        resources:
-          requests: 
-            memory: "1024Mi"
-            cpu: "0.5"
-          limits:
-            memory: "2048Mi"
-            cpu: "2.0"
         volumeMounts:
         - mountPath: /nexus-data
           name: nexus-data-volume
