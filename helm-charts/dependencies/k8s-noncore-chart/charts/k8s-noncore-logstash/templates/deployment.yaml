@@ -44,6 +44,8 @@ spec:
       - name: logstash
         image: "{{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.global.acumosLogstashImage }}"
         imagePullPolicy: {{ .Values.global.elkImagePullPolicy }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
         env:
         - name: ACUMOS_ELASTICSEARCH_PORT
           value: "{{ .Values.global.acumosElasticSearchPort }}"

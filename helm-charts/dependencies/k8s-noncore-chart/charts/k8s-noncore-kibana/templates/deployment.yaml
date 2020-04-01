@@ -50,6 +50,8 @@ spec:
           - name: kibana
             mountPath: /usr/share/kibana/config/kibana.yml
             subPath: kibana.yml
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
         env:
         - name: ELASTICSEARCH_URL
           value: "http://elasticsearch.{{ .Values.global.namespace }}:{{ .Values.global.acumosElasticSearchPort }}"
