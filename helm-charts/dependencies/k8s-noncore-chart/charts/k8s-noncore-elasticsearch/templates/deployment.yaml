@@ -73,12 +73,7 @@ spec:
         - name: elasticsearch-data
           mountPath: /usr/share/elasticsearch/data
         resources:
-          limits:
-            memory: "2048Mi"
-            cpu: "1.0"
-          requests:
-            memory: "1024Mi"
-            cpu: "0.25"
+          {{- toYaml .Values.resources | nindent 10 }}
       restartPolicy: Always
       volumes:
         - name: elasticsearch

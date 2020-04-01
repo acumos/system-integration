@@ -50,12 +50,7 @@ spec:
           containerPort: {{ .Values.global.acumosDockerPort }}
           protocol: TCP
         resources:
-          requests: 
-            memory: "1024Mi"
-            cpu: "0.5"
-          limits:
-            memory: "4096Mi"
-            cpu: "2.0"  
+          {{- toYaml .Values.dockerCmds.resources | nindent 10 }}
       # Docker-Daemon-container
       - name: acumos-docker-daemon
         image: {{ .Values.global.docker.image.repository }}:{{ .Values.global.docker.image.tag }}
@@ -71,9 +66,4 @@ spec:
         - name: docker-volume
           mountPath: /var/lib/docker
         resources:
-          requests: 
-            memory: "1024Mi"
-            cpu: "0.5"
-          limits:
-            memory: "4096Mi"
-            cpu: "2.0"
+          {{- toYaml .Values.dockerDaemon.resources | nindent 10 }}
