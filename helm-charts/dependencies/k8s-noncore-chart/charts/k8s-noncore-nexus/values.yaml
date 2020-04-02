@@ -15,40 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: acumos 
-  name: acumos-mysql
-  namespace: "{{ .Values.global.namespace }}"
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: acumos
-      tier: mysql
-  template:
-    metadata:
-      labels:
-        app: acumos
-        tier: mysql
-    spec:
-      containers:
-        - name: mysql
-          image: mariadb
-          ports:
-            - containerPort: {{ .Values.global.acumosMariaDbPort }}
-              name: mysql
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          env:
-            - name: MYSQL_ROOT_PASSWORD
-              value: "{{ .Values.global.acumosMariaDbRootPassword }}"
-          volumeMounts:
-            - name: mariadb-persistent-storage
-              mountPath: /var/lib/mysql
-      volumes:
-        - name: mariadb-persistent-storage
-          persistentVolumeClaim:
-            claimName: acumos-mariadb-volumeclaim
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+   requests:
+    cpu: 500m
+    memory: 1024Mi
+   limits:
+    cpu: 2000m
+    memory: 2048Mi

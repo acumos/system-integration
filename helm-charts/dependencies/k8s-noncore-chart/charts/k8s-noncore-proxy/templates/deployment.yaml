@@ -36,6 +36,8 @@ spec:
         - image: sameersbn/squid:3.3.8-23
           imagePullPolicy: IfNotPresent
           name: acumos-proxy-container
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
           env:
           - name: SQUID_CACHE_SIZE
             value: "70000"
