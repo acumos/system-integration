@@ -198,6 +198,8 @@ spec:
              name: portal-be-logs
            - mountPath: /app/certs
              name: acumos-certs
+           - mountPath: /images/sidebar-icons
+             name: acumos-images
        - name: filebeat
          image: {{.Values.global.image.repository }}/acumos/{{ .Values.global.acumosFilebeatImage }}
          ports:
@@ -212,6 +214,8 @@ spec:
              name: portal-be-logs
      volumes:
        - name: portal-be-logs
+         emptyDir: {}
+       - name: acumos-images
          emptyDir: {}
        - name: acumos-certs
          secret:
