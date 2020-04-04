@@ -26,6 +26,13 @@ Please see the documentation in the "docs" folder.
 
 ## All In One (AIO)
 
-The AIO subdirectory holds scripts to build an all-in-one instance of Acumos, with the database,
+The `AIO` subdirectory holds scripts to build an all-in-one instance of Acumos, with the database,
 Nexus repositories and docker containers all running on a single virtual machine.
 
+## Helm Charts (helm-charts)
+
+The `helm-charts` subdirectory holds the latest Helm (v2/v3) charts for deploying Acumos.
+
+## Zero-to-Acumos (z2a)
+
+The `z2a` subdirectory holds scripts and supporting files to bootstrap a Kubernetes cluster and install Acumos and MLWB (Machine Learning WorkBench) on a single vanilla Virtual Machine.  z2a is for development/test purposes only.
