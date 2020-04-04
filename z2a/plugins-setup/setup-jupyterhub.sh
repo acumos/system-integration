@@ -32,7 +32,7 @@ helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
 helm repo update
 
 # Simple k/v map to set JupyterHub configuration values
-cat <<EOF >$Z2A_ACUMOS_BASE/jhub_value.yaml
+cat <<EOF | sudo tee $Z2A_ACUMOS_BASE/jhub_value.yaml
 hub:
   cookieSecret: "$Z2A_ACUMOS_JUPYTERHUB_HUB_TOKEN"
 proxy:
