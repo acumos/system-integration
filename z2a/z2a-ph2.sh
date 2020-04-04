@@ -48,10 +48,10 @@ Z2A_ACUMOS_DEPENDENCIES=$Z2A_ACUMOS_BASE/dependencies
 Z2A_ACUMOS_NON_CORE=$Z2A_ACUMOS_BASE/dependencies/k8s-noncore-chart/charts
 save_env
 
-log "Starting Phase 2a (Acumos non-core dependencies) installation ...."
-# Installation - Phase 2a - Acumos non-core dependencies
+log "Starting Phase 2 (Acumos non-core dependencies) installation ...."
+# Installation - Phase 2 - Acumos non-core dependencies
 source $Z2A_BASE/acumos-setup/setup-acumos-non-core.sh
 
-log "Starting Phase 2b (Acumos core) installation ...."
-# Installation - Phase 2b - Acumos core
+log "Starting Phase 2 (Acumos core) installation ...."
+# Installation - Phase 2 - Acumos core
 source $Z2A_BASE/acumos-setup/setup-acumos-core.sh
