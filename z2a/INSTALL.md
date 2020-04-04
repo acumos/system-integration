@@ -2,23 +2,28 @@
 
 > Note: Work in progress.  Subject to change.
 
-## TL;DR Version
+## TL;DR
 
 ```bash
-# To install Acumos (using the vi editor ; substitute with your editor of choice)
-# get VM with sudo access ; login to VM
+# Get VM with sudo access ; Login to VM
+# Clone Acumos system-integration repo
 SI=~/src/system-integration
 git clone https://gerrit.acumos.org/r/system-integration ${SI}
+
+# Using the vi editor (substitute with your editor of choice)
+# Add hostname or hostname:port to proxy.txt ; if necessary
 vi ${SI}/z2a/distro-setup/proxy.txt
 cp ${SI}/z2a/z2a-config/global_value.yaml.dev1 ${SI}/z2a/helm-charts/global_value.yaml
+
+# Execute Phase 1a
 . ${SI}/z2a/z2a-ph1a.sh
 # LOG OUT OF SESSION ; LOG IN TO NEW SESSION (required for Docker group inclusion)
 SI=~/src/system-integration
 . ${SI}/z2a/z2a-ph1b.sh
 . ${SI}/z2a/z2a-ph2.sh
 
-# To install MLWB (using the vi editor ; substitute with your editor of choice)
-# Assuming MLWB is installed in the same session ; otherwise set SI
+# To install MLWB during same session ; uncomment SI if new session
+# SI=~/src/system-integration
 cp ${SI}/z2a/z2a-config/mlwb_value.yaml.dev1 ${SI}/z2a/helm-charts/mlwb_value.yaml
 . ${SI}/z2a/z2a-ph3.sh
 ```
@@ -27,7 +32,7 @@ cp ${SI}/z2a/z2a-config/mlwb_value.yaml.dev1 ${SI}/z2a/helm-charts/mlwb_value.ya
 
 It is assumed that the user who is performing this installation:
 
-- is familiar with Linux (i.e. directory creation, shell script execution, reading log files etc.)
+- is familiar with Linux (i.e. directory creation, shell script execution, editing files, reading log files etc.)
 - has `sudo` access (elevated privileges) to the VM where the installation will occur
 
 ## Getting Started
@@ -83,6 +88,8 @@ In the directory listing shown above, two (2) directories are of special interes
 
 ### Editing the proxy.txt File
 
+> NOTE: z2a includes 'example' values for Acumos and MLWB that are provided to assist in performing a quick installation (see: TL;DR section).  These example values can be used for a private development environment that is not shared, not production and not exposed to the Internet.  The values are for demonstration purposes only.
+
 The `proxy.txt` file is located in the `z2a/distro-setup` directory.  This file needs to be edited such that the Docker installation can proceed cleanly.  We will need to change directories into that location to perform the necessary edits required for the Acumos installation.
 
 This file will contain a single entry in the form of `hostname` OR `hostname:port` (this is not a URL).
@@ -105,7 +112,11 @@ OR
 proxy-hostname.example.com:3128
 ```
 
-### Editing the global_value.yaml File
+### Editing the `global_value.yaml` File
+
+> NOTE: z2a includes an example value files for Acumos in the `~/src/system-integration/z2a/z2a-config` directory.  The Acumos values file is provided for both illustration purposes and to assist in performing a quick installation (see: TL;DR section).
+>
+> The Acumos example values can be used for a private development environment that is not shared, not production and not exposed to the Internet.  These values are for demonstration purposes only.
 
 The `global_value.yaml` file is located in the `helm_charts` directory noted above.  We will need to change directories into that location to perform the necessary edits required for the Acumos installation.
 
@@ -174,7 +185,13 @@ Proxy Setup: <https://www.shellhacks.com/linux-proxy-server-settings-set-proxy-c
 
 ### MLWB
 
-#### Editing the mlwb_value.yaml File
+Machine Learning WorkBench is installed during Phase 3 of the installation process discussed in this document.  Below are details of the installation process.
+
+#### Editing the `mlwb_value.yaml` File
+
+> NOTE: z2a includes an example value file for MLWB in the `~/src/system-integration/z2a/z2a-config` directory.  The values file is provided for both illustration purposes and to assist in performing a quick installation (see: TL;DR section).
+>
+> The MLWB example values can be used for a private development environment that is not shared, not production and not exposed to the Internet.  These values are for demonstration purposes only.
 
 The `mlwb_value.yaml` file is located in the `helm_charts` directory noted above.  We will need to change directories into that location to perform the edits necessary to perform the installation.
 
@@ -191,7 +208,7 @@ The default `mlwb_value.yaml` file requires the user to make edits to the masked
 
 Using your editor of choice (vi, nano, pico etc.) please open the `mlwb_value.yaml` file such that we can edit it's contents.
 
-CouchDB - the following values need to be populated in the `mlwb_value.yaml` file before installation of the MLWB dependencies (Phase 3a).
+CouchDB - the following values need to be populated in the `mlwb_value.yaml` file before installation of the MLWB dependencies (Phase 3).
 
 ```bash
 #CouchDB
@@ -205,7 +222,7 @@ acumosCouchDB:
     user: "******"
 ```
 
-JupyterHub - the following values need to be populated in the `mlwb_value.yaml` file before installation of the MLWB dependencies (Phase 3a).
+JupyterHub - the following values need to be populated in the `mlwb_value.yaml` file before installation of the MLWB dependencies (Phase 3).
 
 ```bash
 #JupyterHub
@@ -218,7 +235,7 @@ acumosJupyterNotebook:
     url: "******"
 ```
 
-Apache NiFi - the following values need to be populated in the `mlwb_value.yaml` file before installation of the MLWB dependencies (Phase 3a).
+Apache NiFi - the following values need to be populated in the `mlwb_value.yaml` file before installation of the MLWB dependencies (Phase 3).
 
 ```bash
 #NIFI
@@ -236,13 +253,13 @@ acumosNifi:
 To perform an installation of MLWB, we will need to perform the following steps:
 
 1. change directory into the `z2a` directory
-2. execute the `z2a-ph2.sh` script which install the MLWB dependencies and the MLWB components
+2. execute the `z2a-ph3.sh` script which install the MLWB dependencies and the MLWB components
 
 ```bash
 cd ~/src/system-integration/z2a
-./z2a-ph2.sh
+./z2a-ph3.sh
 ```
 
 For post-installation Machine Learning WorkBench configuration steps, please see the MLWB section of the CONFIG.md document.
 
-Last Edited: 2020-03-26
+Last Edited: 2020-04-01

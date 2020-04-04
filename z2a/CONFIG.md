@@ -1,12 +1,28 @@
 # Acumos Configuration
 
+> NOTE: Work in progress.  Subject to change.
+
 ## Acumos Configuration Tasks
 
 *Acumos Post-Install Configuration steps in progress ...*
 
+### MariaDB
+
+MariaDB - to support the Common Data Services (CDS)
+
+>NOTE: Scripts to automate the configuration of the MariaDB instance with the CDS schema have been created.  Need to document the end-user steps here when the scripts are merged into z2a.
+
+### Sonatype Nexus
+
+Nexus - to support artifact management
+
+>NOTE: Scripts to automate the configuration of Nexus are in the process of being created.  Need to document the end-user steps here when the scripts are merged into z2a.
+
 ## Kubernetes Configuration Tasks
 
 ### Kubernetes Dashboard
+
+> NOTE:  the Kubernetes Dashboard has been added to the K8s/kind installation - more information forthcoming.
 
 A Kubernetes dashboard is a web-based Kubernetes user interface which is used to deploy containerized applications to a Kubernetes cluster, troubleshoot the applications, and manage the cluster itself along with its attendant resources.
 
@@ -20,4 +36,4 @@ A Kubernetes dashboard is a web-based Kubernetes user interface which is used to
 
 *MLWB Post-Install Configuration steps in progress ...*
 
-Last Edited: 2020-03-26
+Last Edited: 2020-04-02
