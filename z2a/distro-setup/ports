@@ -1,8 +1,0 @@
-Default Ports
-CouchDB			- 5984
-JupyterHub	- 8000
-Kibana			- 5601
-Kong				- 443,8001
-Nexus				- 8081
-NiFi				- 8080
-Squid				- 3128 (proxy)

@@ -105,4 +105,4 @@ sudo usermod -aG docker $USER
 log "Docker has been installed on this host."
 log "Host / VM preparation has been completed."
 log "Please log out of this session and log back in to continue."
-log "Please navigate to the script directory and run z2a_ph2.sh."
+log "After login, please navigate to the script directory and run z2a_ph1b.sh."
