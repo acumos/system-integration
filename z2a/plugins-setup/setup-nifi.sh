@@ -28,11 +28,11 @@ helm repo add cetic https://cetic.github.io/helm-charts
 helm repo update
 
 # Simple k/v map to set NiFi configuration values
-cat <<EOF >$Z2A_ACUMOS_BASE/nifi_config.yaml
+cat <<EOF | sudo tee $Z2A_ACUMOS_BASE/nifi_value.yaml
 EOF
 
 log "Installing NiFi Helm Chart ...."
-helm install -name $RELEASE --namespace $NAMESPACE -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml -f $Z2A_ACUMOS_BASE/nifi_config.yaml cetic/nifi
+helm install -name $RELEASE --namespace $NAMESPACE -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml -f $Z2A_ACUMOS_BASE/nifi_value.yaml cetic/nifi
 
 log "NiFi Cluster setup information ...."
 log "Cluster endpoint IP address will be available at:"

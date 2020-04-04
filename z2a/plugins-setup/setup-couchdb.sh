@@ -25,13 +25,13 @@ RELEASE=mlwb-db
 # Random UUID generated for CouchDB
 Z2A_ACUMOS_COUCHDB_UUID=$(uuidgen)
 
-# Add Apache CouchDB repo to Helm
 log "Adding Apache CouchDB repo ...."
+# Add Apache CouchDB repo to Helm
 helm repo add couchdb https://apache.github.io/couchdb-helm
 helm repo update
 
 # Simple k/v map to set CouchDB configuration values
-cat <<EOF >$Z2A_ACUMOS_BASE/couchdb_value.yaml
+cat <<EOF | sudo tee $Z2A_ACUMOS_BASE/couchdb_value.yaml
 service:
   type: NodePort
 couchdbConfig:
