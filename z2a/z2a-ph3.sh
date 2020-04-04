@@ -43,12 +43,12 @@ trap 'fail' ERR
 
 NAMESPACE=$Z2A_K8S_NAMESPACE
 
-log "Starting Phase 3a (MLWB dependencies) installation ..."
+log "Starting Phase 3 (MLWB dependencies) installation ..."
 # Installation - Phase 3a - MLWB plugin dependencies
 source $Z2A_BASE/plugins-setup/setup-couchdb.sh
 source $Z2A_BASE/plugins-setup/setup-jupyterhub.sh
 source $Z2A_BASE/plugins-setup/setup-nifi-setup.sh
 
-log "Starting Phase 3b (MLWB) installation ..."
+log "Starting Phase 3 (MLWB) installation ..."
 # Installation - Phase 3b - MLWB plugin
 source $Z2A_BASE/plugins-setup/setup-mlwb.sh
