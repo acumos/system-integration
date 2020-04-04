@@ -1,3 +1,6 @@
 ### visual studio ###
 .vs
 **/.vscode
+### z2a ignores
+z2a/k8s-dashboard/main.yaml
+z2a/k8s-dashboard/recommended.yaml
