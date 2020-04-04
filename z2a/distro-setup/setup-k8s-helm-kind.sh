@@ -68,13 +68,52 @@ sudo curl -Lo /tmp/kind "https://github.com/kubernetes-sigs/kind/releases/downlo
 sudo chmod +x /tmp/kind && sudo chown root:root /tmp/kind
 sudo mv /tmp/kind /usr/local/bin/kind
 
-log "Creating k8s cluster : name = kind-acumos (this may take a few minutes .... relax!!!!"
+Z2A_CLUSTER_NAME=acumos ; save_env
+log "Creating kind cluster : name = $Z2A_CLUSTER_NAME (this may take a few minutes .... relax!!!!)"
 # Create kind cluster (named kind-acumos)
-kind create cluster --name=acumos --config $Z2A_BASE/distro-setup/kind-config.yaml
+kind create cluster --name=$Z2A_CLUSTER_NAME --config $Z2A_BASE/distro-setup/kind-config.yaml
 # Echo cluster-info - echo output to both log file and TTY
-log "$(kubectl cluster-info --context kind-acumos)"
+log "$(kubectl cluster-info --context kind-$Z2A_CLUSTER_NAME)"
 
-log "Creating k8s namespace : name = acumos-dev1"
-# Create an acumos-dev1 namespace in the kind-acumos cluster
 Z2A_K8S_NAMESPACE=acumos-dev1 ; save_env
+log "Creating k8s namespace : name = $Z2A_K8S_NAMESPACE"
+# Create an acumos-dev1 namespace in the kind-acumos cluster
 kubectl create namespace $Z2A_K8S_NAMESPACE
+
+log "Building k8s-svc-proxy local image ...."
+# Build local image of the k8s-svc-proxy
+(cd $Z2A_BASE/k8s-svc-proxy ; docker build -t k8s-svc-proxy:v1.0 .)
+
+log "Loading k8s-svc-proxy image into kind cluster ...."
+# Load image into kind
+kind load docker-image k8s-svc-proxy:v1.0 --name $Z2A_CLUSTER_NAME
+
+log "Deploying k8s-svc-proxy pod cluster ...."
+# Deploy the k8s-svc-proxy pod
+kubectl apply -f $Z2A_BASE/k8s-svc-proxy/z2a-svcs-proxy.yaml --namespace=$Z2A_K8S_NAMESPACE
+
+log "Installing the Kubernetes Dashboard ...."
+# Download and install the Kubernetes Dashboard
+curl -o $Z2A_BASE/k8s-dashboard/recommended.yaml https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-rc7/aio/deploy/recommended.yaml
+egrep -v '^\s*#' $Z2A_BASE/k8s-dashboard/recommended.yaml > $Z2A_BASE/k8s-dashboard/main.yaml
+yq w -i -d'*' $Z2A_BASE/k8s-dashboard/main.yaml '**.(.==443).' 9090
+yq w -i -d'*' $Z2A_BASE/k8s-dashboard/main.yaml '**.(.==8443).' 9090
+yq w -i -d'*' $Z2A_BASE/k8s-dashboard/main.yaml '**.(.==HTTPS).' HTTP
+yq w -i -d'*' $Z2A_BASE/k8s-dashboard/main.yaml '**.(.==--auto-generate-certificates).' -- '--enable-insecure-login'
+kubectl apply -f $Z2A_BASE/k8s-dashboard/main.yaml
+
+log "Creating Kubernetes Dashboard Service Account ...."
+# Create Service Account
+kubectl apply -f $Z2A_BASE/k8s-dashboard/admin-user.yaml
+
+log "Creating Kubernetes Dashboard ClusterRole Binding ...."
+# Create Cluster Role Binding
+kubectl apply -f $Z2A_BASE/k8s-dashboard/clusterrolebinding.yaml
+
+log "Capturing Default Bearer Token ...."
+# Get the Default Bearer Token
+NS=kubernetes-dashboard
+TOKEN="$(kubectl -n $NS describe secret $(kubectl -n $NS get secret | awk '/admin-user/ {print $1}'))"
+echo "$TOKEN"     # capture to log
+log "Kubernetes Dashboard Token"
+log $(echo "$TOKEN" | awk '/token:/ {print $2}')
