@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8e900e8b_cd787b5c",
+        "filename": "helm-charts/acumos/microservice-generation/templates/deployment.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-04-06T16:53:04Z",
+      "side": 1,
+      "message": "Could you use space to replace tab here to keep consistency.",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 71
+      },
+      "revId": "a30ecd191edd1f89756116c56cf85d15a8ed3e84",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
