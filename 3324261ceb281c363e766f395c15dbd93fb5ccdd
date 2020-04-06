@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b6fdab6a_554b132c",
+        "filename": "helm-charts/acumos/onboarding/templates/deployment.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-04-06T17:17:25Z",
+      "side": 1,
+      "message": "this is tab",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 1
+      },
+      "revId": "3324261ceb281c363e766f395c15dbd93fb5ccdd",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
