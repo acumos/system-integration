@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "47865d79_e1b862ff",
+        "filename": "helm-charts/global_value.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-04-06T12:59:38Z",
+      "side": 1,
+      "message": "incorrect indentation. This section should under image",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 22
+      },
+      "revId": "2979bd632c601d1855f8fa4639f49b91556788dc",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
