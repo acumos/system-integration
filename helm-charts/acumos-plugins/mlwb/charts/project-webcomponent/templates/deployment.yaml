@@ -38,24 +38,24 @@ spec:
    spec:
      containers:
        - name: project-webcomponent
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.acumosProjectWebcomponentImage }}
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.mlwb.acumosProjectWebcomponentImage }}
          ports:
-           - containerPort: {{ .Values.acumosProjectWebcomponentPort }}
+           - containerPort: {{ .Values.mlwb.acumosProjectWebcomponentPort }}
          env:
            - name: ES_JAVA_OPTS
              value: "-Xmx256m -Xms256m"
            - name: ENVIRONMENT
              value: "deploy"
            - name: projectmSURL
-             value: "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosProjectServicePort }}/mlWorkbench/v1/project"
+             value: "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosProjectServicePort }}/mlWorkbench/v1/project"
            - name: notebookmSURL
-             value: "http://{{ .Values.mlwb.notebookService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosNotebookServicePort }}/mlWorkbench/v1/notebook"
+             value: "http://{{ .Values.mlwb.notebookService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosNotebookServicePort }}/mlWorkbench/v1/notebook"
            - name: pipelinemSURL
-             value: "http://{{ .Values.mlwb.pipelineService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosPipelineServicePort }}/mlWorkbench/v1/pipeline"
+             value: "http://{{ .Values.mlwb.pipelineService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosPipelineServicePort }}/mlWorkbench/v1/pipeline"
            - name: modelmSURL
-             value: "http://{{ .Values.mlwb.modelService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosModelServicePort }}/mlWorkbench/v1/modelservice"
+             value: "http://{{ .Values.mlwb.modelService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosModelServicePort }}/mlWorkbench/v1/modelservice"
            - name: predictormSURL
-             value: "http://{{ .Values.mlwb.predictorService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosPredictorServicePort }}/mlWorkbench/v1/predictor"
+             value: "http://{{ .Values.mlwb.predictorService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosPredictorServicePort }}/mlWorkbench/v1/predictor"
            - name: projectWikiURL
              value: "https://wiki.acumos.org/display/TRAIN"
            - name: notebookWikiURL

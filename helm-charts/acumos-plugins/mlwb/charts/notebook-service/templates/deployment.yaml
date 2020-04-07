@@ -38,14 +38,14 @@ spec:
    spec:
      containers:
        - name: notebook-service
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.acumosNotebookServiceImage }}
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.mlwb.acumosNotebookServiceImage }}
          ports:
-           - containerPort: {{ .Values.acumosNotebookServicePort }}
+           - containerPort: {{ .Values.mlwb.acumosNotebookServicePort }}
          env:
            - name: SPRING_APPLICATION_JSON
              value: '{
                 "server":{
-                    "port":{{ .Values.acumosNotebookServicePort }}
+                    "port":{{ .Values.mlwb.acumosNotebookServicePort }}
                 },
                 "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
                 "resultsetSize" : 2000,
@@ -59,13 +59,13 @@ spec:
                     "url" : "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosProjectServicePort }}/mlWorkbench/v1/project"
                 },
                 "jupyterhub": {
-                    "url" : {{ .Values.acumosJupyterHub.url }},
-                    "token" : {{ .Values.acumosJupyterHub.url }},
-                    "storepass": {{ .Values.acumosJupyterHub.storepass }},
-                    "installcert": {{ .Values.acumosJupyterHub.installcert }}
+                    "url" : {{ .Values.mlwb.acumosJupyterHub.url }},
+                    "token" : {{ .Values.mlwb.acumosJupyterHub.url }},
+                    "storepass": {{ .Values.mlwb.acumosJupyterHub.storepass }},
+                    "installcert": {{ .Values.mlwb.acumosJupyterHub.installcert }}
                 },
                 "jupyternotebook":{
-                    "url": {{ .Values.global.acumosJupyterNotebook.url }}
+                    "url": {{ .Values.mlwb.acumosJupyterNotebook.url }}
                 },
                 "jwt": {
                     "secretkey":"secret"

@@ -18,17 +18,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: acumos-nexus
+  name: "{{ .Values.global.acumosNexusService }}"
   namespace: "{{ .Values.global.namespace }}"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: acumos-nexus
+      app: "{{ .Values.global.acumosNexusService }}"
   template:
     metadata:
       labels:
-        app: acumos-nexus
+        app: "{{ .Values.global.acumosNexusService }}"
     spec:
       securityContext:
         fsGroup: 200

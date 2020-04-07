@@ -38,14 +38,14 @@ spec:
    spec:
      containers:
        - name: pipeline-service
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.acumosPipelineServiceImage }}
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.mlwb.acumosPipelineServiceImage }}
          ports:
-           - containerPort: {{ .Values.acumosPipelineServicePort }}
+           - containerPort: {{ .Values.mlwb.acumosPipelineServicePort }}
          env:
            - name: SPRING_APPLICATION_JSON
              value: '{
                 "server":{
-                    "port":{{ .Values.acumosPipelineServicePort }}
+                    "port":{{ .Values.mlwb.acumosPipelineServicePort }}
                 },
                 "resultsetSize":"2000",
                 "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
@@ -61,12 +61,12 @@ spec:
                     "secretkey":"secret"
                 },
                 "nifi": {
-                    "createpod": {{ .Values.acumosNifi.createpod }},
-                    "adminusername": {{ .Values.acumosNifi.adminuser }},
-                    "serviceurl": {{ .Values.acumosNifi.serviceurl }},
-                    "registryurl": {{ .Values.acumosNifi.registryurl }},
-                    "registryname": {{ .Values.acumosNifi.registryname }},
-                    "namespace": {{ .Values.acumosNifi.namespace }}
+                    "createpod": {{ .Values.mlwb.acumosNifi.createpod }},
+                    "adminusername": {{ .Values.mlwb.acumosNifi.adminuser }},
+                    "serviceurl": {{ .Values.mlwb.acumosNifi.serviceurl }},
+                    "registryurl": {{ .Values.mlwb.acumosNifi.registryurl }},
+                    "registryname": {{ .Values.mlwb.acumosNifi.registryname }},
+                    "namespace": {{ .Values.mlwb.acumosNifi.namespace }}
                 },
                 "useexternalpipeline": {{ .Values.mlwb.useexternalpipeline }}
                 }'

@@ -38,16 +38,16 @@ spec:
    spec:
      containers:
        - name: pipeline-webcomponent
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.acumosPipelineWebcomponentImage }}
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.mlwb.acumosPipelineWebcomponentImage }}
          ports:
-           - containerPort: {{ .Values.acumosPipelineWebcomponentPort }}
+           - containerPort: {{ .Values.mlwb.acumosPipelineWebcomponentPort }}
          env:
            - name: ES_JAVA_OPTS
              value: "-Xmx256m -Xms256m"
            - name: ENVIRONMENT
              value: "deploy"
            - name: pipelinemSURL
-             value: "http://{{ .Values.mlwb.pipelineService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosPipelineServicePort }}/mlWorkbench/v1/pipeline"
+             value: "http://{{ .Values.mlwb.pipelineService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosPipelineServicePort }}/mlWorkbench/v1/pipeline"
            - name: pipelineWikiURL
              value: "https://wiki.acumos.org/display/TRAIN"
            - name: useExternalPipeline

@@ -18,7 +18,8 @@
 # limitations under the License.
 # ============LICENSE_END=========================================================
 
-name: predictor-service
+apiVersion: v1
+name: mlwb-predictor-service
 home:
 source:
 version: 1.0.3

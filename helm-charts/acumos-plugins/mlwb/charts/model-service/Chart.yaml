@@ -18,7 +18,8 @@
 # limitations under the License.
 # ============LICENSE_END=========================================================
 
-name: model-service
+apiVersion: v1
+name: mlwb-model-service
 home:
 source:
 version: 2.0.3

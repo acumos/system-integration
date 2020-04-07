@@ -21,7 +21,7 @@ metadata:
   name: "{{ .Values.global.acumosNexusService }}"
   namespace: "{{ .Values.global.namespace }}"
   labels:
-    app: acumos-nexus
+    app: "{{ .Values.global.acumosNexusService }}"
 spec:
   type: LoadBalancer
   ports:
@@ -34,5 +34,5 @@ spec:
     protocol: TCP
     name: docker-port 
   selector:
-    app: acumos-nexus
+    app: "{{ .Values.global.acumosNexusService }}"
 

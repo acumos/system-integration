@@ -22,14 +22,14 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Values.mlwb.homeWebcomponent.svcName }}
-  namespace: "{{ .Values.namespace }}"
+  namespace: "{{ .Values.global.namespace }}"
   labels:
     app: {{ .Values.mlwb.homeWebcomponent.name }}
 spec:
   type: ClusterIP
   ports:
-    - port: {{ .Values.acumosHomeWebcomponentPort }}
-      targetPort: {{ .Values.acumosHomeWebcomponentPort }}
+    - port: {{ .Values.mlwb.acumosHomeWebcomponentPort }}
+      targetPort: {{ .Values.mlwb.acumosHomeWebcomponentPort }}
       protocol: TCP
       name: {{ .Values.mlwb.homeWebcomponent.svcName }}
   selector:

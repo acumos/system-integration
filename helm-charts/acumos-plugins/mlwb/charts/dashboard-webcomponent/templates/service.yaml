@@ -22,14 +22,14 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Values.mlwb.dashboardWebcomponent.svcName }}
-  namespace: "{{ .Values.namespace }}"
+  namespace: "{{ .Values.global.namespace }}"
   labels:
     app: {{ .Values.mlwb.dashboardWebcomponent.name }}
 spec:
   type: ClusterIP
   ports:
-    - port: {{ .Values.acumosDashboardWebcomponentPort }}
-      targetPort: {{ .Values.acumosDashboardWebcomponentPort }}
+    - port: {{ .Values.mlwb.acumosDashboardWebcomponentPort }}
+      targetPort: {{ .Values.mlwb.acumosDashboardWebcomponentPort }}
       protocol: TCP
       name: {{ .Values.mlwb.dashboardWebcomponent.svcName }}
   selector:

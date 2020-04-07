@@ -22,14 +22,14 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Values.mlwb.modelService.svcName }}
-  namespace: "{{ .Values.namespace }}"
+  namespace: "{{ .Values.global.namespace }}"
   labels:
     app: {{ .Values.mlwb.modelService.name }}
 spec:
   type: ClusterIP
   ports:
-    - port: {{ .Values.acumosModelServicePort }}
-      targetPort: {{ .Values.acumosModelServicePort }}
+    - port: {{ .Values.mlwb.acumosModelServicePort }}
+      targetPort: {{ .Values.mlwb.acumosModelServicePort }}
       protocol: TCP
       name: {{ .Values.mlwb.modelService.svcName }}
   selector:

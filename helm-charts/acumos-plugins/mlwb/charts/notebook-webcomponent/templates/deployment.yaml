@@ -38,16 +38,16 @@ spec:
    spec:
      containers:
        - name: notebook-webcomponent
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.acumosNotebookWebcomponentImage }}
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.mlwb.acumosNotebookWebcomponentImage }}
          ports:
-           - containerPort: {{ .Values.acumosNotebookWebcomponentPort }}
+           - containerPort: {{ .Values.mlwb.acumosNotebookWebcomponentPort }}
          env:
            - name: ES_JAVA_OPTS
              value: "-Xmx256m -Xms256m"
            - name: ENVIRONMENT
              value: "deploy"
            - name: notebookmSURL
-             value: "http://{{ .Values.mlwb.notebookService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosNotebookServicePort }}/mlWorkbench/v1/notebook"
+             value: "http://{{ .Values.mlwb.notebookService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosNotebookServicePort }}/mlWorkbench/v1/notebook"
            - name: notebookWikiURL
              value: "https://wiki.acumos.org/display/TRAIN"
            - name: useExternalNotebook
