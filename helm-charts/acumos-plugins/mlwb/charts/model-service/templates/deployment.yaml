@@ -38,14 +38,14 @@ spec:
    spec:
      containers:
        - name: model-service
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.acumosModelServiceImage  }}
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.mlwb.acumosModelServiceImage  }}
          ports:
-           - containerPort: {{ .Values.acumosModelServicePort }}
+           - containerPort: {{ .Values.mlwb.acumosModelServicePort }}
          env:
            - name: SPRING_APPLICATION_JSON
              value: '{
                 "server":{
-                    "port":{{ .Values.acumosModelServicePort }}
+                    "port":{{ .Values.mlwb.acumosModelServicePort }}
                 },
                 "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
                 "resultsetSize":"2000",
@@ -58,15 +58,15 @@ spec:
                     "url" : "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosProjectServicePort }}/mlWorkbench/v1/project"
                 },
                 "couchdb":{
-                    "user":{{ .Values.acumosCouchDB.user }},
-                    "pwd":{{ .Values.acumosCouchDB.pwd }},
-                    "name":{{ .Values.acumosCouchDB.dbname }},
+                    "user":{{ .Values.mlwb.acumosCouchDB.user }},
+                    "pwd":{{ .Values.mlwb.acumosCouchDB.pwd }},
+                    "name":{{ .Values.mlwb.acumosCouchDB.dbname }},
                     "createdb":{
-                        "if-not-exist":{{ .Values.acumosCouchDB.createdb }}
+                        "if-not-exist":{{ .Values.mlwb.acumosCouchDB.createdb }}
                     },
-                    "protocol":{{ .Values.acumosCouchDB.protocol }},
-                    "host":{{ .Values.acumosCouchDB.host }},
-                    "port":{{ .Values.acumosCouchDB.port }}
+                    "protocol":{{ .Values.mlwb.acumosCouchDB.protocol }},
+                    "host":{{ .Values.mlwb.acumosCouchDB.host }},
+                    "port":{{ .Values.mlwb.acumosCouchDB.port }}
                 },
                 "jwt" : {
                     "secretkey":"secret"

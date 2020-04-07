@@ -47,7 +47,7 @@ log "Starting Phase 3 (MLWB dependencies) installation ..."
 # Installation - Phase 3a - MLWB plugin dependencies
 source $Z2A_BASE/plugins-setup/setup-couchdb.sh
 source $Z2A_BASE/plugins-setup/setup-jupyterhub.sh
-source $Z2A_BASE/plugins-setup/setup-nifi-setup.sh
+source $Z2A_BASE/plugins-setup/setup-nifi.sh
 
 log "Starting Phase 3 (MLWB) installation ..."
 # Installation - Phase 3b - MLWB plugin

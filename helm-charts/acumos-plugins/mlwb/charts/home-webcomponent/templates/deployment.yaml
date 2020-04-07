@@ -38,28 +38,28 @@ spec:
    spec:
      containers:
        - name: home-webcomponent
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.acumosHomeWebcomponentImage }}
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.mlwb.acumosHomeWebcomponentImage }}
          ports:
-           - containerPort: {{ .Values.acumosHomeWebcomponentPort }}
+           - containerPort: {{ .Values.mlwb.acumosHomeWebcomponentPort }}
          env:
            - name: ES_JAVA_OPTS
              value: "-Xmx256m -Xms256m"
            - name: ENVIRONMENT
              value: "deploy"
            - name: dashboardComponent
-             value: "http://{{ .Values.mlwb.dashboardWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosDashboardWebcomponentPort }}"
+             value: "http://{{ .Values.mlwb.dashboardWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosDashboardWebcomponentPort }}"
            - name: projectComponent
-             value: "http://{{ .Values.mlwb.projectWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosProjectWebcomponentPort }}"
+             value: "http://{{ .Values.mlwb.projectWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosProjectWebcomponentPort }}"
            - name: projectCatalogComponent
-             value: "http://{{ .Values.mlwb.projectCatalogWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosProjectCatalogWebcomponentPort }}"
+             value: "http://{{ .Values.mlwb.projectCatalogWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosProjectCatalogWebcomponentPort }}"
            - name: notebookComponent
-             value: "http://{{ .Values.mlwb.notebookWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosNotebookWebcomponentPort }}"
+             value: "http://{{ .Values.mlwb.notebookWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosNotebookWebcomponentPort }}"
            - name: notebookCatalogComponent
-             value: "http://{{ .Values.mlwb.notebookCatalogWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosNotebookCatalogWebcomponentPort }}"
+             value: "http://{{ .Values.mlwb.notebookCatalogWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosNotebookCatalogWebcomponentPort }}"
            - name: pipelineComponent
-             value: "http://{{ .Values.mlwb.pipelineWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosPipelineWebcomponentPort }}"
+             value: "http://{{ .Values.mlwb.pipelineWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosPipelineWebcomponentPort }}"
            - name: pipelineCatalogComponent
-             value: "http://{{ .Values.mlwb.pipelineCatalogWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosPipelineCatalogWebcomponentPort }}"
+             value: "http://{{ .Values.mlwb.pipelineCatalogWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosPipelineCatalogWebcomponentPort }}"
            - name: portalFEURL
              value: "http://{{ .Values.global.portal.portalFe.svcName }}.{{ .Values.global.namespace }}"
            - name: menuItems

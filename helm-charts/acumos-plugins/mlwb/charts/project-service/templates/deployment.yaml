@@ -38,14 +38,14 @@ spec:
    spec:
      containers:
        - name: project-service
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.acumosProjectServiceImage }}
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.mlwb.acumosProjectServiceImage }}
          ports:
-           - containerPort: {{ .Values.acumosProjectServicePort }}
+           - containerPort: {{ .Values.mlwb.acumosProjectServicePort }}
          env:
            - name: SPRING_APPLICATION_JSON
              value: '{
                 "server":{
-                    "port":{{ .Values.acumosProjectServicePort }}
+                    "port":{{ .Values.mlwb.acumosProjectServicePort }}
                 },
                 "resultsetSize":"2000",
                 "cmndatasvc" : {
@@ -54,15 +54,15 @@ spec:
                     "cmndatasvcpwd":"{{ .Values.global.acumosCdsPassword }}"
                 },
                 "couchdb":{
-                    "user":{{ .Values.acumosCouchDB.user }},
-                    "pwd":{{ .Values.acumosCouchDB.pwd }},
-                    "name":{{ .Values.acumosCouchDB.dbname }},
+                    "user":{{ .Values.mlwb.acumosCouchDB.user }},
+                    "pwd":{{ .Values.mlwb.acumosCouchDB.pwd }},
+                    "name":{{ .Values.mlwb.acumosCouchDB.dbname }},
                     "createdb":{
-                        "if-not-exist":{{ .Values.acumosCouchDB.createdb }}
+                        "if-not-exist":{{ .Values.mlwb.acumosCouchDB.createdb }}
                     },
-                    "protocol":{{ .Values.acumosCouchDB.protocol }},
-                    "host":{{ .Values.acumosCouchDB.host }},
-                    "port":{{ .Values.acumosCouchDB.port }}
+                    "protocol":{{ .Values.mlwb.acumosCouchDB.protocol }},
+                    "host":{{ .Values.mlwb.acumosCouchDB.host }},
+                    "port":{{ .Values.mlwb.acumosCouchDB.port }}
                 },
                 "jwt" : {
                     "secretkey":"secret"

@@ -34,40 +34,40 @@
 # Usage:
 
 MLWB_CORE=$Z2A_ACUMOS_BASE/acumos-plugins/mlwb
-MLWB_CHARTS=$$MLWB_CORE/charts
+MLWB_CHARTS=$MLWB_CORE/charts
 
 # Individual MLWB charts
 # helm install -name $CHARTNAME --namespace $NAMESPACE ./$CHARTNAME/ -f ./global_value.yaml
 # where $CHARTNAME is one of the following charts
-  - project-service
-  - notebook-service
-  - pipeline-service
-  - model-service
-  - predictor-service
-  - dashboard-webcomponent
-  - home-webcomponent
-  - notebook-catalog-webcomponent
-  - notebook-webcomponent
-  - pipeline-catalog-webcomponent
-  - pipeline-webcomponent
-  - project-catalog-webcomponent
-  - project-webcomponent
+#  - project-service
+#  - notebook-service
+#  - pipeline-service
+#  - model-service
+#  - predictor-service
+#  - dashboard-webcomponent
+#  - home-webcomponent
+#  - notebook-catalog-webcomponent
+#  - notebook-webcomponent
+#  - pipeline-catalog-webcomponent
+#  - pipeline-webcomponent
+#  - project-catalog-webcomponent
+#  - project-webcomponent
 
 log "Installing MLWB Helm charts ...."
 # Install (or remove) the MLWB charts, one by one in this order
-helm install -name project-service --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
-helm install -name notebook-service --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
-helm install -name pipeline-service --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
-helm install -name model-service --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
-helm install -name predictor-service --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
-helm install -name dashboard-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
-helm install -name home-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
-helm install -name notebook-catalog-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
-helm install -name notebook-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
-helm install -name pipeline-catalog-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
-helm install -name pipeline-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
-helm install -name project-catalog-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
-helm install -name project-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install project-service --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install notebook-service --namespace $NAMESPACE $MLWB_CHARTS/notebook-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install pipeline-service --namespace $NAMESPACE $MLWB_CHARTS/pipeline-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install model-service --namespace $NAMESPACE $MLWB_CHARTS/model-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install predictor-service --namespace $NAMESPACE $MLWB_CHARTS/predictor-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install dashboard-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/dashboard-webcomponent/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install home-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/home-webcomponent/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install notebook-catalog-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/notebook-catalog-webcomponent/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install notebook-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/notebook-component/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install pipeline-catalog-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/pipeline-catalog-webcomponent/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install pipeline-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/pipeline-component/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install project-catalog-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-catalog-webcomponent/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install project-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-webcomponent/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
 
 log "$(Finshed installing MLWB Helm charts ....)"
 log "$(Success!!! You have successfully installed Acumos and MLWB!)"

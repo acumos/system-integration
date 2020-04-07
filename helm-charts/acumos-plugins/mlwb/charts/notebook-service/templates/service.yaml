@@ -22,14 +22,14 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Values.mlwb.notebookService.svcName }}
-  namespace: "{{ .Values.namespace }}"
+  namespace: "{{ .Values.global.namespace }}"
   labels:
     app: {{ .Values.mlwb.notebookService.name }}
 spec:
   type: ClusterIP
   ports:
-    - port: {{ .Values.acumosNotebookServicePort }}
-      targetPort: {{ .Values.acumosNotebookServicePort }}
+    - port: {{ .Values.mlwb.acumosNotebookServicePort }}
+      targetPort: {{ .Values.mlwb.acumosNotebookServicePort }}
       protocol: TCP
       name: {{ .Values.mlwb.notebookService.svcName }}
   selector:

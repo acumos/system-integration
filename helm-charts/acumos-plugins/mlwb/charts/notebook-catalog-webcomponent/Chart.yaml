@@ -18,7 +18,8 @@
 # limitations under the License.
 # ============LICENSE_END=========================================================
 
-name: notebook-catalog-webcomponent
+apiVersion: v1
+name: mlwb-notebook-catalog-webcomponent
 home:
 source:
 version: 2.0.9

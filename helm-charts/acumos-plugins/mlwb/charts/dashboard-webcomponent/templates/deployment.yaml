@@ -38,20 +38,20 @@ spec:
    spec:
      containers:
        - name: dashboard-webcomponent
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.acumosDashboardWebcomponentImage }}
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.mlwb.acumosDashboardWebcomponentImage }}
          ports:
-           - containerPort: {{ .Values.acumosDashboardWebcomponentPort }}
+           - containerPort: {{ .Values.mlwb.acumosDashboardWebcomponentPort }}
          env:
            - name: ES_JAVA_OPTS
              value: "-Xmx256m -Xms256m"
            - name: ENVIRONMENT
              value: "deploy"
            - name: projectmSURL
-             value: "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosProjectServicePort }}/mlWorkbench/v1/project"
+             value: "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosProjectServicePort }}/mlWorkbench/v1/project"
            - name: notebookmSURL
-             value: "http://{{ .Values.mlwb.notebookService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosNotebookServicePort }}/mlWorkbench/v1/notebook"
+             value: "http://{{ .Values.mlwb.notebookService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosNotebookServicePort }}/mlWorkbench/v1/notebook"
            - name: pipelinemSURL
-             value: "http://{{ .Values.mlwb.pipelineService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosPipelineServicePort }}/mlWorkbench/v1/pipeline"
+             value: "http://{{ .Values.mlwb.pipelineService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosPipelineServicePort }}/mlWorkbench/v1/pipeline"
            - name: portalFEURL
              value: "http://{{ .Values.global.portal.portalFe.svcName }}.{{ .Values.global.namespace }}"
            - name: portalBEURL

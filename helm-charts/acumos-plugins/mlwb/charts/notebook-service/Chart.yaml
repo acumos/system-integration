@@ -18,7 +18,8 @@
 # limitations under the License.
 # ============LICENSE_END=========================================================
 
-name: notebook-service
+apiVersion: v1
+name: mlwb-notebook-service
 home:
 source:
 version: 2.0.3

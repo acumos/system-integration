@@ -18,7 +18,8 @@
 # limitations under the License.
 # ============LICENSE_END=========================================================
 
-name: home-webcomponent
+apiVersion: v1
+name: mlwb-home-webcomponent
 home:
 source:
 version: 2.0.9

@@ -19,71 +19,38 @@
 # limitations under the License.
 # ============LICENSE_END=========================================================
 
-# Linux Foundation Component Image Location
-nexus3ReleaseRegistryLf: "nexus3.acumos.org:10002"
-nexus3StagingRegistryLf: "nexus3.acumos.org:10004"
-nexus3RegistryName: "nexus3.acumos.org"
-
-# Ports
-acumosDashboardWebcomponentPort: "9083"
-acumosHomeWebcomponentPort: "9082"
-acumosModelServicePort: "9091"
-acumosNotebookCatalogWebcomponentPort: "9087"
-acumosNotebookServicePort: "9089"
-acumosNotebookWebcomponentPort: "9086"
-acumosPipelineCatalogWebcomponentPort: "9092"
-acumosPipelineServicePort: "9090"
-acumosPipelineWebcomponentPort: "9091"
-acumosPredictorServicePort: "9094"
-acumosProjectCatalogWebcomponentPort: "9085"
-acumosProjectServicePort: "9088"
-acumosProjectWebcomponentPort: "9084"
-acumosValidationPort: "9603"
-
-# Images
-acumosDashboardWebcomponentImage: "dashboard-webcomponent:2.0.9"
-acumosHomeWebcomponentImage: "home-webcomponent:2.0.9"
-acumosModelServiceImage: "model-service:2.0.3"
-acumosNotebookCatalogWebcomponentImage: "notebook-catalog-webcomponent:2.0.9"
-acumosNotebookServiceImage: "notebook-service:2.0.3"
-acumosNotebookWebcomponentImage: "notebook-webcomponent:2.0.9"
-acumosPipelineCatalogWebcomponentImage: "pipeline-catalog-webcomponent:2.0.9"
-acumosPipelineServiceImage: "pipeline-service:2.0.4"
-acumosPipelineWebcomponentImage: "pipeline-webcomponent:2.0.9"
-acumosPredictorServiceImage: "predictor-service:1.0.3"
-acumosProjectCatalogWebcomponentImage: "project-catalog-webcomponent:2.0.9"
-acumosProjectServiceImage: "project-service:2.0.4"
-acumosProjectWebcomponentImage: "project-webcomponent:2.0.9"
-
-# Jupyter
-acumosJupyterHub:
-    installcert: "false"
-    storepass: "******"
-    token: "******"
-    url: "******"
-acumosJupyterNotebook:
-    url: "******"
-
-#NIFI
-acumosNifi:
-    adminuser: "******"
-    createpod: "false"
-    namespace: "default"
-    registryname: "******"
-    registryurl: "******"
-    serviceurl: "******"
-
-#CouchDB
-acumosCouchDB:
-    createdb: "true"
-    dbname: "******"
-    host: "******"
-    port: "5984"
-    protocol: "http"
-    pwd: "******"
-    user: "******"
-
 mlwb:
+    # Ports
+    acumosDashboardWebcomponentPort: "9083"
+    acumosHomeWebcomponentPort: "9082"
+    acumosModelServicePort: "9091"
+    acumosNotebookCatalogWebcomponentPort: "9087"
+    acumosNotebookServicePort: "9089"
+    acumosNotebookWebcomponentPort: "9086"
+    acumosPipelineCatalogWebcomponentPort: "9092"
+    acumosPipelineServicePort: "9090"
+    acumosPipelineWebcomponentPort: "9091"
+    acumosPredictorServicePort: "9094"
+    acumosProjectCatalogWebcomponentPort: "9085"
+    acumosProjectServicePort: "9088"
+    acumosProjectWebcomponentPort: "9084"
+    acumosValidationPort: "9603"
+
+    # Images
+    acumosDashboardWebcomponentImage: "dashboard-webcomponent:2.0.9"
+    acumosHomeWebcomponentImage: "home-webcomponent:2.0.9"
+    acumosModelServiceImage: "model-service:2.0.3"
+    acumosNotebookCatalogWebcomponentImage: "notebook-catalog-webcomponent:2.0.9"
+    acumosNotebookServiceImage: "notebook-service:2.0.3"
+    acumosNotebookWebcomponentImage: "notebook-webcomponent:2.0.9"
+    acumosPipelineCatalogWebcomponentImage: "pipeline-catalog-webcomponent:2.0.9"
+    acumosPipelineServiceImage: "pipeline-service:2.0.4"
+    acumosPipelineWebcomponentImage: "pipeline-webcomponent:2.0.9"
+    acumosPredictorServiceImage: "predictor-service:1.0.3"
+    acumosProjectCatalogWebcomponentImage: "project-catalog-webcomponent:2.0.9"
+    acumosProjectServiceImage: "project-service:2.0.4"
+    acumosProjectWebcomponentImage: "project-webcomponent:2.0.9"
+
     useexternalpipeline: "true"
     useexternalnotebook: "true"
     dashboardWebcomponent:
@@ -139,3 +106,30 @@ mlwb:
         podName: "acumos-k8s-mlwb-project-webcomponent"
         svcName: "mlwb-project-webcomponent"
 
+    #CouchDB
+    acumosCouchDB:
+        createdb: "true"
+        dbname: "******"
+        host: "******"
+        port: "5984"
+        protocol: "http"
+        pwd: "******"
+        user: "******"
+
+    # Jupyter
+    acumosJupyterHub:
+        installcert: "false"
+        storepass: "******"
+        token: "******"
+        url: "******"
+    acumosJupyterNotebook:
+        url: "******"
+
+    #NIFI
+    acumosNifi:
+        adminuser: "******"
+        createpod: "false"
+        namespace: "default"
+        registryname: "******"
+        registryurl: "******"
+        serviceurl: "******"

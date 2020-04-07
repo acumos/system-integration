@@ -18,7 +18,8 @@
 # limitations under the License.
 # ============LICENSE_END=========================================================
 
-name: project-service
+apiVersion: v1
+name: mlwb-project-service
 home:
 source:
 version: 2.0.4

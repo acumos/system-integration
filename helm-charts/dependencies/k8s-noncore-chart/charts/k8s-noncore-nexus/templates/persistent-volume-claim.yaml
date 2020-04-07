@@ -21,7 +21,7 @@ metadata:
   name: acumos-nexus-pvc
   namespace: "{{ .Values.global.namespace }}"
   labels:
-    app: acumos-nexus
+    app: "{{ .Values.global.acumosNexusService }}"
 spec:
   accessModes:
     - ReadWriteOnce

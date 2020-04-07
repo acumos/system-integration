@@ -18,7 +18,8 @@
 # limitations under the License.
 # ============LICENSE_END=========================================================
 
-name: project-catalog-webcomponent
+apiVersion: v1
+name: mlwb-project-catalog-webcomponent
 home:
 source:
 version: 2.0.9
