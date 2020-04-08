@@ -32,7 +32,7 @@ helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
 helm repo update
 
 # Simple k/v map to set JupyterHub configuration values
-cat <<EOF | sudo tee $Z2A_ACUMOS_BASE/jhub_value.yaml
+cat <<EOF | tee $Z2A_ACUMOS_BASE/jhub_value.yaml
 hub:
   cookieSecret: "$Z2A_ACUMOS_JUPYTERHUB_HUB_TOKEN"
 proxy:
@@ -49,6 +49,6 @@ log "Retreiving JupyterHub Public IP Address ...."
 log "$(kubectl --namespace=$NAMESPACE get svc proxy-public)"
 
 log "JupyterHub installation complete."
-log "$(To use JupyterHub, enter the external IP for the proxy-public service into a browser.)"
-log "$(JupyterHub is running with a default authenticator, enter any username/password combination to enter the hub.)"
-log "$(JupyterHub proxy and hub secret tokens are contained in jhub_value.yaml file.)"
+log "To use JupyterHub, enter the external IP for the proxy-public service into a browser."
+log "JupyterHub is running with a default authenticator, enter any username/password combination to enter the hub."
+log "JupyterHub proxy and hub secret tokens are contained in jhub_value.yaml file."
