@@ -21,20 +21,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{.Values.mlwb.notebookService.podName}}
+ name: {{ .Values.mlwb.notebookService.podName | quote }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{.Values.mlwb.notebookService.name}}
+   app: {{ .Values.mlwb.notebookService.name | quote }}
 spec:
  selector:
    matchLabels:
-     app: {{.Values.mlwb.notebookService.name}}
+     app: {{ .Values.mlwb.notebookService.name | quote }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{.Values.mlwb.notebookService.name}}
+       app: {{ .Values.mlwb.notebookService.name | quote }}
    spec:
      containers:
        - name: notebook-service
@@ -70,7 +70,7 @@ spec:
                 "jwt": {
                     "secretkey":"secret"
                 },
-                "useexternalnotebook": {{ .Values.mlwb.useexternalnotebook }}
+                "useexternalnotebook": {{ .Values.mlwb.useexternalnotebook | quote }}
                 }'
          volumeMounts:
            - mountPath: /maven/logs

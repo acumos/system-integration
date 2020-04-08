@@ -21,20 +21,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{ .Values.mlwb.pipelineWebcomponent.podName }}
+ name: {{ .Values.mlwb.pipelineWebcomponent.podName | quote }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{ .Values.mlwb.pipelineWebcomponent.name }}
+   app: {{ .Values.mlwb.pipelineWebcomponent.name | quote }}
 spec:
  selector:
    matchLabels:
-     app: {{ .Values.mlwb.pipelineWebcomponent.name }}
+     app: {{ .Values.mlwb.pipelineWebcomponent.name | quote }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{ .Values.mlwb.pipelineWebcomponent.name }}
+       app: {{ .Values.mlwb.pipelineWebcomponent.name | quote }}
    spec:
      containers:
        - name: pipeline-webcomponent
@@ -51,7 +51,7 @@ spec:
            - name: pipelineWikiURL
              value: "https://wiki.acumos.org/display/TRAIN"
            - name: useExternalPipeline
-             value: "{{ .Values.mlwb.useexternalpipeline }}"
+             value: {{ .Values.mlwb.useexternalpipeline | quote }}
          volumeMounts:
            - mountPath: /maven/logs
              name: pipeline-webcomponent-logs
