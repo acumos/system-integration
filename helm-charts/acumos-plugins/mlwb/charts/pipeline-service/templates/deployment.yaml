@@ -21,20 +21,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{.Values.mlwb.pipelineService.podName}}
+ name: {{ .Values.mlwb.pipelineService.podName | quote }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{.Values.mlwb.pipelineService.name}}
+   app: {{ .Values.mlwb.pipelineService.name | quote }}
 spec:
  selector:
    matchLabels:
-     app: {{.Values.mlwb.pipelineService.name}}
+     app: {{ .Values.mlwb.pipelineService.name | quote }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{.Values.mlwb.pipelineService.name}}
+       app: {{ .Values.mlwb.pipelineService.name | quote }}
    spec:
      containers:
        - name: pipeline-service
@@ -50,7 +50,7 @@ spec:
                 "resultsetSize":"2000",
                 "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
                 "projectservice": {
-                    "url" : "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosProjectServicePort }}/mlWorkbench/v1/project"
+                    "url" : "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosProjectServicePort }}/mlWorkbench/v1/project"
                 },
                 "cmndatasvc" : {
                     "url":"http://{{ .Values.global.cds.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
@@ -61,14 +61,14 @@ spec:
                     "secretkey":"secret"
                 },
                 "nifi": {
-                    "createpod": {{ .Values.mlwb.acumosNifi.createpod }},
-                    "adminusername": {{ .Values.mlwb.acumosNifi.adminuser }},
-                    "serviceurl": {{ .Values.mlwb.acumosNifi.serviceurl }},
-                    "registryurl": {{ .Values.mlwb.acumosNifi.registryurl }},
-                    "registryname": {{ .Values.mlwb.acumosNifi.registryname }},
-                    "namespace": {{ .Values.mlwb.acumosNifi.namespace }}
+                    "createpod": {{ .Values.mlwb.acumosNifi.createpod | quote }},
+                    "adminusername": {{ .Values.mlwb.acumosNifi.adminuser | quote }},
+                    "serviceurl": {{ .Values.mlwb.acumosNifi.serviceurl | quote }},
+                    "registryurl": {{ .Values.mlwb.acumosNifi.registryurl | quote }},
+                    "registryname": {{ .Values.mlwb.acumosNifi.registryname | quote }},
+                    "namespace": {{ .Values.mlwb.acumosNifi.namespace | quote }}
                 },
-                "useexternalpipeline": {{ .Values.mlwb.useexternalpipeline }}
+                "useexternalpipeline": {{ .Values.mlwb.useexternalpipeline | quote }}
                 }'
          volumeMounts:
            - mountPath: /maven/logs

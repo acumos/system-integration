@@ -21,20 +21,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{ .Values.mlwb.notebookCatalogWebcomponent.podName }}
+ name: {{ .Values.mlwb.notebookCatalogWebcomponent.podName | quote }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{ .Values.mlwb.notebookCatalogWebcomponent.name }}
+   app: {{ .Values.mlwb.notebookCatalogWebcomponent.name | quote }}
 spec:
  selector:
    matchLabels:
-     app: {{ .Values.mlwb.notebookCatalogWebcomponent.name }}
+     app: {{ .Values.mlwb.notebookCatalogWebcomponent.name | quote }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{ .Values.mlwb.notebookCatalogWebcomponent.name }}
+       app: {{ .Values.mlwb.notebookCatalogWebcomponent.name | quote }}
    spec:
      containers:
        - name: notebook-catalog-webcomponent
@@ -55,7 +55,7 @@ spec:
            - name: notebookWikiURL
              value: "https://wiki.acumos.org/display/TRAIN"
            - name: useExternalNotebook
-             value: "{{ .Values.mlwb.useexternalnotebook }}"
+             value: {{ .Values.mlwb.useexternalnotebook | quote }}
          volumeMounts:
            - mountPath: /maven/logs
              name: notebook-catalog-webcomponent-logs

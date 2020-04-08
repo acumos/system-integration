@@ -21,20 +21,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{ .Values.mlwb.dashboardWebcomponent.podName }}
+ name: {{ .Values.mlwb.dashboardWebcomponent.podName | quote }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{ .Values.mlwb.dashboardWebcomponent.name }}
+   app: {{ .Values.mlwb.dashboardWebcomponent.name | quote }}
 spec:
  selector:
    matchLabels:
-     app: {{ .Values.mlwb.dashboardWebcomponent.name }}
+     app: {{ .Values.mlwb.dashboardWebcomponent.name | quote }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{ .Values.mlwb.dashboardWebcomponent.name }}
+       app: {{ .Values.mlwb.dashboardWebcomponent.name | quote }}
    spec:
      containers:
        - name: dashboard-webcomponent
