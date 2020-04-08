@@ -21,20 +21,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{ .Values.mlwb.pipelineCatalogWebcomponent.podName }}
+ name: {{ .Values.mlwb.pipelineCatalogWebcomponent.podName | quote }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{ .Values.mlwb.pipelineCatalogWebcomponent.name }}
+   app: {{ .Values.mlwb.pipelineCatalogWebcomponent.name | quote }}
 spec:
  selector:
    matchLabels:
-     app: {{ .Values.mlwb.pipelineCatalogWebcomponent.name }}
+     app: {{ .Values.mlwb.pipelineCatalogWebcomponent.name | quote }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{ .Values.mlwb.pipelineCatalogWebcomponent.name }}
+       app: {{ .Values.mlwb.pipelineCatalogWebcomponent.name | quote }}
    spec:
      containers:
        - name: pipeline-catalog-webcomponent
@@ -55,9 +55,9 @@ spec:
            - name: pipelineWikiURL
              value: "https://wiki.acumos.org/display/TRAIN"
            - name: createTimeout
-             value: 60000
+             value: "60000"
            - name: useExternalPipeline
-             value: "{{ .Values.mlwb.useexternalpipeline }}"
+             value: {{ .Values.mlwb.useexternalpipeline | quote }}
          volumeMounts:
            - mountPath: /maven/logs
              name: pipeline-catalog-webcomponent-logs
