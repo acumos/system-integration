@@ -1,9 +1,13 @@
-#### misc.
+### misc. ###
 .swp
 ### visual studio ###
 .vs
 **/.vscode
-### z2a ignores
+### acumos ignores ###
+### z2a ignores ###
+helm-charts/couchdb_value.yaml
+helm-charts/jhub_value.yaml
+helm-charts/nifi_value.yaml
 z2a/user-env.sh
 z2a/k8s-dashboard/main.yaml
 z2a/k8s-dashboard/recommended.yaml

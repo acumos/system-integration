@@ -41,11 +41,11 @@ spec:
       hostPort: 8081
     resources:
       requests:
-        memory: "1024Mi"
-        cpu: "1.0"
+        memory: "256Mi"
+        cpu: "0.1"
       limits:
-        memory: "2048Mi"
-        cpu: "2.0"
+        memory: "512Mi"
+        cpu: "0.5"
   - name: z2a-svcs-proxy-dashboard
     image: k8s-svc-proxy:v1.0
     args: [ "tcp", "9090", "kubernetes-dashboard.kubernetes-dashboard.svc.cluster.local", "9090" ]
@@ -56,8 +56,8 @@ spec:
       hostPort: 9090
     resources:
       requests:
-        memory: "1024Mi"
-        cpu: "1.0"
+        memory: "256Mi"
+        cpu: "0.1"
       limits:
-        memory: "2048Mi"
-        cpu: "2.0"
+        memory: "512Mi"
+        cpu: "0.5"
