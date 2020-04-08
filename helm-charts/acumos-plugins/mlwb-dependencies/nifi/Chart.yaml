@@ -1,0 +1,13 @@
+appVersion: 1.11.0
+description: Apache NiFi is a software project from the Apache Software Foundation
+  designed to automate the flow of data between software systems.
+home: https://nifi.apache.org/
+icon: https://svn.apache.org/repos/asf/nifi/site/trunk/images/niFi-logo-horizontal-scaled.png
+keywords:
+- nifi
+- data
+- process
+maintainers:
+- name: alexnuttinck
+name: nifi
+version: 0.3.3
