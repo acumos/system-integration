@@ -1,5 +1,5 @@
 ### misc. ###
-.swp
+*.swp
 ### visual studio ###
 .vs
 **/.vscode

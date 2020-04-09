@@ -36,14 +36,29 @@
 
 log "Installing Acumos non-core Helm charts ...."
 # Install (or remove) the Acumos non-core charts, one by one in this order
+log "Install Acumos non-core dependency: MariaDB ...."
 helm install -name k8s-noncore-mariadb --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-mariadb -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+log "Install Acumos non-core dependency: Nexus ...."
 helm install -name k8s-noncore-nexus --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-nexus -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+log "Install Acumos non-core dependency: Docker ...."
 helm install -name k8s-noncore-docker --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-docker -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+log "Install Acumos non-core dependency: Kong ...."
 helm install -name k8s-noncore-kong --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-kong -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+log "Install Acumos non-core dependency: Proxy ...."
 helm install -name k8s-noncore-proxy --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-proxy -f $Z2A_ACUMOS_BASE/global_value.yaml
 # Install (or remove) the Acumos non-core charts for ELK, one by one in this order
+
+log "Install Acumos non-core dependency: Elasticsearch ...."
 helm install -name k8s-noncore-elasticsearch --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-elasticsearch -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+log "Install Acumos non-core dependency: Logstash ...."
 helm install -name k8s-noncore-logstash --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-logstash -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+log "Install Acumos non-core dependency: Kibana ...."
 helm install -name k8s-noncore-kibana --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-kibana -f $Z2A_ACUMOS_BASE/global_value.yaml
 
-log "Finshed installing Acumos core Helm charts ...."
+log "Finished installing Acumos core Helm charts ...."

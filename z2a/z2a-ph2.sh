@@ -36,17 +36,12 @@ Z2A_BASE=$(realpath $(dirname $0))
 source $Z2A_BASE/utils.sh
 # Load user environment
 load_env
-# Redirect stdout/stderrr to log file
+# Redirect stdout/stderr to log file
 redirect_to z2a-ph2-install
 # Exit with an error on any non-zero return code
 trap 'fail' ERR
 
 NAMESPACE=$Z2A_K8S_NAMESPACE
-Z2A_ACUMOS_BASE=$(realpath $Z2A_BASE/../helm-charts)
-Z2A_ACUMOS_CORE=$Z2A_ACUMOS_BASE/acumos
-Z2A_ACUMOS_DEPENDENCIES=$Z2A_ACUMOS_BASE/dependencies
-Z2A_ACUMOS_NON_CORE=$Z2A_ACUMOS_BASE/dependencies/k8s-noncore-chart/charts
-save_env
 
 log "Starting Phase 2 (Acumos non-core dependencies) installation ...."
 # Installation - Phase 2 - Acumos non-core dependencies
