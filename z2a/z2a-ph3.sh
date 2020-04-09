@@ -36,7 +36,7 @@ Z2A_BASE=$(realpath $(dirname $0))
 source $Z2A_BASE/utils.sh
 # Load user environment
 load_env
-# Redirect stdout/stderrr to log file
+# Redirect stdout/stderr to log file
 redirect_to z2a-ph3-install
 # Exit with an error on any non-zero return code
 trap 'fail' ERR

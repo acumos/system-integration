@@ -18,7 +18,7 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: z2a-svcs-proxy.yaml - service proxy definitions for kind
+# Name: service.yaml - service proxy definitions for kind
 #
 # Ports:      8081  - HTTPs - Sonatype Nexus Web Interface Port
 #             9090  - HTTP  - Kubernetes Dashboard
@@ -33,12 +33,12 @@ spec:
   containers:
   - name: z2a-svcs-proxy-nexus
     image: k8s-svc-proxy:v1.0
-    args: [ "tcp", "8081", "acumos-nexus-service.acumos-dev1.svc.cluster.local", "8081" ]
+    args: [ "tcp", {{ .Values.global.acumosNexusEndpointPort | quote }}, "{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}.svc.cluster.local", {{ .Values.global.acumosNexusEndpointPort | quote }} ]
     ports:
     - name: tcp
       protocol: TCP
-      containerPort: 8081
-      hostPort: 8081
+      containerPort: {{ .Values.global.acumosNexusEndpointPort }}
+      hostPort: {{ .Values.global.acumosNexusEndpointPort }}
     resources:
       requests:
         memory: "128Mi"
@@ -48,12 +48,12 @@ spec:
         cpu: "0.5"
   - name: z2a-svcs-proxy-kibana
     image: k8s-svc-proxy:v1.0
-    args: [ "tcp", "5601", "kibana.acumos-dev1.svc.cluster.local", "5601" ]
+    args: [ "tcp", {{ .Values.global.acumosKibanaPort | quote }}, "{{ .Values.global.acumosKibanaService }}.{{ .Values.global.namespace }}.svc.cluster.local", {{ .Values.global.acumosKibanaPort | quote }} ]
     ports:
     - name: tcp
       protocol: TCP
-      containerPort: 5601
-      hostPort: 5601
+      containerPort: {{ .Values.global.acumosKibanaPort }}
+      hostPort: {{ .Values.global.acumosKibanaPort }}
     resources:
       requests:
         memory: "128Mi"
@@ -63,12 +63,12 @@ spec:
         cpu: "0.5"
   - name: z2a-svcs-proxy-kong
     image: k8s-svc-proxy:v1.0
-    args: [ "tcp", "443", "acumos-kong-proxy.acumos-dev1.svc.cluster.local", "443" ]
+    args: [ "tcp", {{ .Values.global.acumosKongPort | quote }}, "{{ .Values.global.acumosKongService }}.{{ .Values.global.namespace }}.svc.cluster.local", {{ .Values.global.acumosKongPort | quote }} ]
     ports:
     - name: tcp
       protocol: TCP
-      containerPort: 443
-      hostPort: 443
+      containerPort: {{ .Values.global.acumosKongPort }}
+      hostPort: {{ .Values.global.acumosKongPort }}
     resources:
       requests:
         memory: "128Mi"

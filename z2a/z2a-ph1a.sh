@@ -34,11 +34,15 @@ for v in $(set | grep ^Z2A_) ; do
 done
 # Anchor Z2A_BASE
 Z2A_BASE=$(realpath $(dirname $0))
+Z2A_ACUMOS_BASE=$(realpath $Z2A_BASE/../helm-charts)
+Z2A_ACUMOS_CORE=$Z2A_ACUMOS_BASE/acumos
+Z2A_ACUMOS_DEPENDENCIES=$Z2A_ACUMOS_BASE/dependencies
+Z2A_ACUMOS_NON_CORE=$Z2A_ACUMOS_BASE/dependencies/k8s-noncore-chart/charts
 # Source the z2a utils file
 source $Z2A_BASE/utils.sh
 # Save initial user environment
 save_env
-# Redirect stdout/stderrr to log file
+# Redirect stdout/stderr to log file
 redirect_to z2a-ph1a-install
 # Exit with an error on any non-zero return code
 trap 'fail' ERR

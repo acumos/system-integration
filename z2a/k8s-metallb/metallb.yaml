@@ -1,4 +1,4 @@
-#!/bin/bash
+#
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -16,18 +16,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# ===============LICENSE_END=========================================================
+# ===============LICENSE_END========================================================
 #
-# Name: utils-dev.sh - utility overrides
-#
-# Prerequisites:
-#
-# Usage:
-
-# Source the utils script
-source $Z2A_BASE/utils.sh
-
-# Override redirect function for logging (etc.)
-function redirect_to() {
-	exec 3>/dev/null             # duplicate stdout before redirect
-}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    address-pools:
+    - name: default
+      protocol: layer2
+      addresses:
+      - 192.168.1.240/28

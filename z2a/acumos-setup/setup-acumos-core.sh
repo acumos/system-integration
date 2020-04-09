@@ -45,12 +45,25 @@
 
 log "Installing Acumos core Helm charts ...."
 # Install (or remove) the Acumos non-core charts, one by one in this order
+log "Installing Acumos prerequisite chart ...."
 helm install -name prerequisite --namespace $NAMESPACE $Z2A_ACUMOS_CORE/prerequisite/ -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+log "Installing Acumos Common Data Services chart ...."
 helm install -name common-data-svc --namespace $NAMESPACE $Z2A_ACUMOS_CORE/common-data-svc/ -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+log "Installing Acumos Portal chart ...."
 helm install -name portal --namespace $NAMESPACE $Z2A_ACUMOS_CORE/portal/ -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+log "Installing Acumos Onboarding chart ...."
 helm install -name onboarding --namespace $NAMESPACE $Z2A_ACUMOS_CORE/onboarding/ -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+log "Installing Acumos Microservice Generation chart ...."
 helm install -name microservice-generation --namespace $NAMESPACE $Z2A_ACUMOS_CORE/microservice-generation/ -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+log "Installing Acumos DS Composition Engine chart ...."
 helm install -name ds-compositionengine --namespace $NAMESPACE $Z2A_ACUMOS_CORE/ds-compositionengine/ -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+log "Installing Acumos Federation chart ...."
 helm install -name federation --namespace $NAMESPACE $Z2A_ACUMOS_CORE/federation/ -f $Z2A_ACUMOS_BASE/global_value.yaml
 
-log "Finshed installing Acumos core Helm charts ...."
+log "Finished installing Acumos core Helm charts ...."
