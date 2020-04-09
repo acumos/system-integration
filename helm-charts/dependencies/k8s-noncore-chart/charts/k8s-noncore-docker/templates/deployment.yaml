@@ -21,7 +21,7 @@ metadata:
   labels:
     app: acumos-docker
   name: acumos-docker
-  namespace: "{{ .Values.global.namespace }}"
+  namespace: {{ .Values.global.namespace | quote }}
 spec:
   replicas: 1
   selector:
@@ -39,8 +39,8 @@ spec:
       containers:
       - name: acumos-docker-cmds
         image: {{ .Values.global.docker.image.repository }}:{{ .Values.global.docker.image.tag }}
-        securityContext: 
-            privileged: true 
+        securityContext:
+            privileged: true
         command: ['docker', 'run', '-p', '80:80', 'httpd:latest']
         env:
           - name: DOCKER_HOST
@@ -54,7 +54,7 @@ spec:
       # Docker-Daemon-container
       - name: acumos-docker-daemon
         image: {{ .Values.global.docker.image.repository }}:{{ .Values.global.docker.image.tag }}
-        securityContext: 
+        securityContext:
             privileged: true
         env:
           - name: DIND_INSECURE_REGISTRIES

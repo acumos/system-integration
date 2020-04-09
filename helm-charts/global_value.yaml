@@ -1,7 +1,8 @@
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
-# Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# Copyright (C) 2017-2020 AT&T Intellectual Property & Tech Mahindra.
+# All rights reserved.
 # ===================================================================================
 # This Acumos software file is distributed by AT&T and Tech Mahindra
 # under the Apache License, Version 2.0 (the "License");
@@ -49,6 +50,7 @@ global:
     acumosFederationLocalPort: "9884"
     acumosFilebeatPort: "5000"
     acumosKibanaPort: "5601"
+    acumosKongPort: "443"
     acumosKongAdmSslPort: "8444"
     acumosKongAdminPort: "8001"
     acumosKongPostgresPort: "5432"
@@ -129,9 +131,6 @@ global:
     acumosCmsUser: "******"
     acumosCmsPassword: "******"
 
-    # Security Verification (sv)
-    acumosSVscan: "false"
-
     # Docker
     acumosDockerHost: "acumos-docker-service"
     acumosDockerUsername: "docker"
@@ -139,8 +138,18 @@ global:
     acumosDockerProxyHost: "acumos-docker-proxy-service"
 
     # ELK
+    acumosELKHost: "******"
+    acumosElasticsearchName: "elasticsearch"
+    acumosLogstashName: "elasticsearch"
+    acumosKibanaName: "kibana"
+    acumosElasticsearchService: "elasticsearch-service"
+    acumosLogstashService: "elasticsearch-service"
+    acumosKibanaService: "kibana"
+    # acumosKibanaService: "kibana-service"
+
+    # ELK (to be refactored)
     elkImagePullPolicy: "IfNotPresent"
-    elkersistenceEnabled: "true"
+    elkPersistenceEnabled: "true"
     elkPersistencePVCName: "elasticsearch-data"
     elkPersistenceSize: "10Gi"
 
@@ -150,11 +159,25 @@ global:
     acumosKongPostgresDB: "kong"
     acumosKongPostgresPassword: "kong"
     acumosKongPostgresUser: "kong"
+    acumosKongService: "acumos-kong-proxy"
 
     # MariaDB/MySQL
     acumosMariaDbUser: "******"
     acumosMariaDbPassword: "******"
     acumosMariaDbRootPassword: "******"
+
+    # Misc.
+    acumosDockerRegistryEmail: "******"
+    acumosHostname: "******"
+    acumosKeyStorePwd: "******"
+    acumosLogstashHost: "******"
+    acumosMailJetApiKey: "******"
+    acumosMailJetId: "******"
+    acumosMailJetSecretKey: "******"
+    acumosOnboardingCli: "******"
+    acumosProxy: "acumos-proxy"
+    acumosQandAUrl: "******"
+    acumosTrustStorePwd: "******"
 
     # Nexus Admin
     acumosNexusAdmin: "admin"
@@ -166,7 +189,8 @@ global:
     acumosNexusService: "acumos-nexus-service"
 
     # Nexus User
-    acumosNexusUsername: "*******"
+    acumosNexusUserEmail: "******"
+    acumosNexusUserName: "*******"
     acumosNexusUserPassword: "******"
     acumosNexusRole: "acumos-k8-role"
 
@@ -184,19 +208,8 @@ global:
     acumosNexusPVCStorage: "50Gi"
     acumosPVCStorage: "2Gi"
 
-    # Misc.
-    acumosDockerRegistryEmail: "******"
-    acumosELKHost: "******"
-    acumosHostname: "******"
-    acumosKeyStorePwd: "******"
-    acumosLogstashHost: "******"
-    acumosMailJetApiKey: "******"
-    acumosMailJetId: "******"
-    acumosMailJetSecretKey: "******"
-    acumosOnboardingCli: "******"
-    acumosProxy: "acumos-proxy"
-    acumosQandAUrl: "******"
-    acumosTrustStorePwd: "******"
+    # Security Verification (sv)
+    acumosSVscan: "false"
 
     cds:
         name: 'acumos-common-data-svc'
@@ -207,6 +220,16 @@ global:
         image:
             repository: "docker"
             tag: "17.06.0-dind"
+
+    dsComposition:
+        name: 'acumos-ds-composition'
+        podName: 'acumos-k8s-ds-composition'
+        svcName: 'ds-composition'
+
+    microserviceGeneration:
+        name: 'acumos-microservice-generartion'
+        podName: 'acumos-k8s-microservice-generation'
+        svcName: 'microservice-generation'
 
     onboarding:
         name: 'acumos-onboarding'
@@ -222,14 +245,3 @@ global:
             name: 'acumos-portal-back-end'
             podName: 'acumos-k8s-portal-be'
             svcName: 'acumos-portal-be'
-
-    microserviceGeneration:
-        name: 'acumos-microservice-generartion'
-        podName: 'acumos-k8s-microservice-generation'
-        svcName: 'microservice-generation'
-
-    dsComposition:
-        name: 'acumos-ds-composition'
-        podName: 'acumos-k8s-ds-composition'
-        svcName: 'ds-composition'
-
