@@ -20,7 +20,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: kibana
-  namespace: "{{ .Values.global.namespace }}"
+  namespace: {{ .Values.global.namespace | quote }}
   labels:
     app: kibana
 spec:
