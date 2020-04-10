@@ -38,7 +38,7 @@ kind load docker-image k8s-svc-proxy:v1.0 --name $Z2A_CLUSTER_NAME
 log "Deploying k8s-svc-proxy pod cluster ...."
 # Deploy the k8s-svc-proxy pod
 # kubectl apply -f $Z2A_BASE/k8s-svc-proxy/z2a-svcs-proxy.yaml --namespace=$Z2A_K8S_NAMESPACE
-helm install z2a-svcs-proxy --namespace=$Z2A_K8S_NAMESPACE ./z2a-svcs-proxy/ -f $Z2A_ACUMOS_BASE/global_value.yaml
+helm install z2a-svcs-proxy --namespace=$Z2A_K8S_NAMESPACE ./z2a-svcs-proxy/ -f $Z2A_BASE/z2a-config/z2a_value.yaml
 
 log "Install MetalLB ...."
 # Install MetalLB load Balancer

@@ -51,5 +51,6 @@ trap 'fail' ERR
 
 log "Starting Phase 1b (k8s, helm, kind) installation ..."
 # Installation - Phase 1b - kubectl, helm and kind
+source $Z2A_BASE/distro-setup/setup-z2a-values.sh
 source $Z2A_BASE/distro-setup/setup-k8s-helm-kind.sh
 source $Z2A_BASE/distro-setup/setup-k8s-helpers.sh
