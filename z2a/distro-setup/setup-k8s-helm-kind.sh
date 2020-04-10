@@ -75,7 +75,6 @@ kind create cluster --name=$Z2A_CLUSTER_NAME --config $Z2A_BASE/distro-setup/kin
 # Echo cluster-info - echo output to both log file and TTY
 log "$(kubectl cluster-info --context kind-$Z2A_CLUSTER_NAME)"
 
-Z2A_K8S_NAMESPACE=acumos-dev1 ; save_env
 log "Creating k8s namespace : name = $Z2A_K8S_NAMESPACE"
 # Create an acumos-dev1 namespace in the kind-acumos cluster
 kubectl create namespace $Z2A_K8S_NAMESPACE

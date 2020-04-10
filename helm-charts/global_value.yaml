@@ -140,10 +140,11 @@ global:
     # ELK
     acumosELKHost: "******"
     acumosElasticsearchName: "elasticsearch"
-    acumosLogstashName: "logstash"
+    acumosLogstashName: "elasticsearch"
+    acumosLogstashHost: "******"
     acumosKibanaName: "kibana"
     acumosElasticsearchService: "elasticsearch-service"
-    acumosLogstashService: "logstash-service"
+    acumosLogstashService: "elasticsearch-service"
     acumosKibanaService: "kibana-service"
 
     # ELK (to be refactored)
@@ -169,7 +170,6 @@ global:
     acumosDockerRegistryEmail: "******"
     acumosHostname: "******"
     acumosKeyStorePwd: "******"
-    acumosLogstashHost: "******"
     acumosMailJetApiKey: "******"
     acumosMailJetId: "******"
     acumosMailJetSecretKey: "******"
@@ -226,7 +226,7 @@ global:
         svcName: 'ds-composition'
 
     microserviceGeneration:
-        name: 'acumos-microservice-generartion'
+        name: 'acumos-microservice-generation'
         podName: 'acumos-k8s-microservice-generation'
         svcName: 'microservice-generation'
 

@@ -20,8 +20,12 @@
 #
 # Name: service.yaml - service proxy definitions for kind
 #
-# Ports:      8081  - HTTPs - Sonatype Nexus Web Interface Port
-#             9090  - HTTP  - Kubernetes Dashboard
+# Ports:
+#       -  443    - HTTPs - Kong SSL Port
+#       - 5601    - HTTP  - Kibana Service Port
+#       - 8081    - HTTPs - Sonatype Nexus Web Interface Port
+#       - 8443    - HTTPs - unused at this time
+#       - 9090    - HTTP  - default Kubernetes Dashboard
 
 apiVersion: v1
 kind: Pod
@@ -31,14 +35,29 @@ spec:
   nodeSelector:
     svc-proxy: "true"
   containers:
-  - name: z2a-svcs-proxy-nexus
+  - name: z2a-svcs-proxy-nexus-admin
     image: k8s-svc-proxy:v1.0
-    args: [ "tcp", {{ .Values.global.acumosNexusEndpointPort | quote }}, "{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}.svc.cluster.local", {{ .Values.global.acumosNexusEndpointPort | quote }} ]
+    args: [ "tcp", {{ .Values.z2a.ports.nexusAdminSrc | quote }}, "{{ .Values.z2a.ports.nexusAdminSvc }}.{{ .Values.z2a.namespace }}.svc.cluster.local", {{ .Values.z2a.ports.nexusAdminDst | quote }} ]
     ports:
     - name: tcp
       protocol: TCP
-      containerPort: {{ .Values.global.acumosNexusEndpointPort }}
-      hostPort: {{ .Values.global.acumosNexusEndpointPort }}
+      containerPort: {{ .Values.z2a.ports.nexusAdminSrc }}
+      hostPort: {{ .Values.z2a.ports.nexusAdminSrc }}
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "0.1"
+      limits:
+        memory: "512Mi"
+        cpu: "0.5"
+  - name: z2a-svcs-proxy-nexus
+    image: k8s-svc-proxy:v1.0
+    args: [ "tcp", {{ .Values.z2a.ports.nexusSrc | quote }}, "{{ .Values.z2a.ports.nexusSvc }}.{{ .Values.z2a.namespace }}.svc.cluster.local", {{ .Values.z2a.ports.nexusDst | quote }} ]
+    ports:
+    - name: tcp
+      protocol: TCP
+      containerPort: {{ .Values.z2a.ports.nexusSrc }}
+      hostPort: {{ .Values.z2a.ports.nexusSrc }}
     resources:
       requests:
         memory: "128Mi"
@@ -48,12 +67,12 @@ spec:
         cpu: "0.5"
   - name: z2a-svcs-proxy-kibana
     image: k8s-svc-proxy:v1.0
-    args: [ "tcp", {{ .Values.global.acumosKibanaPort | quote }}, "{{ .Values.global.acumosKibanaService }}.{{ .Values.global.namespace }}.svc.cluster.local", {{ .Values.global.acumosKibanaPort | quote }} ]
+    args: [ "tcp", {{ .Values.z2a.ports.kibanaSrc | quote }}, "{{ .Values.z2a.ports.kibanaSvc }}.{{ .Values.z2a.namespace }}.svc.cluster.local", {{ .Values.z2a.ports.kibanaDst | quote }} ]
     ports:
     - name: tcp
       protocol: TCP
-      containerPort: {{ .Values.global.acumosKibanaPort }}
-      hostPort: {{ .Values.global.acumosKibanaPort }}
+      containerPort: {{ .Values.z2a.ports.kibanaSrc }}
+      hostPort: {{ .Values.z2a.ports.kibanaSrc }}
     resources:
       requests:
         memory: "128Mi"
@@ -63,12 +82,12 @@ spec:
         cpu: "0.5"
   - name: z2a-svcs-proxy-kong
     image: k8s-svc-proxy:v1.0
-    args: [ "tcp", {{ .Values.global.acumosKongPort | quote }}, "{{ .Values.global.acumosKongService }}.{{ .Values.global.namespace }}.svc.cluster.local", {{ .Values.global.acumosKongPort | quote }} ]
+    args: [ "tcp", {{ .Values.z2a.ports.kongSrc | quote }}, "{{ .Values.z2a.ports.kongSvc }}.{{ .Values.z2a.namespace }}.svc.cluster.local", {{ .Values.z2a.ports.kongSrc | quote }} ]
     ports:
     - name: tcp
       protocol: TCP
-      containerPort: {{ .Values.global.acumosKongPort }}
-      hostPort: {{ .Values.global.acumosKongPort }}
+      containerPort: {{ .Values.z2a.ports.kongSrc }}
+      hostPort: {{ .Values.z2a.ports.kongSrc }}
     resources:
       requests:
         memory: "128Mi"
@@ -78,12 +97,12 @@ spec:
         cpu: "0.5"
   - name: z2a-svcs-proxy-dashboard
     image: k8s-svc-proxy:v1.0
-    args: [ "tcp", "9090", "kubernetes-dashboard.kubernetes-dashboard.svc.cluster.local", "9090" ]
+    args: [ "tcp", {{ .Values.z2a.ports.k8sDashSrc | quote }}, "kubernetes-dashboard.kubernetes-dashboard.svc.cluster.local", {{ .Values.z2a.ports.k8sDashDst | quote }} ]
     ports:
     - name: tcp
       protocol: TCP
-      containerPort: 9090
-      hostPort: 9090
+      containerPort: {{ .Values.z2a.ports.k8sDashSrc }}
+      hostPort: {{ .Values.z2a.ports.k8sDashSrc }}
     resources:
       requests:
         memory: "128Mi"

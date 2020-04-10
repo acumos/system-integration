@@ -38,6 +38,7 @@ Z2A_ACUMOS_BASE=$(realpath $Z2A_BASE/../helm-charts)
 Z2A_ACUMOS_CORE=$Z2A_ACUMOS_BASE/acumos
 Z2A_ACUMOS_DEPENDENCIES=$Z2A_ACUMOS_BASE/dependencies
 Z2A_ACUMOS_NON_CORE=$Z2A_ACUMOS_BASE/dependencies/k8s-noncore-chart/charts
+Z2A_K8S_NAMESPACE=$(yq r $Z2A_ACUMOS_BASE/global_value.yaml global.namespace)
 # Source the z2a utils file
 source $Z2A_BASE/utils.sh
 # Save initial user environment
