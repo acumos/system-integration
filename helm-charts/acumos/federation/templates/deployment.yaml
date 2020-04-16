@@ -38,7 +38,7 @@ spec:
    spec:
      containers:
        - name:  federation-gateway
-         image: {{ .Values.global.image.repository }}/acumos/{{ .Values.global.acumosFederationImage }}
+         image: {{ .Values.global.image.repository }}/{{ .Values.global.acumosFederationImage }}
          resources:
            {{- toYaml .Values.resources | nindent 10 }}
          ports:
@@ -107,7 +107,7 @@ spec:
            - mountPath: /app/certs
              name: acumos-certs
        - name: filebeat
-         image: {{ .Values.global.image.repository }}/acumos/{{ .Values.global.acumosFilebeatImage }}
+         image: {{ .Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}
          ports:
            - containerPort: {{ .Values.global.acumosFilebeatPort }}
          env:

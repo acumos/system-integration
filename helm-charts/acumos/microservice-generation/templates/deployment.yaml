@@ -36,7 +36,7 @@ spec:
    spec:
      containers:
        - name: microservice-generation
-         image: {{.Values.global.image.repository }}/acumos/{{ .Values.global.acumosMicroServiceGenerationImage }}
+         image: {{.Values.global.image.repository }}/{{ .Values.global.acumosMicroServiceGenerationImage }}
          resources:
            {{- toYaml .Values.resources | nindent 10 }}
          ports:
@@ -125,7 +125,7 @@ spec:
            - mountPath: /maven/logs
              name: acumos-microservice-generation-logs
        - name: filebeat
-         image: {{.Values.global.image.repository }}/acumos/{{ .Values.global.acumosFilebeatImage }}
+         image: {{.Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}
          ports:
            - containerPort: {{ .Values.global.acumosFilebeatPort }}
          env:
