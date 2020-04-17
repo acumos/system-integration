@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eedff158_41a38743",
+        "filename": "helm-charts/acumos/common-data-svc/templates/deployment.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 24
+      },
+      "writtenOn": "2020-04-17T16:53:59Z",
+      "side": 1,
+      "message": "we are using secrets over here for CDS.\nSame we did for many other files on this request:\nhttps://gerrit.acumos.org/r/c/system-integration/+/7638",
+      "range": {
+        "startLine": 66,
+        "startChar": 29,
+        "endLine": 70,
+        "endChar": 39
+      },
+      "revId": "583708a02ab58d39e7ad365b91c27faff55b9252",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
