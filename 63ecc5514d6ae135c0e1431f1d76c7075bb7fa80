@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ce9477ba_3276db7e",
+        "filename": "helm-charts/dependencies/k8s-noncore-chart/charts/k8s-noncore-docker/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-04-17T17:54:57Z",
+      "side": 1,
+      "message": "override my change.",
+      "range": {
+        "startLine": 51,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 22
+      },
+      "revId": "63ecc5514d6ae135c0e1431f1d76c7075bb7fa80",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a4643ca4_87dc9b38",
+        "filename": "helm-charts/dependencies/k8s-noncore-chart/charts/k8s-noncore-docker/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-04-17T17:54:57Z",
+      "side": 1,
+      "message": "override my change.",
+      "range": {
+        "startLine": 73,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 22
+      },
+      "revId": "63ecc5514d6ae135c0e1431f1d76c7075bb7fa80",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
