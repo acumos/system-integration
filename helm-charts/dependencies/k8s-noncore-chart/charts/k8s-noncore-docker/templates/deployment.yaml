@@ -21,7 +21,7 @@ metadata:
   labels:
     app: acumos-docker
   name: acumos-docker
-  namespace: {{ .Values.global.namespace | quote }}
+  namespace: "{{ .Values.global.namespace }}"
 spec:
   replicas: 1
   selector:
@@ -32,9 +32,6 @@ spec:
       labels:
         app: acumos-docker
     spec:
-      volumes:
-      - name: docker-volume
-        emptyDir: {}
       # Docker-commands-container
       containers:
       - name: acumos-docker-cmds
@@ -51,6 +48,9 @@ spec:
           protocol: TCP
         resources:
           {{- toYaml .Values.dockerCmds.resources | nindent 10 }}
+        volumeMounts:
+        - mountPath: /docker-data
+          name: docker-data-volume
       # Docker-Daemon-container
       - name: acumos-docker-daemon
         image: {{ .Values.global.docker.image.repository }}:{{ .Values.global.docker.image.tag }}
@@ -67,3 +67,10 @@ spec:
           mountPath: /var/lib/docker
         resources:
           {{- toYaml .Values.dockerDaemon.resources | nindent 10 }}
+      volumes:
+        - name: docker-data-volume
+          persistentVolumeClaim:
+            claimName: acumos-docker-pvc
+        - name: docker-volume
+          persistentVolumeClaim:
+            claimName: docker-daemon-pvc
