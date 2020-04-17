@@ -39,19 +39,19 @@ spec:
      containers:
        - name:  federation-gateway
          image: {{ .Values.global.image.repository }}/{{ .Values.global.acumosFederationImage }}
-         resources:
-           {{- toYaml .Values.resources | nindent 10 }}
          ports:
            - containerPort: {{ .Values.global.acumosFederationGatewayPort }}
          env:
+           - name: "cdms.client.url"
+             value: "http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds"
+           - name: "cdms.client.username"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: username }
+           - name: "cdms.client.password"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: password }
            - name: SPRING_APPLICATION_JSON
-             value: '{
-            "logging":{
-               "level":{
-                  "root": "{{ .Values.logLevel }}"
-               }
-             },
-            "federation" : {
+             value: '{ "federation" : {
                "instance" : "gateway",
                "instance.name" : "k8",
                "operator" : "d468656f-57d0-46e3-9f94-7ffa4f66dc03",
@@ -93,13 +93,7 @@ spec:
                "jobchecker": {
                  "interval": 300
                }
-             },
-             "cdms" : {
-               "client" : {
-                 "url": "http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
-                 "username": "{{ .Values.global.acumosCdsUser }}",
-                 "password": "{{ .Values.global.acumosCdsPassword }}"
-               }
+             }
              }}'
          volumeMounts:
            - mountPath: /maven/logs
@@ -128,3 +122,4 @@ spec:
      imagePullSecrets:
        - name: {{ .Values.global.image.pullSecrets }}
      {{- end }}
+

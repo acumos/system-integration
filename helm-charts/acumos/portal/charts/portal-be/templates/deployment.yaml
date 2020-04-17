@@ -37,33 +37,27 @@ spec:
      containers:
        - name: acumos-portal-be
          image: {{.Values.global.image.repository }}/{{ .Values.global.acumosPortalBeImage }}
-         resources:
-           {{- toYaml .Values.resources | nindent 10 }}
          ports:
            - containerPort: {{ .Values.global.acumosPortalBePort }}
          env:
+           - name: "cdms.client.url"
+             value: "http://acumos-cds:{{ .Values.acumosCommonDataSvcPort }}/ccds"
+           - name: "cdms.client.username"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: username }
+           - name: "cdms.client.password"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: password }
            - name: SPRING_APPLICATION_JSON
              value: '{ "server" : {
                    "port" : {{ .Values.global.acumosPortalBePort }}
                 },
-                 "logging":{
-                    "level":{
-                        "root": "{{ .Values.logLevel }}"
-                    }
-                 },
                 "nexus": {
                         "url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}/repository/acumos-k8-models-maven",
                         "proxy": "",
                         "password": "{{ .Values.global.acumosNexusPassword }}",
                         "username": "{{ .Values.global.acumosNexusUsername }}",
                         "groupid": "com.artifact"
-                },
-                "cdms" : {
-                  "client" : {
-                     "url": "http://{{.Values.global.cds.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
-                     "username": "{{ .Values.global.acumosCdsUser }}",
-                     "password": "{{ .Values.global.acumosCdsPassword }}"
-                     }
                 },
                 "docker" : {
                    "host" : "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
@@ -198,8 +192,6 @@ spec:
              name: portal-be-logs
            - mountPath: /app/certs
              name: acumos-certs
-           - mountPath: /images/sidebar-icons
-             name: acumos-images
        - name: filebeat
          image: {{.Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}
          ports:
@@ -214,8 +206,6 @@ spec:
              name: portal-be-logs
      volumes:
        - name: portal-be-logs
-         emptyDir: {}
-       - name: acumos-images
          emptyDir: {}
        - name: acumos-certs
          secret:
