@@ -18,7 +18,7 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: setup-acumos-non-core.sh - setup Acumos non-core components
+# Name: setup-acumos-noncore.sh - setup Acumos non-core components
 #
 # Prerequisites:
 # - Ubuntu Bionic (18.04), or Centos 7 VM
@@ -27,38 +27,42 @@
 #   - has sudo access on the VM
 #   - has successfully completed z2a phases 1a and 1b OR
 #   - has a working Kubernetes environment created by other methods
-#   - has sourced this script via the top-level z2a-ph2.sh script (which sets the ENV vars)
+#   - has sourced this script via the top-level z2a script (which sets the ENV vars)
 # Usage:
 
 # Individual Acumos non-core charts
-# helm install -name $CHARTNAME --namespace $NAMESPACE ./$CHARTNAME/ -f ./global_value.yaml
+# helm install -name $CHARTNAME --namespace $NAMESPACE <PATH>$CHARTNAME -f <PATH>global_value.yaml
 # where $CHARTNAME is one of the following charts
 
-log "Installing Acumos non-core Helm charts ...."
+echo "Installing Acumos noncore Helm charts ...."
 # Install (or remove) the Acumos non-core charts, one by one in this order
-log "Install Acumos non-core dependency: MariaDB ...."
-helm install -name k8s-noncore-mariadb --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-mariadb -f $Z2A_ACUMOS_BASE/global_value.yaml
+echo "Install Acumos noncore dependency: MariaDB (Bitnami Chart) ...."
+export ACUMOS_GLOBAL_VALUE=$Z2A_ACUMOS_BASE/global_value.yaml
+(cd $Z2A_BASE/noncore-config/ ; make install_mariadb)
+# source $Z2A_BASE/noncore-config/mariadb/setup-mariadb.sh
 
-log "Install Acumos non-core dependency: Nexus ...."
+exit 0
+
+echo "Install Acumos noncore dependency: Nexus ...."
 helm install -name k8s-noncore-nexus --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-nexus -f $Z2A_ACUMOS_BASE/global_value.yaml
 
-log "Install Acumos non-core dependency: Docker ...."
-helm install -name k8s-noncore-docker --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-docker -f $Z2A_ACUMOS_BASE/global_value.yaml
-
-log "Install Acumos non-core dependency: Kong ...."
+echo "Install Acumos noncore dependency: Kong ...."
 helm install -name k8s-noncore-kong --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-kong -f $Z2A_ACUMOS_BASE/global_value.yaml
 
-log "Install Acumos non-core dependency: Proxy ...."
-helm install -name k8s-noncore-proxy --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-proxy -f $Z2A_ACUMOS_BASE/global_value.yaml
-# Install (or remove) the Acumos non-core charts for ELK, one by one in this order
+echo "Install Acumos noncore dependency: Docker ...."
+helm install -name k8s-noncore-docker --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-docker -f $Z2A_ACUMOS_BASE/global_value.yaml
 
-log "Install Acumos non-core dependency: Elasticsearch ...."
+echo "Install Acumos noncore dependency: Proxy ...."
+helm install -name k8s-noncore-proxy --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-proxy -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+# Install (or remove) the Acumos non-core charts for ELK, one by one in this order
+echo "Install Acumos noncore dependency: Elasticsearch ...."
 helm install -name k8s-noncore-elasticsearch --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-elasticsearch -f $Z2A_ACUMOS_BASE/global_value.yaml
 
-log "Install Acumos non-core dependency: Logstash ...."
+echo "Install Acumos noncore dependency: Logstash ...."
 helm install -name k8s-noncore-logstash --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-logstash -f $Z2A_ACUMOS_BASE/global_value.yaml
 
-log "Install Acumos non-core dependency: Kibana ...."
+echo "Install Acumos noncore dependency: Kibana ...."
 helm install -name k8s-noncore-kibana --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-kibana -f $Z2A_ACUMOS_BASE/global_value.yaml
 
-log "Finished installing Acumos core Helm charts ...."
+echo "Finished installing Acumos noncore dependency Helm charts ...."

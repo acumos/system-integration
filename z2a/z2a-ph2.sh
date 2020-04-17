@@ -33,20 +33,26 @@
 # Anchor Z2A_BASE
 Z2A_BASE=$(realpath $(dirname $0))
 # Source the z2a utils file
-source $Z2A_BASE/utils.sh
+source $Z2A_BASE/z2a-utils.sh
 # Load user environment
 load_env
-# Redirect stdout/stderr to log file
-redirect_to z2a-ph2-install
 # Exit with an error on any non-zero return code
 trap 'fail' ERR
 
+redirect_to /dev/tty
+
 NAMESPACE=$Z2A_K8S_NAMESPACE
 
-log "Starting Phase 2 (Acumos non-core dependencies) installation ...."
-# Installation - Phase 2 - Acumos non-core dependencies
-source $Z2A_BASE/acumos-setup/setup-acumos-non-core.sh
+# Test to ensure that all Pods are running before proceeding
+wait_for_pods 180   # seconds
 
-log "Starting Phase 2 (Acumos core) installation ...."
+echo "Starting Phase 2 (Acumos non-core dependencies) installation ...."
+# Installation - Phase 2 - Acumos non-core dependencies
+source $Z2A_BASE/acumos-setup/setup-acumos-noncore.sh
+
+echo "Starting Phase 2 (Acumos core) installation ...."
 # Installation - Phase 2 - Acumos core
 source $Z2A_BASE/acumos-setup/setup-acumos-core.sh
+
+echo "Please check the status of the K8s pods at this time .... "
+echo "Please ensure that all pods are in a 'Running' status before proceeding ...."

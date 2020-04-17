@@ -1,0 +1,6 @@
+master:
+  persistence:
+    size: 1Gi
+slave:
+  persistence:
+    size: 1Gi

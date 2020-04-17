@@ -34,6 +34,16 @@ EOF
 log "Installing NiFi Helm Chart ...."
 helm install $RELEASE --namespace $NAMESPACE -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml -f $Z2A_ACUMOS_BASE/nifi_value.yaml cetic/nifi
 
+# Loop for JupyterHub to become available
+for i in $(seq 1 20) ; do
+  sleep 10
+  logc .
+  TODO: craft a query to determine the status of NiFi
+  # kubectl exec --namespace $NAMESPACE $RELEASE
+  if [ $i -eq 20 ] ; then log "\nTimeout waiting for Nifi to become available ...." ; exit ; fi
+done
+log "\n"
+
 log "NiFi Cluster setup information ...."
 log "$(kubectl get svc $RELEASE -n $NAMESPACE)"
 log "Cluster endpoint IP address will be available at:"

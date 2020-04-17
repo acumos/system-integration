@@ -27,13 +27,13 @@
 #   - has sudo access on the VM
 #   - has successfully completed z2a phases 1a and 1b OR
 #   - has a working Kubernetes environment created by other methods
-#   - has sourced this script via the top-level z2a-ph2.sh script (which sets the ENV vars)
-#		- has successfully succesfully installed the Acumos non-core dependencies
+#   - has sourced this script via the top-level z2a script (which sets the ENV vars)
+#		- has successfully installed and configured the Acumos non-core dependencies
 #
 # Usage:
 
 # Individual Acumos core charts
-# helm install -name $CHARTNAME --namespace $NAMESPACE ./$CHARTNAME/ -f ../../global_value.yaml
+# helm install -name $CHARTNAME --namespace $NAMESPACE <PATH>$CHARTNAME -f <PATH>global_value.yaml
 # where $CHARTNAME is one of the following charts
 # - prerequisite
 # - common-data-svc

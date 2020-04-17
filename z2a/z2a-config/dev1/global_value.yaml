@@ -19,6 +19,7 @@
 # NOTE: The values in this file are for Acumos Z2A DEMONSTRATION PURPOSES ONLY.
 # NOTE: Do not use these values for any PRODUCTION or Internet-facing systems.
 #
+# TODO: Needs to be refactored to align with new global_value.yaml format.
 
 global:
     appVersion: "1.0.0"
@@ -63,7 +64,7 @@ global:
     acumosKongSslPort: "8443"
     acumosKubernetesClientPort: "8082"
     acumosLogstashPort: "5044"
-    acumosMariaDbPort: "3306"
+    acumosCdsDbPort: "3306"
     acumosMetricBeatPort: "8098"
     acumosMicroServiceGenerationPort: "8333"
     acumosModelServicePort: "9091"
@@ -99,29 +100,29 @@ global:
     acumosCsvDataBrokerImage: "csvdatabroker:1.4.0"
     acumosDashboardWebcomponentImage: "dashboard-webcomponent:2.0.9"
     acumosDataBrokerImage: "databroker-zipbroker:1.0.0"
-    acumosDesignStudioImage: "ds-compositionengine:3.0.3"
+    acumosDesignStudioImage: "acumos/ds-compositionengine:3.0.3"
     acumosElasticsearchImage: "acumos-elasticsearch:2.2.2"
-    acumosFederationImage: "federation-gateway:3.1.0"
-    acumosFilebeatImage: "acumos-filebeat:3.0.5"
+    acumosFederationImage: "acumos/federation-gateway:3.1.0"
+    acumosFilebeatImage: "acumos/acumos-filebeat:3.0.5"
     acumosH20GenericJavaModelRunnerImage: "h2o-genericjava-modelrunner-2.2.3"
     acumosHomeWebcomponentImage: "home-webcomponent:2.0.9"
     acumosKibanaImage: "acumos-kibana:2.2.2"
     acumosKubernetesClientImage: "kubernetes-client:2.0.11"
     acumosLogstashImage: "acumos-logstash:2.2.2"
     acumosMetricBeatImage: "acumos-metricbeat:2.2.2"
-    acumosMicroServiceGenerationImage: "microservice-generation:3.8.1"
+    acumosMicroServiceGenerationImage: "acumos/microservice-generation:3.8.1"
     acumosModelServiceImage: "model-service:2.0.3"
     acumosNotebookCatalogWebcomponentImage: "notebook-catalog-webcomponent:2.0.9"
     acumosNotebookServiceImage: "notebook-service:2.0.3"
     acumosNotebookWebcomponentImage: "notebook-webcomponent:2.0.9"
     acumosOnboardingBaseRImage: "onboarding-base-r:1.0.0"
-    acumosOnboardingImage: "onboarding-app:3.8.1"
+    acumosOnboardingImage: "acumos/onboarding-app:3.8.1"
     acumosOpenStackImage: "openstack-client:2.0.12"
     acumosPipelineCatalogWebcomponentImage: "pipeline-catalog-webcomponent:2.0.9"
     acumosPipelineServiceImage: "pipeline-service:2.0.4"
     acumosPipelineWebcomponentImage: "pipeline-webcomponent:2.0.9"
-    acumosPortalBeImage: "acumos-portal-be:3.0.28"
-    acumosPortalFeImage: "acumos-portal-fe:3.0.28"
+    acumosPortalBeImage: "acumos/acumos-portal-be:3.0.28"
+    acumosPortalFeImage: "acumos/acumos-portal-fe:3.0.28"
     acumosPredictorServiceImage: "predictor-service:1.0.3"
     acumosProjectCatalogWebcomponentImage: "project-catalog-webcomponent:2.0.9"
     acumosProjectServiceImage: "project-service:2.0.4"
@@ -140,13 +141,14 @@ global:
     acumosRWUserPassword: "docker"
     acumosRWUserName: "docker"
 
-    # Cds and CMS
+    # Common Data Service (CDS/Cds)
     acumosCdsDb: "CDS"
     acumosCdsUser: "ccds_client"
     acumosCdsPassword: "ccds_client"
-    acumosCMSDb: "*******"
-    acumosCmsUser: "******"
-    acumosCmsPassword: "******"
+    acumosCdsDbUserName: "CDS_USER"
+    acumosCdsDbUserPassword: "CDS_PASS"
+    acumosCdsDbRootPassword: "rootme"
+    acumosCdsDbService: "acumos-cds-db"
 
     # Docker
     acumosDockerHost: "acumos-docker-service"
@@ -161,8 +163,7 @@ global:
     acumosKibanaName: "kibana"
     acumosElasticsearchService: "elasticsearch-service"
     acumosLogstashService: "elasticsearch-service"
-    acumosKibanaService: "kibana"
-    # acumosKibanaService: "kibana-service"
+    acumosKibanaService: "kibana-service"
 
     # ELK (to be refactored)
     elkImagePullPolicy: "IfNotPresent"
@@ -177,11 +178,6 @@ global:
     acumosKongPostgresPassword: "kong"
     acumosKongPostgresUser: "kong"
     acumosKongService: "acumos-kong-proxy"
-
-    # MariaDB/MySQL
-    acumosMariaDbUser: "CDS_USER"
-    acumosMariaDbPassword: "CDS_PASS"
-    acumosMariaDbRootPassword: "rootme"
 
     # Misc.
     acumosDockerRegistryEmail: "acumos-k8-user-rw@example.com"
@@ -222,7 +218,7 @@ global:
     acumosSecurityGroupName: "E6E-Access"
 
     # PVC
-    acumosMariaDbPvcStorage: "1Gi"
+    acumosCdsDbPvcStorage: "1Gi"
     acumosNexusPVCStorage: "50Gi"
     acumosPVCStorage: "2Gi"
 
@@ -255,7 +251,7 @@ global:
             svcName: 'acumos-portal-be'
 
     microserviceGeneration:
-        name: 'acumos-microservice-generartion'
+        name: 'acumos-microservice-generation'
         podName: 'acumos-k8s-microservice-generation'
         svcName: 'microservice-generation'
 

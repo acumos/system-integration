@@ -42,10 +42,20 @@ EOF
 log "Installing JupyterHub Helm Chart ...."
 helm upgrade --install $RELEASE --namespace $NAMESPACE -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml -f $Z2A_ACUMOS_BASE/jhub_value.yaml --version=0.8.2 jupyterhub/jupyterhub
 
-log "Determinining JupyterHub Cluster setup ...."
+# Loop for NiFi to become available
+for i in $(seq 1 20) ; do
+  sleep 10
+  logc .
+  TODO: craft a query to determine the status of NiFi
+  # kubectl exec --namespace $NAMESPACE $RELEASE
+  if [ $i -eq 20 ] ; then log "\nTimeout waiting for JupyterHub to become available ...." ; exit ; fi
+done
+log "\n"
+
+log "Determining JupyterHub Cluster setup ...."
 log "$(kubectl --namespace=$NAMESPACE get pod)"
 
-log "Retreiving JupyterHub Public IP Address ...."
+log "Retrieving JupyterHub Public IP Address ...."
 log "$(kubectl --namespace=$NAMESPACE get svc proxy-public)"
 
 log "JupyterHub installation complete."

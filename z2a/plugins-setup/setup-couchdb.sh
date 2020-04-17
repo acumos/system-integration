@@ -43,14 +43,22 @@ EOF
 log "Installing CouchDB Helm Chart ...."
 helm install $RELEASE --namespace $NAMESPACE -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml -f $Z2A_ACUMOS_BASE/couchdb_value.yaml --set allowAdminParty=true couchdb/couchdb
 
-# TODO: Add logic / delay loop instead of just a sleep
-echo "sleeping .... waiting for CouchDB to become available"
-sleep 300
+# Wait for pods to become available
+wait_for_pods 180   # seconds
+
+# Loop for CouchDB to become available"
+for i in $(seq 1 20) ; do
+  sleep 10
+  logc .
+  kubectl exec --namespace $NAMESPACE $RELEASE-couchdb-0 -c couchdb -- curl -s http://127.0.0.1:5984/"
+  if [ $i -eq 20 ] ; then log "\nTimeout waiting for CouchDB to become available ...." ; exit ; fi
+done
+log "\n"
 
 log "Performing CouchDB Cluster setup ...."
 kubectl exec --namespace $NAMESPACE $RELEASE-couchdb-0 -c couchdb -- curl -s http://127.0.0.1:5984/_cluster_setup -X POST -H "Content-Type: application/json" -d '{"action": "finish_cluster"}'
 
-log "Retreiving CouchDB Admin secret ...."
+log "Retrieving CouchDB Admin secret ...."
 Z2A_MLWB_COUCHDB_PASSWORD=$(kubectl get secret --namespace $NAMESPACE $RELEASE-couchdb -o go-template='{{ .data.adminPassword }}' | base64 --decode) ; save_env
 
 log "CouchDB installation complete."

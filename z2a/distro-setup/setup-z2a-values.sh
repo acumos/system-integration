@@ -38,10 +38,10 @@ egrep -v '^\s*#' $ZT > $ZV
 yq w -i $ZV z2a.namespace $Z2A_K8S_NAMESPACE
 
 # Associate local variable with Acumos global value
-KIBANA_PORT=$( yq r $GV global.acumosKibanaPort )
-KONG_PORT=$( yq r $GV global.acumosKongPort )
-NEXUS_PORT=$( yq r $GV global.acumosNexusPort )
-NEXUS_ADMIN_PORT=$( yq r $GV global.acumosNexusEndpointPort )
+KIBANA_PORT=$(yq r $GV global.acumosKibanaPort)
+KONG_PORT=$(yq r $GV global.acumosKongPort)
+NEXUS_PORT=$(yq r $GV global.acumosNexusPort)
+NEXUS_ADMIN_PORT=$(yq r $GV global.acumosNexusEndpointPort)
 
 # Write z2a port value into kind cluster config
 yq w -i $ZV z2a.ports.kibanaDst $KIBANA_PORT
@@ -50,10 +50,10 @@ yq w -i $ZV z2a.ports.nexusDst $NEXUS_PORT
 yq w -i $ZV z2a.ports.nexusAdminDst $NEXUS_ADMIN_PORT
 
 # Associate local variables with Acumos global value file
-KIBANA_SVC=$( yq r $GV global.acumosKibanaService )
-KONG_SVC=$( yq r $GV global.acumosKongService )
-NEXUS_SVC=$( yq r $GV global.acumosNexusService )
-NEXUS_ADMIN_SVC=$( yq r $GV global.acumosNexusService )
+KIBANA_SVC=$(yq r $GV global.acumosKibanaService)
+KONG_SVC=$(yq r $GV global.acumosKongService)
+NEXUS_SVC=$(yq r $GV global.acumosNexusService)
+NEXUS_ADMIN_SVC=$(yq r $GV global.acumosNexusService)
 
 # Write z2a service names into kind cluster config
 yq w -i $ZV z2a.ports.kibanaSvc $KIBANA_SVC
@@ -61,10 +61,10 @@ yq w -i $ZV z2a.ports.kongSvc $KONG_SVC
 yq w -i $ZV z2a.ports.nexusSvc $NEXUS_SVC
 yq w -i $ZV z2a.ports.nexusAdminSvc $NEXUS_ADMIN_SVC
 
-KIBANA_PORT=$( yq r $ZV z2a.ports.kibanaSrc )
-KONG_PORT=$( yq r $ZV z2a.ports.kongSrc )
-NEXUS_PORT=$( yq r $ZV z2a.ports.nexusSrc )
-NEXUS_ADMIN_PORT=$( yq r $ZV z2a.ports.nexusAdminSrc )
+KIBANA_PORT=$(yq r $ZV z2a.ports.kibanaSrc)
+KONG_PORT=$(yq r $ZV z2a.ports.kongSrc)
+NEXUS_PORT=$(yq r $ZV z2a.ports.nexusSrc)
+NEXUS_ADMIN_PORT=$(yq r $ZV z2a.ports.nexusAdminSrc)
 
 # Static Values - go here
 K8S_DASHBOARD_PORT=9090
@@ -75,7 +75,7 @@ yq w -i $ZV z2a.ports.k8sDashDst $K8S_DASHBOARD_PORT
 egrep -v '^\s*#' $KT > $KC
 
 # Create a key from kind-config.yaml file
-KEY=$( yq r -p p $KC 'nodes.(kubeadmConfigPatches==*)' )
+KEY=$(yq r -p p $KC 'nodes.(kubeadmConfigPatches==*)')
 
 # Remove the extraPortMappings block using KEY
 yq d -i $KC $KEY.extraPortMappings
