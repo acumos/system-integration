@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "225ca91a_0b2f4181",
+        "filename": "helm-charts/acumos/common-data-svc/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 387
+      },
+      "writtenOn": "2020-04-17T14:46:43Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "b4ed0021_b7306b43",
+      "range": {
+        "startLine": 39,
+        "startChar": 54,
+        "endLine": 39,
+        "endChar": 60
+      },
+      "revId": "d2c82b0fc8bee22e2c28282065cf1111aa89626a",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0121af42_f8de9a43",
         "filename": "helm-charts/acumos/common-data-svc/templates/deployment.yaml",
         "patchSetId": 1
@@ -45,6 +69,30 @@
       "revId": "d2c82b0fc8bee22e2c28282065cf1111aa89626a",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1a0f80ee_ba96789a",
+        "filename": "helm-charts/acumos/common-data-svc/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 387
+      },
+      "writtenOn": "2020-04-17T14:46:43Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "0121af42_f8de9a43",
+      "range": {
+        "startLine": 78,
+        "startChar": 53,
+        "endLine": 78,
+        "endChar": 62
+      },
+      "revId": "d2c82b0fc8bee22e2c28282065cf1111aa89626a",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
