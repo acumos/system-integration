@@ -41,11 +41,11 @@ id -nG | grep -q docker || {
 # Anchor Z2A_BASE
 Z2A_BASE=$(realpath $(dirname $0))
 # Source the z2a utils file
-source $Z2A_BASE/utils.sh
+source $Z2A_BASE/z2a-utils.sh
 # Load user environment
 load_env
 # Redirect stdout/stderr to log file
-redirect_to z2a-ph1b-install
+redirect_to $Z2A_BASE/z2a-ph1b-install.log
 # Exit with an error on any non-zero return code
 trap 'fail' ERR
 
@@ -54,3 +54,7 @@ log "Starting Phase 1b (k8s, helm, kind) installation ..."
 source $Z2A_BASE/distro-setup/setup-z2a-values.sh
 source $Z2A_BASE/distro-setup/setup-k8s-helm-kind.sh
 source $Z2A_BASE/distro-setup/setup-k8s-helpers.sh
+
+log "Completed Phase 1b (k8s, helm, kind) installation ..."
+log "Please check the status of the K8s pods at this time. "
+log "Please ensure that all pods are in a 'Running' status before proceeding with Phase 2 installation."

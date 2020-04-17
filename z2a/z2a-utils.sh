@@ -18,11 +18,8 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: utils.sh - assortment of useful shell utility functions
+# Name: z2a-utils.sh - assortment of useful shell utility functions for z2a
 #
-# Prerequisites:
-#
-# Usage:
 
 # Distribution ID function(s)
 eval "$(grep ^ID= /etc/os-release)"
@@ -50,18 +47,41 @@ function log() {
 	caller 0 | (
 		set +x;
 		read l f n;
-		echo "$(date -Iseconds) ${n#**/}:$l:($f) $@"
-		echo "$(date -Iseconds) ${n#**/}:$l:($f) $@" >&3
-		);
+		logc "$(date -Iseconds) ${n#**/}:$l:($f) $@"
+	);
+}
+
+# logc function
+function logc() {
+	echo -e "$@"
+	echo -e "$@" >&3
 }
 
 # Redirect function for logging (etc.)
 function redirect_to() {
-	exec 3>&1													# duplicate stdout before redirect
-	exec >&$Z2A_BASE/$1.log 2>&1      # redirect stdout/stderr to file
+	exec 3>&1						# duplicate stdout before redirect
+	exec >&$1 2>&1      # redirect stdout/stderr to file
 }
 
 # Save environment vars
 function save_env() {
 	( cat $Z2A_BASE/user-env.sh.tpl ; set | grep ^Z2A_ ) > $Z2A_BASE/user-env.sh
+}
+
+# Test to ensure that all Pods are running before proceeding
+# TODO: fix cosmetic bug
+function wait_for_pods() {
+	i=0 ; wait=$1
+	log ".\c"
+	while : ; do
+		PODS=$(kc get pods --field-selector 'status.phase!=Running','status.phase!=Succeeded' -A 2>/dev/null)
+		if [[ -z $PODS ]]; then break ; fi
+		sleep 1
+		(( ++i > wait )) && {
+				log "Timed out waiting for pods."
+				exit
+		}
+		logc ".\c"
+	done
+	logc ""
 }

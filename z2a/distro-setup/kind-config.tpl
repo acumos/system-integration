@@ -18,7 +18,7 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# four node kind cluster config - one control-plane, three workers
+# Four node kind cluster config - one control-plane, three workers
 # One control plane node and three "workers".
 #
 # This kind configuration WILL NOT ADD MORE REAL COMPUTE CAPACITY and

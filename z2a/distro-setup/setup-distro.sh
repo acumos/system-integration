@@ -46,19 +46,18 @@ rhel && {
 log "Adding miscellaneous prerequisites ...."
 # RHEL/Centos Distribution misc. requirements
 rhel && sudo yum install -y --setopt=skip_missing_names_on_install=False \
-	yum-utils device-mapper-persistent-data lvm2 git jq
+	yum-utils device-mapper-persistent-data lvm2 git jq make
 # Ubuntu Distribution misc. requirements
 ubuntu && sudo apt-get update && sudo apt-get install apt-transport-https ca-certificates \
-	curl gnupg-agent software-properties-common git jq
+	curl gnupg-agent software-properties-common git jq make
 
-log "Installing yq - portable command-line YAML parser ..."
 # RHEL/Centos and Ubuntu are the same
 sudo wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/3.2.1/yq_linux_amd64
 sudo chmod 755 /usr/local/bin/yq
 
 log "Setting resources limits ..."
 rhel && {
-	cat <<EOF | sudo tee -a /etc/sysctl.d/98-inotify.conf
+  cat <<EOF | sudo tee -a /etc/sysctl.d/98-inotify.conf
 fs.inotify.max_user_watches = 524288
 fs.inotify.max_user_instances = 512
 EOF

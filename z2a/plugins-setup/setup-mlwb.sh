@@ -97,3 +97,4 @@ helm install project-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-we
 
 log "Finished installing MLWB Helm charts ...."
 log "Success!!! You have successfully installed Acumos and MLWB!"
+log "Please check the status of the newly installed pods to ensure they are all in a 'Running' state."
