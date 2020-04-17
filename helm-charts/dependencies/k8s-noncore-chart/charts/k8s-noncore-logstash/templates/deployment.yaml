@@ -26,7 +26,7 @@ metadata:
 spec:
   replicas: 1
   selector:
-    matchLabels: 
+    matchLabels:
       name: logstash-deployment
       app: logstash
   revisionHistoryLimit: 3
@@ -54,7 +54,7 @@ spec:
         - name: ACUMOS_ELK_JDBC_DRIVER_CLASS
           value: "org.mariadb.jdbc.Driver"
         - name: ACUMOS_ELK_JDBC_CONNECTION_STRING
-          value: "jdbc:mariadb://acumos-mysql.{{ .Values.global.namespace }}:{{ .Values.global.acumosMariaDbPort }}/CDS"
+          value: "jdbc:mariadb://acumos-mysql.{{ .Values.global.namespace }}:{{ .Values.global.acumosCdsDbPort }}/CDS"
         - name: ACUMOS_ELK_JDBC_USERNAME
           value: "CDS_USER"
         - name: ACUMOS_ELK_JDBC_PASSWORD
@@ -80,7 +80,7 @@ spec:
             name: logstash
             items:
             - key: logstash.yml
-              path: logstash.yml			
+              path: logstash.yml
         - name: pipeline
           configMap:
             name: logstash

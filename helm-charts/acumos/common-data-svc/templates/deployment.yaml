@@ -19,20 +19,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{.Values.global.cds.podName}}
+ name: {{ .Values.global.cds.podName }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{.Values.global.cds.name}}
+   app: {{ .Values.global.cds.name }}
 spec:
  selector:
    matchLabels:
-     app: {{.Values.global.cds.name}}
+     app: {{ .Values.global.cds.name }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{.Values.global.cds.name}}
+       app: {{ .Values.global.cds.name }}
    spec:
      containers:
        - name:  cds
@@ -52,9 +52,9 @@ spec:
                  },
                  "spring" : {
                             "datasource" : {
-                                        "jdbc-url" : "jdbc:mariadb://acumos-mysql.{{ .Values.global.namespace }}:{{ .Values.global.acumosMariaDbPort }}/{{ .Values.global.acumosCdsDb }}?useLegacyDatetimeCode=false&useSSL=false",
-                                        "username" : "{{ .Values.global.acumosMariaDbUser }}",
-                                        "password" : "{{ .Values.global.acumosMariaDbPassword }}"
+                                        "jdbc-url" : "jdbc:mariadb://{{ .Values.global.acumosCdsDbService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCdsDbPort }}/{{ .Values.global.acumosCdsDb }}?useLegacyDatetimeCode=false&useSSL=false",
+                                        "username" : "{{ .Values.global.acumosCdsDbUserName }}",
+                                        "password" : "{{ .Values.global.acumosCdsDbUserPassword }}"
                                         },
                             "jpa" : {
                                     "database-platform" : "org.hibernate.dialect.MariaDB102Dialect",

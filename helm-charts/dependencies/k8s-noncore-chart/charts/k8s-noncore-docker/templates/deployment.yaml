@@ -60,7 +60,7 @@ spec:
           - name: DIND_INSECURE_REGISTRIES
             value: "[\"0.0.0.0/0\"]"
           - name: DOCKER_OPTS
-            value: '--insecure-registry={{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}'
+            value: "--insecure-registry={{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}"
         args: ["$(DOCKER_OPTS)"]
         volumeMounts:
         - name: docker-volume
