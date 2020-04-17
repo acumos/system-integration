@@ -2,9 +2,9 @@
 
 > NOTE: This document is a work in progress - subject to change.
 >
-> **z2a is not designed to be a production environment deployment tool**.  z2a is specifically designed for development and/or test environment installations only.  A key component of z2a (kind -  Kubernetes in Docker) is designed for dev/test environments, not for production workloads.
+> At the time of this writing, **z2a should not be used as a production environment deployment tool**.  z2a is designed for development and/or test environment installations only.  Currently, a key component of z2a (`kind` -  Kubernetes in Docker) is designed for dev/test environments, not for production workloads.
 >
-> NOTE: At the time of this writing, the kind (Kubernetes in Docker) cluster does not persist across VM reboots. Work to add this cluster recovery capability is being worked on by the upstream developers.  At this time, if (for some reason) the VM is rebooted, portions of the z2a installation process must be executed again.
+>> NOTE: At the time of this writing, the `kind` (Kubernetes in Docker) cluster does not persist across a VM reboot OR a Docker service reconfigure/restart operation. Work to add this cluster recovery capability is being worked on by the upstream developers.  At this time, if (for some reason) the VM is rebooted or the Docker service is restarted, portions of the z2a installation process `(z2a_ph1b.sh)` must be executed again.
 >
 > **z2a performs NO post-installation component configuration**.  The z2a scripts are INSTALLATION-ONLY at this time.  No post-installation configuration is performed to any of the components that are installed. As z2a matures, post-installation configuration will be added to configurations that can be easily maintained.
 
@@ -35,7 +35,7 @@ z2a is intended to be a simple installation-only mechanism for Acumos to allow d
 
 ## Miscellaneous Requirements
 
-* The user **must** have sudo rights on the VM (i.e. must exist in the /etc/sudoers file).
+* The user **must** have sudo rights on the VM (i.e. must exist in the `/etc/sudoers` file).
 
 * The VM requires Internet access such that OS updates, OS supplemental packages and Helm chart installations can be performed. Either the VM has proxied access to the Internet or the user must be able to configure the proxy setting for the VM.
 
@@ -45,13 +45,13 @@ z2a is intended to be a simple installation-only mechanism for Acumos to allow d
 
 z2a performs the Acumos and Acumos plugin(s) installation in a number of discrete steps that are referred to as 'phases'.
 
-* Phase 1 - performs the Linux distribution (RHEL/CentOS or Ubuntu) setup and installation of the tools required to perform the complete installation.  This phase is composed of two (2) shell scripts: *z2a_ph1a.sh* and *z2a_ph1b.sh*.
+* Phase 1 - performs the Linux distribution (RHEL/CentOS or Ubuntu) setup and installation of the tools required to perform the complete installation.  This phase is composed of two (2) shell scripts: `z2a_ph1a.sh` and `z2a_ph1b.sh`.
 
->NOTE: the user performing the installation MUST log out of their session after the successful completion of Phase 1a and log back in to complete Phase 1 by executing the Phase 1b script.  The logout is required such that they can join the 'docker' group that is created during Phase 1a and required for Phase 1b and subsequent phases.
+>NOTE: the user performing the installation MUST log out of their session after the successful completion of Phase 1a and log back in to complete Phase 1 by executing the Phase 1b script.  The logout is required such that they can join the `docker` group that is created during Phase 1a and required for Phase 1b and subsequent phases.
 
-* Phase 2 - performs the installation of the Acumos non-core and Acumos core components. This phase is composed of a single shell script: *z2a_ph2.sh*.
+* Phase 2 - performs the installation of the Acumos non-core and Acumos core components. This phase is composed of a single shell script: `z2a_ph2.sh`.
 
-* Phase 3 - performs the installation of the Acumos plugin dependencies and Acumos plugins.  At the time of this writing, the only Acumos plugin supported in MLWB (Machine Learning WorkBench). This phase is composed of a single shell script: *z2a_ph3.sh*.
+* Phase 3 - performs the installation of the Acumos plugin dependencies and Acumos plugins.  At the time of this writing, the only Acumos plugin supported in MLWB (Machine Learning WorkBench). This phase is composed of a single shell script: `z2a_ph3.sh`.
 
 > NOTE: The z2a scripts have been developed to run in the phase order noted above.  However, the scripts should be sufficiently portable enough to be ran in a stand-alone manner.
 
@@ -60,4 +60,4 @@ Please refer to the following documents for additional information:
 CONFIG.md   - the Acumos configuration markdown document (in progress)
 INSTALL.md  - the Acumos installation markdown document (in progress)
 
-Last Edited: 2020-04-01
+Last Edited: 2020-04-15

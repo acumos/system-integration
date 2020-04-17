@@ -27,5 +27,5 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: "{{ .Values.global.acumosMariaDbPvcStorage }}"
+      storage: "{{ .Values.global.acumosCdsDbPvcStorage }}"
 

@@ -33,7 +33,7 @@ spec:
       securityContext:
         fsGroup: 200
       containers:
-      - image: sonatype/nexus3
+      - image: sonatype/nexus3:latest
         imagePullPolicy: IfNotPresent
         name: acumos-nexus-container
         resources:
@@ -48,4 +48,3 @@ spec:
         - name: nexus-data-volume
           persistentVolumeClaim:
             claimName: acumos-nexus-pvc
-
