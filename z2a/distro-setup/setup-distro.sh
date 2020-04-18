@@ -20,7 +20,11 @@
 #
 # Name: setup-distro.sh - script to setup distribution dependencies
 #
+<<<<<<< HEAD
+# Dependencies: Centos 7 or Ubuntu
+=======
 # Dependencies: Centos 7 or Ubuntu 18.04
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242
 
 # Determine the end-user actual GID
 [[ -z GID ]] && GID=$(id -rg) ; export GID
@@ -35,8 +39,13 @@ sudo mkdir -p /var/log/acumos-install
 sudo chown root:$GID /var/log/acumos-install
 sudo chmod 664 /var/log/acumos-install
 
+<<<<<<< HEAD
+# Add EPEL repo to RHEL/Centos
+log "Adding EPEL repo ...."
+=======
 log "Adding EPEL repo ...."
 # Add EPEL repo to RHEL/Centos
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242
 rhel && {
 	rpm -qa | grep -q epel-release ||
 		sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
@@ -51,10 +60,17 @@ rhel && sudo yum install -y --setopt=skip_missing_names_on_install=False \
 ubuntu && sudo apt-get update && sudo apt-get install apt-transport-https ca-certificates \
 	curl gnupg-agent software-properties-common git jq make
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+log "Installing yq - portable command-line YAML parser ..."
+=======
+>>>>>>> 6695cd52b37b146d178b9e86c03c43354a3e2a3d
 # RHEL/Centos and Ubuntu are the same
 sudo wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/3.2.1/yq_linux_amd64
 sudo chmod 755 /usr/local/bin/yq
 
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242
 log "Setting resources limits ..."
 rhel && {
   cat <<EOF | sudo tee -a /etc/sysctl.d/98-inotify.conf
@@ -73,4 +89,8 @@ EOF
 	sudo systemctl -p /etc/sysctl.conf
 }
 
+<<<<<<< HEAD
 true
+=======
+true
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242

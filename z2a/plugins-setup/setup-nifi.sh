@@ -28,6 +28,21 @@ helm repo add cetic https://cetic.github.io/helm-charts
 helm repo update
 
 # Simple k/v map to set NiFi configuration values
+<<<<<<< HEAD
+cat <<EOF >$Z2A_ACUMOS_BASE/nifi_config.yaml
+EOF
+
+log "Installing NiFi Helm Chart ...."
+helm install -name $RELEASE --namespace $NAMESPACE -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml -f $Z2A_ACUMOS_BASE/nifi_config.yaml cetic/nifi
+
+log "NiFi Cluster setup information ...."
+log "Cluster endpoint IP address will be available at:"
+log "$(kubectl get svc $RELEASE -n $NAMESPACE)"
+log "$(kubectl get svc nifi -n $NAMESPACE -o jsonpath='{.status.loadBalancer.ingress[*].ip}')"
+
+log "NiFi installation complete."
+log "$(Note:  DNS and/or /etc/hosts will need to be updated with the NiFi cluster information.)"
+=======
 cat <<EOF | tee $Z2A_ACUMOS_BASE/nifi_value.yaml
 EOF
 
@@ -51,3 +66,4 @@ log "$(kubectl get svc $RELEASE -n $NAMESPACE -o jsonpath='{.status.loadBalancer
 
 log "NiFi installation complete."
 log "Note:  DNS and/or /etc/hosts will need to be updated with the NiFi cluster information."
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242

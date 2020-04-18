@@ -19,51 +19,45 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{.Values.global.portal.portalBe.podName}}
+ name: {{ .Values.global.portal.portalBe.podName }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{.Values.global.portal.portalBe.name}}
+   app: {{ .Values.global.portal.portalBe.name }}
 spec:
  selector:
    matchLabels:
-     app: {{.Values.global.portal.portalBe.name}}
+     app: {{ .Values.global.portal.portalBe.name }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{.Values.global.portal.portalBe.name}}
+       app: {{ .Values.global.portal.portalBe.name }}
    spec:
      containers:
        - name: acumos-portal-be
-         image: {{.Values.global.image.repository }}/{{ .Values.global.acumosPortalBeImage }}
-         resources:
-           {{- toYaml .Values.resources | nindent 10 }}
+         image: {{ .Values.global.image.repository }}/{{ .Values.global.acumosPortalBeImage }}
          ports:
            - containerPort: {{ .Values.global.acumosPortalBePort }}
          env:
+           - name: "cdms.client.url"
+             value: "http://acumos-cds:{{ .Values.acumosCommonDataSvcPort }}/ccds"
+           - name: "cdms.client.username"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: username }
+           - name: "cdms.client.password"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: password }
            - name: SPRING_APPLICATION_JSON
              value: '{ "server" : {
                    "port" : {{ .Values.global.acumosPortalBePort }}
                 },
-                 "logging":{
-                    "level":{
-                        "root": "{{ .Values.logLevel }}"
-                    }
-                 },
                 "nexus": {
                         "url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}/repository/acumos-k8-models-maven",
                         "proxy": "",
                         "password": "{{ .Values.global.acumosNexusPassword }}",
                         "username": "{{ .Values.global.acumosNexusUsername }}",
                         "groupid": "com.artifact"
-                },
-                "cdms" : {
-                  "client" : {
-                     "url": "http://{{.Values.global.cds.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
-                     "username": "{{ .Values.global.acumosCdsUser }}",
-                     "password": "{{ .Values.global.acumosCdsPassword }}"
-                     }
                 },
                 "docker" : {
                    "host" : "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
@@ -86,11 +80,11 @@ spec:
                 "onboarding" : {
                    "push" : {
                        "model" : {
-                          "url": "http://{{.Values.global.onboarding.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/models",
+                          "url": "http://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/models",
                           "dcae_url": "http://{{ .Values.global.namespace }}:{{ .Values.global.acumosMicroServiceGenerationPort }}/microservice-generation/v2/generateMicroservice"
                           },
                          "advancedmodel" : {
-                                   "url" : "http://{{.Values.global.onboarding.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/advancedModel"
+                                   "url" : "http://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/advancedModel"
                                }
                        },
                    "cliPushUrl": "http://{{ .Values.global.acumosOnboardingCli }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/push",
@@ -198,10 +192,8 @@ spec:
              name: portal-be-logs
            - mountPath: /app/certs
              name: acumos-certs
-           - mountPath: /images/sidebar-icons
-             name: acumos-images
        - name: filebeat
-         image: {{.Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}
+         image: {{ .Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}
          ports:
            - containerPort: {{ .Values.global.acumosFilebeatPort }}
          env:
@@ -214,8 +206,6 @@ spec:
              name: portal-be-logs
      volumes:
        - name: portal-be-logs
-         emptyDir: {}
-       - name: acumos-images
          emptyDir: {}
        - name: acumos-certs
          secret:

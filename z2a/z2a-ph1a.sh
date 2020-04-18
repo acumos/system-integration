@@ -50,6 +50,7 @@ source $Z2A_BASE/z2a-utils.sh
 # Save initial user environment
 save_env
 # Redirect stdout/stderr to log file
+redirect_to z2a-ph1a-install
 redirect_to $Z2A_BASE/z2a-ph1a-install.log
 # Exit with an error on any non-zero return code
 trap 'fail' ERR

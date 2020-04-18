@@ -19,29 +19,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{.Values.global.onboarding.podName}}
+ name: {{ .Values.global.onboarding.podName }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{.Values.global.onboarding.name}}
+   app: {{ .Values.global.onboarding.name }}
 spec:
  selector:
    matchLabels:
-     app: {{.Values.global.onboarding.name}}
+     app: {{ .Values.global.onboarding.name }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{.Values.global.onboarding.name}}
+       app: {{ .Values.global.onboarding.name }}
    spec:
      containers:
        - name: onboarding-app
-         image: {{.Values.global.image.repository }}/{{ .Values.global.acumosOnboardingImage }}
-         resources:
-           {{- toYaml .Values.resources | nindent 10 }}
+         image: {{ .Values.global.image.repository }}/{{ .Values.global.acumosOnboardingImage }}
          ports:
            - containerPort: {{ .Values.global.acumosOnboardingAppPort }}
          env:
+           - name: "cmndatasvc.cmnDataSvcEndPoinURL"
+             value: "http://{{ .Values.global.cds.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds"
+           - name: "cmndatasvc.cmnDataSvcUser"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: username }
+           - name: "cmndatasvc.cmnDataSvcPwd"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: password }
            - name: SPRING_APPLICATION_JSON
              value: '{ "server" :{
                    "port" : {{ .Values.global.acumosOnboardingAppPort }},
@@ -49,11 +55,6 @@ spec:
                             "context-path": "/onboarding-app"
                                }
                       },
-                 "logging":{
-                    "level":{
-                        "root": "{{ .Values.logLevel }}"
-                    }
-                 },
                  "docker" : {
                             "host" : "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
                             "port": {{ .Values.global.acumosDockerPort }} ,
@@ -77,20 +78,15 @@ spec:
                             "nexusproxy": "",
                             "nexusGroupId": "com.artifact"
                            },
-                 "cmndatasvc": {
-                                "cmnDataSvcEndPoinURL": "http://{{.Values.global.cds.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
-                                "cmnDataSvcUser": "{{ .Values.global.acumosCdsUser }}",
-                                "cmnDataSvcPwd": "{{ .Values.global.acumosCdsPassword }}"
-                               },
                  "tosca": {
                             "OutputFolder" : "/temp/",
                             "GeneratorEndPointURL": "http://acumos.acumos-ns01:8080/model_create"
                           },
                  "mktPlace": {
-                              "mktPlaceEndPointURL" : "http://{{.Values.global.onboarding.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalBePort }}"
+                              "mktPlaceEndPointURL" : "http://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalBePort }}"
                               },
                  "microService": {
-                     "microServiceEndPointURL": "http://{{.Values.global.microserviceGeneration.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosMicroServiceGenerationPort }}/microservice-generation"
+                     "microServiceEndPointURL": "http://{{ .Values.global.microserviceGeneration.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosMicroServiceGenerationPort }}/microservice-generation"
                    },
                  "requirements": {
                                   "extraIndexURL": "",
@@ -100,7 +96,7 @@ spec:
                        "verificationEnableFlag":"{{ .Values.global.acumosSVscan }}",
                        "verificationApiUrl" : "http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosSecurityVerificationPort }}"
                        },
-                 "authenticationServiceURL": "http://{{.Values.global.onboarding.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalBePort }}",
+                 "authenticationServiceURL": "http://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalBePort }}",
                  "spring": {
                      "servlet": {
                        "multipart": {
@@ -109,13 +105,13 @@ spec:
                        }
                      }
                    },
-                 "base_image": { "rimage": "{{.Values.global.image.repository }}/{{ .Values.global.acumosOnboardingBaseRImage }}","dockerusername": "{{ .Values.global.acumosDockerUsername }}","dockerpassword": "{{ .Values.global.acumosDockerPassword }}"}
+                 "base_image": { "rimage": "{{ .Values.global.image.repository }}/{{ .Values.global.acumosOnboardingBaseRImage }}","dockerusername": "{{ .Values.global.acumosDockerUsername }}","dockerpassword": "{{ .Values.global.acumosDockerPassword }}"}
                  }'
          volumeMounts:
            - mountPath: /maven/logs
              name: acumos-onboarding-logs
        - name: filebeat
-         image: {{.Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}
+         image: {{ .Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}
          ports:
            - containerPort: {{ .Values.global.acumosFilebeatPort }}
          env:

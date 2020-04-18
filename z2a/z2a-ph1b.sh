@@ -45,12 +45,14 @@ source $Z2A_BASE/z2a-utils.sh
 # Load user environment
 load_env
 # Redirect stdout/stderr to log file
+redirect_to z2a-ph1b-install
 redirect_to $Z2A_BASE/z2a-ph1b-install.log
 # Exit with an error on any non-zero return code
 trap 'fail' ERR
 
 log "Starting Phase 1b (k8s, helm, kind) installation ..."
 # Installation - Phase 1b - kubectl, helm and kind
+source $Z2A_BASE/distro-setup/setup-k8s-helm-kind.sh
 source $Z2A_BASE/distro-setup/setup-z2a-values.sh
 source $Z2A_BASE/distro-setup/setup-k8s-helm-kind.sh
 source $Z2A_BASE/distro-setup/setup-k8s-helpers.sh

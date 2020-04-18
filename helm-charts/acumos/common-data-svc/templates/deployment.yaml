@@ -19,20 +19,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{ .Values.global.cds.podName }}
+ name: {{.Values.global.cds.podName}}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{ .Values.global.cds.name }}
+   app: {{.Values.global.cds.name}}
 spec:
  selector:
    matchLabels:
-     app: {{ .Values.global.cds.name }}
+     app: {{.Values.global.cds.name}}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{ .Values.global.cds.name }}
+       app: {{.Values.global.cds.name}}
    spec:
      containers:
        - name:  cds
@@ -42,6 +42,16 @@ spec:
          ports:
            - containerPort: {{ .Values.global.acumosCommonDataSvcPort }}
          env:
+           - name: spring_security_user_name
+             valueFrom:
+               secretKeyRef:
+                  name: ccdsclientsecret
+                  key: username
+           - name: spring_security_user_password
+             valueFrom:
+               secretKeyRef:
+                  name: ccdsclientsecret
+                  key: password
            - name: SPRING_APPLICATION_JSON
              value: '{ "server" : {
                  "port" : {{ .Values.global.acumosCommonDataSvcPort }} },
@@ -52,9 +62,9 @@ spec:
                  },
                  "spring" : {
                             "datasource" : {
-                                        "jdbc-url" : "jdbc:mariadb://{{ .Values.global.acumosCdsDbService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCdsDbPort }}/{{ .Values.global.acumosCdsDb }}?useLegacyDatetimeCode=false&useSSL=false",
-                                        "username" : "{{ .Values.global.acumosCdsDbUserName }}",
-                                        "password" : "{{ .Values.global.acumosCdsDbUserPassword }}"
+                                        "jdbc-url" : "jdbc:mariadb://acumos-mysql.{{ .Values.global.namespace }}:{{ .Values.global.acumosMariaDbPort }}/{{ .Values.global.acumosCdsDb }}?useLegacyDatetimeCode=false&useSSL=false",
+                                        "username" : "{{ .Values.global.acumosMariaDbUser }}",
+                                        "password" : "{{ .Values.global.acumosMariaDbPassword }}"
                                         },
                             "jpa" : {
                                     "database-platform" : "org.hibernate.dialect.MariaDB102Dialect",
@@ -65,11 +75,11 @@ spec:
                                      },
                              "security" : {
                              "user" : {
-                                      "name": "{{ .Values.global.acumosCdsUser }}",
-                                      "password": "{{ .Values.global.acumosCdsPassword }}"
+                                      "name": "${spring_security_user_name}",
+                                      "password": "${spring_security_user_password}"
                                       }
                              }
-                             }
+                            }
                      }'
          volumeMounts:
            - mountPath: /maven/logs

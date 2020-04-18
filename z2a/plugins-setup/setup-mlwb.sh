@@ -34,12 +34,50 @@
 # Usage:
 
 MLWB_CORE=$Z2A_ACUMOS_BASE/acumos-plugins/mlwb
+<<<<<<< HEAD
+MLWB_CHARTS=$$MLWB_CORE/charts
+=======
 MLWB_CHARTS=$MLWB_CORE/charts
 Z2A_ACUMOS_BASE=$(realpath $Z2A_BASE/../helm-charts)
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242
 
 # Individual MLWB charts
 # helm install -name $CHARTNAME --namespace $NAMESPACE ./$CHARTNAME/ -f ./global_value.yaml
 # where $CHARTNAME is one of the following charts
+<<<<<<< HEAD
+  - project-service
+  - notebook-service
+  - pipeline-service
+  - model-service
+  - predictor-service
+  - dashboard-webcomponent
+  - home-webcomponent
+  - notebook-catalog-webcomponent
+  - notebook-webcomponent
+  - pipeline-catalog-webcomponent
+  - pipeline-webcomponent
+  - project-catalog-webcomponent
+  - project-webcomponent
+
+log "Installing MLWB Helm charts ...."
+# Install (or remove) the MLWB charts, one by one in this order
+helm install -name project-service --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install -name notebook-service --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install -name pipeline-service --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install -name model-service --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install -name predictor-service --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install -name dashboard-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install -name home-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install -name notebook-catalog-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install -name notebook-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install -name pipeline-catalog-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install -name pipeline-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install -name project-catalog-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+helm install -name project-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+
+log "$(Finshed installing MLWB Helm charts ....)"
+log "$(Success!!! You have successfully installed Acumos and MLWB!)"
+=======
 #  - project-service
 #  - notebook-service
 #  - pipeline-service
@@ -97,4 +135,8 @@ helm install project-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-we
 
 log "Finished installing MLWB Helm charts ...."
 log "Success!!! You have successfully installed Acumos and MLWB!"
+<<<<<<< HEAD
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242
+=======
 log "Please check the status of the newly installed pods to ensure they are all in a 'Running' state."
+>>>>>>> 6695cd52b37b146d178b9e86c03c43354a3e2a3d

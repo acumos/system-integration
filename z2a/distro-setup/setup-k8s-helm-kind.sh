@@ -27,8 +27,13 @@
 #
 # Usage:
 
+<<<<<<< HEAD
+# Add Kubernetes repo to RHEL/Centos
+log "Adding K8s repo ...."
+=======
 log "Adding K8s repo ...."
 # Add Kubernetes repo to RHEL/Centos
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242
 rhel && {
   cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
@@ -68,6 +73,18 @@ sudo curl -Lo /tmp/kind "https://github.com/kubernetes-sigs/kind/releases/downlo
 sudo chmod +x /tmp/kind && sudo chown root:root /tmp/kind
 sudo mv /tmp/kind /usr/local/bin/kind
 
+<<<<<<< HEAD
+log "Creating k8s cluster : name = kind-acumos (this may take a few minutes .... relax!!!!"
+# Create kind cluster (named kind-acumos)
+kind create cluster --name=acumos --config $Z2A_BASE/distro-setup/kind-config.yaml
+# Echo cluster-info - echo output to both log file and TTY
+log "$(kubectl cluster-info --context kind-acumos)"
+
+log "Creating k8s namespace : name = acumos-dev1"
+# Create an acumos-dev1 namespace in the kind-acumos cluster
+Z2A_K8S_NAMESPACE=acumos-dev1 ; save_env
+kubectl create namespace $Z2A_K8S_NAMESPACE
+=======
 Z2A_CLUSTER_NAME=acumos ; save_env
 log "Creating kind cluster : name = $Z2A_CLUSTER_NAME (this may take a few minutes .... relax!!!!)"
 # Create kind cluster (named kind-acumos)
@@ -78,3 +95,4 @@ log "$(kubectl cluster-info --context kind-$Z2A_CLUSTER_NAME)"
 log "Creating k8s namespace : name = $Z2A_K8S_NAMESPACE"
 # Create an acumos-dev1 namespace in the kind-acumos cluster
 kubectl create namespace $Z2A_K8S_NAMESPACE
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242

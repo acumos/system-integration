@@ -159,6 +159,21 @@ global:
     clusterName: "kind-acumos"
 ```
 
+<<<<<<< HEAD
+For entries in the _global_value.conf_ file that have a entry, do not edit these values are they are essential for correct installation.
+
+To perform an installation of Acumos, we will need to perform the following steps:
+
+1. change directory into the _z2a_ directory
+execute the z2a scripts in the following sequence:
+
+```bash
+cd ~/src/system-integration/z2a
+source ./z2a-ph1a.sh
+source ./z2a-ph1b.sh
+source ./z2a-ph2.sh
+source ./z2a-ph3.sh
+=======
 For entries in the `global_value.conf` file that have a entry, do not edit these values as they are essential for correct installation.
 
 ### Installation Process
@@ -167,6 +182,15 @@ To perform an installation of Acumos, we will need to perform the following step
 
 1. Change directory into the `z2a` directory.
 
+<<<<<<< HEAD
+```bash
+cd ~/src/system-integration/z2a
+./z2a-ph1a.sh
+./z2a-ph1b.sh
+./z2a-ph2.sh
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242
+```
+=======
     ```bash
     cd ~/src/system-integration/z2a
     ```
@@ -209,16 +233,23 @@ To perform an installation of Acumos, we will need to perform the following step
     ```
 
 When all Kubernetes pods are in a `Running` state, the Acumos installation anc configuration has been completed.
+>>>>>>> 6695cd52b37b146d178b9e86c03c43354a3e2a3d
 
 ## Additional Documentation
 
 Below are links to supplementary sources of information.
 
+<<<<<<< HEAD
+### Proxy Setup
+
+See: <https://www.shellhacks.com/linux-proxy-server-settings-set-proxy-command-line/>
+=======
 Docker Proxy Configuration: <https://docs.docker.com/network/proxy/>
 
 Kind: <https://kind.sigs.k8s.io/>
 
 Proxy Setup: <https://www.shellhacks.com/linux-proxy-server-settings-set-proxy-command-line/>
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242
 
 -----
 
@@ -228,6 +259,13 @@ Proxy Setup: <https://www.shellhacks.com/linux-proxy-server-settings-set-proxy-c
 
 ### MLWB
 
+<<<<<<< HEAD
+#### Editing the mlwb_value.yaml File
+
+The *mlwb_value.yaml* file is located in the _helm-charts_ directory noted above.  We will need to change directories into that location to perform the edits necessary to perform the installation.
+
+Before starting to edit the *mlwb_value.yaml* file, create a copy of the original file just in case you need to refer to the original or to recreate the file.
+=======
 Machine Learning WorkBench is installed during Phase 3 of the installation process discussed in this document.  Below are details of the installation process.
 
 #### Editing the `mlwb_value.yaml` File
@@ -239,11 +277,22 @@ Machine Learning WorkBench is installed during Phase 3 of the installation proce
 The `mlwb_value.yaml` file is located in the `helm_charts` directory noted above.  We will need to change directories into that location to perform the edits necessary to perform the installation.
 
 Before starting to edit the `mlwb_value.yaml` file, create a copy of the original file just in case you need to refer to the original or to recreate the file.
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242
 
 Here are the commands to execute to accomplish the next tasks.
 
 ```bash
 cd ~/src/system-integration/helm-charts
+<<<<<<< HEAD
+cp global_value.yaml global_value.orig
+```
+
+The default *mlwb_value.yaml* file requires the user to make edits to the masked values in the file.  Masked values are denoted by this value: "******"
+
+Using your editor of choice (vi, nano, pico etc.) please open the *mlwb_value.yaml* file such that we can edit it's contents.
+
+CouchDB - the following values need to be populated in the *mlwb_value.yaml* file before installation of the MLWB dependencies (Phase 3a).
+=======
 cp mlwb_value.yaml mlwb_value.orig
 ```
 
@@ -252,6 +301,7 @@ The default `mlwb_value.yaml` file requires the user to make edits to the masked
 Using your editor of choice (vi, nano, pico etc.) please open the `mlwb_value.yaml` file such that we can edit it's contents.
 
 CouchDB - the following values need to be populated in the `mlwb_value.yaml` file before installation of the MLWB dependencies (Phase 3).
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242
 
 ```bash
 #CouchDB
@@ -265,7 +315,11 @@ acumosCouchDB:
     user: "******"
 ```
 
+<<<<<<< HEAD
+JupyterHub - the following values need to be populated in the *mlwb_value.yaml* file before installation of the MLWB dependencies (Phase 3a).
+=======
 JupyterHub - the following values need to be populated in the `mlwb_value.yaml` file before installation of the MLWB dependencies (Phase 3).
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242
 
 ```bash
 #JupyterHub
@@ -278,7 +332,11 @@ acumosJupyterNotebook:
     url: "******"
 ```
 
+<<<<<<< HEAD
+Apache NiFi - the following values need to be populated in the *mlwb_value.yaml* file before installation of the MLWB dependencies (Phase 3a).
+=======
 Apache NiFi - the following values need to be populated in the `mlwb_value.yaml` file before installation of the MLWB dependencies (Phase 3).
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242
 
 ```bash
 #NIFI
@@ -290,6 +348,8 @@ acumosNifi:
     registryurl: "******"
     serviceurl: "******"
 ```
+<<<<<<< HEAD
+=======
 
 ### MLWB Installation
 
@@ -305,6 +365,11 @@ cd ~/src/system-integration/z2a
 
 For post-installation Machine Learning WorkBench configuration steps, please see the MLWB section of the CONFIG.md document.
 
+<<<<<<< HEAD
+Last Edited: 2020-04-01
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242
+=======
 TODO: Add section on accessing the Acumos Portal once installation is completed.
 
 Last Edited: 2020-04-15
+>>>>>>> 6695cd52b37b146d178b9e86c03c43354a3e2a3d

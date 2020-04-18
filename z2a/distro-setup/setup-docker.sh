@@ -22,15 +22,25 @@
 #
 # Dependencies: assumes that setup-distro.sh has been executed.
 
+<<<<<<< HEAD
+# Remove old Docker versions (just in case) ; ignore if package does not exist
+log "Removing old Docker versions ...."
+=======
 log "Removing old Docker versions ...."
 # Remove old Docker versions (just in case) ; ignore if package does not exist
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242
 rhel && sudo yum remove docker docker-client docker-client-latest \
 	docker-common docker-latest docker-latest-logrotate docker-logrotate \
 	docker-engine || true
 ubuntu && sudo apt-get remove docker docker-engine docker.io containerd runc || true
 
+<<<<<<< HEAD
+# Setup Docker-CE repo
+log "Setting up Docker-CE repositories ...."
+=======
 log "Setting up Docker-CE repositories ...."
 # Setup Docker-CE repo
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242
 rhel && sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 ubuntu && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - \
 	&& sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
@@ -40,6 +50,12 @@ log "Setting up Docker Community-Edition ...."
 rhel && sudo yum -y install docker-ce docker-ce-cli containerd.io
 ubuntu && sudo apt-get -y update && sudo apt-get -y install docker-ce docker-ce-cli containerd.io
 
+<<<<<<< HEAD
+log "Starting Docker service ...."
+# Start docker service
+sudo systemctl enable docker.service
+sudo systemctl start docker.service
+=======
 log "Creating /etc/docker directory ...."
 ## Create /etc/docker directory.
 sudo mkdir -p /etc/docker
@@ -96,6 +112,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable docker.service
 sudo systemctl start docker.service
 sudo systemctl show --property=Environment docker
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242
 
 log "Adding USER to docker group ...."
 # Add default user to the 'docker' group
@@ -105,4 +122,8 @@ sudo usermod -aG docker $USER
 log "Docker has been installed on this host."
 log "Host / VM preparation has been completed."
 log "Please log out of this session and log back in to continue."
+<<<<<<< HEAD
+log "Please navigate to the script directory and run z2a_ph2.sh."
+=======
 log "After login, please navigate to the ~/z2a script directory and run z2a-ph1b.sh."
+>>>>>>> ebd8949d19b4aa7c652add32fe1721b43bb54242
