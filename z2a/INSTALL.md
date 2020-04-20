@@ -13,7 +13,8 @@ git clone https://gerrit.acumos.org/r/system-integration ${SI}
 # Using the vi editor (substitute with your editor of choice)
 # Add hostname or hostname:port to proxy.txt ; if necessary
 vi ${SI}/z2a/distro-setup/proxy.txt
-cp ${SI}/z2a/z2a-config/global_value.yaml.dev1 ${SI}/z2a/helm-charts/global_value.yaml
+# Copy the example values from z2a-config/dev1 to the helm-charts directory
+cp ${SI}/z2a/z2a-config/dev1/global_value.yaml ${SI}/z2a/helm-charts/global_value.yaml
 
 # Execute Phase 1a
 . ${SI}/z2a/z2a-ph1a.sh
@@ -28,9 +29,9 @@ kubectl get pods -A
 # Execute Phase 2 (the Acumos installation and configuration)
 . ${SI}/z2a/z2a-ph2.sh
 
-# To install MLWB during same session ; uncomment SI if new session
+# To install MLWB during same session ; uncomment SI if new session and set the SI ENV value
 # SI=~/src/system-integration
-cp ${SI}/z2a/z2a-config/mlwb_value.yaml.dev1 ${SI}/z2a/helm-charts/mlwb_value.yaml
+cp ${SI}/z2a/z2a-config/dev1/mlwb_value.yaml ${SI}/z2a/helm-charts/mlwb_value.yaml
 . ${SI}/z2a/z2a-ph3.sh
 ```
 
@@ -50,7 +51,7 @@ It is assumed that the user who is performing this installation:
 In the following section, the user will perform the following actions:
 
 1. Login to the Linux VM where the install will occur
-2. Create a new directory that will be used to perform this installation (i.e. src)
+2. Create a new directory that will be used to perform this installation (i.e. `src`)
 3. Change directory into this new directory
 4. Clone the gerrit.acumos.org `system-integration` repository into the new directory
 5. Change directory into the newly created `system-integration` directory
@@ -67,7 +68,7 @@ git clone "https://gerrit.acumos.org/r/system-integration"
 cd ~/src/system-integration
 ```
 
-Next, we will inspect the contents of the directory structure that was just created by the 'git clone' command above.
+Next, we will inspect the contents of the directory structure that was just created by the `git clone` command above.
 
 ```bash
 $ ls -l
@@ -94,7 +95,7 @@ In the directory listing shown above, two (2) directories are of special interes
 
 ### Editing the proxy.txt File
 
-> NOTE: z2a includes 'example' values for Acumos and MLWB that are provided to assist in performing a quick installation (see: TL;DR section).  These example values can be used for a private development environment that is not shared, not production and not exposed to the Internet.  The values are for demonstration purposes only.
+> NOTE: z2a includes 'example' values for Acumos and MLWB that are provided to assist in performing a quick installation (see: *TL;DR* section).  These example values can be used for a private development environment that is not shared, not production and not exposed to the Internet.  The values are for demonstration purposes only.
 
 The `proxy.txt` file is located in the `z2a/distro-setup` directory.  This file needs to be edited such that the Docker installation can proceed cleanly.  We will need to change directories into that location to perform the necessary edits required for the Acumos installation.
 
@@ -120,11 +121,18 @@ proxy-hostname.example.com:3128
 
 ### Editing the `global_value.yaml` File
 
-> NOTE: z2a includes an example value files for Acumos in the `~/src/system-integration/z2a/z2a-config` directory.  The Acumos example values file is provided for both illustrative purposes and to assist in performing a quick installation (see: TL;DR section).
+> NOTE: z2a includes an example values file for Acumos in the `~/src/system-integration/z2a/z2a-config/dev1` directory.  The Acumos example values file is provided for both illustrative purposes and to assist in performing a quick installation (see: TL;DR section).  The example Acumos values file from that directory could be used here and these edits are not required.
 >
-> The Acumos example values can be used for a private development environment that is not shared, not production and not exposed to the Internet.  These values are for demonstration purposes only.
+> The commands to use the Acumos example values are:
+>
+```bash
+SI=~/src/system-integration
+cp ${SI}/z2a/z2a-config/dev1/global_value.yaml ${SI}/z2a/helm-charts/global_value.yaml
+```
+>
+> The Acumos example values can be used for a private development environment that is not shared, not production and not exposed to the Internet.  The values in the Acumos example file are for demonstration purposes only.
 
-The `global_value.yaml` file is located in the `helm_charts` directory noted above.  We will need to change directories into that location to perform the necessary edits required for the Acumos installation.
+The `global_value.yaml` file is located in the `~/src/system-integration/helm_charts` directory.  We will need to change directories into that location to perform the necessary edits required for the Acumos installation or use the examples values noted above.
 
 Before starting to edit the `global_value.yaml` file, create a copy of the original file just in case you need to refer to the original or to recreate the file.
 
@@ -135,7 +143,7 @@ cd ~/src/system-integration/helm-charts
 cp global_value.yaml global_value.orig
 ```
 
-The default `global_value.yaml` file requires the user to make edits to the masked values in the file.  Masked values are denoted by this value: "******"
+The default `global_value.yaml` file requires the user to make edits to the masked values in the file.  Masked values are denoted by six (6) asterix as shown: "******"
 
 All entries with the masked values must be changed to values that will be used during the installation process. Below is an example edit of a snippet of the `global_value.yaml` file, where the values for *namespace* and *clusterName* are edited. (please use these values)
 
@@ -159,9 +167,11 @@ global:
     clusterName: "kind-acumos"
 ```
 
-For entries in the `global_value.conf` file that have a entry, do not edit these values as they are essential for correct installation.
+For entries in the `global_value.conf` file that have an existing entry, do not edit these values as they are essential for correct installation.
 
 ### Installation Process
+
+>NOTE: This installation process is being is in the process of being modified to automate the status feedback (Step 5 thru Step 7) to make in the installation process smoother.
 
 To perform an installation of Acumos, we will need to perform the following steps:
 
@@ -232,9 +242,16 @@ Machine Learning WorkBench is installed during Phase 3 of the installation proce
 
 #### Editing the `mlwb_value.yaml` File
 
-> NOTE: z2a includes an example value file for MLWB in the `~/src/system-integration/z2a/z2a-config` directory.  The values file is provided for both illustration purposes and to assist in performing a quick installation (see: TL;DR section).
+> NOTE: z2a includes an example value file for MLWB in the `~/src/system-integration/z2a/z2a-config/dev1` directory.  The MLWB example values file is provided for both illustrative purposes and to assist in performing a quick installation (see: TL;DR section).  The example MLWB values file from that directory could be used here and these edits are not required.
 >
-> The MLWB example values can be used for a private development environment that is not shared, not production and not exposed to the Internet.  These values are for demonstration purposes only.
+> The commands to use the MLWB example values are:
+>
+```bash
+SI=~/src/system-integration
+cp ${SI}/z2a/z2a-config/dev1/mlwb_value.yaml ${SI}/z2a/helm-charts/mlwb_value.yaml
+```
+>
+> The MLWB example values can be used for a private development environment that is not shared, not production and not exposed to the Internet.  The values in the MLWB example file are for demonstration purposes only
 
 The `mlwb_value.yaml` file is located in the `helm_charts` directory noted above.  We will need to change directories into that location to perform the edits necessary to perform the installation.
 
@@ -251,7 +268,7 @@ The default `mlwb_value.yaml` file requires the user to make edits to the masked
 
 Using your editor of choice (vi, nano, pico etc.) please open the `mlwb_value.yaml` file such that we can edit it's contents.
 
-CouchDB - the following values need to be populated in the `mlwb_value.yaml` file before installation of the MLWB dependencies (Phase 3).
+*CouchDB* - the following values need to be populated in the `mlwb_value.yaml` file before installation of the MLWB dependencies (Phase 3).
 
 ```bash
 #CouchDB
@@ -265,7 +282,7 @@ acumosCouchDB:
     user: "******"
 ```
 
-JupyterHub - the following values need to be populated in the `mlwb_value.yaml` file before installation of the MLWB dependencies (Phase 3).
+*JupyterHub* - the following values need to be populated in the `mlwb_value.yaml` file before installation of the MLWB dependencies (Phase 3).
 
 ```bash
 #JupyterHub
@@ -278,7 +295,7 @@ acumosJupyterNotebook:
     url: "******"
 ```
 
-Apache NiFi - the following values need to be populated in the `mlwb_value.yaml` file before installation of the MLWB dependencies (Phase 3).
+*Apache NiFi* - the following values need to be populated in the `mlwb_value.yaml` file before installation of the MLWB dependencies (Phase 3).
 
 ```bash
 #NIFI
@@ -307,4 +324,4 @@ For post-installation Machine Learning WorkBench configuration steps, please see
 
 TODO: Add section on accessing the Acumos Portal once installation is completed.
 
-Last Edited: 2020-04-18
+Last Edited: 2020-04-20

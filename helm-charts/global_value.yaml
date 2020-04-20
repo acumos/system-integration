@@ -67,6 +67,8 @@ global:
     acumosCdsImage: "acumos/common-dataservice:3.1.0"
     acumosCdsPassword: "ccds_client"
     acumosCdsUser: "ccds_client"
+    # TODO: refactor to acumosCdsSvcPort
+    acumosCommonDataSvcPort: "8000"
     cds:
         name: 'acumos-common-data-svc'
         podName: 'acumos-k8s-cds'
@@ -93,6 +95,7 @@ global:
 
     # DesignStudio Composition
     acumosDesignStudioImage: "acumos/ds-compositionengine:3.0.3"
+    acumosPortalDsCompositionPort: "8088"
     dsComposition:
         name: 'acumos-ds-composition'
         podName: 'acumos-k8s-ds-composition'
@@ -107,6 +110,7 @@ global:
     acumosKibanaName: "kibana"
     acumosKibanaPort: "5601"
     acumosKibanaService: "kibana-service"
+    acumosLogstashHost: "logstash-service"
     acumosLogstashImage: "acumos-logstash:2.2.2"
     acumosLogstashName: "logstash"
     acumosLogstashPort: "5044"
@@ -185,7 +189,6 @@ global:
 
     # Misc. Ports
     # TODO: find a better home for these
-    acumosCommonDataSvcPort: "8000"
     acumosDeployedSolutionPort: "3330"
     acumosPlatOnPort: "9083"
     acumosProbePort: "5006"
@@ -235,7 +238,6 @@ global:
     # Portal FE/BE
     acumosPortalBeImage: "acumos/acumos-portal-be:3.0.28"
     acumosPortalBePort: "8083"
-    acumosPortalDsCompositionPort: "8088"
     acumosPortalFeImage: "acumos/acumos-portal-fe:3.0.28"
     acumosPortalFePort: "8085"
     portal:
@@ -250,6 +252,7 @@ global:
 
     # PVC
     acumosCdsDbPvcStorage: "1Gi"
+    acumosDockerPVCStorage: "50Gi"
     acumosNexusPVCStorage: "50Gi"
     acumosPVCStorage: "2Gi"
 
