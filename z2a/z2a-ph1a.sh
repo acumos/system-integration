@@ -32,6 +32,7 @@
 for v in $(set | grep ^Z2A_) ; do
 	unset ${v%=**}
 done
+
 # Anchor Z2A_BASE value
 Z2A_BASE=$(realpath $(dirname $0))
 # Z2A_* environment values
@@ -45,6 +46,7 @@ egrep -v '^\s*#' $Z2A_ACUMOS_BASE/global_value.yaml.orig > $Z2A_ACUMOS_BASE/glob
 # Z2A K8S environment values
 Z2A_K8S_CLUSTERNAME=$(yq r $Z2A_ACUMOS_BASE/global_value.yaml global.clusterName)
 Z2A_K8S_NAMESPACE=$(yq r $Z2A_ACUMOS_BASE/global_value.yaml global.namespace)
+
 # Source the z2a utils file
 source $Z2A_BASE/z2a-utils.sh
 # Save initial user environment

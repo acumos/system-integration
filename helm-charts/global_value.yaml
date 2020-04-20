@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
-
+#
 # Notes:
 #   - all sections alphabetically sorted
 #   - see Misc. blocks for miscellaneous values
@@ -119,6 +119,7 @@ global:
     elkPersistenceSize: "10Gi"
 
     # Federation
+    acumosFederationName: "acumos-k8s-federation"
     acumosFederationGatewayPort: "9084"
     acumosFederationImage: "acumos/federation-gateway:3.1.0"
     acumosFederationLocalPort: "9884"

@@ -2,7 +2,7 @@
 
 > NOTE: This document is a work in progress - subject to change.
 >
-> At the time of this writing, **z2a should not be used as a production environment deployment tool**.  z2a is designed for development and/or test environment installations only.  Currently, a key component of z2a (`kind` -  Kubernetes in Docker) is designed for dev/test environments, not for production workloads.
+> **z2a should not be used as a production environment deployment tool**.  z2a is designed for development and/or test environment installations only.  Currently, a key component of z2a (`kind` -  Kubernetes in Docker) is designed for dev/test environments, not for production workloads.
 >
 >> NOTE: At the time of this writing, the `kind` (Kubernetes in Docker) cluster does not persist across a VM reboot OR a Docker service reconfigure/restart operation. Work to add this cluster recovery capability is being worked on by the upstream developers.  At this time, if (for some reason) the VM is rebooted or the Docker service is restarted, portions of the z2a installation process `(z2a_ph1b.sh)` must be executed again.
 >
@@ -60,4 +60,4 @@ Please refer to the following documents for additional information:
 CONFIG.md   - the Acumos configuration markdown document (in progress)
 INSTALL.md  - the Acumos installation markdown document (in progress)
 
-Last Edited: 2020-04-15
+Last Edited: 2020-04-18
