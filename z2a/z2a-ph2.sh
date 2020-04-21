@@ -41,6 +41,8 @@ trap 'fail' ERR
 
 redirect_to /dev/tty
 
+# Global Values
+export ACUMOS_GLOBAL_VALUE=$Z2A_ACUMOS_BASE/global_value.yaml
 NAMESPACE=$Z2A_K8S_NAMESPACE
 
 # Test to ensure that all Pods are running before proceeding

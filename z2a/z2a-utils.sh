@@ -47,7 +47,7 @@ function log() {
 	caller 0 | (
 		set +x;
 		read l f n;
-		logc "$(date -Iseconds) ${n#**/}:$l:($f) $@"
+		logc "$(date -Iseconds) ${n##*/}:$l:($f) $@"
 	);
 }
 

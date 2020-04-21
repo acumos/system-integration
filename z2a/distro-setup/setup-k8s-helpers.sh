@@ -64,17 +64,17 @@ log "Creating Kubernetes Dashboard Service Account ...."
 kubectl apply -f $Z2A_BASE/k8s-dashboard/admin-user.yaml
 
 log "Creating Kubernetes Dashboard ClusterRole Binding ...."
-# Create Cluster Role Binding
+# Create k8s Cluster Role Binding
 kubectl apply -f $Z2A_BASE/k8s-dashboard/clusterrolebinding.yaml
 
 log "Capturing Kubernetes Cluster Status ...."
+# Capture k8s cluster status
 kubectl get all -A
 
 log "Capturing Default Bearer Token ...."
 # Get the Default Bearer Token
 NS=kubernetes-dashboard
 TOKEN="$(kubectl -n $NS describe secret $(kubectl -n $NS get secret | awk '/admin-user/ {print $1}'))"
-echo "$TOKEN"     # capture to log
 log "Kubernetes Dashboard Token"
-log $(echo "$TOKEN" | awk '/token:/ {print $2}')
+logc "\n$(echo "$TOKEN" | awk '/token:/ {print $2}')\n"
 

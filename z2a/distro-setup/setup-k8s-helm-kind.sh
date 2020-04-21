@@ -56,7 +56,7 @@ log "Installing Helm v3 ...."
 # Download and install helm v3 (to /usr/local/bin)
 sudo curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 
-log "Initializing official Helm stable chart repo ..."
+log "Initializing official Helm stable chart repo ...."
 # Initialize the official helm stable chart repo ; perform update
 helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 helm repo update
@@ -73,7 +73,7 @@ log "Creating kind cluster : name = $Z2A_CLUSTER_NAME (this may take a few minut
 # Create kind cluster (named kind-acumos)
 kind create cluster --name=$Z2A_CLUSTER_NAME --config $Z2A_BASE/distro-setup/kind-config.yaml
 # Echo cluster-info - echo output to both log file and TTY
-log "$(kubectl cluster-info --context kind-$Z2A_CLUSTER_NAME)"
+log "\n\n$(kubectl cluster-info --context kind-$Z2A_CLUSTER_NAME)\n"
 
 log "Creating k8s namespace : name = $Z2A_K8S_NAMESPACE"
 # Create an acumos-dev1 namespace in the kind-acumos cluster
