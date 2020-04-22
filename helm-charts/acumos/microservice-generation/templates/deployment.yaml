@@ -85,7 +85,7 @@ spec:
                    },
                    "http_proxy": "http://{{ .Values.global.acumosProxy }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosProxyPort }}",
                    "nexus": {
-                            "nexusEndPointURL": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}/repository/acumos-k8-models-maven/",
+                            "nexusEndPointURL": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}/repository/{{ .Values.global.acumosNexusMavenRepo }}/",
                             "nexusUserName": "{{ .Values.global.acumosNexusUsername }}",
                             "nexusPassword": "{{ .Values.global.acumosNexusPassword }}",
                             "nexusproxy": "",
