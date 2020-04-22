@@ -3,6 +3,8 @@ all : kong mariadb-cds nexus
 
 kong :
 	cp utils.sh.tpl kong/utils.sh
+install_kong 	: kong
+	cd kong && ./install-kong.sh
 
 # MariaDB/CDS
 mariadb-cds :

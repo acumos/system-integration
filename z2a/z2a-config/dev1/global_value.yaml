@@ -19,7 +19,6 @@
 # NOTE: The values in this file are for Acumos Z2A DEMONSTRATION PURPOSES ONLY.
 # NOTE: Do not use these values for any PRODUCTION or Internet-facing systems.
 #
-# TODO: Needs to be refactored to align with new global_value.yaml format.
 
 global:
     appVersion: "1.0.0"
@@ -142,7 +141,8 @@ global:
     acumosKongPostgresPort: "5432"
     acumosKongPostgresUser: "kong"
     acumosKongProxyPort: "8000"
-    acumosKongService: "acumos-kong-proxy"
+    acumosKongRelease: "acumos-kong"
+    acumosKongService: "******"
     acumosKongSslPort: "8443"
 
     # Kubernetes Client

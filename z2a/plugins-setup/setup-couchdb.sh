@@ -18,7 +18,7 @@
 # ===============LICENSE_END=========================================================
 #
 
-# Default values for Acoumos CouchDB
+# Default values for Acumos CouchDB
 # Edit these values for custom values
 RELEASE=mlwb-db
 
