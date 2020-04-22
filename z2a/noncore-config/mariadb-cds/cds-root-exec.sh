@@ -27,4 +27,4 @@ RELEASE=${RELEASE:-acumos-cds-db}
 
 ROOT_PASSWORD=$(kubectl get secret --namespace $NAMESPACE $RELEASE -o jsonpath="{.data.mariadb-root-password}" | base64 --decode)
 
-kubectl run $RELEASE-client --rm -i --restart='Never' --image  docker.io/bitnami/mariadb:latest --namespace $NAMESPACE --command -- mysql -h $RELEASE.$NAMESPACE.svc.cluster.local -uroot -p$ROOT_PASSWORD
+kubectl run $RELEASE-client --rm -i --restart='Never' --image  docker.io/bitnami/mariadb:latest --namespace $NAMESPACE --command -- mysql -h $RELEASE.$NAMESPACE.svc.cluster.local --connect-timeout=5 -uroot -p$ROOT_PASSWORD

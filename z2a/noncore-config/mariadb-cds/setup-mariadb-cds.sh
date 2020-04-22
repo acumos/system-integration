@@ -18,23 +18,13 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-#   # Expected Values from global_value.conf
-    # acumosCdsDbPort: "3306"                     < deferred for this version
-    # acumosCdsImage: "common-dataservice:3.1.0"
-    # acumosCdsDb: "CDS"
-    # acumosCdsUser: "ccds_client"
-    # acumosCdsPassword: "ccds_client"
-    # acumosCdsDbUserName: "CDS_USER"
-    # acumosCdsDbUserPassword: "CDS_PASS"
-    # acumosCdsDbRootPassword: "rootme"
-    # acumosCdsDbPvcStorage: "1Gi"
 
 # Anchor the base directory for the util.sh helper
 HERE=$(dirname $(readlink -f $0))
 source $HERE/utils.sh
 redirect_to $HERE/install.log
 
-# Default values for Acumos MariaDB - in support of Common Data Services (CDS)
+# Default values for Common Data Services (CDS)
 # Edit these values for custom values
 NAMESPACE=$(gv_read global.namespace)
 RELEASE=$(gv_read global.acumosCdsDbService)
@@ -46,14 +36,15 @@ helm repo update
 
 # Simple k/v map to set MariaDB configuration values
 # These are override values for the default Bitnami chart.
+CDS_PVC_SIZE=$(gv_read global.acumosCdsDbPvcStorage)
 cat <<EOF | tee $HERE/cds_mariadb_value.yaml
 nameOverride: $RELEASE
 master:
   persistence:
-    size: 1Gi
+    size: "$CDS_PVC_SIZE"
 slave:
   persistence:
-    size: 1Gi
+    size: "$CDS_PVC_SIZE"
 EOF
 
 log "Installing Bitnami MariaDB Helm Chart ...."
@@ -62,11 +53,12 @@ helm install $RELEASE --namespace $NAMESPACE -f $ACUMOS_GLOBAL_VALUE -f $HERE/cd
 
 # Extract the DB root password from the K8s secrets ; insert the K/V into the global_values.yaml file
 log "\c"
-for i in $(seq 1 20) ; do
-  sleep 10
+wait=180  # seconds
+for i in $(seq $((wait/5)) -1 1) ; do
   logc ".\c"
   kubectl get secrets -A --namespace $NAMESPACE | grep -q ${RELEASE} && break
-  if [ $i -eq 20 ] ; then log "\nTimeout on root password retrieval ...." ; exit ; fi
+  if [ $i -eq 1 ] ; then log "\nTimeout on root password retrieval ...." ; exit ; fi
+  sleep 5
 done
 logc ""
 
@@ -87,14 +79,16 @@ export DB_NAME=$(gv_read global.acumosCdsDb)
 # Inline Placeholder updates
 sed -i -e "s/%CDS%/$DB_NAME/g" -e "s/%CDS_USER%/$DB_USER/g" -e "s/%CDS_PASS%/$DB_PASSWORD/g" $HERE/db-files/db-create.sql
 
-log "Confirming MariaDB Service Availability .... (this may take a few minutes) ...."
+log "Confirming MariaDB Service Availability (this may take a few minutes) ...."
 # Confirm DB service availability before we connect to build the DB and load the DML
 log "\c"
-for i in $(seq 1 20) ; do
-  sleep 10
+wait=180  # seconds
+# see cds-root-exec.sh - connect timeout = 5 seconds
+for i in $(seq $((wait/5)) -1 1) ; do
   logc ".\c"
   if echo "SELECT 1;" | $HERE/cds-root-exec.sh > /dev/null 2>&1 ; then break ; fi
-  if [ $i -eq 20 ] ; then log "\nTimed out waiting on CDS DB ...." ; exit ; fi
+  if [ $i -eq 1 ] ; then log "\nTimed out waiting on CDS DB ...." ; exit ; fi
+  # sleep 5 - relying on connect timeout value
 done
 logc ""
 

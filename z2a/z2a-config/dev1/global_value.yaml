@@ -212,7 +212,7 @@ global:
     acumosNexusPort: "8001"
 
     # Nexus User
-    acumosNexusUserEmail: "******"
+    acumosNexusUserEmail: "nobody@example.com"
     acumosNexusUserName: "nexus-user"
     acumosNexusUserPassword: "Th3-l0ng-and-w1nd1ng-r0ad"
     acumosNexusRole: "acumos-k8-role"
