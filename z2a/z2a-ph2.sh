@@ -39,6 +39,7 @@ load_env
 # Exit with an error on any non-zero return code
 trap 'fail' ERR
 
+#TODO: fix this
 redirect_to /dev/tty
 
 # Global Values
@@ -48,6 +49,7 @@ NAMESPACE=$Z2A_K8S_NAMESPACE
 # Test to ensure that all Pods are running before proceeding
 wait_for_pods 180   # seconds
 
+echo "Starting Phase 2 installation ...."
 echo "Starting Phase 2 (Acumos non-core dependencies) installation ...."
 # Installation - Phase 2 - Acumos non-core dependencies
 source $Z2A_BASE/acumos-setup/setup-acumos-noncore.sh

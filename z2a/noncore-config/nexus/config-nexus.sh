@@ -25,31 +25,42 @@ HERE=$(dirname $(readlink -f $0))
 source $HERE/utils.sh
 redirect_to $HERE/config.log
 
-# Acumos Global Values Location
+# Acumos Values
 GV=$ACUMOS_GLOBAL_VALUE
-# Acquire Nexus Password from global_value.yaml
+NAMESPACE=$(gv_read global.namespace)
+RELEASE=$(gv_read global.acumosNexusRelease)
+ACUMOS_SVC=$(svc_lookup $RELEASE $NAMESPACE)
+yq w -i $GV global.acumosNexusService $ACUMOS_SVC
 GV_ADMIN_PASSWORD=$(gv_read global.acumosNexusAdminPassword)
 
-# TODO: get the IP address of the k8s Pod running the Nexus service and inject it into the function call
-# kubectl describe svc acumos-nexus -n $NAMESPACE | awk '/IP:/ {print $2}'
+# Default password for Sonatype Nexus
+echo admin123 > $HERE/admin.password
+
+ADMIN_POD=$(kubectl get po -l app=config-helper -n $NAMESPACE -o name)
+ADMIN_EXEC="kubectl exec -i $ADMIN_POD -n $NAMESPACE -- bash"
 
 # Function to make API calls to Nexus
+# TODO: lookup port dynamically
 function api() {
   ADMIN_PW=$(< $HERE/admin.password)
-  CURL="/usr/bin/curl --connect-timeout 10 -v -u admin:$ADMIN_PW"
+  CMD="/usr/bin/curl --noproxy '*' --connect-timeout 10 -v -u admin:$ADMIN_PW"
   VERB=$1;shift
   case $VERB in
-    GET) $CURL 'http://127.0.0.1:8081/service/rest'$1 || exit 1
+    GET) CMD="$CMD 'http://$ACUMOS_SVC.$NAMESPACE:8081/service/rest'$1"
       ;;
-    POST) $CURL -H "Content-Type: application/json" -X POST -d "$2" 'http://127.0.0.1:8081/service/rest'$1 || exit 1
+    POST) CMD="$CMD -H 'Content-Type: application/json' -X POST -d '$2' 'http://$ACUMOS_SVC.$NAMESPACE:8081/service/rest'$1"
       ;;
-    PUT) $CURL -H "Content-Type: text/plain" -X PUT -d "$2" 'http://127.0.0.1:8081/service/rest'$1 || exit 1
+    PUT) CMD="$CMD -H 'Content-Type: text/plain' -X PUT -d '$2' 'http://$ACUMOS_SVC.$NAMESPACE:8081/service/rest'$1"
       ;;
-    DELETE) $CURL -H "Content-Type: text/plain" -X DELETE -d "$2" 'http://127.0.0.1:8081/service/rest'$1 || exit 1
+    DELETE) CMD="$CMD -H 'Content-Type: text/plain' -X DELETE -d '$2' 'http://$ACUMOS_SVC.$NAMESPACE:8081/service/rest'$1"
       ;;
   esac
+  echo "$CMD" | $ADMIN_EXEC
 }
 function join(){ local IFS=','; echo "$*" ; }
+
+# wait for pods to become ready
+wait_for_pods 900 # seconds
 
 # Nexus Setup - Task 1 - Set the Nexus Administrator Password
 api PUT /beta/security/users/admin/change-password $GV_ADMIN_PASSWORD

@@ -18,6 +18,7 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
+# Name: config-mariadb-cds.sh  - helper script to configure noncore MariaDB (CDS)
 
 # Anchor the base directory for the util.sh helper
 HERE=$(dirname $(readlink -f $0))
@@ -28,43 +29,6 @@ redirect_to $HERE/install.log
 # Edit these values for custom values
 NAMESPACE=$(gv_read global.namespace)
 RELEASE=$(gv_read global.acumosCdsDbService)
-
-log "Adding Bitnami repo ...."
-# Add Bitnami repo to Helm
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo update
-
-# Simple k/v map to set MariaDB configuration values
-# These are override values for the default Bitnami chart.
-CDS_PVC_SIZE=$(gv_read global.acumosCdsDbPvcStorage)
-cat <<EOF | tee $HERE/cds_mariadb_value.yaml
-nameOverride: $RELEASE
-master:
-  persistence:
-    size: "$CDS_PVC_SIZE"
-slave:
-  persistence:
-    size: "$CDS_PVC_SIZE"
-EOF
-
-log "Installing Bitnami MariaDB Helm Chart ...."
-# Helm Chart Installation incantation
-helm install $RELEASE --namespace $NAMESPACE -f $ACUMOS_GLOBAL_VALUE -f $HERE/cds_mariadb_value.yaml bitnami/mariadb
-
-# Extract the DB root password from the K8s secrets ; insert the K/V into the global_values.yaml file
-log "\c"
-wait=180  # seconds
-for i in $(seq $((wait/5)) -1 1) ; do
-  logc ".\c"
-  kubectl get secrets -A --namespace $NAMESPACE | grep -q ${RELEASE} && break
-  if [ $i -eq 1 ] ; then log "\nTimeout on root password retrieval ...." ; exit ; fi
-  sleep 5
-done
-logc ""
-
-# Extract the DB root password from the K8s secrets ; insert the K/V into the global_values.yaml file
-ROOT_PASSWORD=$(kubectl get secret --namespace $NAMESPACE $RELEASE -o jsonpath="{.data.mariadb-root-password}" | base64 --decode)
-yq w -i $ACUMOS_GLOBAL_VALUE global.acumosCdsDbRootPassword $ROOT_PASSWORD
 
 log "Preparing Database Files ...."
 # Prepare db-files for the DB creation activity
@@ -82,7 +46,7 @@ sed -i -e "s/%CDS%/$DB_NAME/g" -e "s/%CDS_USER%/$DB_USER/g" -e "s/%CDS_PASS%/$DB
 log "Confirming MariaDB Service Availability (this may take a few minutes) ...."
 # Confirm DB service availability before we connect to build the DB and load the DML
 log "\c"
-wait=180  # seconds
+wait=900  # seconds
 # see cds-root-exec.sh - connect timeout = 5 seconds
 for i in $(seq $((wait/5)) -1 1) ; do
   logc ".\c"

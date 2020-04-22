@@ -54,22 +54,30 @@ function redirect_to() {
 	exec >&$1 2>&1 			# redirect stdout/stderr to file
 }
 
-# Test to ensure that all Pods are running before proceeding
-# TODO: add logic to wait for specific pods
-function wait_for_pods() {
-	i=0 ; wait=$1
+# Test to ensure that a specific Pod is ready before proceeding
+function wait_for_pod_ready() {
+	NAMESPACE=$(gv_read global.namespace)
+	i=0 ; wait=$1 ; pattern=$2 ; pod=""
 	log ".\c"
 	while : ; do
-		PODS=$(kc get pods --field-selector 'status.phase!=Running','status.phase!=Succeeded' -A)
-		if [[ -z $PODS ]]; then break ; fi
-		sleep 1
-		(( ++i > wait )) && {
-				log "Timed out waiting for pods."
-				exit
+		if [[ -z $pod ]] ; then
+			sleep 1 ; (( ++i ))
+			pod=$(kubectl get pods -n $NAMESPACE -o name | grep pod/$pattern)
+		else
+			kubectl wait --for=condition=Ready $pod -n $NAMESPACE --timeout=5s && break || (( i = i+5 ))
+		fi
+		(( i > wait )) && {
+				log "Timed out waiting for pod $pod ready state."
+				exit 1
 		}
 		logc ".\c"
 	done
 	logc ""
+}
+
+# Kubernetes service lookup function
+function svc_lookup() {
+	helm get manifest $1 -n $2 | yq r -d'*' -j - | grep '"kind":"Service"' | jq -r .metadata.name
 }
 
 # INIT

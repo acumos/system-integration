@@ -18,7 +18,7 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: install-nexus.sh    - helper script to install Sonatype Nexus for Acumos
+# Name: install-config-helper.sh    - helper script to install k8s config-helper pod
 
 # Anchor the base directory for the util.sh helper
 HERE=$(dirname $(readlink -f $0))
@@ -28,35 +28,18 @@ redirect_to $HERE/install.log
 # Acumos Global Values Location
 GV=$ACUMOS_GLOBAL_VALUE
 
-# Acquire Namespace and Nexus Service values for Nexus
+# Acquire NAMESPACE and RELEASE values
 NAMESPACE=$(gv_read global.namespace)
-RELEASE=$(gv_read global.acumosNexusRelease)
+# TODO: add global_value for configHelperRelease
+# RELEASE=$(gv_read global.configHelperRelease)
+RELEASE=config-helper
 
-log "Adding Sonatype Nexus repo ...."
-# Add Sonatype-Nexus repo
-helm repo add oteemocharts https://oteemo.github.io/charts
-helm repo update
-
-#TODO: See https://github.com/Oteemo/charts/tree/master/charts/sonatype-nexus for recommended values
-# Local override values for 3rd party Nexus chart goes here
-cat <<EOF | tee $HERE/nexus_value.yaml
-nexusProxy:
-  enabled: false
-service:
-  enabled: true
-  name: $RELEASE
-  ports:
-  - name: nexus-service
-    targetPort: 8081
-    port: 8081
-EOF
-
-log "Installing Nexus Helm Chart ...."
-# Install the Nexus Helm Chart
-# helm install $RELEASE --namespace $NAMESPACE -f $GV -f $HERE/nexus_value.yaml stable/sonatype-nexus
-helm install $RELEASE --namespace $NAMESPACE -f $GV -f $HERE/nexus_value.yaml oteemocharts/sonatype-nexus
+log "Installing k8s config-helper Chart ...."
+# K8s config-helper Pod Deployment
+helm install $RELEASE -n $NAMESPACE $HERE/config-helper/ -f $ACUMOS_GLOBAL_VALUE \
+  --set global.namespace=$NAMESPACE \
+  --set-string kubeconfig="$(kubectl config view --flatten --minify | base64 -w0)"
 
 log "Sleeping .... waiting (up to 15 minutes) for pod ready status ...."
 # Wait for the Nexus pods to become available
 wait_for_pod_ready 900 $RELEASE
-kubectl get pods -o json

@@ -27,34 +27,17 @@
 #
 # Usage:
 
-log "Adding K8s repo ...."
-# Add Kubernetes repo to RHEL/Centos
-rhel && {
-  cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
-[kubernetes]
-name=Kubernetes
-baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
-enabled=1
-gpgcheck=1
-repo_gpgcheck=1
-gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
-EOF
-  sudo yum -y update
-}
-
 log "Installing kubectl binary ...."
 # Download and install kubectl
-# RHEL/Centos
-rhel && sudo yum install -y kubectl
-# Download and install kubectl
-# Ubuntu
-ubuntu && curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-ubuntu && echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
-ubuntu && sudo apt-get update && sudo apt-get install -y kubectl
+K8S_RELEASE=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
+sudo curl -L -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$K8S_RELEASE/bin/linux/amd64/kubectl
+sudo chmod 755 /usr/local/bin/kubectl
 
 log "Installing Helm v3 ...."
 # Download and install helm v3 (to /usr/local/bin)
-sudo curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+HELM_RELEASE=$(curl -Ls https://github.com/helm/helm/releases| awk '$0 ~ pat {print gensub(/.*".*\/(.*)".*/, "\\1","g");exit}' pat='href="/helm/helm/releases/tag/v3')
+sudo curl -s https://get.helm.sh/helm-${HELM_RELEASE}-linux-amd64.tar.gz | tar -zxO linux-amd64/helm > /usr/local/bin/helm
+sudo chmod 755 /usr/local/bin/helm
 
 log "Initializing official Helm stable chart repo ...."
 # Initialize the official helm stable chart repo ; perform update

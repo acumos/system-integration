@@ -19,6 +19,8 @@
 # NOTE: The values in this file are for Acumos Z2A DEMONSTRATION PURPOSES ONLY.
 # NOTE: Do not use these values for any PRODUCTION or Internet-facing systems.
 #
+# TODO: xxxxxx is the placeholder for end-users to manually update
+# TODO: add different placeholder for automatic/dynamically generated values
 
 global:
     appVersion: "1.0.0"
@@ -44,7 +46,7 @@ global:
     acumosAzureNetworkGroupName: "E6E-NSG"
     acumosAzureSubnet: "Cognita-OAM-vsubnet"
     acumosAzureVnet: "Cognita-OAM-vnet"
-    # TODO: need to be refactored as acumosAzure*
+    # TODO: need to be refactored as acumosAzure
     acumosDeployedVMPassword: "12NewPA^^w0rd!"
     acumosDeployedVMUser: "dockerUser"
     acumosRWUserName: "docker"
@@ -142,7 +144,7 @@ global:
     acumosKongPostgresUser: "kong"
     acumosKongProxyPort: "8000"
     acumosKongRelease: "acumos-kong"
-    acumosKongService: "******"
+    acumosKongService: "acumos-nexus-service"
     acumosKongSslPort: "8443"
 
     # Kubernetes Client
@@ -204,12 +206,13 @@ global:
     acumosNexusAdminPassword: "Chang3-M3-R1ght-N0w"
     acumosNexusBlobStore: "acumos-blob-store"
     acumosNexusDataPath: "nexus-data"
-    acumosNexusDockerRepo: "acumos-docker-repo"
-    acumosNexusMavenRepo: "acumos-maven-repo"
-    acumosNexusService: "acumos-nexus-service"
     acumosNexusDockerPort: "10002"
+    acumosNexusDockerRepo: "acumos-docker-repo"
     acumosNexusEndpointPort: "8081"
+    acumosNexusMavenRepo: "acumos-maven-repo"
     acumosNexusPort: "8001"
+    acumosNexusRelease: "acumos-nexus"
+    acumosNexusService: "xxxxxx"
 
     # Nexus User
     acumosNexusUserEmail: "nobody@example.com"
