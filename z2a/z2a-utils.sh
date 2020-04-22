@@ -37,6 +37,11 @@ function fail() {
 	exit 1
 }
 
+# read global value from the global_value.yaml file
+function gv_read() {
+	yq r $ACUMOS_GLOBAL_VALUE $@
+}
+
 # Load env environment vars
 function load_env() {
 	source $Z2A_BASE/user-env.sh
@@ -71,10 +76,12 @@ function save_env() {
 # Test to ensure that all Pods are running before proceeding
 # TODO: fix cosmetic bug
 function wait_for_pods() {
+	NAMESPACE=$(gv_read global.namespace)
 	i=0 ; wait=$1
 	log ".\c"
 	while : ; do
-		PODS=$(kc get pods --field-selector 'status.phase!=Running','status.phase!=Succeeded' -A 2>/dev/null)
+		# PODS="$(kubectl get pods -n $NAMESPACE --field-selector 'status.phase!=Running','status.phase!=Succeeded' -A 2>/dev/null)"
+		PODS="$(kubectl get pods -n $NAMESPACE -o jsonpath='{range .items[*].status.containerStatuses[*]}{.ready}{"\n"}{end}'  2>/dev/null | grep -v true)"
 		if [[ -z $PODS ]]; then break ; fi
 		sleep 1
 		(( ++i > wait )) && {

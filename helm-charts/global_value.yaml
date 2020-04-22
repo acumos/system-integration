@@ -24,8 +24,8 @@
 
 global:
     appVersion: "1.0.0"
-    namespace: "******"
-    clusterName: "******"
+    namespace: "xxxxxx"
+    clusterName: "xxxxxx"
 
     image:
         repository: "nexus3.acumos.org:10002"
@@ -42,15 +42,15 @@ global:
     # Azure client
     acumosAzureClientImage: "acumos-azure-client:2.0.15"
     acumosAzureClientPort: "9081"
-    acumosAzureContainerNamePrefix: "******"
-    acumosAzureNetworkGroupName: "******"
-    acumosAzureSubnet: "******"
-    acumosAzureVnet: "******"
+    acumosAzureContainerNamePrefix: "xxxxxx"
+    acumosAzureNetworkGroupName: "xxxxxx"
+    acumosAzureSubnet: "xxxxxx"
+    acumosAzureVnet: "xxxxxx"
     # TODO: need to be refactored as acumosAzure*
-    acumosDeployedVMPassword: "*******"
-    acumosDeployedVMUser: "******"
-    acumosRWUserName: "******"
-    acumosRWUserPassword: "******"
+    acumosDeployedVMPassword: "xxxxxx"
+    acumosDeployedVMUser: "xxxxxx"
+    acumosRWUserName: "xxxxxx"
+    acumosRWUserPassword: "xxxxxx"
 
     # Blueprint
     acumosBluePrintOrchestratorImage: "blueprint-orchestrator:2.0.13"
@@ -60,10 +60,10 @@ global:
     acumosCdsDb: "CDS"
     acumosCdsDbHelmRelease: "acumos-cds-db"
     acumosCdsDbPort: "3306"
-    acumosCdsDbRootPassword: "******"
-    acumosCdsDbService: "******"
-    acumosCdsDbUserName: "******"
-    acumosCdsDbUserPassword: "******"
+    acumosCdsDbRootPassword: "xxxxxx"
+    acumosCdsDbService: "xxxxxx"
+    acumosCdsDbUserName: "xxxxxx"
+    acumosCdsDbUserPassword: "xxxxxx"
     acumosCdsImage: "acumos/common-dataservice:3.1.0"
     acumosCdsPassword: "ccds_client"
     acumosCdsUser: "ccds_client"
@@ -86,7 +86,7 @@ global:
     acumosDockerPort: "2375"
     acumosDockerProxyHost: "acumos-docker-proxy-service"
     acumosDockerProxyPort: "8883"
-    acumosDockerRegistryEmail: "******"
+    acumosDockerRegistryEmail: "xxxxxx"
     acumosDockerUsername: "docker"
     docker:
         image:
@@ -116,7 +116,7 @@ global:
     acumosLogstashPort: "5044"
     acumosLogstashService: "logstash-service"
     # TODO: ELK (to be refactored to acumosElk*)
-    acumosELKHost: "******"
+    acumosELKHost: "xxxxxx"
     elkImagePullPolicy: "IfNotPresent"
     elkPersistenceEnabled: "true"
     elkPersistencePVCName: "elasticsearch-data"
@@ -151,9 +151,9 @@ global:
     acumosKubernetesClientPort: "8082"
 
     # MailJet
-    acumosMailJetApiKey: "******"
-    acumosMailJetId: "******"
-    acumosMailJetSecretKey: "******"
+    acumosMailJetApiKey: "xxxxxx"
+    acumosMailJetId: "xxxxxx"
+    acumosMailJetSecretKey: "xxxxxx"
 
     # MetricBeat
     acumosMetricBeatImage: "acumos-metricbeat:2.2.2"
@@ -181,11 +181,11 @@ global:
 
     # Misc. Keys
     # TODO: find a better home for these
-    acumosHostname: "******"
-    acumosKeyStorePwd: "******"
+    acumosHostname: "xxxxxx"
+    acumosKeyStorePwd: "xxxxxx"
     acumosProxy: "acumos-proxy"
-    acumosQandAUrl: "******"
-    acumosTrustStorePwd: "******"
+    acumosQandAUrl: "xxxxxx"
+    acumosTrustStorePwd: "xxxxxx"
 
     # Misc. Ports
     # TODO: find a better home for these
@@ -196,7 +196,7 @@ global:
 
     # Nexus Admin
     acumosNexusAdmin: "admin"
-    acumosNexusAdminPassword: "******"
+    acumosNexusAdminPassword: "xxxxxx"
     acumosNexusBlobStore: "acumos-blob-store"
     acumosNexusDataPath: "nexus-data"
     acumosNexusDockerPort: "10002"
@@ -204,17 +204,18 @@ global:
     acumosNexusEndpointPort: "8081"
     acumosNexusMavenRepo: "acumos-maven-repo"
     acumosNexusPort: "8001"
+    acumosNexusRelease: "acumos-nexus"
     acumosNexusService: "acumos-nexus-service"
 
     # Nexus User
-    acumosNexusUserEmail: "******"
-    acumosNexusUserName: "*******"
-    acumosNexusUserPassword: "******"
+    acumosNexusUserEmail: "xxxxxx"
+    acumosNexusUserName: "xxxxxx"
+    acumosNexusUserPassword: "xxxxxx"
     acumosNexusRole: "acumos-k8-role"
 
     # Onboarding
     acumosOnboardingAppPort: "8090"
-    acumosOnboardingCli: "******"
+    acumosOnboardingCli: "xxxxxx"
     acumosOnboardingBaseRImage: "onboarding-base-r:1.0.0"
     acumosOnboardingImage: "acumos/onboarding-app:3.8.1"
     onboarding:
@@ -224,16 +225,16 @@ global:
 
     # OpenStack client
     acumosOpenStackClientPort: "8007"
-    acumosOpenStackEndpoint: "******"
-    acumosOpenStackEndpointPassword: "******"
-    acumosOpenStackEndpointUsername: "******"
-    acumosOpenStackHostUsername: "******"
+    acumosOpenStackEndpoint: "xxxxxx"
+    acumosOpenStackEndpointPassword: "xxxxxx"
+    acumosOpenStackEndpointUsername: "xxxxxx"
+    acumosOpenStackHostUsername: "xxxxxx"
     acumosOpenStackImage: "openstack-client:2.0.12"
-    acumosOpenStackProxyIp: "******"
+    acumosOpenStackProxyIp: "xxxxxx"
     acumosOpenStackSolutionPort: "8336"
-    acumosOpenStackVMUsername: "******"
+    acumosOpenStackVMUsername: "xxxxxx"
     # TODO: refactor to acumosOpenStackSecurityGroupName (or similar)
-    acumosSecurityGroupName: "******"
+    acumosSecurityGroupName: "xxxxxx"
 
     # Portal FE/BE
     acumosPortalBeImage: "acumos/acumos-portal-be:3.0.28"

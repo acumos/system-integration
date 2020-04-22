@@ -39,6 +39,7 @@ load_env
 # Exit with an error on any non-zero return code
 trap 'fail' ERR
 
+#TODO: fix this
 redirect_to /dev/tty
 
 # Global Values
@@ -46,6 +47,15 @@ export ACUMOS_GLOBAL_VALUE=$Z2A_ACUMOS_BASE/global_value.yaml
 NAMESPACE=$Z2A_K8S_NAMESPACE
 
 # Test to ensure that all Pods are running before proceeding
+wait_for_pods 180   # seconds
+
+echo "Starting Phase 2 installation ...."
+# Preparation - Phase 2 - K8s Admin Pod Deployment
+# TODO: add global_value for k8sAdminRelease
+helm install k8s-admin -n $NAMESPACE $Z2A_BASE/k8s-admin/ -f $ACUMOS_GLOBAL_VALUE \
+  --set global.namespace=$NAMESPACE \
+  --set-string kubeconfig="$(kubectl config view --flatten --minify | base64 -w0)"
+
 wait_for_pods 180   # seconds
 
 echo "Starting Phase 2 (Acumos non-core dependencies) installation ...."

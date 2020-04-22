@@ -57,10 +57,12 @@ function redirect_to() {
 # Test to ensure that all Pods are running before proceeding
 # TODO: add logic to wait for specific pods
 function wait_for_pods() {
+	NAMESPACE=$(gv_read global.namespace)
 	i=0 ; wait=$1
 	log ".\c"
 	while : ; do
-		PODS=$(kc get pods --field-selector 'status.phase!=Running','status.phase!=Succeeded' -A)
+		# PODS="$(kubectl get pods -n $NAMESPACE --field-selector 'status.phase!=Running','status.phase!=Succeeded' -A 2>/dev/null)"
+		PODS="$(kubectl get pods -n $NAMESPACE -o jsonpath='{range .items[*].status.containerStatuses[*]}{.ready}{"\n"}{end}' 2>/dev/null | grep -v true)"
 		if [[ -z $PODS ]]; then break ; fi
 		sleep 1
 		(( ++i > wait )) && {
@@ -70,6 +72,11 @@ function wait_for_pods() {
 		logc ".\c"
 	done
 	logc ""
+}
+
+# Kubernetes service lookup function
+function svc_lookup() {
+	helm get manifest $1 -n $2 | yq r -d'*' -j - | grep '"kind":"Service"' | jq -r .metadata.name
 }
 
 # INIT

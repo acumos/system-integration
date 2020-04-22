@@ -30,7 +30,7 @@ GV=$ACUMOS_GLOBAL_VALUE
 
 # Acquire Namespace and Nexus Service values for Nexus
 NAMESPACE=$(gv_read global.namespace)
-RELEASE=$(gv_read global.acumosNexusService)
+RELEASE=$(gv_read global.acumosNexusRelease)
 
 log "Adding Sonatype Nexus repo ...."
 # Add Sonatype-Nexus repo
@@ -56,27 +56,7 @@ log "Installing Nexus Helm Chart ...."
 # helm install $RELEASE --namespace $NAMESPACE -f $GV -f $HERE/nexus_value.yaml stable/sonatype-nexus
 helm install $RELEASE --namespace $NAMESPACE -f $GV -f $HERE/nexus_value.yaml oteemocharts/sonatype-nexus
 
+# TODO: add function wait_for_pod timeout podname
+sleep 10
 # Wait for the Nexus pods to become available
 wait_for_pods 180   # seconds
-# TODO:  add wait_for_pod_ready function to ensure Pod is in a ready state
-sleep 300 # seconds
-
-# From deprecated stable/sonatype-nexus chart
-# POD=$(kubectl get pods --namespace=$NAMESPACE | awk '/acumos-nexus/ {print $1}')
-# ADMIN_PW=$(kubectl exec -it $POD --namespace=$NAMESPACE -- /bin/cat /nexus-data/admin.password)
-
-# Default setting
-ADMIN_PW=admin123
-echo $ADMIN_PW > admin.password
-
-# Docker inspect script to determine the IP of the k8s control plane
-# TODO: These commands are kind and z2a-specific ; need to wrap in a context-aware switch
-# CLUSTER_NAME=$(/usr/local/bin/kind get clusters)
-# docker inspect hobbes-1-control-plane | jq -r '.[].NetworkSettings.Networks.bridge.IPAddress'
-
-# Capture the Nexus Admin TCP port from Kubernetes
-# kubectl get svc acumos-nexus -o=json | jq '.spec.ports[] | select(.name == "admin-http").port'
-
-# Capture the IP address of the Nexus service to pass to config-nexus.sh
-# TODO: capture the IP address of the Nexus service to pass to config-nexus.sh
-# kubectl describe svc acumos-nexus -n $NAMESPACE | awk '/IP:/ {print $2}'

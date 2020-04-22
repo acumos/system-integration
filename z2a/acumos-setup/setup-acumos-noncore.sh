@@ -37,13 +37,13 @@
 echo "Installing Acumos noncore Helm charts ...."
 # Install (or remove) the Acumos non-core charts, one by one in this order
 
-echo "Install Acumos noncore dependency: MariaDB (Bitnami Chart) ...."
-(cd $Z2A_BASE/noncore-config/ ; make install_mariadb-cds)
-
 echo "Install Acumos noncore dependency: Sonatype Nexus (Oteemo Chart)...."
-(cd $Z2A_BASE/noncore-config/ ; make install_nexus)
+(cd $Z2A_BASE/noncore-config/ ; make nexus_all)
 
 exit 0
+
+echo "Install Acumos noncore dependency: MariaDB (Bitnami Chart) ...."
+(cd $Z2A_BASE/noncore-config/ ; make mariadb-cds_all)
 
 echo "Install Acumos noncore dependency: Kong ...."
 helm install -name k8s-noncore-kong --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-kong -f $Z2A_ACUMOS_BASE/global_value.yaml
