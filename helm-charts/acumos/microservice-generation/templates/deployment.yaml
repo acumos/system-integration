@@ -135,7 +135,7 @@ spec:
            - name: LOGSTASH_HOST
              value: {{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}
            - name: LOGSTASH_PORT
-             value: {{ .Values.global.acumosLogstashPort }}
+             value: {{ .Values.global.acumosLogstashPort | quote }}
          volumeMounts:
            - mountPath: /filebeat-logs
              name: acumos-microservice-generation-logs

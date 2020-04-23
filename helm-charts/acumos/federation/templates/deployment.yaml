@@ -19,21 +19,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{ . Values.global.acumosFederationName }}
+ name: {{ .Values.global.acumosFederationName }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{ . Values.global.acumosFederationName }}
+   app: {{ .Values.global.acumosFederationName }}
 spec:
  selector:
    matchLabels:
-     app: {{ . Values.global.acumosFederationName }}
+     app: {{ .Values.global.acumosFederationName }}
      tier: frontend
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{ . Values.global.acumosFederationName }}
+       app: {{ .Values.global.acumosFederationName }}
        tier: frontend
    spec:
      containers:
@@ -116,7 +116,7 @@ spec:
            - name: LOGSTASH_HOST
              value: {{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}
            - name: LOGSTASH_PORT
-             value: {{ .Values.global.acumosLogstashPort }}
+             value: {{ .Values.global.acumosLogstashPort | quote }}
          volumeMounts:
            - mountPath: /filebeat-logs
              name: acumos-federation-logs
