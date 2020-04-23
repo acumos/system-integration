@@ -117,6 +117,9 @@ spec:
                 "jupyter" : {
                    "url" : "https://acumos.{{ .Values.global.namespace }}:8086"
                 },
+                "elk" : {
+                   "url" : "http://{{ .Values.global.elasticsearch.svcName }}.{{ .Values.global.namespace }}:9600/elkclient"
+                },
                 "kubernetes" : {
                    "doc" : {
                       "url" : "http://docs.acumos.org/"
