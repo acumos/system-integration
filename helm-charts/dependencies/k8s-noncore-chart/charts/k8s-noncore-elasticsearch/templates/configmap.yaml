@@ -27,6 +27,7 @@ data:
   elasticsearch.yml: |
     cluster.name: "{{ .Values.global.clusterName }}"
     path.data: /usr/share/elasticsearch/data
+    path.repo: ["/usr/share/elasticsearch/data/backup/"]
     network.host: "0.0.0.0"
     discovery.zen.ping.unicast.hosts: "elasticsearch.{{ .Values.global.namespace }}"
     discovery.zen.minimum_master_nodes: 1
