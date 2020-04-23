@@ -116,6 +116,7 @@ global:
     acumosLogstashPort: "5044"
     acumosLogstashService: "logstash-service"
     # TODO: ELK (to be refactored to acumosElk*)
+    acumosELKHostPort: "9600"
     acumosELKHost: "******"
     elkImagePullPolicy: "IfNotPresent"
     elkPersistenceEnabled: "true"
@@ -250,6 +251,11 @@ global:
             podName: 'acumos-k8s-portal-be'
             svcName: 'acumos-portal-be'
 
+    elasticsearch:
+        name: 'elasticsearch'
+        podName: 'elasticsearch'
+        svcName: 'elasticsearch'
+    
     # PVC
     acumosCdsDbPvcStorage: "1Gi"
     acumosDockerPVCStorage: "50Gi"
