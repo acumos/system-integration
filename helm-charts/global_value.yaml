@@ -250,6 +250,11 @@ global:
             podName: 'acumos-k8s-portal-be'
             svcName: 'acumos-portal-be'
 
+    elasticsearch:
+        name: 'elasticsearch'
+        podName: 'elasticsearch'
+        svcName: 'elasticsearch'
+    
     # PVC
     acumosCdsDbPvcStorage: "1Gi"
     acumosDockerPVCStorage: "50Gi"
