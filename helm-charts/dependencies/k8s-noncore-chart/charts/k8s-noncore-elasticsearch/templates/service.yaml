@@ -28,5 +28,9 @@ spec:
     - name: elasticsearch
       port: {{ .Values.global.acumosElasticSearchPort }}
       targetPort: {{ .Values.global.acumosElasticSearchPort }}
+    - name: elkclient
+      port: {{ .Values.global.acumosElkClientPort }}
+      targetPort: {{ .Values.global.acumosElkClientPort }}
+      protocol: TCP
   selector:
     app: elasticsearch
