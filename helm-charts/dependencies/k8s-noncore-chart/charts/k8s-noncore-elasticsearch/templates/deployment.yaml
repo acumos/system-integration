@@ -19,16 +19,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: elasticsearch
+  name: "{{ .Values.global.elasticsearch.podName }}"
   namespace: "{{ .Values.global.namespace }}"
   labels:
-    app: elasticsearch
+    app: {{ .Values.global.elasticsearch.name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
       name: elasticsearch-deployment
-      app: elasticsearch
+      app: {{ .Values.global.elasticsearch.name }}
   revisionHistoryLimit: 3
   strategy:
     type: Recreate
@@ -36,9 +36,9 @@ spec:
     metadata:
       labels:
         name: elasticsearch-deployment
-        app: elasticsearch
+        app: {{ .Values.global.elasticsearch.name }}
       annotations:
-        # releasetime: 
+        # releasetime:
         # releasetime: needs to be updated to function `now` for Helm 3
     spec:
       initContainers:
@@ -74,8 +74,40 @@ spec:
           mountPath: /usr/share/elasticsearch/data
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
+      - name: elkclient
+        image: "{{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.global.acumosElkClientImage }}"
+        imagePullPolicy: {{ .Values.global.elkImagePullPolicy }}
+        env:
+        - name: SPRING_APPLICATION_JSON
+          value: '{
+              "server" : {
+                   "port" : "{{ .Values.global.acumosELKHostPort }}"
+               },
+               "elk" : {
+                   "host" : {
+                       "url": "{{ .Values.global.elasticsearch.name }}.{{ .Values.global.namespace }}"
+                   },
+                   "elasticssearch" : {
+                               "port": "{{ .Values.global.acumosElasticSearchPort }}"
+                   },
+                   "cronschedule": {
+                       "createsnapshot":{
+                           "time": "0 0 * * * *"
+                       }
+                   }
+               }
+          }'
+        ports:
+        - containerPort: {{ .Values.global.acumosELKHostPort }}
+        volumeMounts:
+        - name: acumos-logs
+          mountPath: /usr/share/maven/logs
+        - name: elasticsearch-data
+          mountPath: /elasticsearch/data
       restartPolicy: Always
       volumes:
+        - name: acumos-logs
+          emptyDir: {}
         - name: elasticsearch
           configMap:
             name: elasticsearch
@@ -91,6 +123,3 @@ spec:
       {{- end }}
       imagePullSecrets:
         - name: acumossecret
-
-
- 
