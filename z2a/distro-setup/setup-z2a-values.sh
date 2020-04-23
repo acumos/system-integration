@@ -18,7 +18,7 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: setup-port-mappings.sh - helper script to map Acumos ports to kind ports
+# Name: setup-z2a-values.sh - helper script to setup z2a-specific values
 #
 # Prerequisites:
 # - Ubuntu Xenial (16.04), Bionic (18.04), or Centos 7 VM
