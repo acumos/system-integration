@@ -36,9 +36,11 @@ log "Preparing Database Files ...."
 cp $HERE/db-files/cmn-data-svc-base-mysql.sql $HERE/db-files/db-create.sql
 cp $HERE/db-files/cmn-data-svc-ddl-dml.sql $HERE/db-files/db-init.sql
 
+# Exports for mariaDB-exec scripts
 export DB_USER=$(gv_read global.acumosCdsDbUserName)
 export DB_PASSWORD=$(gv_read global.acumosCdsDbUserPassword)
 export DB_NAME=$(gv_read global.acumosCdsDb)
+export NAMESPACE RELEASE
 
 # Inline Placeholder updates
 sed -i -e "s/%CDS%/$DB_NAME/g" -e "s/%CDS_USER%/$DB_USER/g" -e "s/%CDS_PASS%/$DB_PASSWORD/g" $HERE/db-files/db-create.sql

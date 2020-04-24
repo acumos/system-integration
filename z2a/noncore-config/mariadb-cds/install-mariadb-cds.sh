@@ -69,4 +69,3 @@ logc ""
 # Extract the DB root password from the K8s secrets ; insert the K/V into the global_values.yaml file
 ROOT_PASSWORD=$(kubectl get secret --namespace $NAMESPACE $RELEASE -o jsonpath="{.data.mariadb-root-password}" | base64 --decode)
 yq w -i $ACUMOS_GLOBAL_VALUE global.acumosCdsDbRootPassword $ROOT_PASSWORD
-

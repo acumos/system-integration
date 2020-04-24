@@ -118,9 +118,13 @@ global:
     # TODO: ELK (to be refactored to acumosElk)
     acumosELKHost: "acumosk8s-test-elk.example.com"
     elkImagePullPolicy: "IfNotPresent"
-    elkersistenceEnabled: "true"
+    elkPersistenceEnabled: "true"
     elkPersistencePVCName: "elasticsearch-data"
     elkPersistenceSize: "10Gi"
+    elasticsearch:
+        name: "elasticsearch"
+        podName: "elasticsearch"
+        svcName: "elasticsearch"
 
     # Federation
     acumosFederationName: "acumos-k8s-federation"

@@ -1,3 +1,6 @@
+# TODO: add config-helper for standalong operation
+# TODO: to the other targets
+
 all : kong mariadb-cds nexus
 .PHONY : config-helper kong mariadb-cds nexus
 
@@ -13,9 +16,9 @@ kong :
 	cp utils.sh.tpl kong/utils.sh
 kong_install : kong
 	cd kong && ./install-kong.sh
-# kong_config : kong
-#       cd kong && ./config-kong.sh
-kong_all : kong_install
+kong_config : kong
+	cd kong && ./config-kong.sh
+kong_all : kong_install kong_config
 
 # MariaDB/CDS
 mariadb-cds :

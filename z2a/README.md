@@ -2,11 +2,13 @@
 
 > NOTE: This document is a work in progress - subject to change.
 >
-> **z2a should not be used as a production environment deployment tool**.  `z2a` is designed for development and/or test environment installations only.  Currently, a key component of `z2a` (`kind` -  Kubernetes in Docker) is designed for dev/test environments, not for production workloads.
+> **z2a should not be used as a production environment deployment tool**.  `z2a` is designed for development and/or test environment installations.  Currently, a key component of `z2a` (`kind` -  Kubernetes in Docker) is designed for dev/test environments, not for production workloads.
 >
->> NOTE: At the time of this writing, the `kind` (Kubernetes in Docker) cluster does not persist across a VM reboot OR a Docker service reconfigure/restart operation. Work to add this cluster recovery capability is being worked on by the upstream developers.  At this time, if (for some reason) the VM is rebooted or the Docker service is restarted, portions of the `z2a` installation process `(z2a_ph1b.sh)` must be executed again and any "work" would be lost.
+>> NOTE: At the time of this writing, the `kind` (Kubernetes in Docker) cluster does not persist across a VM reboot OR a Docker service reconfigure/restart operation. Work to add this cluster recovery capability is being worked on by the upstream developers.  At this time, if (for some reason) the VM is rebooted or the Docker service is restarted, portions of the `z2a` installation process `(z2a_ph1b.sh)` must be executed again and any "work" may be lost.  The end-user must ensure that they have any work performed in the current `z2a` environment saved outside of z2a.
 >
 > **z2a performs NO post-installation component configuration**.  The `z2a` scripts are INSTALLATION-ONLY at this time.  No post-installation configuration is performed to any of the components that are installed. As `z2a` matures, post-installation configuration will be added to configurations that can be easily maintained.
+>
+>> NOTE: Preliminary work is being performed to auto-configure components of Acumos.  This auto-configure capability is work in progress.
 
 In the Acumos `system-integration` repository, the `z2a` sub-directory contains scripts that will allow for installation of Acumos on a vanilla Linux distribution.
 
@@ -47,7 +49,11 @@ In the Acumos `system-integration` repository, the `z2a` sub-directory contains 
 
 * Phase 2 - performs the installation of the Acumos non-core and Acumos core components. This phase is composed of a single shell script: `z2a_ph2.sh`.
 
+> NOTE:  Work is being performed to decouple `z2a` Phase 2 from `z2a` in such a manner that the Phase 2 install and configuration scripts can be ran in environments not created by Phase 1. (i.e. BYOC - Bring Your own Cluster)
+
 * Phase 3 - performs the installation of the Acumos plugin dependencies and Acumos plugins.  Currently, the only Acumos plugin supported in MLWB (Machine Learning WorkBench). This phase is composed of a single shell script: `z2a_ph3.sh`.
+
+> NOTE:  Work is being performed to decouple `z2a` Phase 3 from `z2a` in such a manner that the Phase 3 install and configuration scripts can be ran independently.
 
 > NOTE: `z2a` scripts have been developed to run in the phase order noted above.  However, the scripts should be sufficiently portable enough to be ran in a stand-alone manner.
 
@@ -57,4 +63,4 @@ Please refer to the following documents for additional information:
 >
 > INSTALL.md  - the Acumos installation markdown document (in progress)
 
-Last Edited: 2020-04-20
+Last Edited: 2020-04-24

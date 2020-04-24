@@ -16,13 +16,10 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 
-global:
-  namespace: z2a-test
-k8s_admin:
-  resources:
-    requests:
-     cpu: 500m
-     memory: 1024Mi
-    limits:
-     cpu: 2000m
-     memory: 4096Mi
+resources:
+  requests:
+    cpu: 100m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 2048Mi

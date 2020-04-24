@@ -29,42 +29,52 @@ redirect_to $HERE/config.log
 GV=$ACUMOS_GLOBAL_VALUE
 NAMESPACE=$(gv_read global.namespace)
 RELEASE=$(gv_read global.acumosNexusRelease)
-ACUMOS_SVC=$(svc_lookup $RELEASE $NAMESPACE)
-yq w -i $GV global.acumosNexusService $ACUMOS_SVC
-GV_ADMIN_PASSWORD=$(gv_read global.acumosNexusAdminPassword)
+
+NEXUS_ADMIN_PASSWORD=$(gv_read global.acumosNexusAdminPassword)
+NEXUS_API_PORT=$(gv_read global.acumosNexusEndpointPort)
+NEXUS_SVC=$(svc_lookup $RELEASE $NAMESPACE)
+yq w -i $GV global.acumosNexusService $NEXUS_SVC
 
 # Default password for Sonatype Nexus
 echo admin123 > $HERE/admin.password
 
-ADMIN_POD=$(kubectl get po -l app=config-helper -n $NAMESPACE -o name)
-ADMIN_EXEC="kubectl exec -i $ADMIN_POD -n $NAMESPACE -- bash"
+# ADMIN_URL="http://$NEXUS_SVC.$NAMESPACE:${NEXUS_API_PORT}/service/rest"
+ADMIN_URL="http://localhost:${NEXUS_API_PORT}/service/rest"
 
 # Function to make API calls to Nexus
 # TODO: lookup port dynamically
+CURL="/usr/bin/curl --noproxy '*' --connect-timeout 10 -v -4"
 function api() {
   ADMIN_PW=$(< $HERE/admin.password)
-  CMD="/usr/bin/curl --noproxy '*' --connect-timeout 10 -v -u admin:$ADMIN_PW"
+  CMD="$CURL -u admin:$ADMIN_PW"
   VERB=$1;shift
   case $VERB in
-    GET) CMD="$CMD 'http://$ACUMOS_SVC.$NAMESPACE:8081/service/rest'$1"
+    GET) CMD="$CMD $ADMIN_URL$1"
       ;;
-    POST) CMD="$CMD -H 'Content-Type: application/json' -X POST -d '$2' 'http://$ACUMOS_SVC.$NAMESPACE:8081/service/rest'$1"
+    POST) CMD="$CMD -H 'Content-Type: application/json' -X POST -d '$2' $ADMIN_URL$1"
       ;;
-    PUT) CMD="$CMD -H 'Content-Type: text/plain' -X PUT -d '$2' 'http://$ACUMOS_SVC.$NAMESPACE:8081/service/rest'$1"
+    PUT) CMD="$CMD -H 'Content-Type: text/plain' -X PUT -d '$2' $ADMIN_URL$1"
       ;;
-    DELETE) CMD="$CMD -H 'Content-Type: text/plain' -X DELETE -d '$2' 'http://$ACUMOS_SVC.$NAMESPACE:8081/service/rest'$1"
+    DELETE) CMD="$CMD -H 'Content-Type: text/plain' -X DELETE -d '$2' $ADMIN_URL$1"
       ;;
   esac
-  echo "$CMD" | $ADMIN_EXEC
+  eval "$CMD"
 }
 function join(){ local IFS=','; echo "$*" ; }
 
 # wait for pods to become ready
-wait_for_pods 900 # seconds
+wait_for_pod_ready 900 $RELEASE  #seconds
+
+PORT_FWD=service/$RELEASE
+kubectl port-forward $PORT_FWD $NEXUS_API_PORT:$NEXUS_API_PORT &
+while : ; do
+    eval "$CURL -o /dev/null $ADMIN_URL" && break
+    sleep 1
+done
 
 # Nexus Setup - Task 1 - Set the Nexus Administrator Password
-api PUT /beta/security/users/admin/change-password $GV_ADMIN_PASSWORD
-echo $GV_ADMIN_PASSWORD > $HERE/admin.password
+api PUT /beta/security/users/admin/change-password $NEXUS_ADMIN_PASSWORD
+echo $NEXUS_ADMIN_PASSWORD > $HERE/admin.password
 # TODO: add API call to DISABLE anonymous access
 
 # Nexus Setup - Task 2 - Create the Nexus Blob Store for Acumos
@@ -103,3 +113,6 @@ GV_NEXUS_PWD=$(gv_read global.acumosNexusUserPassword)
 GV_NEXUS_EMAIL=$(gv_read global.acumosNexusUserEmail)
 GV_NEXUS_USER_JSON='{ "userId": "'$GV_NEXUS_USER'", "firstName": "Nexus", "lastName": "User", "emailAddress": "'$GV_NEXUS_EMAIL'", "password": "'$GV_NEXUS_PWD'", "status": "active", "roles": [ "'$GV_NEXUS_ROLE'" ] }'
 api POST /beta/security/users "$GV_NEXUS_USER_JSON"
+
+# Explicitly pkill running port-forward
+pkill -f -9 $PORT_FWD

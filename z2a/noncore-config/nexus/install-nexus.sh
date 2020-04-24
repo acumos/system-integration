@@ -58,5 +58,5 @@ helm install $RELEASE --namespace $NAMESPACE -f $GV -f $HERE/nexus_value.yaml ot
 
 log "Sleeping .... waiting (up to 15 minutes) for pod ready status ...."
 # Wait for the Nexus pods to become available
-wait_for_pod_ready 900 $RELEASE
+wait_for_pod_ready 900 $RELEASE   # seconds
 kubectl get pods -o json

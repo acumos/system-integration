@@ -33,26 +33,28 @@ NAMESPACE=$(gv_read global.namespace)
 RELEASE=$(gv_read global.acumosKongRelease)
 # yq w -i $ACUMOS_GLOBAL_VALUE global.acumosKongRelease $RELEASE
 
-log "Adding Kong repo ...."
-# Add Kong repo
-helm repo add kong https://charts.konghq.com
+log "Adding Bitnami repo ...."
+# Add Bitnami repo
+helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
 
-# Local override values for Kong chart go here
+# Local override values for KongHQ chart & PostgreSQL chart go here
+# Note: KongHQ Chart pulls in the Bitnami PostgreSQL chart when enabled
+POSTGRES_DATABASE=$(gv_read global.acumosKongPostgresDB)
+POSTGRES_PASSWORD=$(gv_read global.acumosKongPostgresPassword)
+POSTGRES_PORT=$(gv_read acumosKongPostgresPort)
 cat <<EOF | tee $HERE/kong_value.yaml
 ingressController:
   installCRDs: false
 EOF
 
-log "Installing Kong Helm Chart ...."
-# Install the Nexus Helm Chart
-helm install $RELEASE --namespace $NAMESPACE -f $GV -f $HERE/kong_value.yaml kong/kong
+log "Installing Bitnami Kong & PostgreSQL Helm Charts ...."
+# Install the Bitnami Kong & PostgreSQL Helm Charts
+# helm install $RELEASE --namespace $NAMESPACE -f $GV -f $HERE/kong_value.yaml kong/kong
+helm install $RELEASE --namespace $NAMESPACE -f $GV -f $HERE/kong_value.yaml bitnami/kong
 
-# Wait for the Nexus pods to become available
-wait_for_pods 180   # seconds
+# Wait for the Kong pods to become available
+wait_for_pod_ready 900 $RELEASE   # seconds
 
-# Acquire the IP address of the External IP for the kong service
-# export PROXY_IP=$(kubectl get -o jsonpath="{.status.loadBalancer.ingress[0].ip}" service -n $NAMESPACE $RELEASE)
-# echo $PROXY_IP
-# HOST=$(kubectl get svc --namespace acumos-dev1 acumos-kong-proxy-acumos-kong-proxy -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-# PORT=$(kubectl get svc --namespace acumos-dev1 acumos-kong-proxy-acumos-kong-proxy -o jsonpath='{.spec.ports[0].port}')
+# Invocation to retrieve the PostgreSQL password
+# kubectl get secret --namespace z2a-test acumos-kong-postgresql -o jsonpath="{.data.postgresql-password}" | base64 --decode
