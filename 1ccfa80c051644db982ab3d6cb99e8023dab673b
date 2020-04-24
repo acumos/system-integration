@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dbbf3b32_eb641a68",
+        "filename": "helm-charts/acumos/portal/charts/portal-be/templates/deployment.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-04-24T16:20:52Z",
+      "side": 1,
+      "message": "parameterize this port number",
+      "range": {
+        "startLine": 121,
+        "startChar": 106,
+        "endLine": 121,
+        "endChar": 114
+      },
+      "revId": "1ccfa80c051644db982ab3d6cb99e8023dab673b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b507ea02_f951b30a",
+        "filename": "helm-charts/dependencies/k8s-noncore-chart/charts/k8s-noncore-elasticsearch/templates/deployment.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-04-24T16:20:52Z",
+      "side": 1,
+      "message": "do not hard code",
+      "range": {
+        "startLine": 88,
+        "startChar": 31,
+        "endLine": 88,
+        "endChar": 57
+      },
+      "revId": "1ccfa80c051644db982ab3d6cb99e8023dab673b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "30070079_a3a997ff",
+        "filename": "helm-charts/dependencies/k8s-noncore-chart/charts/k8s-noncore-elasticsearch/templates/deployment.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-04-24T16:20:52Z",
+      "side": 1,
+      "message": "cannot find it in global value file.",
+      "range": {
+        "startLine": 101,
+        "startChar": 43,
+        "endLine": 101,
+        "endChar": 62
+      },
+      "revId": "1ccfa80c051644db982ab3d6cb99e8023dab673b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "26f3dffe_5a735753",
+        "filename": "helm-charts/dependencies/k8s-noncore-chart/charts/k8s-noncore-elasticsearch/templates/deployment.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-04-24T16:20:52Z",
+      "side": 1,
+      "message": "does not make any sense here",
+      "range": {
+        "startLine": 109,
+        "startChar": 0,
+        "endLine": 110,
+        "endChar": 22
+      },
+      "revId": "1ccfa80c051644db982ab3d6cb99e8023dab673b",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
