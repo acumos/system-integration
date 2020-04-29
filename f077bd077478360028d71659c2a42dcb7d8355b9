@@ -22,6 +22,30 @@
       "revId": "f077bd077478360028d71659c2a42dcb7d8355b9",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9cf3a926_0e10bc0a",
+        "filename": "helm-charts/dependencies/k8s-noncore-chart/charts/k8s-noncore-elasticsearch/templates/deployment.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 24
+      },
+      "writtenOn": "2020-04-29T15:00:53Z",
+      "side": 0,
+      "message": "Yesterday Gerard was getting error on this chart. I tested and found after removing this it works fine. Also I found restartPolicy is not used in many components.\nI will check with Gerard if this change work for him.",
+      "parentUuid": "1514294d_41b24203",
+      "range": {
+        "startLine": 107,
+        "startChar": 5,
+        "endLine": 107,
+        "endChar": 27
+      },
+      "revId": "f077bd077478360028d71659c2a42dcb7d8355b9",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
     }
   ]
 }
