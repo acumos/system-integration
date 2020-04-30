@@ -46,6 +46,30 @@
       "revId": "f077bd077478360028d71659c2a42dcb7d8355b9",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ad9fe90d_eeb9d4be",
+        "filename": "helm-charts/dependencies/k8s-noncore-chart/charts/k8s-noncore-elasticsearch/templates/deployment.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 24
+      },
+      "writtenOn": "2020-04-30T18:04:46Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "9cf3a926_0e10bc0a",
+      "range": {
+        "startLine": 107,
+        "startChar": 5,
+        "endLine": 107,
+        "endChar": 27
+      },
+      "revId": "f077bd077478360028d71659c2a42dcb7d8355b9",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
