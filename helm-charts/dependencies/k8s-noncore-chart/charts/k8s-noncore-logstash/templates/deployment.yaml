@@ -43,7 +43,7 @@ spec:
       containers:
       - name: logstash
         image: "{{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.global.acumosLogstashImage }}"
-        imagePullPolicy: {{ .Values.global.elkImagePullPolicy }}
+        imagePullPolicy: {{ .Values.global.acumosELKImagePullPolicy | quote }}
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
         env:

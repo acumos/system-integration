@@ -19,16 +19,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "{{ .Values.global.elasticsearch.podName }}"
+  name: "{{ .Values.global.acumosElasticsearch.podName }}"
   namespace: "{{ .Values.global.namespace }}"
   labels:
-    app: {{ .Values.global.elasticsearch.name }}
+    app: {{ .Values.global.acumosElasticsearch.name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
       name: elasticsearch-deployment
-      app: {{ .Values.global.elasticsearch.name }}
+      app: {{ .Values.global.acumosElasticsearch.name }}
   revisionHistoryLimit: 3
   strategy:
     type: Recreate
@@ -36,7 +36,7 @@ spec:
     metadata:
       labels:
         name: elasticsearch-deployment
-        app: {{ .Values.global.elasticsearch.name }}
+        app: {{ .Values.global.acumosElasticsearch.name }}
       annotations:
         # releasetime:
         # releasetime: needs to be updated to function `now` for Helm 3
@@ -48,7 +48,7 @@ spec:
         command: ['sysctl', '-w', 'vm.max_map_count=262144']
         securityContext:
           privileged: true
-      {{- if .Values.global.elkPersistenceEnabled }}
+      {{- if .Values.global.acumosELKPersistenceEnabled }}
       - name: volume-mount-hack
         image: quay.io/giantswarm/busybox:1.28.3
         imagePullPolicy: IfNotPresent
@@ -60,7 +60,7 @@ spec:
       containers:
       - name: elasticsearch
         image: "{{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.global.acumosElasticsearchImage }}"
-        imagePullPolicy: {{ .Values.global.elkImagePullPolicy }}
+        imagePullPolicy: {{ .Values.global.acumosELKImagePullPolicy | quote }}
         env:
         - name: ES_JAVA_OPTS
           value: "-Djava.net.preferIPv4Stack=true -Xms1024m -Xmx1024m"
@@ -76,7 +76,7 @@ spec:
           {{- toYaml .Values.resources | nindent 10 }}
       - name: elkclient
         image: "{{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.global.acumosElkClientImage }}"
-        imagePullPolicy: {{ .Values.global.elkImagePullPolicy }}
+        imagePullPolicy: {{ .Values.global.acumosELKImagePullPolicy | quote }}
         env:
         - name: SPRING_APPLICATION_JSON
           value: '{
@@ -85,7 +85,7 @@ spec:
                },
                "elk" : {
                    "host" : {
-                       "url": "{{ .Values.global.elasticsearch.name }}.{{ .Values.global.namespace }}"
+                       "url": "{{ .Values.global.acumosElasticsearch.name }}.{{ .Values.global.namespace }}"
                    },
                    "elasticssearch" : {
                                "port": "{{ .Values.global.acumosElasticSearchPort }}"
@@ -104,19 +104,19 @@ spec:
           mountPath: /usr/share/maven/logs
         - name: elasticsearch-data
           mountPath: /elasticsearch/data
-      restartPolicy: Always
       - name: filebeat
-        image: {{ .Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}
+        image: "{{ .Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}"
         ports:
           - containerPort: {{ .Values.global.acumosFilebeatPort }}
         env:
           - name: LOGSTASH_HOST
-            value: {{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}
+            value: "{{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}"
           - name: LOGSTASH_PORT
             value: {{ .Values.global.acumosLogstashPort | quote }}
         volumeMounts:
           - mountPath: /filebeat-logs
             name: elk-client-logs
+      restartPolicy: Always
       volumes:
         - name: elk-client-logs
           emptyDir: {}
@@ -127,9 +127,9 @@ spec:
             - key: elasticsearch.yml
               path: elasticsearch.yml
         - name: elasticsearch-data
-      {{- if .Values.global.elkPersistenceEnabled }}
+      {{- if .Values.global.acumosELKPersistenceEnabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.global.elkPersistencePVCName }}
+            claimName: {{ .Values.global.acumosELKPersistencePVCName }}
       {{- else }}
           emptyDir: {}
       {{- end }}
