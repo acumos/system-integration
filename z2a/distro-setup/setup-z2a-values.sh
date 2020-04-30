@@ -82,7 +82,7 @@ yq d -i $KC $KEY.extraPortMappings
 
 # Loop thru placeholders and build YAML block for kind config
 i=0
-for PORT in $KIBANA_PORT $KONG_PORT $NEXUS_PORT $NEXUS_ADMIN_PORT $K8S_DASHBOARD_PORT ; do
+for PORT in $KIBANA_PORT $NEXUS_PORT $K8S_DASHBOARD_PORT ; do
   yq w -i $KC $KEY.extraPortMappings[$i].containerPort $PORT
   yq w -i $KC $KEY.extraPortMappings[$i].hostPort $PORT
   yq w -i $KC $KEY.extraPortMappings[$i].listenAddress 0.0.0.0

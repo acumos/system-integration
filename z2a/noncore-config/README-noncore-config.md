@@ -1,5 +1,16 @@
 # README - Phase 2 - Acumos Noncore Config
 
+## Prerequisites
+
+To run (execute) the `z2a` Phase 2 `noncore-config` scripts in a standalone manner (i.e. from a Linux CLI session), the following tools are required:
+
+- make (yep!)
+- yq (YAML ginsu knife)
+- jq (JSON ginsu knife)
+- socat (seems Ubuntu may not install by default)
+
+> TODO: add commands to install these tools for CentOS/Redhat and Ubuntu.
+
 ## ACUMOS_GLOBAL_VALUE
 
 For the scripts in the `noncore-config` directory to run stand-alone (i.e. outside the z2a context), the `ACUMOS_GLOBAL_VALUE` environment variable MUST be set BEFORE executing `make` to install or configure any of the defined targets in the `Makefile`.
@@ -22,9 +33,18 @@ make config-helper_all
 
 ## Installing & Configuring - Kong
 
-> NOTE:
+> NOTE: n X.509 certificate and key needs to be provided before running these scripts. The certificate and key MUST be installed in the `z2a/noncore-config/kong/certs` directory.
 >
-> Prerequisite:  The Kong X.509 certificate and key needs to be provided before running these scripts. The certificate and key MUST be installed in the `z2a/noncore-config/kong/certs` directory.
+> NOTE:  Temporary Kong certificates can be generated using these commands:
+
+```bash
+openssl req -newkey rsa:2048 -nodes -keyout key.pem -x509 -days 365 -out certificate.pem
+openssl x509 -text -noout -in certificate.pem
+openssl pkcs12 -inkey key.pem -in certificate.pem -export -out certificate.p12
+openssl pkcs12 -in certificate.p12 -noout -info
+```
+
+> Note: Temporary certificates have been provided in the z2a/noncore-config/kong/certs directory. These certificates should be replaced (using the commands shown above) and should NEVER be used in a production environment.
 
 To configure Kong (only), execute the following command:
 

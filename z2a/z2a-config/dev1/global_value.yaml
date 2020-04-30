@@ -116,21 +116,22 @@ global:
     acumosLogstashPort: "5044"
     acumosLogstashService: "logstash-service"
     # TODO: ELK (to be refactored to acumosElk)
+    acumosELKHostPort: "9600"
     acumosELKHost: "acumosk8s-test-elk.example.com"
     elkImagePullPolicy: "IfNotPresent"
     elkPersistenceEnabled: "true"
     elkPersistencePVCName: "elasticsearch-data"
     elkPersistenceSize: "10Gi"
     elasticsearch:
-        name: "elasticsearch"
-        podName: "elasticsearch"
-        svcName: "elasticsearch"
+        name: 'elasticsearch'
+        podName: 'elasticsearch'
+        svcName: 'elasticsearch'
 
     # Federation
-    acumosFederationName: "acumos-k8s-federation"
     acumosFederationGatewayPort: "9084"
-    acumosFederationLocalPort: "9884"
     acumosFederationImage: "acumos/federation-gateway:3.1.0"
+    acumosFederationLocalPort: "9884"
+    acumosFederationName: "acumos-k8s-federation"
 
     # Filebeat
     acumosFilebeatImage: "acumos/acumos-filebeat:3.0.5"

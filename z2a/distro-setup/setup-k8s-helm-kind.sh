@@ -31,13 +31,14 @@ log "Installing kubectl binary ...."
 # Download and install kubectl
 K8S_RELEASE=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
 sudo curl -L -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$K8S_RELEASE/bin/linux/amd64/kubectl
-sudo chmod 755 /usr/local/bin/kubectl
+sudo chmod +x /usr/local/bin/kubectl & sudo chown root:root /usr/local/bin/kubectl
 
 log "Installing Helm v3 ...."
 # Download and install helm v3 (to /usr/local/bin)
 HELM_RELEASE=$(curl -Ls https://github.com/helm/helm/releases| awk '$0 ~ pat {print gensub(/.*".*\/(.*)".*/, "\\1","g");exit}' pat='href="/helm/helm/releases/tag/v3')
-sudo curl -s https://get.helm.sh/helm-${HELM_RELEASE}-linux-amd64.tar.gz | tar -zxO linux-amd64/helm > /usr/local/bin/helm
-sudo chmod 755 /usr/local/bin/helm
+sudo curl -s https://get.helm.sh/helm-${HELM_RELEASE}-linux-amd64.tar.gz | tar -zxO linux-amd64/helm > /tmp/helm
+sudo chmod +x /tmp/helm && sudo chown root:root /tmp/helm
+sudo mv /tmp/helm /usr/local/bin/helm
 
 log "Initializing official Helm stable chart repo ...."
 # Initialize the official helm stable chart repo ; perform update

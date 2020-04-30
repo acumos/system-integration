@@ -49,7 +49,7 @@ echo "Install Acumos noncore dependency: Kong & PostgreSQL (Bitnami Charts) ....
 (cd $Z2A_BASE/noncore-config/ ; make kong_all)
 
 # Phase 2 - the following charts are installed  directly via a helm deployment command
-# helm install -name $CHARTNAME --namespace $NAMESPACE <PATH>$CHARTNAME -f <PATH>global_value.yaml
+helm install -name $CHARTNAME --namespace $NAMESPACE <PATH>$CHARTNAME -f <PATH>global_value.yaml
 
 echo "Install Acumos noncore dependency: Docker ...."
 helm install -name k8s-noncore-docker --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-docker -f $Z2A_ACUMOS_BASE/global_value.yaml

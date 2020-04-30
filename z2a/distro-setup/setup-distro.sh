@@ -46,10 +46,10 @@ rhel && {
 log "Adding miscellaneous prerequisites ...."
 # RHEL/Centos Distribution misc. requirements
 rhel && sudo yum install -y --setopt=skip_missing_names_on_install=False \
-	yum-utils device-mapper-persistent-data lvm2 git jq make
+	yum-utils device-mapper-persistent-data lvm2 git jq make socat
 # Ubuntu Distribution misc. requirements
-ubuntu && sudo apt-get update && sudo apt-get install apt-transport-https ca-certificates \
-	curl gnupg-agent software-properties-common git jq make
+ubuntu && sudo apt-get update -y && sudo apt-get install -y apt-transport-https ca-certificates \
+	curl gnupg-agent software-properties-common git jq make socat
 
 log "Installing yq - portable command-line YAML parser ...."
 # RHEL/Centos and Ubuntu are the same
