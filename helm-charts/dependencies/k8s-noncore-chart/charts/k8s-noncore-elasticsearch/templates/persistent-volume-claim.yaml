@@ -17,13 +17,13 @@
 # limitations under the License.
 # ===============LICENSE_END====================================================
 #
-{{- if .Values.global.elkPersistenceEnabled }}
+{{- if .Values.global.acumosELKPersistenceEnabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
     app: elasticsearch
-  name: {{ .Values.global.elkPersistencePVCName }}
+  name: {{ .Values.global.acumosELKPersistencePVCName }}
   namespace: "{{ .Values.global.namespace }}"
   annotations:
     "helm.sh/resource-policy": Delete
@@ -32,5 +32,5 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Values.global.elkPersistenceSize }}
+      storage: {{ .Values.global.acumosELKPersistenceSize }}
 {{- end }}
