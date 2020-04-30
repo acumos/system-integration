@@ -118,7 +118,7 @@ spec:
                    "url" : "https://acumos.{{ .Values.global.namespace }}:8086"
                 },
                 "elk" : {
-                   "url" : "http://{{ .Values.global.elasticsearch.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosELKHostPort }}/elkclient"
+                   "url" : "http://{{ .Values.global.acumosElasticsearch.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosELKHostPort }}/elkclient"
                 },
                 "kubernetes" : {
                    "doc" : {
