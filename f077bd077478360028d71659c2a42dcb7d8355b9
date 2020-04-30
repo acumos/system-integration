@@ -70,6 +70,30 @@
       "revId": "f077bd077478360028d71659c2a42dcb7d8355b9",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "430bb779_26611994",
+        "filename": "helm-charts/dependencies/k8s-noncore-chart/charts/k8s-noncore-elasticsearch/templates/deployment.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 387
+      },
+      "writtenOn": "2020-04-30T21:19:35Z",
+      "side": 0,
+      "message": "Ack",
+      "parentUuid": "ad9fe90d_eeb9d4be",
+      "range": {
+        "startLine": 107,
+        "startChar": 5,
+        "endLine": 107,
+        "endChar": 27
+      },
+      "revId": "f077bd077478360028d71659c2a42dcb7d8355b9",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
