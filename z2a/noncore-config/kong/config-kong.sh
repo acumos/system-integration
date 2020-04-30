@@ -77,7 +77,7 @@ ADMIN_EXEC="kubectl exec -i $ADMIN_POD -n $NAMESPACE -- bash"
 #echo "${CMD[*]}" | $ADMIN_EXEC
 
 PORT_FWD=deployment/$RELEASE
-kubectl port-forward $PORT_FWD $ACUMOS_KONG_API_PORT:$ACUMOS_KONG_API_PORT &
+kubectl port-forward -n $NAMESPACE $PORT_FWD $ACUMOS_KONG_API_PORT:$ACUMOS_KONG_API_PORT &
 while : ; do
     curl -k -o /dev/null $ADMIN_URL && break
     sleep 1

@@ -80,9 +80,7 @@ function wait_for_pods() {
 	i=0 ; wait=$1
 	log ".\c"
 	while : ; do
-		# PODS="$(kubectl get pods -n $NAMESPACE --field-selector 'status.phase!=Running','status.phase!=Succeeded' -A 2>/dev/null)"
-		PODS="$(kubectl get pods -n $NAMESPACE -o jsonpath='{range .items[*].status.containerStatuses[*]}{.ready}{"\n"}{end}'  2>/dev/null | grep -v true)"
-		if [[ -z $PODS ]]; then break ; fi
+		kubectl wait pods --for=condition=Ready --all -n $NAMESPACE --timeout=0 && break
 		sleep 1
 		(( ++i > wait )) && {
 				log "Timed out waiting for pods."

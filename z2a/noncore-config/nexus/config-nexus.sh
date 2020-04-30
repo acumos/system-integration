@@ -66,7 +66,7 @@ function join(){ local IFS=','; echo "$*" ; }
 wait_for_pod_ready 900 $RELEASE  #seconds
 
 PORT_FWD=service/$RELEASE
-kubectl port-forward $PORT_FWD $NEXUS_API_PORT:$NEXUS_API_PORT &
+kubectl port-forward -n $NAMESPACE $PORT_FWD $NEXUS_API_PORT:$NEXUS_API_PORT &
 while : ; do
     eval "$CURL -o /dev/null $ADMIN_URL" && break
     sleep 1
