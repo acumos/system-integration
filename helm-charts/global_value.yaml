@@ -102,27 +102,28 @@ global:
         svcName: 'ds-composition'
 
     # ELK
-    acumosElasticsearchImage: "acumos-elasticsearch:2.2.2"
+    acumosElasticsearchImage: "acumos/acumos-elasticsearch:2.2.2"
+    acumosElkClientImage: "acumos/elk-client:3.0.7"
     acumosElasticsearchName: "elasticsearch"
     acumosElasticSearchPort: "9200"
     acumosElasticsearchService: "elasticsearch-service"
-    acumosKibanaImage: "acumos-kibana:2.2.2"
+    acumosKibanaImage: "acumos/acumos-kibana:2.2.2"
     acumosKibanaName: "kibana"
     acumosKibanaPort: "5601"
     acumosKibanaService: "kibana-service"
     acumosLogstashHost: "logstash-service"
-    acumosLogstashImage: "acumos-logstash:2.2.2"
+    acumosLogstashImage: "acumos/acumos-logstash:2.2.2"
     acumosLogstashName: "logstash"
     acumosLogstashPort: "5044"
     acumosLogstashService: "logstash-service"
     # TODO: ELK (to be refactored to acumosElk*)
     acumosELKHostPort: "9600"
     acumosELKHost: "xxxxxx"
-    elkImagePullPolicy: "IfNotPresent"
-    elkPersistenceEnabled: "true"
-    elkPersistencePVCName: "elasticsearch-data"
-    elkPersistenceSize: "10Gi"
-    elasticsearch:
+    acumosELKImagePullPolicy: "IfNotPresent"
+    acumosELKPersistenceEnabled: "true"
+    acumosELKPersistencePVCName: "elasticsearch-data"
+    acumosELKPersistenceSize: "10Gi"
+    acumosElasticsearch:
         name: 'elasticsearch'
         podName: 'elasticsearch'
         svcName: 'elasticsearch'
