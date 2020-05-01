@@ -36,7 +36,7 @@ spec:
    spec:
      containers:
        - name: onboarding-app
-         image: {{ .Values.global.image.repository }}/{{ .Values.global.acumosOnboardingImage }}
+         image: "{{ .Values.global.image.repository }}/{{ .Values.global.acumosOnboardingImage }}"
          resources:
            {{- toYaml .Values.resources | nindent 10 }}
          ports:
@@ -52,7 +52,7 @@ spec:
                 secretKeyRef: { name: ccdsclientsecret, key: password }
            - name: SPRING_APPLICATION_JSON
              value: '{ "server" :{
-                   "port" : {{ .Values.global.acumosOnboardingAppPort }},
+                   "port" : "{{ .Values.global.acumosOnboardingAppPort }}",
                    "servlet": {
                             "context-path": "/onboarding-app"
                                }
@@ -64,7 +64,7 @@ spec:
                  },
                  "docker" : {
                             "host" : "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
-                            "port": {{ .Values.global.acumosDockerPort }} ,
+                            "port": "{{ .Values.global.acumosDockerPort }}",
                             "config": "/docker_host/.docker",
                             "registry" :{"url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
                             "username" : "{{ .Values.global.acumosNexusUsername }}",
@@ -79,7 +79,7 @@ spec:
                             },
                  "http_proxy": "http://{{ .Values.global.acumosProxy }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosProxyPort }}",
                  "nexus": {
-                            "nexusEndPointURL": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}/repository/{{ .Values.global.{{ .Values.global.acumosNexusMavenRepo }} }}/",
+                            "nexusEndPointURL": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}/repository/{{ .Values.global.acumosNexusMavenRepo }} }}/",
                             "nexusUserName": "{{ .Values.global.acumosNexusUsername }}",
                             "nexusPassword": "{{ .Values.global.acumosNexusPassword }}",
                             "nexusproxy": "",
@@ -118,12 +118,12 @@ spec:
            - mountPath: /maven/logs
              name: acumos-onboarding-logs
        - name: filebeat
-         image: {{ .Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}
+         image: "{{ .Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}"
          ports:
            - containerPort: {{ .Values.global.acumosFilebeatPort }}
          env:
            - name: LOGSTASH_HOST
-             value: {{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}
+             value: "{{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}"
            - name: LOGSTASH_PORT
              value: {{ .Values.global.acumosLogstashPort | quote }}
          volumeMounts:

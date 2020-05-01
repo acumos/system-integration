@@ -19,24 +19,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{.Values.global.portal.portalFe.podName}}
+ name: {{ .Values.global.portal.portalFe.podName }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{.Values.global.portal.portalFe.name}}
+   app: {{ .Values.global.portal.portalFe.name }}
 spec:
  selector:
    matchLabels:
-     app: {{.Values.global.portal.portalFe.name}}
+     app: {{ .Values.global.portal.portalFe.name }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{.Values.global.portal.portalFe.name}}
+       app: {{ .Values.global.portal.portalFe.name }}
    spec:
      containers:
        - name: acumos
-         image: {{.Values.global.image.repository }}/{{ .Values.global.acumosPortalFeImage }}
+         image: "{{ .Values.global.image.repository }}/{{ .Values.global.acumosPortalFeImage }}"
          resources:
            {{- toYaml .Values.resources | nindent 10 }}
          ports:
@@ -45,7 +45,7 @@ spec:
          env:
            - name: SPRING_APPLICATION_JSON
              value: '{ "server" : {
-                    "port" : {{ .Values.global.acumosPortalFePort }}
+                    "port" : "{{ .Values.global.acumosPortalFePort }}"
                 },
                  "logging":{
                     "level":{
@@ -58,7 +58,7 @@ spec:
                "zuul" : {
                    "routes" : {
                       "api" : {
-                        "url": "http://{{.Values.global.portal.portalBe.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalBePort }}"
+                        "url": "http://{{ .Values.global.portal.portalBe.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalBePort }}"
                       },
                       "dsce": {
                         "url": "http://{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalDsCompositionPort }}"
@@ -105,12 +105,12 @@ spec:
            - mountPath: /maven/logs
              name: portal-fe-logs
        - name: filebeat
-         image: {{.Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}
+         image: "{{ .Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}"
          ports:
            - containerPort: {{ .Values.global.acumosFilebeatPort }}
          env:
            - name: LOGSTASH_HOST
-             value: {{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}
+             value: "{{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}"
            - name: LOGSTASH_PORT
              value: {{ .Values.global.acumosLogstashPort | quote }}
          volumeMounts:

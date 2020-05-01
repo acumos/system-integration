@@ -19,10 +19,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{.Values.global.microserviceGeneration.svcName}}
+  name: {{ .Values.global.microserviceGeneration.svcName }}
   namespace: "{{ .Values.global.namespace }}"
   labels:
-    app: {{.Values.global.microserviceGeneration.name}}
+    app: {{ .Values.global.microserviceGeneration.name }}
 spec:
   type: ClusterIP
   ports:
@@ -31,4 +31,4 @@ spec:
       protocol: TCP
       name: microservice-generation
   selector:
-    app: {{.Values.global.microserviceGeneration.name}}
+    app: {{ .Values.global.microserviceGeneration.name }}

@@ -36,7 +36,7 @@ spec:
    spec:
      containers:
        - name: ds-compositionengine
-         image: {{ .Values.global.image.repository }}/{{ .Values.global.acumosDesignStudioImage }}
+         image: "{{ .Values.global.image.repository }}/{{ .Values.global.acumosDesignStudioImage }}"
          resources:
            {{- toYaml .Values.resources | nindent 10 }}
          ports:
@@ -52,8 +52,7 @@ spec:
                 secretKeyRef: { name: ccdsclientsecret, key: password }
            - name: SPRING_APPLICATION_JSON
              value: '{ "server": {
-                    "port": {{ .Values.global.acumosPortalDsCompositionPort }}
-                    },
+                    "port": "{{ .Values.global.acumosPortalDsCompositionPort }}" },
                     "logging":{
                       "level":{
                           "root": "{{ .Values.logLevel }}"
@@ -99,12 +98,12 @@ spec:
            - mountPath: /maven/logs
              name: acumos-ds-composition-logs
        - name: filebeat
-         image: {{ .Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}
+         image: "{{ .Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}"
          ports:
            - containerPort: {{ .Values.global.acumosFilebeatPort }}
          env:
            - name: LOGSTASH_HOST
-             value: {{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}
+             value: "{{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}"
            - name: LOGSTASH_PORT
              value: {{ .Values.global.acumosLogstashPort | quote }}
          volumeMounts:

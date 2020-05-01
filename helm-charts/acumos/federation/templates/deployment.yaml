@@ -38,7 +38,7 @@ spec:
    spec:
      containers:
        - name:  federation-gateway
-         image: {{ .Values.global.image.repository }}/{{ .Values.global.acumosFederationImage }}
+         image: "{{ .Values.global.image.repository }}/{{ .Values.global.acumosFederationImage }}"
          resources:
            {{- toYaml .Values.resources | nindent 10 }}
          ports:
@@ -65,7 +65,7 @@ spec:
                "operator" : "d468656f-57d0-46e3-9f94-7ffa4f66dc03",
                "address" : "0.0.0.0",
                "server" : {
-                 "port" : {{ .Values.global.acumosFederationGatewayPort }}
+                 "port" : "{{ .Values.global.acumosFederationGatewayPort }}"
                },
                "ssl" : {
                  "key-store" : "/app/certs/acumos-k8s.pkcs12",
@@ -79,7 +79,7 @@ spec:
              "local" : {
                "address": "0.0.0.0",
                "server": {
-                 "port" : {{ .Values.global.acumosFederationLocalPort }}
+                 "port" : "{{ .Values.global.acumosFederationLocalPort }}"
                },
                "ssl" : {
                  "key-store" : "/app/certs/acumos-k8s.pkcs12",
@@ -109,12 +109,12 @@ spec:
            - mountPath: /app/certs
              name: acumos-certs
        - name: filebeat
-         image: {{ .Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}
+         image: "{{ .Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}"
          ports:
            - containerPort: {{ .Values.global.acumosFilebeatPort }}
          env:
            - name: LOGSTASH_HOST
-             value: {{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}
+             value: "{{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}"
            - name: LOGSTASH_PORT
              value: {{ .Values.global.acumosLogstashPort | quote }}
          volumeMounts:
