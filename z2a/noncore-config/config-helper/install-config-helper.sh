@@ -40,6 +40,6 @@ helm install $RELEASE -n $NAMESPACE $HERE/config-helper/ -f $ACUMOS_GLOBAL_VALUE
   --set global.namespace=$NAMESPACE \
   --set-string kubeconfig="$(kubectl config view --flatten --minify | base64 -w0)"
 
-log "Sleeping .... waiting (up to 15 minutes) for pod ready status ...."
+log "Waiting .... (up to 15 minutes) for pod ready status ...."
 # Wait for the Nexus pods to become available
 wait_for_pod_ready 900 $RELEASE

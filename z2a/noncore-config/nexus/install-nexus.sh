@@ -56,7 +56,7 @@ log "Installing Nexus Helm Chart ...."
 # helm install $RELEASE --namespace $NAMESPACE -f $GV -f $HERE/nexus_value.yaml stable/sonatype-nexus
 helm install $RELEASE --namespace $NAMESPACE -f $GV -f $HERE/nexus_value.yaml oteemocharts/sonatype-nexus
 
-log "Sleeping .... waiting (up to 15 minutes) for pod ready status ...."
+log "Waiting .... (up to 15 minutes) for pod ready status ...."
 # Wait for the Nexus pods to become available
 wait_for_pod_ready 900 $RELEASE   # seconds
 kubectl get pods -o json

@@ -44,7 +44,7 @@ trap 'fail' ERR
 NAMESPACE=$Z2A_K8S_NAMESPACE
 
 # Test to ensure that all Pods are running before proceeding
-wait_for_pods 180   # seconds
+wait_for_pods 900   # seconds
 
 log "Starting Phase 3 (MLWB dependencies) installation ..."
 # Installation - Phase 3a - MLWB plugin dependencies

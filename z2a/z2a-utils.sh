@@ -74,13 +74,12 @@ function save_env() {
 }
 
 # Test to ensure that all Pods are running before proceeding
-# TODO: fix cosmetic bug
 function wait_for_pods() {
 	NAMESPACE=$(gv_read global.namespace)
 	i=0 ; wait=$1
 	log ".\c"
 	while : ; do
-		kubectl wait pods --for=condition=Ready --all -n $NAMESPACE --timeout=0 && break
+		kubectl wait pods --for=condition=Ready --all -n $NAMESPACE --timeout=0 >/dev/null 2>&1 && break
 		sleep 1
 		(( ++i > wait )) && {
 				log "Timed out waiting for pods."

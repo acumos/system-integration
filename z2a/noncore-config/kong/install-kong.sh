@@ -53,6 +53,7 @@ log "Installing Bitnami Kong & PostgreSQL Helm Charts ...."
 # helm install $RELEASE --namespace $NAMESPACE -f $GV -f $HERE/kong_value.yaml kong/kong
 helm install $RELEASE --namespace $NAMESPACE -f $GV -f $HERE/kong_value.yaml bitnami/kong
 
+log "Waiting .... (up to 15 minutes) for pod ready status ...."
 # Wait for the Kong pods to become available
 wait_for_pod_ready 900 $RELEASE   # seconds
 

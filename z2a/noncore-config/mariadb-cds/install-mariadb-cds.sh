@@ -52,6 +52,7 @@ log "Installing Bitnami MariaDB Helm Chart ...."
 # Helm Chart Installation incantation
 helm install $RELEASE --namespace $NAMESPACE -f $ACUMOS_GLOBAL_VALUE -f $HERE/cds_mariadb_value.yaml bitnami/mariadb
 
+log "Waiting .... (up to 15 minutes) for pod ready status ...."
 # Wait for the MariaDB-CDS pod to become ready
 wait_for_pod_ready 900 $RELEASE
 
