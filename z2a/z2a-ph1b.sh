@@ -49,12 +49,13 @@ redirect_to $Z2A_BASE/z2a-ph1b-install.log
 # Exit with an error on any non-zero return code
 trap 'fail' ERR
 
-log "Starting Phase 1b (k8s, helm, kind) installation ..."
+log "Starting Phase 1b (k8s, helm, kind) installation ...."
 # Installation - Phase 1b - kubectl, helm and kind
 source $Z2A_BASE/distro-setup/setup-z2a-values.sh
 source $Z2A_BASE/distro-setup/setup-k8s-helm-kind.sh
 source $Z2A_BASE/distro-setup/setup-k8s-helpers.sh
 
-log "Completed Phase 1b (k8s, helm, kind) installation ..."
-log "Please check the status of the K8s pods at this time. "
-log "Please ensure that all pods are in a 'Running' status before proceeding with Phase 2 installation."
+log "Waiting for all cluster pods to attain 'Ready' status ...."
+kubectl wait pods --for=condition=Ready --all -A
+
+log "Completed Phase 1b (k8s, helm, kind) installation ...."

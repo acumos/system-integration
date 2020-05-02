@@ -46,8 +46,8 @@ redirect_to /dev/tty
 export ACUMOS_GLOBAL_VALUE=$Z2A_ACUMOS_BASE/global_value.yaml
 NAMESPACE=$Z2A_K8S_NAMESPACE
 
-# Test to ensure that all Pods are running before proceeding
-wait_for_pods 180   # seconds
+# Test to ensure that the namespace we are installing into is clean
+check_for_clean_namespace
 
 echo "Starting Phase 2 installation ...."
 echo "Starting Phase 2 (Acumos non-core dependencies) installation ...."
@@ -58,5 +58,5 @@ echo "Starting Phase 2 (Acumos core) installation ...."
 # Installation - Phase 2 - Acumos core
 source $Z2A_BASE/acumos-setup/setup-acumos-core.sh
 
-echo "Please check the status of the K8s pods at this time .... "
+echo "Please check the status of the Kubernetes pods at this time .... "
 echo "Please ensure that all pods are in a 'Running' status before proceeding ...."

@@ -16,6 +16,9 @@ vi ${SI}/z2a/distro-setup/proxy.txt
 # Copy the example values from z2a-config/dev1 to the helm-charts directory
 cp ${SI}/z2a/z2a-config/dev1/global_value.yaml ${SI}/z2a/helm-charts/global_value.yaml
 
+# Execute Phase 0
+. ${SI}/z2a/z2a-ph0.sh
+
 # Execute Phase 1a
 . ${SI}/z2a/z2a-ph1a.sh
 
@@ -121,7 +124,7 @@ proxy-hostname.example.com:3128
 
 ### Editing the `global_value.yaml` File
 
-> NOTE: z2a includes an example values file for Acumos in the `~/src/system-integration/z2a/z2a-config/dev1` directory.  The Acumos example values file is provided for both illustrative purposes and to assist in performing a quick installation (see: TL;DR section).  The example Acumos values file from that directory could be used here and these edits are not required.
+> NOTE: z2a includes an example values file for Acumos in the `~/src/system-integration/z2a/z2a-config/dev1` directory.  The Acumos example values file is provided for both illustrative purposes and to assist in performing a quick installation (see: TL;DR section).  The example Acumos values file from that directory could be used for a test installation and the following edits are not required.
 >
 > The commands to use the Acumos example values are:
 >
@@ -143,7 +146,7 @@ cd ~/src/system-integration/helm-charts
 cp global_value.yaml global_value.orig
 ```
 
-The default `global_value.yaml` file requires the user to make edits to the masked values in the file.  Masked values are denoted by six (6) asterix as shown: "******"
+The default `global_value.yaml` file requires the user to make edits to the masked values in the file.  Masked values are denoted by six (6) asterisk as shown: "******"
 
 All entries with the masked values must be changed to values that will be used during the installation process. Below is an example edit of a snippet of the `global_value.yaml` file, where the values for *namespace* and *clusterName* are edited. (please use these values)
 
@@ -181,38 +184,44 @@ To perform an installation of Acumos, we will need to perform the following step
     cd ~/src/system-integration/z2a
     ```
 
-2. Execute the z2a Phase 1a script.
+2. Execute the z2a Phase 0 script.
+
+    ```bash
+    ./z2a-ph0.sh
+    ```
+
+3. Execute the z2a Phase 1a script.
 
     ```bash
     ./z2a-ph1a.sh
     ```
 
-3. Once the z2a Phase 1a script has completed, please log out of your session and log back in.  This step is required such that you (the installer) are added to the `docker` group, which is required in the next step.
+4. Once the z2a Phase 1a script has completed, please log out of your session and log back in.  This step is required such that you (the installer) are added to the `docker` group, which is required in the next step.
 
     ```bash
     logout
     ```
 
-4. Once you are logged back into the VM, change directory into the `z2a` directory and execute the z2a Phase 1b script.
+5. Once you are logged back into the VM, change directory into the `z2a` directory and execute the z2a Phase 1b script.
 
     ```bash
     cd ~/src/system-integration/z2a
     ./z2a-ph1b.sh
     ```
 
-5. After the z2a Phase 1b script has completed, we will need to check the status of the newly created Kubernetes pods before we proceed with the Acumos installation.  We can ensure that all necessary Kubernetes pods are running by executing this `kubectl` command.
+6. After the z2a Phase 1b script has completed, we will need to check the status of the newly created Kubernetes pods before we proceed with the Acumos installation.  We can ensure that all necessary Kubernetes pods are running by executing this `kubectl` command.
 
     ```bash
     kubectl get pods -A
     ```
 
-6. When all Kubernetes pods are in a `Running` state, we can proceed and execute the z2a Phase 2 script to install and configure Acumos.
+7. When all Kubernetes pods are in a `Running` state, we can proceed and execute the z2a Phase 2 script to install and configure Acumos.
 
     ```bash
     ./z2a-ph2.sh
     ```
 
-7. The last step is to check the status of the Kubernetes pods create during the Acumos installation process.
+8. The last step is to check the status of the Kubernetes pods create during the Acumos installation process.
 
     ```bash
     kubectl get pods -A
@@ -324,4 +333,4 @@ For post-installation Machine Learning WorkBench configuration steps, please see
 
 TODO: Add section on accessing the Acumos Portal once installation is completed.
 
-Last Edited: 2020-04-20
+Last Edited: 2020-05-01

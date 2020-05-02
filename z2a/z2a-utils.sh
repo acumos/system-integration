@@ -26,6 +26,13 @@ eval "$(grep ^ID= /etc/os-release)"
 rhel() { [[ ${ID} =~ ^(rhel|centos)$ ]]; }
 ubuntu() { [[ ${ID} == ubuntu ]]; }
 
+# check for clean namespace in k8s cluster
+function check_for_clean_namespace() {
+	NAMESPACE=$(gv_read global.namespace)
+	OUT=$(kubectl get all -n $NAMESPACE)
+	if [[ -n "$OUT" ]] ; then echo "Resources found in $NAMESPACE!" ; exit 1 ; fi
+}
+
 # error function for z2a scripts
 function fail() {
   caller 0 | (
