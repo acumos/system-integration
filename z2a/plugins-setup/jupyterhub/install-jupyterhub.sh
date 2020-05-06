@@ -17,6 +17,7 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
+# Name: install-jupyterhub.sh - installation script for JupyterHub dependency of MLWB
 
 # Default values for Acoumos JupyterHub
 # Edit these values for custom values
@@ -31,7 +32,7 @@ log "Adding JupyterHub repo ...."
 helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
 helm repo update
 
-# Simple k/v map to set JupyterHub configuration values
+# k/v map to set JupyterHub local configuration values
 cat <<EOF | tee $Z2A_ACUMOS_BASE/jhub_value.yaml
 hub:
   cookieSecret: "$Z2A_ACUMOS_JUPYTERHUB_HUB_TOKEN"
@@ -42,11 +43,12 @@ EOF
 log "Installing JupyterHub Helm Chart ...."
 helm upgrade --install $RELEASE --namespace $NAMESPACE -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml -f $Z2A_ACUMOS_BASE/jhub_value.yaml --version=0.8.2 jupyterhub/jupyterhub
 
-# Loop for NiFi to become available
+log "Waiting for JupyterHub to become available ...."
+# Loop for JupyterHub to become available
 for i in $(seq 1 20) ; do
   sleep 10
   logc .
-  TODO: craft a query to determine the status of NiFi
+  TODO: craft a query to determine the status of JupyterHub
   # kubectl exec --namespace $NAMESPACE $RELEASE
   if [ $i -eq 20 ] ; then log "\nTimeout waiting for JupyterHub to become available ...." ; exit ; fi
 done
@@ -61,4 +63,4 @@ log "$(kubectl --namespace=$NAMESPACE get svc proxy-public)"
 log "JupyterHub installation complete."
 log "To use JupyterHub, enter the external IP for the proxy-public service into a browser."
 log "JupyterHub is running with a default authenticator, enter any username/password combination to enter the hub."
-log "JupyterHub proxy and hub secret tokens are contained in jhub_value.yaml file."
+log "JupyterHub proxy and hub secret tokens are contained in $Z2A_ACUMOS_BASE/jhub_value.yaml file."

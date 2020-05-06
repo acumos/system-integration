@@ -17,6 +17,7 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
+# Name: install-couchdb.sh - installation script for CouchDB dependency for MLWB
 
 # Default values for Acumos CouchDB
 # Edit these values for custom values
@@ -30,7 +31,7 @@ log "Adding Apache CouchDB repo ...."
 helm repo add couchdb https://apache.github.io/couchdb-helm
 helm repo update
 
-# Simple k/v map to set CouchDB configuration values
+# k/v map to set CouchDB local configuration values
 cat <<EOF | tee $Z2A_ACUMOS_BASE/couchdb_value.yaml
 service:
   type: NodePort
@@ -43,9 +44,11 @@ EOF
 log "Installing CouchDB Helm Chart ...."
 helm install $RELEASE --namespace $NAMESPACE -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml -f $Z2A_ACUMOS_BASE/couchdb_value.yaml --set allowAdminParty=true couchdb/couchdb
 
+log "Waiting for pods to become ready ...."
 # Wait for pods to become available
-wait_for_pods 180   # seconds
+wait_for_pods_ready 900   # seconds
 
+log "Waiting for CouchDB instance to become ready ...."
 # Loop for CouchDB to become available"
 for i in $(seq 1 20) ; do
   sleep 10

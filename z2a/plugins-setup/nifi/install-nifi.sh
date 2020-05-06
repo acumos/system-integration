@@ -17,8 +17,9 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
+# Name: installnifi.sh - installation script for NiFi dependency for MLWB
 
-# Default values for Acoumos NiFi
+# Default values for Acumos NiFi
 # Edit these values for custom values
 export RELEASE=mlwb-nifi
 
@@ -27,14 +28,14 @@ log "Adding NiFi repo ...."
 helm repo add cetic https://cetic.github.io/helm-charts
 helm repo update
 
-# Simple k/v map to set NiFi configuration values
+# k/v map to set NiFi configuration values
 cat <<EOF | tee $Z2A_ACUMOS_BASE/nifi_value.yaml
 EOF
 
 log "Installing NiFi Helm Chart ...."
 helm install $RELEASE --namespace $NAMESPACE -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml -f $Z2A_ACUMOS_BASE/nifi_value.yaml cetic/nifi
 
-# Loop for JupyterHub to become available
+# Loop for NiFi to become available
 for i in $(seq 1 20) ; do
   sleep 10
   logc .

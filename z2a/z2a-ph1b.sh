@@ -56,6 +56,7 @@ source $Z2A_BASE/distro-setup/setup-k8s-helm-kind.sh
 source $Z2A_BASE/distro-setup/setup-k8s-helpers.sh
 
 log "Waiting for all cluster pods to attain 'Ready' status ...."
+# Query `kind` cluster for the condition of the deployed pods
 kubectl wait pods --for=condition=Ready --all -A
 
 log "Completed Phase 1b (k8s, helm, kind) installation ...."

@@ -18,20 +18,15 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: setup-mlwb.sh - setup MLWB components
+# Name: install-mlwb.sh - install MLWB components
 #
 # Prerequisites:
-# 1. setup-distro.sh ran successfully
-# 2. setup-docker.sh ran successfully
-# 3. end-user (installer) logged out and back in ('docker' group)
-# 4. setup-k8s-helm-kind.sh ran successfully and the kind cluster is running
-# 5. setup-acumos-non-core.sh ran successfully and dependencies are installed
-# 6: mlwb plugin dependencies ran successfully and dependencies are installed
-#		 - setup-couchdb.sh ran successfully
-#		 - setup-jupyterhub.sh ran successfully
-#		 - setup-nifi.sh ran successfully
+# acumos installed and configured
+# mlwb plugin dependencies installed and configured
+#		 - make couchdb_install
+#		 - make jupyterhub_install
+#		 - make nifi_install
 #
-# Usage:
 
 MLWB_CORE=$Z2A_ACUMOS_BASE/acumos-plugins/mlwb
 MLWB_CHARTS=$MLWB_CORE/charts

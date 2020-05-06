@@ -44,26 +44,26 @@ trap 'fail' ERR
 NAMESPACE=$Z2A_K8S_NAMESPACE
 
 # Test to ensure that all Pods are running before proceeding
-wait_for_pods 900   # seconds
+wait_for_pods_ready 900   # seconds
 
 log "Starting Phase 3 (MLWB dependencies) installation ..."
 # Installation - Phase 3a - MLWB plugin dependencies
 
 log "Starting MLWB dependency - CouchDB installation ..."
 # Installation - Phase 3a - MLWB plugin dependencies
-source $Z2A_BASE/plugins-setup/setup-couchdb.sh
+(cd $Z2A_BASE/plugins-setup/ ; make couchdb_install)
 
 log "Starting MLWB dependency - JupyterHub installation ..."
 # Installation - Phase 3a - MLWB plugin dependencies
-source $Z2A_BASE/plugins-setup/setup-jupyterhub.sh
+(cd $Z2A_BASE/plugins-setup/ ; make jupyterhub_install)
 
 log "Starting MLWB dependency - NiFi installation ..."
 # Installation - Phase 3a - MLWB plugin dependencies
-source $Z2A_BASE/plugins-setup/setup-nifi.sh
+(cd $Z2A_BASE/plugins-setup/ ; make nifi_install)
 
 log "Starting Phase 3 (MLWB) installation ..."
 # Installation - Phase 3b - Machine Learning WorkBench (MLWB)
-source $Z2A_BASE/plugins-setup/setup-mlwb.sh
+(cd $Z2A_BASE/plugins-setup/ ; make mlwb_install)
 
 log "Please check the status of the K8s pods at this time .... "
 log "Please ensure that all pods are in a 'Running' status before proceeding ...."

@@ -1,5 +1,7 @@
 # z2a Directory Listing
 
+NOTE: Subject to change.  (major overhaul in progress to simplify this directory structure)
+
 ## Directories
 
 ### acumos-setup
@@ -128,3 +130,5 @@ Phase 3 top-level shell script.
 ### z2a-utils.sh - z2a utilities script
 
 z2a shell script containing multiple utility functions that are using by z2a (Phase 1a/b, Phase 2 and Phase 3).  The z2a framework cannot execute correctly without the functions in this utility script.
+
+Last Edited: 2020-05-05

@@ -27,8 +27,8 @@ In the Acumos `system-integration` repository, the `z2a` sub-directory contains 
 > NOTE: earlier versions of CentOS (v6) or Ubuntu (16.04) may be sufficient to run the z2a installation, but they have not been tested.
 
 * VM Sizing Recommendations
-  * two (2) CPU (four (4) recommended)
-  * 16GB of memory (32GB recommended)
+  * four (4) vCPU (minimum)
+  * 32GB of memory (minimum)
   * 30GB disk space (minimum) (40GB+ for MLWB)
 
 ## Miscellaneous Requirements
@@ -39,7 +39,7 @@ In the Acumos `system-integration` repository, the `z2a` sub-directory contains 
 
 > NOTE: internet proxy configurations are beyond the scope of the installation documentation.  A very simple proxy mechanism has been provided to assist with the installation process. Proxy configuration HOWTO references have been included in the Additional Documentation section to assist with more complex configuration.
 
-## Deployment Phases
+## Deployment
 
 `z2a` performs the Acumos and Acumos plugin(s) installation in a number of discrete steps that are referred to as 'phases'.
 

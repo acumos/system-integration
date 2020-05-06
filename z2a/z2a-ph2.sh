@@ -25,10 +25,11 @@
 #
 # - It is assumed, that the user running this script:
 #		- has sudo access on the VM
-#		- has successfully ran the accompanying z2a_ph1a.sh
-#			and z2a_ph1b.sh setup scripts
+#		- has successfully ran the accompanying z2a_ph0.sh, z2a_ph1a.sh
+#			and z2a_ph1b.sh setup scripts to create a standalone k8s cluster
 #
-# Usage:
+# - OR - has executed the z2a-ph0.sh script and provided their own k8s cluster
+#
 
 # Anchor Z2A_BASE
 Z2A_BASE=$(realpath $(dirname $0))
@@ -46,8 +47,9 @@ redirect_to /dev/tty
 export ACUMOS_GLOBAL_VALUE=$Z2A_ACUMOS_BASE/global_value.yaml
 NAMESPACE=$Z2A_K8S_NAMESPACE
 
+# TODO: correct the test logic here for BYOC vs. `kind`
 # Test to ensure that the namespace we are installing into is clean
-check_for_clean_namespace
+# check_for_clean_namespace
 
 echo "Starting Phase 2 installation ...."
 echo "Starting Phase 2 (Acumos non-core dependencies) installation ...."
