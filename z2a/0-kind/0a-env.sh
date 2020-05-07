@@ -18,18 +18,55 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: setup-z2a-values.sh - helper script to setup z2a-specific values
+# Name: 0a-env.sh      - end-user environment initialization script
 #
-# Prerequisites:
-# - Ubuntu Xenial (16.04), Bionic (18.04), or Centos 7 VM
+# Usage: execute this script prior to running any of the Phase 2 subordinate scripts
+# for installation or configuration of Acumos core and/or non-core components.
+#
+# Example values:
+# Z2A_ACUMOS_BASE=$HOME/src/local/system-integration/helm-charts
+# Z2A_ACUMOS_CORE=$HOME/src/local/system-integration/helm-charts/acumos
+# Z2A_ACUMOS_DEPENDENCIES=$HOME/src/local/system-integration/helm-charts/dependencies
+# Z2A_ACUMOS_NON_CORE=$HOME/src/local/system-integration/helm-charts/dependencies/k8s-noncore-chart/charts
+# Z2A_BASE=$HOME/src/local/system-integration/z2a
+# Z2A_K8S_CLUSTERNAME=acumos
+# Z2A_K8S_NAMESPACE=acumos-dev1
 #
 
+# Create user environment
+for v in $(set | grep ^Z2A_) ; do
+	unset ${v%=**}
+done
+
+# Anchor Z2A_BASE value
+Z2A_BASE=$(realpath $(dirname $0)/..)
+# Z2A_* environment values
+Z2A_ACUMOS_BASE=$(realpath $Z2A_BASE/../helm-charts)
+Z2A_ACUMOS_CORE=$Z2A_ACUMOS_BASE/acumos
+Z2A_ACUMOS_DEPENDENCIES=$Z2A_ACUMOS_BASE/dependencies
+Z2A_ACUMOS_NON_CORE=$Z2A_ACUMOS_BASE/dependencies/k8s-noncore-chart/charts
+# Create clean working copy of global_value.yaml to work with
+mv $Z2A_ACUMOS_BASE/global_value.yaml $Z2A_ACUMOS_BASE/global_value.yaml.orig
+egrep -v '^\s*#' $Z2A_ACUMOS_BASE/global_value.yaml.orig > $Z2A_ACUMOS_BASE/global_value.yaml
+# Z2A K8S environment values
+Z2A_K8S_CLUSTERNAME=$(yq r $Z2A_ACUMOS_BASE/global_value.yaml global.clusterName)
+Z2A_K8S_NAMESPACE=$(yq r $Z2A_ACUMOS_BASE/global_value.yaml global.namespace)
+
+# Source the z2a utils file
+source $Z2A_BASE/z2a-utils.sh
+# Save initial user environment
+save_env
+
+HERE=$(realpath $(dirname $0))
 # Set up some file location env variables
 GV=$Z2A_ACUMOS_BASE/global_value.yaml
-KC=$Z2A_BASE/distro-setup/kind-config.yaml
-KT=$Z2A_BASE/distro-setup/kind-config.tpl
-ZT=$Z2A_BASE/z2a-config/z2a_value.tpl
-ZV=$Z2A_BASE/z2a-config/z2a_value.yaml
+KC=$HERE/kind-config.yaml
+KT=$HERE/kind-config.tpl
+ZT=$HERE/z2a_value.tpl
+ZV=$HERE/z2a_value.yaml
+
+Z2A_VALUE_OVERRIDE=$ZV
+save_env
 
 # Strip comments from kind template file
 egrep -v '^\s*#' $ZT > $ZV
@@ -89,3 +126,6 @@ for PORT in $KIBANA_PORT $NEXUS_PORT $K8S_DASHBOARD_PORT ; do
   yq w -i $KC $KEY.extraPortMappings[$i].protocol TCP
   ((i=i+1))
 done
+
+redirect_to /dev/null
+log "Phase 0a-env (end-user environment) creation ...."

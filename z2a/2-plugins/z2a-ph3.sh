@@ -18,25 +18,17 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: z2a-ph1b.sh - z2a Phase 1b setup script
+# Name: z2a-ph3.sh - z2a Phase 3 setup script (MLWB)
 #
 # Prerequisites:
 # - Ubuntu Xenial (16.04), Bionic (18.04), or Centos 7 VM
 #
 # - It is assumed, that the user running this script:
 #		- has sudo access on the VM
-#		- has successfully ran the accompanying z2a_ph1a.sh script
-#   - has logged out and back in to a new session
+#		- has successfully completed the Phase 2 (Acumos) installation OR
+#			has installed Acumos by other methods
 #
 # Usage:
-
-# Determine if the end-user is actually a member of the Docker group
-# We can not proceed past here without the user being in the Docker group
-id -nG | grep -q docker || {
-  echo "User is not a member of the docker group."
-  echo "Please log out and log back in to a new session."
-  exit 1
-}
 
 # Anchor Z2A_BASE
 Z2A_BASE=$(realpath $(dirname $0))
@@ -45,18 +37,33 @@ source $Z2A_BASE/z2a-utils.sh
 # Load user environment
 load_env
 # Redirect stdout/stderr to log file
-redirect_to $Z2A_BASE/z2a-ph1b-install.log
+redirect_to z2a-ph3-install
 # Exit with an error on any non-zero return code
 trap 'fail' ERR
 
-log "Starting Phase 1b (k8s, helm, kind) installation ...."
-# Installation - Phase 1b - kubectl, helm and kind
-source $Z2A_BASE/distro-setup/setup-z2a-values.sh
-source $Z2A_BASE/distro-setup/setup-k8s-helm-kind.sh
-source $Z2A_BASE/distro-setup/setup-k8s-helpers.sh
+NAMESPACE=$Z2A_K8S_NAMESPACE
 
-log "Waiting for all cluster pods to attain 'Ready' status ...."
-# Query `kind` cluster for the condition of the deployed pods
-kubectl wait pods --for=condition=Ready --all -A
+# Test to ensure that all Pods are running before proceeding
+wait_for_pods_ready 900   # seconds
 
-log "Completed Phase 1b (k8s, helm, kind) installation ...."
+log "Starting Phase 3 (MLWB dependencies) installation ..."
+# Installation - Phase 3a - MLWB plugin dependencies
+
+log "Starting MLWB dependency - CouchDB installation ..."
+# Installation - Phase 3a - MLWB plugin dependencies
+(cd $Z2A_BASE/plugins-setup/ ; make couchdb_install)
+
+log "Starting MLWB dependency - JupyterHub installation ..."
+# Installation - Phase 3a - MLWB plugin dependencies
+(cd $Z2A_BASE/plugins-setup/ ; make jupyterhub_install)
+
+log "Starting MLWB dependency - NiFi installation ..."
+# Installation - Phase 3a - MLWB plugin dependencies
+(cd $Z2A_BASE/plugins-setup/ ; make nifi_install)
+
+log "Starting Phase 3 (MLWB) installation ..."
+# Installation - Phase 3b - Machine Learning WorkBench (MLWB)
+(cd $Z2A_BASE/plugins-setup/ ; make mlwb_install)
+
+log "Please check the status of the K8s pods at this time .... "
+log "Please ensure that all pods are in a 'Running' status before proceeding ...."

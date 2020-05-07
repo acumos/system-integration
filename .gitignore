@@ -8,13 +8,13 @@ helm-charts/couchdb_value.yaml
 helm-charts/jhub_value.yaml
 helm-charts/nifi_value.yaml
 ### z2a ignores ###
-z2a/**/config.log
-z2a/**/install.log
 z2a/TODO.md
 z2a/user-env.sh
-z2a/distro-setup/kind-config.yaml
+z2a/**/*config.log
+z2a/**/*install.log
+z2a/**/kind-config.yaml
 z2a/noncore-config/*/*_value.yaml
 z2a/noncore-config/*/admin.password
 z2a/noncore-config/*/utils.sh
-z2a/k8s-dashboard/main.yaml
-z2a/k8s-dashboard/recommended.yaml
+z2a/**/z2a-k8s-dashboard/main.yaml
+z2a/**/z2a-k8s-dashboard/recommended.yaml
