@@ -19,49 +19,53 @@
 #
 # Name: install-couchdb.sh - installation script for CouchDB dependency for MLWB
 
+# HERE
+HERE=$(realpath $(dirname $0))
+
 # Default values for Acumos CouchDB
 # Edit these values for custom values
 RELEASE=mlwb-db
+NAMESPACE=$(yq r $ACUMOS_GLOBAL_VALUE global.namespace)
 
 # Random UUID generated for CouchDB
-Z2A_ACUMOS_COUCHDB_UUID=$(uuidgen)
+ACUMOS_COUCHDB_UUID=$(uuidgen)
 
-log "Adding Apache CouchDB repo ...."
+echo "Adding Apache CouchDB repo ...."
 # Add Apache CouchDB repo to Helm
 helm repo add couchdb https://apache.github.io/couchdb-helm
 helm repo update
 
 # k/v map to set CouchDB local configuration values
-cat <<EOF | tee $Z2A_ACUMOS_BASE/couchdb_value.yaml
+cat <<EOF | tee $HERE/couchdb_value.yaml
 service:
   type: NodePort
 couchdbConfig:
   couchdb:
-    uuid: $Z2A_ACUMOS_COUCHDB_UUID
+    uuid: $ACUMOS_COUCHDB_UUID
     require_valid_user: true
 EOF
 
-log "Installing CouchDB Helm Chart ...."
-helm install $RELEASE --namespace $NAMESPACE -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml -f $Z2A_ACUMOS_BASE/couchdb_value.yaml --set allowAdminParty=true couchdb/couchdb
+echo "Installing CouchDB Helm Chart ...."
+helm install $RELEASE --namespace $NAMESPACE -f $ACUMOS_GLOBAL_VALUE -f $ACUMOS_BASE/mlwb_value.yaml -f $HERE/couchdb_value.yaml --set allowAdminParty=true couchdb/couchdb
 
-log "Waiting for pods to become ready ...."
+echo "Waiting for pods to become ready ...."
 # Wait for pods to become available
-wait_for_pods_ready 900   # seconds
+kubectl wait pods --for=condition=Ready --all --namespace=$NAMESPACE --timeout=900s
 
-log "Waiting for CouchDB instance to become ready ...."
+echo "Waiting for CouchDB instance to become ready ...."
 # Loop for CouchDB to become available"
 for i in $(seq 1 20) ; do
   sleep 10
-  logc .
-  kubectl exec --namespace $NAMESPACE $RELEASE-couchdb-0 -c couchdb -- curl -s http://127.0.0.1:5984/"
-  if [ $i -eq 20 ] ; then log "\nTimeout waiting for CouchDB to become available ...." ; exit ; fi
+  kubectl exec --namespace $NAMESPACE $RELEASE-couchdb-0 -c couchdb -- curl -s http://127.0.0.1:5984/ && break
+  if [ $i -eq 20 ] ; then echo "\nTimeout waiting for CouchDB to become available ...." ; exit ; fi
 done
-log "\n"
+echo "\n"
 
-log "Performing CouchDB Cluster setup ...."
+echo "Performing CouchDB Cluster setup ...."
 kubectl exec --namespace $NAMESPACE $RELEASE-couchdb-0 -c couchdb -- curl -s http://127.0.0.1:5984/_cluster_setup -X POST -H "Content-Type: application/json" -d '{"action": "finish_cluster"}'
 
-log "Retrieving CouchDB Admin secret ...."
-Z2A_MLWB_COUCHDB_PASSWORD=$(kubectl get secret --namespace $NAMESPACE $RELEASE-couchdb -o go-template='{{ .data.adminPassword }}' | base64 --decode) ; save_env
+# TODO: write this value back to mlwb_value.yaml
+echo "Retrieving CouchDB Admin secret ...."
+MLWB_COUCHDB_PASSWORD=$(kubectl get secret --namespace $NAMESPACE $RELEASE-couchdb -o go-template='{{ .data.adminPassword }}' | base64 --decode)
 
-log "CouchDB installation complete."
+echo "CouchDB installation complete."

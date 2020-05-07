@@ -12,20 +12,19 @@ git clone https://gerrit.acumos.org/r/system-integration ${SI}
 
 # Using the vi editor (substitute with your editor of choice)
 # Add hostname or hostname:port to proxy.txt ; if necessary
-vi ${SI}/z2a/distro-setup/proxy.txt
+vi ${SI}/z2a/0-kind/proxy.txt
 # Copy the example values from z2a-config/dev1 to the helm-charts directory
-cp ${SI}/z2a/z2a-config/dev1/global_value.yaml ${SI}/z2a/helm-charts/global_value.yaml
+cp ${SI}/z2a/dev1/global_value.yaml ${SI}/z2a/helm-charts/global_value.yaml
 
-# Execute Phase 0
-. ${SI}/z2a/z2a-ph0.sh
-
-# Execute Phase 1a
-. ${SI}/z2a/z2a-ph1a.sh
+# Execute 0-kind/0a-env.sh
+. ${SI}/z2a/0-kind/0a-env.sh
+# Execute 0-kind/0b-depends.sh
+. ${SI}/z2a/0-kind/0b-depends.sh
 
 # LOG OUT OF SESSION ; LOG IN TO NEW SESSION (required for Docker group inclusion)
-# Execute Phase 1b
+# Execute 0-kind/0c-cluster.sh
 SI=~/src/system-integration
-. ${SI}/z2a/z2a-ph1b.sh
+. ${SI}/z2a/0-kind/0c-cluster.sh
 
 # Ensure all k8s Pods created in Phase 1b are in a 'Running' state.
 kubectl get pods -A
@@ -100,14 +99,14 @@ In the directory listing shown above, two (2) directories are of special interes
 
 > NOTE: z2a includes 'example' values for Acumos and MLWB that are provided to assist in performing a quick installation (see: *TL;DR* section).  These example values can be used for a private development environment that is not shared, not production and not exposed to the Internet.  The values are for demonstration purposes only.
 
-The `proxy.txt` file is located in the `z2a/distro-setup` directory.  This file needs to be edited such that the Docker installation can proceed cleanly.  We will need to change directories into that location to perform the necessary edits required for the Acumos installation.
+The `proxy.txt` file is located in the `z2a/0-kind` directory.  This file needs to be edited such that the Docker installation can proceed cleanly.  We will need to change directories into that location to perform the necessary edits required for the Acumos installation.
 
 This file will contain a single entry in the form of `hostname` OR `hostname:port` (this is not a URL).
 
 Here is the `change directory` command to execute.
 
 ```bash
-cd ~/src/system-integration/z2a/distro-setup
+cd ~/src/system-integration/z2a/0-kind
 ```
 
 Using your editor of choice (vi, nano, pico etc.) please open the `proxy.txt` file such that we can edit it's contents.
@@ -130,7 +129,7 @@ proxy-hostname.example.com:3128
 >
 ```bash
 SI=~/src/system-integration
-cp ${SI}/z2a/z2a-config/dev1/global_value.yaml ${SI}/z2a/helm-charts/global_value.yaml
+cp $SI/z2a/dev1/global_value.yaml $SI/z2a/helm-charts/global_value.yaml
 ```
 >
 > The Acumos example values can be used for a private development environment that is not shared, not production and not exposed to the Internet.  The values in the Acumos example file are for demonstration purposes only.
@@ -178,46 +177,47 @@ For entries in the `global_value.conf` file that have an existing entry, do not 
 
 To perform an installation of Acumos, we will need to perform the following steps:
 
-1. Change directory into the `z2a` directory.
+1. Change directory into the z2a/0-kind directory.
 
     ```bash
-    cd ~/src/system-integration/z2a
+    cd ~/src/system-integration/z2a/0-kind
     ```
 
-2. Execute the z2a Phase 0 script.
+2. Execute the z2a 0a-env.sh script.
 
     ```bash
-    ./z2a-ph0.sh
+    ./0a-env.sh
     ```
 
-3. Execute the z2a Phase 1a script.
+3. Execute the z2a 0b-depends.sh script.
 
     ```bash
-    ./z2a-ph1a.sh
+    ./0b-depends.sh
     ```
 
-4. Once the z2a Phase 1a script has completed, please log out of your session and log back in.  This step is required such that you (the installer) are added to the `docker` group, which is required in the next step.
+4. Once the z2a 0b-depends.sh has completed, please log out of your session and log back in.  This step is required such that you (the installer) are added to the `docker` group, which is required in the next step.
 
     ```bash
     logout
     ```
 
-5. Once you are logged back into the VM, change directory into the `z2a` directory and execute the z2a Phase 1b script.
+5. Once you are logged back into the VM, change directory into the z2a/0-kind directory and execute the z2a 0c-cluster.sh script.
 
     ```bash
-    cd ~/src/system-integration/z2a
-    ./z2a-ph1b.sh
+    cd ~/src/system-integration/z2a/0-kind
+    ./0c-cluster.sh
     ```
 
-6. After the z2a Phase 1b script has completed, we will need to check the status of the newly created Kubernetes pods before we proceed with the Acumos installation.  We can ensure that all necessary Kubernetes pods are running by executing this `kubectl` command.
+6. After the z2a 0c-cluster.sh script has completed, we will need to check the status of the newly created Kubernetes pods before we proceed with the Acumos installation.  We can ensure that all necessary Kubernetes pods are running by executing this `kubectl` command.
 
     ```bash
     kubectl get pods -A
     ```
 
-7. When all Kubernetes pods are in a `Running` state, we can proceed and execute the z2a Phase 2 script to install and configure Acumos.
+7. When all Kubernetes pods are in a `Running` state, we can proceed and execute the 1-kind scripts to install and configure Acumos.
 
     ```bash
+    cd ~/src/system-integration/z2a/1-acumos
     ./z2a-ph2.sh
     ```
 
@@ -226,6 +226,8 @@ To perform an installation of Acumos, we will need to perform the following step
     ```bash
     kubectl get pods -A
     ```
+
+TODO - edited to here.
 
 When all Kubernetes pods are in a `Running` state, the Acumos installation anc configuration has been completed.
 
@@ -251,13 +253,13 @@ Machine Learning WorkBench is installed during Phase 3 of the installation proce
 
 #### Editing the `mlwb_value.yaml` File
 
-> NOTE: z2a includes an example value file for MLWB in the `~/src/system-integration/z2a/z2a-config/dev1` directory.  The MLWB example values file is provided for both illustrative purposes and to assist in performing a quick installation (see: TL;DR section).  The example MLWB values file from that directory could be used here and these edits are not required.
+> NOTE: z2a includes an example value file for MLWB in the `~/src/system-integration/z2a/dev1` directory.  The MLWB example values file is provided for both illustrative purposes and to assist in performing a quick installation (see: TL;DR section).  The example MLWB values file from that directory could be used here and these edits are not required.
 >
 > The commands to use the MLWB example values are:
 >
 ```bash
 SI=~/src/system-integration
-cp ${SI}/z2a/z2a-config/dev1/mlwb_value.yaml ${SI}/z2a/helm-charts/mlwb_value.yaml
+cp ${SI}/z2a/dev1/mlwb_value.yaml ${SI}/z2a/helm-charts/mlwb_value.yaml
 ```
 >
 > The MLWB example values can be used for a private development environment that is not shared, not production and not exposed to the Internet.  The values in the MLWB example file are for demonstration purposes only
@@ -321,11 +323,11 @@ acumosNifi:
 
 To perform an installation of MLWB, we will need to perform the following steps:
 
-1. change directory into the `z2a` directory
+1. change directory into the z2a/2-plugins directory
 2. execute the `z2a-ph3.sh` script which install the MLWB dependencies and the MLWB components
 
 ```bash
-cd ~/src/system-integration/z2a
+cd ~/src/system-integration/z2a/02-plugins
 ./z2a-ph3.sh
 ```
 
@@ -333,4 +335,4 @@ For post-installation Machine Learning WorkBench configuration steps, please see
 
 TODO: Add section on accessing the Acumos Portal once installation is completed.
 
-Last Edited: 2020-05-01
+Last Edited: 2020-05-07

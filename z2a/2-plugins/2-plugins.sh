@@ -18,7 +18,7 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: z2a-ph3.sh - z2a Phase 3 setup script (MLWB)
+# Name: 2-plugins.sh - z2a 2-plugins setup script (MLWB)
 #
 # Prerequisites:
 # - Ubuntu Xenial (16.04), Bionic (18.04), or Centos 7 VM
@@ -31,39 +31,41 @@
 # Usage:
 
 # Anchor Z2A_BASE
-Z2A_BASE=$(realpath $(dirname $0))
+HERE=$(realpath $(dirname $0))
+Z2A_BASE=$(realpath $HERE/..)
 # Source the z2a utils file
 source $Z2A_BASE/z2a-utils.sh
 # Load user environment
 load_env
-# Redirect stdout/stderr to log file
-redirect_to z2a-ph3-install
 # Exit with an error on any non-zero return code
-trap 'fail' ERR
+# trap 'fail' ERR
+set -e
 
-NAMESPACE=$Z2A_K8S_NAMESPACE
+export ACUMOS_BASE=$Z2A_ACUMOS_BASE
+export ACUMOS_GLOBAL_VALUE=$Z2A_ACUMOS_BASE/global_value.yaml
+NAMESPACE=$(yq r $ACUMOS_GLOBAL_VALUE global.namespace)
 
 # Test to ensure that all Pods are running before proceeding
-wait_for_pods_ready 900   # seconds
+kubectl wait pods --for=condition=Ready --all --namespace=$NAMESPACE --timeout=900s
 
-log "Starting Phase 3 (MLWB dependencies) installation ..."
+echo "Starting Phase 3 (MLWB dependencies) installation ..."
 # Installation - Phase 3a - MLWB plugin dependencies
 
-log "Starting MLWB dependency - CouchDB installation ..."
+echo "Starting MLWB dependency - CouchDB installation ..."
 # Installation - Phase 3a - MLWB plugin dependencies
 (cd $Z2A_BASE/plugins-setup/ ; make couchdb_install)
 
-log "Starting MLWB dependency - JupyterHub installation ..."
+echo "Starting MLWB dependency - JupyterHub installation ..."
 # Installation - Phase 3a - MLWB plugin dependencies
 (cd $Z2A_BASE/plugins-setup/ ; make jupyterhub_install)
 
-log "Starting MLWB dependency - NiFi installation ..."
+echo "Starting MLWB dependency - NiFi installation ..."
 # Installation - Phase 3a - MLWB plugin dependencies
 (cd $Z2A_BASE/plugins-setup/ ; make nifi_install)
 
-log "Starting Phase 3 (MLWB) installation ..."
+echo "Starting Phase 3 (MLWB) installation ..."
 # Installation - Phase 3b - Machine Learning WorkBench (MLWB)
 (cd $Z2A_BASE/plugins-setup/ ; make mlwb_install)
 
-log "Please check the status of the K8s pods at this time .... "
-log "Please ensure that all pods are in a 'Running' status before proceeding ...."
+echo "Please check the status of the K8s pods at this time .... "
+echo "Please ensure that all pods are in a 'Running' status before proceeding ...."

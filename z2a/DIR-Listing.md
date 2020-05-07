@@ -16,21 +16,25 @@ Directory containing two (2) 2nd-level shell scripts that install the noncore an
 
 Directory containing Virtual Machine (VM) Operating System setup scripts.  (z2a Phase 1 only)
 
-### k8s-dashboard
+### 0-kind/z2a-k8s-dashboard
 
-Directory containing Kubernetes dashboard that is deployed into the kind (Kubernetes in Docker) cluster. (z2a Phase 1 only)
+Directory containing Kubernetes dashboard that is deployed into the kind (Kubernetes in Docker) cluster. (0-kind/0c-cluster.sh script only)
 
-### k8s-metallb
+### 0-kind/z2a-k8s-metallb
 
-Directory containing MetalLB load-balancer that is deployed into the kind (Kubernetes in Docker) cluster. (z2a Phase 1 only)
+Directory containing MetalLB load-balancer that is deployed into the kind (Kubernetes in Docker) cluster. (0-kind/0c-cluster.sh script only)
 
-### k8s-svc-proxy
+### 0-kind/k8s-svc-proxy
 
-Directory containing Kubernetes (kind) service proxy that is deployed into the kind (Kubernetes in Docker) cluster. (z2a Phase 1 only)
+Directory containing Kubernetes (kind) service proxy that is deployed into the kind (Kubernetes in Docker) cluster. (0-kind/0c-cluster.sh script only)
+
+### 0-kind/z2a-svcs-proxy
+
+Directory containing Kubernetes (kind) service proxy Helm chart. (0-kind/0c-cluster.sh script only)
 
 ### noncore-config
 
-Directory containing scripts that install and configure Acumos noncore components.   These scripts are used by z2a Phase 2, but can also be executed in a  stand-alone manner using targets defined in the Makefile.
+Directory containing scripts that install and configure Acumos noncore components.   These scripts are used by z2a Phase 2, but can also be executed in a stand-alone manner using targets defined in the Makefile.
 
 The current Makefile targets are:
 
@@ -71,13 +75,9 @@ Directory containing z2a Phase 3 plugins.   This directory currently contains sc
 >
 > `setup-nifi.sh`             # script to install and configure Apache NiFi
 
-### z2a-config
+### dev1
 
-Directory containing z2a configuration files.  This directory houses the temporary (test) versions of the `global_value.yaml` and `mlwb_value.yaml` files.
-
-### z2a-svcs-proxy
-
-Directory containing Kubernetes (kind) service proxy Helm chart. (z2a Phase 1 only)
+This directory houses the temporary (test) versions of the `global_value.yaml` and `mlwb_value.yaml` files.
 
 ## Files
 
@@ -103,15 +103,7 @@ Listing of TODO items.  (has entry in .gitignore)
 
 ### user-env.sh.tpl
 
-Template file used to seed the user-env.sh (user environment shell script).
-
-### z2a-ph1a.sh - Phase 1a top-level shell script (z2a Phase 1 only)
-
-Phase 1a top-level shell script (z2a Phase 1 only).
-
-### z2a-ph1b.sh - Phase 1b top-level shell script (z2a Phase 1 only)
-
-Phase 1b top-level shell script (z2a Phase 1 only).
+Template file used to seed the user environment script.
 
 ### z2a-ph2.sh - Phase 2 top-level shell script (z2a Phase 2 or standalone)
 
@@ -129,6 +121,6 @@ Phase 3 top-level shell script.
 
 ### z2a-utils.sh - z2a utilities script
 
-z2a shell script containing multiple utility functions that are using by z2a (Phase 1a/b, Phase 2 and Phase 3).  The z2a framework cannot execute correctly without the functions in this utility script.
+z2a shell script containing multiple utility functions that are used by z2a.  The z2a framework cannot execute correctly without the functions in this utility script.
 
-Last Edited: 2020-05-05
+Last Edited: 2020-05-07

@@ -64,10 +64,6 @@ kind create cluster --name=$Z2A_K8S_CLUSTERNAME --config $HERE/kind-config.yaml
 # Echo cluster-info - echo output to both log file and TTY
 log "\n\n$(kubectl cluster-info --context kind-$Z2A_K8S_CLUSTERNAME)\n"
 
-log "Creating k8s namespace : name = $Z2A_K8S_NAMESPACE"
-# Create an acumos-dev1 namespace in the kind-acumos cluster
-kubectl create namespace $Z2A_K8S_NAMESPACE
-
 # source $Z2A_BASE/distro-setup/setup-k8s-helpers.sh
 log "Building k8s-svc-proxy local image ...."
 # Build local image of the k8s-svc-proxy
@@ -80,7 +76,8 @@ kind load docker-image k8s-svc-proxy:v1.0 --name $Z2A_K8S_CLUSTERNAME
 log "Deploying k8s-svc-proxy pod cluster ...."
 # Deploy the k8s-svc-proxy pod
 # kubectl apply -f $Z2A_BASE/k8s-svc-proxy/z2a-svcs-proxy.yaml --namespace=$Z2A_K8S_NAMESPACE
-helm install z2a-svcs-proxy --namespace=$Z2A_K8S_NAMESPACE $HERE/z2a-svcs-proxy/ -f $Z2A_VALUE_OVERRIDE
+kubectl create namespace z2a-svcs-proxy
+helm install z2a-svcs-proxy --namespace=z2a-svcs-proxy $HERE/z2a-svcs-proxy/ -f $Z2A_VALUE_OVERRIDE
 
 log "Install MetalLB ...."
 # Install MetalLB load Balancer

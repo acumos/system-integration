@@ -18,20 +18,48 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: setup-acumos-noncore.sh - setup Acumos non-core components
+# Name: 1-acumos.sh - z2a 1-acumos.sh script (Acumos)
 #
 # Prerequisites:
-# - Ubuntu Bionic (18.04), or Centos 7 VM
+# - Ubuntu Xenial (16.04), Bionic (18.04), or Centos 7 VM
 #
 # - It is assumed, that the user running this script:
-#   - has sudo access on the VM
-#   - has successfully completed z2a phases 1a and 1b OR
-#   - has a working Kubernetes environment created by other methods
+#		- has sudo access on their VM and
+#		- has executed the 0-kind/*.sh setup scripts to create a standalone k8s cluster
+#   - OR - has executed the 0a-env.sh script and provided their own k8s cluster
 #
-# Usage:
 
-# Phase 2 - the following charts use the new install and configuration method
-#         - see z2a/non-core/Makefile for target definitions noted below
+# Anchor Z2A_BASE
+
+HERE=$(realpath $(dirname $0))
+Z2A_BASE=$(realpath $HERE/..)
+# Source the z2a utils file
+source $Z2A_BASE/z2a-utils.sh
+# Load user environment
+load_env
+# Exit with an error on any non-zero return code
+# trap 'fail' ERR
+set -e
+
+#TODO: fix this
+# redirect_to /dev/tty
+
+# Global Values
+export ACUMOS_GLOBAL_VALUE=$Z2A_ACUMOS_BASE/global_value.yaml
+NAMESPACE=$Z2A_K8S_NAMESPACE
+
+# TODO: correct the test logic here for BYOC vs. `kind`
+# Test to ensure that the namespace we are installing into is clean
+# check_for_clean_namespace
+
+echo "Starting Phase 2 installation ...."
+echo "Creating k8s namespace : name = $Z2A_K8S_NAMESPACE"
+# Create an acumos-dev1 namespace in the kind-acumos cluster
+kubectl create namespace $Z2A_K8S_NAMESPACE
+
+echo "Starting Phase 2 (Acumos non-core dependencies) installation ...."
+# Installation - Phase 2 - Acumos non-core dependencies
+# source $Z2A_BASE/acumos-setup/setup-acumos-noncore.sh
 
 echo "Installing Acumos noncore dependencies ...."
 # Install (or remove) the Acumos non-core charts, one by one in this order
@@ -68,3 +96,35 @@ echo "Install Acumos noncore dependency: Kibana ...."
 helm install -name k8s-noncore-kibana --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-kibana -f $Z2A_ACUMOS_BASE/global_value.yaml
 
 echo "Finished installing Acumos noncore dependencies ...."
+
+echo "Starting Phase 2 (Acumos core) installation ...."
+# Installation - Phase 2 - Acumos core
+# source $Z2A_BASE/acumos-setup/setup-acumos-core.sh
+
+echo "Installing Acumos core Helm charts ...."
+# Install (or remove) the Acumos non-core charts, one by one in this order
+echo "Installing Acumos prerequisite chart ...."
+helm install -name prerequisite --namespace $NAMESPACE $Z2A_ACUMOS_CORE/prerequisite/ -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+echo "Installing Acumos Common Data Services chart ...."
+helm install -name common-data-svc --namespace $NAMESPACE $Z2A_ACUMOS_CORE/common-data-svc/ -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+echo "Installing Acumos Portal chart ...."
+helm install -name portal --namespace $NAMESPACE $Z2A_ACUMOS_CORE/portal/ -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+echo "Installing Acumos Onboarding chart ...."
+helm install -name onboarding --namespace $NAMESPACE $Z2A_ACUMOS_CORE/onboarding/ -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+echo "Installing Acumos Microservice Generation chart ...."
+helm install -name microservice-generation --namespace $NAMESPACE $Z2A_ACUMOS_CORE/microservice-generation/ -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+echo "Installing Acumos DS Composition Engine chart ...."
+helm install -name ds-compositionengine --namespace $NAMESPACE $Z2A_ACUMOS_CORE/ds-compositionengine/ -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+echo "Installing Acumos Federation chart ...."
+helm install -name federation --namespace $NAMESPACE $Z2A_ACUMOS_CORE/federation/ -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+echo "Finished installing Acumos core Helm charts ...."
+
+echo "Please check the status of the Kubernetes pods at this time ...."
+echo "Please ensure that all pods are in a 'Running' status before proceeding ...."

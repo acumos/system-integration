@@ -128,4 +128,6 @@ for PORT in $KIBANA_PORT $NEXUS_PORT $K8S_DASHBOARD_PORT ; do
 done
 
 redirect_to /dev/null
+echo ""
 log "Phase 0a-env (end-user environment) creation ...."
+echo ""

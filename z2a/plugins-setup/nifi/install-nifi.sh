@@ -17,38 +17,44 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: installnifi.sh - installation script for NiFi dependency for MLWB
+# Name: install-nifi.sh - installation script for NiFi dependency for MLWB
+
+# HERE
+HERE=$(realpath $(dirname $0))
 
 # Default values for Acumos NiFi
 # Edit these values for custom values
-export RELEASE=mlwb-nifi
+RELEASE=mlwb-nifi
+NAMESPACE=$(yq r $ACUMOS_GLOBAL_VALUE global.namespace)
 
 # Add NiFi repo to Helm
-log "Adding NiFi repo ...."
+echo "Adding NiFi repo ...."
 helm repo add cetic https://cetic.github.io/helm-charts
 helm repo update
 
 # k/v map to set NiFi configuration values
-cat <<EOF | tee $Z2A_ACUMOS_BASE/nifi_value.yaml
+cat <<EOF | tee $HERE/nifi_value.yaml
 EOF
 
-log "Installing NiFi Helm Chart ...."
-helm install $RELEASE --namespace $NAMESPACE -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml -f $Z2A_ACUMOS_BASE/nifi_value.yaml cetic/nifi
+echo "Installing NiFi Helm Chart ...."
+helm install $RELEASE --namespace $NAMESPACE -f $ACUMOS_GLOBAL_VALUE \
+  -f $ACUMOS_BASE/mlwb_value.yaml -f $HERE/nifi_value.yaml cetic/nifi
 
 # Loop for NiFi to become available
+kubectl wait pods --for=condition=Ready --all --namespace=$NAMESPACE --timeout=900s
 for i in $(seq 1 20) ; do
   sleep 10
-  logc .
-  TODO: craft a query to determine the status of NiFi
+  # TODO: craft a query to determine the status of NiFi
   # kubectl exec --namespace $NAMESPACE $RELEASE
-  if [ $i -eq 20 ] ; then log "\nTimeout waiting for Nifi to become available ...." ; exit ; fi
+  break
+  if [ $i -eq 20 ] ; then echo "\nTimeout waiting for Nifi to become available ...." ; exit ; fi
 done
-log "\n"
+echo "\n"
 
-log "NiFi Cluster setup information ...."
-log "$(kubectl get svc $RELEASE -n $NAMESPACE)"
-log "Cluster endpoint IP address will be available at:"
-log "$(kubectl get svc $RELEASE -n $NAMESPACE -o jsonpath='{.status.loadBalancer.ingress[*].ip}')"
+echo "NiFi Cluster setup information ...."
+echo "$(kubectl get svc $RELEASE -n $NAMESPACE)"
+echo "Cluster endpoint IP address will be available at:"
+echo "$(kubectl get svc $RELEASE -n $NAMESPACE -o jsonpath='{.status.loadBalancer.ingress[*].ip}')"
 
-log "NiFi installation complete."
-log "Note:  DNS and/or /etc/hosts will need to be updated with the NiFi cluster information."
+echo "NiFi installation complete."
+echo "Note:  DNS and/or /etc/hosts will need to be updated with the NiFi cluster information."
