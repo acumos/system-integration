@@ -21,20 +21,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{.Values.mlwb.projectService.podName}}
+ name: {{ .Values.mlwb.projectService.podName | quote }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{.Values.mlwb.projectService.name}}
+   app: {{ .Values.mlwb.projectService.name | quote }}
 spec:
  selector:
    matchLabels:
-     app: {{.Values.mlwb.projectService.name}}
+     app: {{ .Values.mlwb.projectService.name | quote }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{.Values.mlwb.projectService.name}}
+       app: {{ .Values.mlwb.projectService.name | quote }}
    spec:
      containers:
        - name: project-service
@@ -45,24 +45,24 @@ spec:
            - name: SPRING_APPLICATION_JSON
              value: '{
                 "server":{
-                    "port":{{ .Values.mlwb.acumosProjectServicePort }}
+                    "port":"{{ .Values.mlwb.acumosProjectServicePort }}"
                 },
-                "resultsetSize":"2000",
+                "resultsetSize": "2000",
                 "cmndatasvc" : {
                     "cmndatasvcendpointurl":"http://{{ .Values.global.cds.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
                     "cmndatasvcuser":"{{ .Values.global.acumosCdsUser }}",
                     "cmndatasvcpwd":"{{ .Values.global.acumosCdsPassword }}"
                 },
                 "couchdb":{
-                    "user":{{ .Values.mlwb.acumosCouchDB.user }},
-                    "pwd":{{ .Values.mlwb.acumosCouchDB.pwd }},
-                    "name":{{ .Values.mlwb.acumosCouchDB.dbname }},
+                    "user":"{{ .Values.mlwb.acumosCouchDB.user }}",
+                    "pwd":"{{ .Values.mlwb.acumosCouchDB.pwd }}",
+                    "name":"{{ .Values.mlwb.acumosCouchDB.dbname }}",
                     "createdb":{
-                        "if-not-exist":{{ .Values.mlwb.acumosCouchDB.createdb }}
+                        "if-not-exist":"{{ .Values.mlwb.acumosCouchDB.createdb }}"
                     },
-                    "protocol":{{ .Values.mlwb.acumosCouchDB.protocol }},
-                    "host":{{ .Values.mlwb.acumosCouchDB.host }},
-                    "port":{{ .Values.mlwb.acumosCouchDB.port }}
+                    "protocol":"{{ .Values.mlwb.acumosCouchDB.protocol }}",
+                    "host":"{{ .Values.mlwb.acumosCouchDB.host }}",
+                    "port":"{{ .Values.mlwb.acumosCouchDB.port }}"
                 },
                 "jwt" : {
                     "secretkey":"secret"

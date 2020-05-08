@@ -18,7 +18,7 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: 2-plugins.sh - z2a 2-plugins setup script (MLWB)
+# Name: 2-plugins.sh - z2a 2-plugins setup script
 #
 # Prerequisites:
 # - Ubuntu Xenial (16.04), Bionic (18.04), or Centos 7 VM
@@ -48,23 +48,24 @@ NAMESPACE=$(yq r $ACUMOS_GLOBAL_VALUE global.namespace)
 # Test to ensure that all Pods are running before proceeding
 kubectl wait pods --for=condition=Ready --all --namespace=$NAMESPACE --timeout=900s
 
-echo "Starting Phase 3 (MLWB dependencies) installation ..."
-# Installation - Phase 3a - MLWB plugin dependencies
+echo "Starting Phase 2-plugins dependency installation ...."
+# Installation - MLWB plugin dependencies
 
-echo "Starting MLWB dependency - CouchDB installation ..."
-# Installation - Phase 3a - MLWB plugin dependencies
+echo "Starting MLWB dependency - CouchDB installation ...".
+# Installation - MLWB plugin dependencies
 (cd $Z2A_BASE/plugins-setup/ ; make couchdb_install)
 
-echo "Starting MLWB dependency - JupyterHub installation ..."
-# Installation - Phase 3a - MLWB plugin dependencies
+echo "Starting MLWB dependency - JupyterHub installation ...."
+# Installation - MLWB plugin dependencies
 (cd $Z2A_BASE/plugins-setup/ ; make jupyterhub_install)
 
-echo "Starting MLWB dependency - NiFi installation ..."
-# Installation - Phase 3a - MLWB plugin dependencies
+echo "Starting MLWB dependency - NiFi installation ...."
+# Installation - MLWB plugin dependencies
 (cd $Z2A_BASE/plugins-setup/ ; make nifi_install)
 
-echo "Starting Phase 3 (MLWB) installation ..."
-# Installation - Phase 3b - Machine Learning WorkBench (MLWB)
+echo "Starting Phase 2-plugins installation ...."
+# Installation - Machine Learning WorkBench (MLWB)
+echo "Installing MLWB Components ...."
 (cd $Z2A_BASE/plugins-setup/ ; make mlwb_install)
 
 echo "Please check the status of the K8s pods at this time .... "

@@ -55,7 +55,7 @@ spec:
            - name: notebookWikiURL
              value: "https://wiki.acumos.org/display/TRAIN"
            - name: useExternalNotebook
-             value: {{ .Values.mlwb.useexternalnotebook | quote }}
+             value: "{{ .Values.mlwb.useexternalnotebook }}"
          volumeMounts:
            - mountPath: /maven/logs
              name: notebook-catalog-webcomponent-logs

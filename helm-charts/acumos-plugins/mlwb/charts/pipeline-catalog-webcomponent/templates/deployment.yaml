@@ -57,7 +57,7 @@ spec:
            - name: createTimeout
              value: "60000"
            - name: useExternalPipeline
-             value: {{ .Values.mlwb.useexternalpipeline | quote }}
+             value: "{{ .Values.mlwb.useexternalpipeline }}"
          volumeMounts:
            - mountPath: /maven/logs
              name: pipeline-catalog-webcomponent-logs

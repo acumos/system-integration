@@ -75,9 +75,9 @@ spec:
            - name: createTimeout
              value: "60000"
            - name: useExternalNotebook
-             value: {{ .Values.mlwb.useexternalnotebook | quote }}
+             value: "{{ .Values.mlwb.useexternalnotebook }}"
            - name: useExternalPipeline
-             value: {{ .Values.mlwb.useexternalpipeline | quote }}
+             value: "{{ .Values.mlwb.useexternalpipeline }}"
          volumeMounts:
            - mountPath: /maven/logs
              name: project-catalog-webcomponent-logs

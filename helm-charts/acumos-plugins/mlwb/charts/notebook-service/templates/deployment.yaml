@@ -45,10 +45,10 @@ spec:
            - name: SPRING_APPLICATION_JSON
              value: '{
                 "server":{
-                    "port":{{ .Values.mlwb.acumosNotebookServicePort }}
+                    "port":"{{ .Values.mlwb.acumosNotebookServicePort }}"
                 },
                 "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
-                "resultsetSize" : 2000,
+                "resultsetSize" : "2000",
                 "outputFolder": "/tmp",
                 "cmndatasvc": {
                     "endpointurl": "http://{{ .Values.global.cds.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
@@ -59,18 +59,18 @@ spec:
                     "url" : "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosProjectServicePort }}/mlWorkbench/v1/project"
                 },
                 "jupyterhub": {
-                    "url" : {{ .Values.mlwb.acumosJupyterHub.url }},
-                    "token" : {{ .Values.mlwb.acumosJupyterHub.url }},
-                    "storepass": {{ .Values.mlwb.acumosJupyterHub.storepass }},
-                    "installcert": {{ .Values.mlwb.acumosJupyterHub.installcert }}
+                    "url" : "{{ .Values.mlwb.acumosJupyterHub.url }}",
+                    "token" : "{{ .Values.mlwb.acumosJupyterHub.url }}",
+                    "storepass": "{{ .Values.mlwb.acumosJupyterHub.storepass }}",
+                    "installcert": "{{ .Values.mlwb.acumosJupyterHub.installcert }}"
                 },
                 "jupyternotebook":{
-                    "url": {{ .Values.mlwb.acumosJupyterNotebook.url }}
+                    "url": "{{ .Values.mlwb.acumosJupyterNotebook.url }}"
                 },
                 "jwt": {
                     "secretkey":"secret"
                 },
-                "useexternalnotebook": {{ .Values.mlwb.useexternalnotebook | quote }}
+                "useexternalnotebook": "{{ .Values.mlwb.useexternalnotebook }}"
                 }'
          volumeMounts:
            - mountPath: /maven/logs

@@ -45,7 +45,7 @@ spec:
            - name: SPRING_APPLICATION_JSON
              value: '{
                 "server":{
-                    "port":{{ .Values.mlwb.acumosPipelineServicePort }}
+                    "port":"{{ .Values.mlwb.acumosPipelineServicePort }}"
                 },
                 "resultsetSize":"2000",
                 "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
@@ -61,14 +61,14 @@ spec:
                     "secretkey":"secret"
                 },
                 "nifi": {
-                    "createpod": {{ .Values.mlwb.acumosNifi.createpod | quote }},
-                    "adminusername": {{ .Values.mlwb.acumosNifi.adminuser | quote }},
-                    "serviceurl": {{ .Values.mlwb.acumosNifi.serviceurl | quote }},
-                    "registryurl": {{ .Values.mlwb.acumosNifi.registryurl | quote }},
-                    "registryname": {{ .Values.mlwb.acumosNifi.registryname | quote }},
-                    "namespace": {{ .Values.mlwb.acumosNifi.namespace | quote }}
+                    "createpod": "{{ .Values.mlwb.acumosNifi.createpod }}",
+                    "adminusername": "{{ .Values.mlwb.acumosNifi.adminuser }}",
+                    "serviceurl": "{{ .Values.mlwb.acumosNifi.serviceurl }}",
+                    "registryurl": "{{ .Values.mlwb.acumosNifi.registryurl }}",
+                    "registryname": "{{ .Values.mlwb.acumosNifi.registryname }}",
+                    "namespace": "{{ .Values.mlwb.acumosNifi.namespace }}"
                 },
-                "useexternalpipeline": {{ .Values.mlwb.useexternalpipeline | quote }}
+                "useexternalpipeline": "{{ .Values.mlwb.useexternalpipeline }}"
                 }'
          volumeMounts:
            - mountPath: /maven/logs

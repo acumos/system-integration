@@ -274,21 +274,3 @@ global:
     acumosSecurityVerificationPort: "9099"
     acumosSVscan: "false"
 
-    # MLWB Images (moved to mlwb_value.yaml)
-    # TODO: remove from this file once MLWB charts are verified
-    acumosDashboardWebcomponentImage: "dashboard-webcomponent:2.0.9"
-    acumosDashboardWebcomponentPort: "9083"
-    acumosHomeWebcomponentImage: "home-webcomponent:2.0.9"
-    acumosHomeWebcomponentPort: "9082"
-    acumosNotebookCatalogWebcomponentImage: "notebook-catalog-webcomponent:2.0.9"
-    acumosNotebookCatalogWebcomponentPort: "9087"
-    acumosNotebookWebcomponentImage: "notebook-webcomponent:2.0.9"
-    acumosNotebookWebcomponentPort: "9086"
-    acumosPipelineCatalogWebcomponentImage: "pipeline-catalog-webcomponent:2.0.9"
-    acumosPipelineCatalogWebcomponentPort: "9092"
-    acumosPipelineWebcomponentImage: "pipeline-webcomponent:2.0.9"
-    acumosPipelineWebcomponentPort: "9091"
-    acumosProjectCatalogWebcomponentImage: "project-catalog-webcomponent:2.0.9"
-    acumosProjectCatalogWebcomponentPort: "9085"
-    acumosProjectWebcomponentImage: "project-webcomponent:2.0.9"
-    acumosProjectWebcomponentPort: "9084"

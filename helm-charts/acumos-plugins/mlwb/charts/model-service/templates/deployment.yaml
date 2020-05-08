@@ -45,7 +45,7 @@ spec:
            - name: SPRING_APPLICATION_JSON
              value: '{
                 "server":{
-                    "port":{{ .Values.mlwb.acumosModelServicePort }}
+                    "port":"{{ .Values.mlwb.acumosModelServicePort }}"
                 },
                 "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
                 "resultsetSize":"2000",
@@ -58,15 +58,15 @@ spec:
                     "url" : "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosProjectServicePort }}/mlWorkbench/v1/project"
                 },
                 "couchdb":{
-                    "user":{{ .Values.mlwb.acumosCouchDB.user  | quote }},
-                    "pwd":{{ .Values.mlwb.acumosCouchDB.pwd  | quote }},
-                    "name":{{ .Values.mlwb.acumosCouchDB.dbname  | quote }},
+                    "user":"{{ .Values.mlwb.acumosCouchDB.user }}",
+                    "pwd":"{{ .Values.mlwb.acumosCouchDB.pwd }}",
+                    "name":"{{ .Values.mlwb.acumosCouchDB.dbname }}",
                     "createdb":{
-                        "if-not-exist":{{ .Values.mlwb.acumosCouchDB.createdb  | quote }}
+                        "if-not-exist":"{{ .Values.mlwb.acumosCouchDB.createdb }}"
                     },
-                    "protocol":{{ .Values.mlwb.acumosCouchDB.protocol }},
-                    "host":{{ .Values.mlwb.acumosCouchDB.host }},
-                    "port":{{ .Values.mlwb.acumosCouchDB.port }}
+                    "protocol":"{{ .Values.mlwb.acumosCouchDB.protocol }}",
+                    "host":"{{ .Values.mlwb.acumosCouchDB.host }}",
+                    "port":"{{ .Values.mlwb.acumosCouchDB.port }}"
                 },
                 "jwt" : {
                     "secretkey":"secret"

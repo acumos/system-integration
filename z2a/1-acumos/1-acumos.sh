@@ -30,7 +30,6 @@
 #
 
 # Anchor Z2A_BASE
-
 HERE=$(realpath $(dirname $0))
 Z2A_BASE=$(realpath $HERE/..)
 # Source the z2a utils file
@@ -52,13 +51,13 @@ NAMESPACE=$Z2A_K8S_NAMESPACE
 # Test to ensure that the namespace we are installing into is clean
 # check_for_clean_namespace
 
-echo "Starting Phase 2 installation ...."
+echo "Starting Phase 1-acumos installation ...."
 echo "Creating k8s namespace : name = $Z2A_K8S_NAMESPACE"
 # Create an acumos-dev1 namespace in the kind-acumos cluster
 kubectl create namespace $Z2A_K8S_NAMESPACE
 
-echo "Starting Phase 2 (Acumos non-core dependencies) installation ...."
-# Installation - Phase 2 - Acumos non-core dependencies
+echo "Starting Phase 1-acumos (Acumos non-core dependencies) installation ...."
+# Installation - Acumos non-core dependencies
 # source $Z2A_BASE/acumos-setup/setup-acumos-noncore.sh
 
 echo "Installing Acumos noncore dependencies ...."
@@ -76,7 +75,7 @@ echo "Install Acumos noncore dependency: MariaDB (Bitnami Chart) ...."
 echo "Install Acumos noncore dependency: Kong & PostgreSQL (Bitnami Charts) ...."
 (cd $Z2A_BASE/noncore-config/ ; make kong_all)
 
-# Phase 2 - the following charts are installed  directly via a helm deployment command
+# The following charts are installed  directly via a helm deployment command
 # *this is a comment* helm install -name $CHARTNAME --namespace $NAMESPACE <PATH>$CHARTNAME -f <PATH>global_value.yaml
 
 echo "Install Acumos noncore dependency: Docker ...."
@@ -97,8 +96,8 @@ helm install -name k8s-noncore-kibana --namespace $NAMESPACE $Z2A_ACUMOS_NON_COR
 
 echo "Finished installing Acumos noncore dependencies ...."
 
-echo "Starting Phase 2 (Acumos core) installation ...."
-# Installation - Phase 2 - Acumos core
+echo "Starting Phase 1-acumos (Acumos core) installation ...."
+# Installation - Acumos core
 # source $Z2A_BASE/acumos-setup/setup-acumos-core.sh
 
 echo "Installing Acumos core Helm charts ...."

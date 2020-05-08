@@ -41,19 +41,19 @@ mlwb:
     acumosValidationPort: "9603"
 
     # Images
-    acumosDashboardWebcomponentImage: "dashboard-webcomponent:2.0.9"
-    acumosHomeWebcomponentImage: "home-webcomponent:2.0.9"
+    acumosDashboardWebcomponentImage: "dashboard-webcomponent:2.0.8"
+    acumosHomeWebcomponentImage: "home-webcomponent:2.0.8"
     acumosModelServiceImage: "model-service:2.0.3"
-    acumosNotebookCatalogWebcomponentImage: "notebook-catalog-webcomponent:2.0.9"
+    acumosNotebookCatalogWebcomponentImage: "notebook-catalog-webcomponent:2.0.8"
     acumosNotebookServiceImage: "notebook-service:2.0.3"
-    acumosNotebookWebcomponentImage: "notebook-webcomponent:2.0.9"
-    acumosPipelineCatalogWebcomponentImage: "pipeline-catalog-webcomponent:2.0.9"
+    acumosNotebookWebcomponentImage: "notebook-webcomponent:2.0.8"
+    acumosPipelineCatalogWebcomponentImage: "pipeline-catalog-webcomponent:2.0.8"
     acumosPipelineServiceImage: "pipeline-service:2.0.4"
-    acumosPipelineWebcomponentImage: "pipeline-webcomponent:2.0.9"
+    acumosPipelineWebcomponentImage: "pipeline-webcomponent:2.0.8"
     acumosPredictorServiceImage: "predictor-service:1.0.3"
-    acumosProjectCatalogWebcomponentImage: "project-catalog-webcomponent:2.0.9"
+    acumosProjectCatalogWebcomponentImage: "project-catalog-webcomponent:2.0.8"
     acumosProjectServiceImage: "project-service:2.0.4"
-    acumosProjectWebcomponentImage: "project-webcomponent:2.0.9"
+    acumosProjectWebcomponentImage: "project-webcomponent:2.0.8"
 
     useexternalpipeline: "true"
     useexternalnotebook: "true"
@@ -110,6 +110,16 @@ mlwb:
         podName: "acumos-k8s-mlwb-project-webcomponent"
         svcName: "mlwb-project-webcomponent"
 
+    #CouchDB
+    acumosCouchDB:
+        createdb: "true"
+        dbname: "acumos-couchdb"
+        host: "localhost"
+        port: "5984"
+        protocol: "http"
+        pwd: "changeMePlease"
+        user: "couch-admin"
+
     # Jupyter
     acumosJupyterHub:
         installcert: "false"
@@ -127,13 +137,3 @@ mlwb:
         registryname: "nexus-name"
         registryurl: "http://some-registryurl.acumos-dev1"
         serviceurl: "http://some-serviceurl.acumos-dev1"
-
-    #CouchDB
-    acumosCouchDB:
-        createdb: "true"
-        dbname: "acumos-couchdb"
-        host: "localhost"
-        port: "5984"
-        protocol: "http"
-        pwd: "changeMePlease"
-        user: "couch-admin"

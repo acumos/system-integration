@@ -51,7 +51,7 @@ spec:
            - name: pipelineWikiURL
              value: "https://wiki.acumos.org/display/TRAIN"
            - name: useExternalPipeline
-             value: {{ .Values.mlwb.useexternalpipeline | quote }}
+             value: "{{ .Values.mlwb.useexternalpipeline }}"
          volumeMounts:
            - mountPath: /maven/logs
              name: pipeline-webcomponent-logs
