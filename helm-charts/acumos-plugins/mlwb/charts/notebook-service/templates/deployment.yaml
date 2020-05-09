@@ -38,7 +38,7 @@ spec:
    spec:
      containers:
        - name: notebook-service
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.mlwb.acumosNotebookServiceImage }}
+         image: {{ .Values.global.nexus3StagingRegistryLf }}/acumos/{{ .Values.mlwb.acumosNotebookServiceImage }}
          ports:
            - containerPort: {{ .Values.mlwb.acumosNotebookServicePort }}
          env:
@@ -59,13 +59,13 @@ spec:
                     "url" : "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosProjectServicePort }}/mlWorkbench/v1/project"
                 },
                 "jupyterhub": {
-                    "url" : {{ .Values.mlwb.acumosJupyterHub.url }},
-                    "token" : {{ .Values.mlwb.acumosJupyterHub.url }},
-                    "storepass": {{ .Values.mlwb.acumosJupyterHub.storepass }},
-                    "installcert": {{ .Values.mlwb.acumosJupyterHub.installcert }}
+                    "url" : {{ .Values.mlwb.acumosJupyterHub.url | quote }},
+                    "token" : {{ .Values.mlwb.acumosJupyterHub.url | quote }},
+                    "storepass": {{ .Values.mlwb.acumosJupyterHub.storepass | quote }},
+                    "installcert": {{ .Values.mlwb.acumosJupyterHub.installcert | quote }}
                 },
                 "jupyternotebook":{
-                    "url": {{ .Values.mlwb.acumosJupyterNotebook.url }}
+                    "url": {{ .Values.mlwb.acumosJupyterNotebook.url | quote }}
                 },
                 "jwt": {
                     "secretkey":"secret"

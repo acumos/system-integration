@@ -38,7 +38,7 @@ spec:
    spec:
      containers:
        - name: pipeline-service
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.mlwb.acumosPipelineServiceImage }}
+         image: {{ .Values.global.nexus3StagingRegistryLf }}/acumos/{{ .Values.mlwb.acumosPipelineServiceImage }}
          ports:
            - containerPort: {{ .Values.mlwb.acumosPipelineServicePort }}
          env:

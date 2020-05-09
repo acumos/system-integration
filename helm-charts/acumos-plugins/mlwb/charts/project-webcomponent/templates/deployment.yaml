@@ -38,7 +38,7 @@ spec:
    spec:
      containers:
        - name: project-webcomponent
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.mlwb.acumosProjectWebcomponentImage }}
+         image: {{ .Values.global.nexus3StagingRegistryLf }}/acumos/{{ .Values.mlwb.acumosProjectWebcomponentImage }}
          ports:
            - containerPort: {{ .Values.mlwb.acumosProjectWebcomponentPort }}
          env:

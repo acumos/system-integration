@@ -38,7 +38,7 @@ spec:
    spec:
      containers:
        - name: project-service
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.mlwb.acumosProjectServiceImage }}
+         image: {{ .Values.global.nexus3StagingRegistryLf }}/acumos/{{ .Values.mlwb.acumosProjectServiceImage }}
          ports:
            - containerPort: {{ .Values.mlwb.acumosProjectServicePort }}
          env:
@@ -54,14 +54,14 @@ spec:
                     "cmndatasvcpwd":"{{ .Values.global.acumosCdsPassword }}"
                 },
                 "couchdb":{
-                    "user":{{ .Values.mlwb.acumosCouchDB.user }},
-                    "pwd":{{ .Values.mlwb.acumosCouchDB.pwd }},
-                    "name":{{ .Values.mlwb.acumosCouchDB.dbname }},
+                    "user":{{ .Values.mlwb.acumosCouchDB.user | quote }},
+                    "pwd":{{ .Values.mlwb.acumosCouchDB.pwd | quote }},
+                    "name":{{ .Values.mlwb.acumosCouchDB.dbname | quote }},
                     "createdb":{
-                        "if-not-exist":{{ .Values.mlwb.acumosCouchDB.createdb }}
+                        "if-not-exist":{{ .Values.mlwb.acumosCouchDB.createdb | quote }}
                     },
-                    "protocol":{{ .Values.mlwb.acumosCouchDB.protocol }},
-                    "host":{{ .Values.mlwb.acumosCouchDB.host }},
+                    "protocol":{{ .Values.mlwb.acumosCouchDB.protocol | quote }},
+                    "host":{{ .Values.mlwb.acumosCouchDB.host | quote }},
                     "port":{{ .Values.mlwb.acumosCouchDB.port }}
                 },
                 "jwt" : {

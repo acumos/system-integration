@@ -38,7 +38,7 @@ spec:
    spec:
      containers:
        - name: notebook-webcomponent
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.mlwb.acumosNotebookWebcomponentImage }}
+         image: {{ .Values.global.nexus3StagingRegistryLf }}/acumos/{{ .Values.mlwb.acumosNotebookWebcomponentImage }}
          ports:
            - containerPort: {{ .Values.mlwb.acumosNotebookWebcomponentPort }}
          env:

@@ -38,7 +38,7 @@ spec:
    spec:
      containers:
        - name: pipeline-catalog-webcomponent
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.mlwb.acumosPipelineCatalogWebcomponentImage }}
+         image: {{ .Values.global.nexus3StagingRegistryLf }}/acumos/{{ .Values.mlwb.acumosPipelineCatalogWebcomponentImage }}
          ports:
            - containerPort: {{ .Values.mlwb.acumosPipelineCatalogWebcomponentPort }}
          env:

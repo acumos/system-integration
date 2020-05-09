@@ -38,7 +38,7 @@ spec:
    spec:
      containers:
        - name: dashboard-webcomponent
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.mlwb.acumosDashboardWebcomponentImage }}
+         image: {{ .Values.global.nexus3StagingRegistryLf }}/acumos/{{ .Values.mlwb.acumosDashboardWebcomponentImage }}
          ports:
            - containerPort: {{ .Values.mlwb.acumosDashboardWebcomponentPort }}
          env:
