@@ -19,20 +19,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{ .Values.global.onboarding.podName }}
+ name: {{ .Values.global.onboarding.podName | quote }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{ .Values.global.onboarding.name }}
+   app: {{ .Values.global.onboarding.name | quote }}
 spec:
  selector:
    matchLabels:
-     app: {{ .Values.global.onboarding.name }}
+     app: {{ .Values.global.onboarding.name | quote }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{ .Values.global.onboarding.name }}
+       app: {{ .Values.global.onboarding.name | quote }}
    spec:
      containers:
        - name: onboarding-app
@@ -57,8 +57,8 @@ spec:
                             "context-path": "/onboarding-app"
                                }
                       },
-                   "logging":{
-                      "level":{
+                   "logging": {
+                      "level": {
                           "root": "{{ .Values.logLevel }}"
                     }
                  },
@@ -66,13 +66,13 @@ spec:
                             "host" : "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
                             "port": "{{ .Values.global.acumosDockerPort }}",
                             "config": "/docker_host/.docker",
-                            "registry" :{"url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
-                            "username" : "{{ .Values.global.acumosNexusUsername }}",
-                            "password" : "{{ .Values.global.acumosNexusPassword }}",
+                            "registry": {"url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
+                            "username": "{{ .Values.global.acumosNexusUsername }}",
+                            "password": "{{ .Values.global.acumosNexusPassword }}",
                             "email": "{{ .Values.global.acumosDockerRegistryEmail }}"},
                             "tls": { "verify": "false" },
                             "api": { "version": "1.23" },
-                            "imagetag":{
+                            "imagetag": {
                                 "prefix": "{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}"
                                     },
                             "max_total_connections":  "1", "max_per_route_connections": "1"
@@ -86,11 +86,11 @@ spec:
                             "nexusGroupId": "com.artifact"
                            },
                  "tosca": {
-                            "OutputFolder" : "/temp/",
+                            "OutputFolder": "/temp/",
                             "GeneratorEndPointURL": "http://acumos.acumos-ns01:8080/model_create"
                           },
                  "mktPlace": {
-                              "mktPlaceEndPointURL" : "http://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalBePort }}"
+                              "mktPlaceEndPointURL": "http://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalBePort }}"
                               },
                  "microService": {
                      "microServiceEndPointURL": "http://{{ .Values.global.microserviceGeneration.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosMicroServiceGenerationPort }}/microservice-generation"
@@ -100,8 +100,8 @@ spec:
                                   "trustedHost": ""
                                  },
                   "security" : {
-                       "verificationEnableFlag":"{{ .Values.global.acumosSVscan }}",
-                       "verificationApiUrl" : "http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosSecurityVerificationPort }}"
+                       "verificationEnableFlag": "{{ .Values.global.acumosSVscan }}",
+                       "verificationApiUrl": "http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosSecurityVerificationPort }}"
                        },
                  "authenticationServiceURL": "http://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalBePort }}",
                  "spring": {
@@ -125,7 +125,7 @@ spec:
            - name: LOGSTASH_HOST
              value: "{{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}"
            - name: LOGSTASH_PORT
-             value: {{ .Values.global.acumosLogstashPort | quote }}
+             value: "{{ .Values.global.acumosLogstashPort }}"
          volumeMounts:
            - mountPath: /filebeat-logs
              name: acumos-onboarding-logs

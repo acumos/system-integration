@@ -15,20 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END====================================================
-#
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kibana
+  name: {{ .Values.global.acumosKibanaName | quote }}
   namespace: "{{ .Values.global.namespace }}"
   labels:
-    app: kibana
+    app: {{ .Values.global.acumosKibanaName | quote }}
 spec:
   replicas: 1
   selector:
-    matchLabels: 
+    matchLabels:
       name: kibana-deployment
-      app: kibana
+      app: {{ .Values.global.acumosKibanaName | quote }}
   revisionHistoryLimit: 3
   strategy:
     type: Recreate
@@ -36,14 +36,14 @@ spec:
     metadata:
       labels:
         name: kibana-deployment
-        app: kibana
+        app: {{ .Values.global.acumosKibanaName | quote }}
       annotations:
         # releasetime: needs to be updated to function `now` for Helm 3
     spec:
       containers:
       - name: kibana
         image: "{{ .Values.global.nexus3ReleaseRegistryLf}}/{{ .Values.global.acumosKibanaImage }}"
-        imagePullPolicy: {{ .Values.global.elasticsearchImagePullPolicy }}
+        imagePullPolicy: {{ .Values.global.elasticsearchImagePullPolicy | quote }}
         ports:
         - containerPort: {{ .Values.global.acumosKibanaPort }}
         volumeMounts:

@@ -19,20 +19,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{ .Values.global.microserviceGeneration.podName }}
+ name: {{ .Values.global.microserviceGeneration.podName | quote }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{ .Values.global.microserviceGeneration.name }}
+   app: {{ .Values.global.microserviceGeneration.name | quote }}
 spec:
  selector:
    matchLabels:
-     app: {{ .Values.global.microserviceGeneration.name }}
+     app: {{ .Values.global.microserviceGeneration.name | quote }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{ .Values.global.microserviceGeneration.name }}
+       app: {{ .Values.global.microserviceGeneration.name | quote }}
    spec:
      containers:
        - name: microservice-generation
@@ -52,14 +52,14 @@ spec:
                 secretKeyRef: { name: ccdsclientsecret, key: password }
            - name: SPRING_APPLICATION_JSON
              value: '{
-                   "server":{
+                   "server": {
                      "port": "{{ .Values.global.acumosMicroServiceGenerationPort }}",
                      "servlet": {
                          "context-path": "/microservice-generation"
                                }
                    },
-                   "logging":{
-                      "level":{
+                   "logging": {
+                      "level": {
                         "root": "{{ .Values.logLevel }}"
                       }
                    },
@@ -67,7 +67,7 @@ spec:
                      "host": "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
                      "port": "{{ .Values.global.acumosDockerPort }}",
                      "config": "/docker_host/.docker",
-                     "registry" :{"url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
+                     "registry" : {"url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
                      "username" : "{{ .Values.global.acumosNexusUsername }}",
                      "password" : "{{ .Values.global.acumosNexusPassword }}",
                      "email": "{{ .Values.global.acumosDockerRegistryEmail }}"},
@@ -135,7 +135,7 @@ spec:
            - name: LOGSTASH_HOST
              value: "{{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}"
            - name: LOGSTASH_PORT
-             value: {{ .Values.global.acumosLogstashPort | quote }}
+             value: "{{ .Values.global.acumosLogstashPort }}"
          volumeMounts:
            - mountPath: /filebeat-logs
              name: acumos-microservice-generation-logs

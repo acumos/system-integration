@@ -19,21 +19,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{ .Values.global.acumosFederationName }}
+ name: {{ .Values.global.acumosFederationName | quote }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{ .Values.global.acumosFederationName }}
+   app: {{ .Values.global.acumosFederationName | quote }}
 spec:
  selector:
    matchLabels:
-     app: {{ .Values.global.acumosFederationName }}
+     app: {{ .Values.global.acumosFederationName | quote }}
      tier: frontend
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{ .Values.global.acumosFederationName }}
+       app: {{ .Values.global.acumosFederationName | quote }}
        tier: frontend
    spec:
      containers:
@@ -54,8 +54,8 @@ spec:
                 secretKeyRef: { name: ccdsclientsecret, key: password }
            - name: SPRING_APPLICATION_JSON
              value: '{
-               "logging":{
-               "level":{
+               "logging": {
+               "level": {
                   "root": "{{ .Values.logLevel }}"
                }
              },
@@ -99,7 +99,7 @@ spec:
              },
              "peer": {
                "jobchecker": {
-                 "interval": 300
+                 "interval": "300"
                }
              }
              }}'
@@ -116,7 +116,7 @@ spec:
            - name: LOGSTASH_HOST
              value: "{{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}"
            - name: LOGSTASH_PORT
-             value: {{ .Values.global.acumosLogstashPort | quote }}
+             value: "{{ .Values.global.acumosLogstashPort }}"
          volumeMounts:
            - mountPath: /filebeat-logs
              name: acumos-federation-logs

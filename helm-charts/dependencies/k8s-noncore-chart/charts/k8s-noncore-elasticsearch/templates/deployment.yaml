@@ -19,16 +19,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "{{ .Values.global.acumosElasticsearch.podName }}"
+  name: {{ .Values.global.acumosElasticsearch.podName | quote }}
   namespace: "{{ .Values.global.namespace }}"
   labels:
-    app: {{ .Values.global.acumosElasticsearch.name }}
+    app: {{ .Values.global.acumosElasticsearch.name | quote }}
 spec:
   replicas: 1
   selector:
     matchLabels:
       name: elasticsearch-deployment
-      app: {{ .Values.global.acumosElasticsearch.name }}
+      app: {{ .Values.global.acumosElasticsearch.name | quote }}
   revisionHistoryLimit: 3
   strategy:
     type: Recreate
@@ -36,7 +36,7 @@ spec:
     metadata:
       labels:
         name: elasticsearch-deployment
-        app: {{ .Values.global.acumosElasticsearch.name }}
+        app: {{ .Values.global.acumosElasticsearch.name | quote }}
       annotations:
         # releasetime:
         # releasetime: needs to be updated to function `now` for Helm 3
@@ -80,18 +80,18 @@ spec:
         env:
         - name: SPRING_APPLICATION_JSON
           value: '{
-              "server" : {
-                   "port" : "{{ .Values.global.acumosELKHostPort }}"
+              "server": {
+                   "port": "{{ .Values.global.acumosELKHostPort }}"
                },
-               "elk" : {
-                   "host" : {
+               "elk": {
+                   "host": {
                        "url": "{{ .Values.global.acumosElasticsearch.name }}.{{ .Values.global.namespace }}"
                    },
-                   "elasticssearch" : {
+                   "elasticssearch": {
                                "port": "{{ .Values.global.acumosElasticSearchPort }}"
                    },
                    "cronschedule": {
-                       "createsnapshot":{
+                       "createsnapshot": {
                            "time": "0 0 * * * *"
                        }
                    }
@@ -112,7 +112,7 @@ spec:
           - name: LOGSTASH_HOST
             value: "{{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}"
           - name: LOGSTASH_PORT
-            value: {{ .Values.global.acumosLogstashPort | quote }}
+            value: "{{ .Values.global.acumosLogstashPort }}"
         volumeMounts:
           - mountPath: /filebeat-logs
             name: elk-client-logs

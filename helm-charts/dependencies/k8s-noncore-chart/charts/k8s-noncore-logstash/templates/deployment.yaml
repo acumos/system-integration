@@ -19,16 +19,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: logstash
+  name: {{ .Values.global.acumosLogstashName | quote }}
   namespace: "{{ .Values.global.namespace }}"
   labels:
-    app: logstash
+    app: {{ .Values.global.acumosLogstashName | quote }}
 spec:
   replicas: 1
   selector:
     matchLabels:
       name: logstash-deployment
-      app: logstash
+      app: {{ .Values.global.acumosLogstashName | quote }}
   revisionHistoryLimit: 3
   strategy:
     type: Recreate
@@ -36,7 +36,7 @@ spec:
     metadata:
       labels:
         name: logstash-deployment
-        app: logstash
+        app: {{ .Values.global.acumosLogstashName | quote }}
       annotations:
         # releasetime: needs to be updated to function `now` for Helm 3
     spec:

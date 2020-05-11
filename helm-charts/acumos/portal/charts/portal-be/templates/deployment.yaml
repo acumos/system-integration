@@ -19,20 +19,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{ .Values.global.portal.portalBe.podName }}
+ name: {{ .Values.global.portal.portalBe.podName | quote }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{ .Values.global.portal.portalBe.name }}
+   app: {{ .Values.global.portal.portalBe.name | quote }}
 spec:
  selector:
    matchLabels:
-     app: {{ .Values.global.portal.portalBe.name }}
+     app: {{ .Values.global.portal.portalBe.name | quote }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{ .Values.global.portal.portalBe.name }}
+       app: {{ .Values.global.portal.portalBe.name | quote }}
    spec:
      containers:
        - name: acumos-portal-be
@@ -52,10 +52,10 @@ spec:
                 secretKeyRef: { name: ccdsclientsecret, key: password }
            - name: SPRING_APPLICATION_JSON
              value: '{ "server" : {
-                   "port" : "{{ .Values.global.acumosPortalBePort }}"
+                   "port": "{{ .Values.global.acumosPortalBePort }}"
                 },
-                "logging":{
-                    "level":{
+                "logging": {
+                    "level": {
                         "root": "{{ .Values.logLevel }}"
                     }
                  },
@@ -66,134 +66,134 @@ spec:
                         "username": "{{ .Values.global.acumosNexusUsername }}",
                         "groupid": "com.artifact"
                 },
-                "docker" : {
-                   "host" : "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
-                   "registry" : {
+                "docker": {
+                   "host": "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
+                   "registry": {
                       "url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
-                      "username" : "{{ .Values.global.acumosNexusUsername }}",
-                      "password" : "{{ .Values.global.acumosNexusPassword }}",
+                      "username": "{{ .Values.global.acumosNexusUsername }}",
+                      "password": "{{ .Values.global.acumosNexusPassword }}",
                       "email": "admin@acumos.com"
                    },
-                   "imagetag" : {
+                   "imagetag": {
                        "prefix": "{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}"
                    }
                 },
-                "qanda" : {
-                   "url" : "https://{{ .Values.global.acumosQandAUrl }}"
+                "qanda": {
+                   "url": "https://{{ .Values.global.acumosQandAUrl }}"
                 },
-                "image" : {
-                   "size" : "800KB"
+                "image": {
+                   "size": "800KB"
                 },
-                "onboarding" : {
-                   "push" : {
-                       "model" : {
+                "onboarding": {
+                   "push": {
+                       "model": {
                           "url": "http://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/models",
                           "dcae_url": "http://{{ .Values.global.namespace }}:{{ .Values.global.acumosMicroServiceGenerationPort }}/microservice-generation/v2/generateMicroservice"
                           },
-                         "advancedmodel" : {
-                                   "url" : "http://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/advancedModel"
+                         "advancedmodel": {
+                                   "url": "http://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/advancedModel"
                                }
                        },
                    "cliPushUrl": "http://{{ .Values.global.acumosOnboardingCli }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/push",
                    "cliAuthUrl": "http://{{ .Values.global.acumosOnboardingCli }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/auth",
                    "tokenmode": "apiToken"
                    },
-                "model" : {
-                   "storage" : {
-                      "folder" : {
-                         "name" : "/acumosWebOnboarding"
+                "model": {
+                   "storage": {
+                      "folder": {
+                         "name": "/acumosWebOnboarding"
                       }
                    }
                 },
-                "microservice" : {
-                   "url" : "http://{{ .Values.global.namespace }}:{{ .Values.global.acumosMicroServiceGenerationPort }}/microservice-generation/v2/generateMicroservice"
+                "microservice": {
+                   "url": "http://{{ .Values.global.namespace }}:{{ .Values.global.acumosMicroServiceGenerationPort }}/microservice-generation/v2/generateMicroservice"
                 },
-                "doc" : {
-                   "url" : "https://wiki.acumos.org"
+                "doc": {
+                   "url": "https://wiki.acumos.org"
                 },
-                "document" : {
-                   "size" : 10000000
+                "document": {
+                   "size": "10000000"
                 },
-                "jupyter" : {
-                   "url" : "https://acumos.{{ .Values.global.namespace }}:8086"
+                "jupyter": {
+                   "url": "https://acumos.{{ .Values.global.namespace }}:8086"
                 },
-                "elk" : {
-                   "url" : "http://{{ .Values.global.acumosElasticsearch.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosELKHostPort }}/elkclient"
+                "elk": {
+                   "url": "http://{{ .Values.global.acumosElasticsearch.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosELKHostPort }}/elkclient"
                 },
-                "kubernetes" : {
-                   "doc" : {
-                      "url" : "http://docs.acumos.org/"
+                "kubernetes": {
+                   "doc": {
+                      "url": "http://docs.acumos.org/"
                    }
                 },
-                "portal" : {
-                   "mailjet" : {
-                      "api" : {
-                         "key" : "{{ .Values.global.acumosMailJetApiKey }}"
+                "portal": {
+                   "mailjet": {
+                      "api": {
+                         "key": "{{ .Values.global.acumosMailJetApiKey }}"
                       },
-                      "secret" : {
-                         "key" : "{{ .Values.global.acumosMailJetSecretKey }}"
+                      "secret": {
+                         "key": "{{ .Values.global.acumosMailJetSecretKey }}"
                       },
-                      "address" : {
-                         "from" : "{{ .Values.global.acumosMailJetId }}"
+                      "address": {
+                         "from": "{{ .Values.global.acumosMailJetId }}"
                       }
                    },
-                   "feature" : {
-                      "publishSelfRequestEnabled" : "true",
-                      "enablePublication" : "true",
-                      "email_service" : "mailjet",
-                      "cas_enabled" : "false",
+                   "feature": {
+                      "publishSelfRequestEnabled": "true",
+                      "enablePublication": "true",
+                      "email_service": "mailjet",
+                      "cas_enabled": "false",
                       "verifyAccount": "false",
                       "verifyToken": {
-                          "exp_time": 24
+                          "exp_time": "24"
                         },
-                      "ds" : {
-                          "menu" : "{\"workbenchActive\":true,\"acucomposeActive\":true,\"blocks\":[{\"active\":true,\"title\":\"AT&T Test 2\",\"description\":\"This another new test of the DS TILE THAT IS CONFIGURABLE VIA YML.\",\"url\":\"http://att.com\",\"imagePath\":\"/images/sidebar-icons/lfai-landscape-icon-color.png\"},{\"active\":true,\"title\":\"AT&T Test\",\"description\":\"This a new test of the DS TILE THAT IS CONFIGURABLE VIA YML.\",\"url\":\"http://att.com\",\"imagePath\":\"/images/sidebar-icons/AI_Ethics.png\"}]}"
+                      "ds": {
+                          "menu": "{\"workbenchActive\":true,\"acucomposeActive\":true,\"blocks\":[{\"active\":true,\"title\":\"AT&T Test 2\",\"description\":\"This another new test of the DS TILE THAT IS CONFIGURABLE VIA YML.\",\"url\":\"http://att.com\",\"imagePath\":\"/images/sidebar-icons/lfai-landscape-icon-color.png\"},{\"active\":true,\"title\":\"AT&T Test\",\"description\":\"This a new test of the DS TILE THAT IS CONFIGURABLE VIA YML.\",\"url\":\"http://att.com\",\"imagePath\":\"/images/sidebar-icons/AI_Ethics.png\"}]}"
                     },
-                      "sv" : {
-                         "enabled" : "{{ .Values.global.acumosSVscan }}",
-                         "api" : " http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosSecurityVerificationPort }}/scan"
+                      "sv": {
+                         "enabled": "{{ .Values.global.acumosSVscan }}",
+                         "api": " http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosSecurityVerificationPort }}/scan"
                       },
-                      "menu" : "[{\"name\" : \"ML Learning Path\", \"url\" : \"\", \"imagePath\" : \"/images/sidebar-icons/ML_learning_path_selected.png\" }]",
-                      "cloud_enabled" : "[{\"cloudEnabled\" : \"true\", \"cloudName\" : \"azure\", \"cloudDisplayText\" : \"Microsoft Azure\", \"imageUrl\": \"/images/deploy-cloud/microsoft_azure.png\" },{ \"cloudEnabled\" : \"false\", \"cloudName\" : \"rackspace\", \"cloudDisplayText\" : \"Rackspace\", \"imageUrl\": \"/images/deploy-cloud/rackspace.png\" },{ \"cloudEnabled\" : \"false\",  \"cloudName\" : \"gcp\", \"cloudDisplayText\" : \"Google Cloud Platform\", \"imageUrl\": \"/images/deploy-cloud/google_cloud_platform.png\" },{ \"cloudEnabled\" : \"true\",  \"cloudName\" : \"deploylocal\", \"cloudDisplayText\" : \"Deploy To Local\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_local.png\" },{ \"cloudEnabled\" : \"false\",  \"cloudName\" : \"whitebox\", \"cloudDisplayText\" : \"Deploy To White Box\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_whitebox.png\" }]"
+                      "menu": "[{\"name\" : \"ML Learning Path\", \"url\" : \"\", \"imagePath\" : \"/images/sidebar-icons/ML_learning_path_selected.png\" }]",
+                      "cloud_enabled": "[{\"cloudEnabled\" : \"true\", \"cloudName\" : \"azure\", \"cloudDisplayText\" : \"Microsoft Azure\", \"imageUrl\": \"/images/deploy-cloud/microsoft_azure.png\" },{ \"cloudEnabled\" : \"false\", \"cloudName\" : \"rackspace\", \"cloudDisplayText\" : \"Rackspace\", \"imageUrl\": \"/images/deploy-cloud/rackspace.png\" },{ \"cloudEnabled\" : \"false\",  \"cloudName\" : \"gcp\", \"cloudDisplayText\" : \"Google Cloud Platform\", \"imageUrl\": \"/images/deploy-cloud/google_cloud_platform.png\" },{ \"cloudEnabled\" : \"true\",  \"cloudName\" : \"deploylocal\", \"cloudDisplayText\" : \"Deploy To Local\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_local.png\" },{ \"cloudEnabled\" : \"false\",  \"cloudName\" : \"whitebox\", \"cloudDisplayText\" : \"Deploy To White Box\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_whitebox.png\" }]"
                    },
-                   "ui" : {
-                      "server" : {
-                           "address" : "https://{{ .Values.global.acumosHostname }}"
+                   "ui": {
+                      "server": {
+                           "address": "https://{{ .Values.global.acumosHostname }}"
                       }
                    },
-                   "dashboard":{
-                       "url" : "http://{{ .Values.global.acumosELKHost }}:{{ .Values.global.acumosKibanaPort }}"
+                   "dashboard": {
+                       "url": "http://{{ .Values.global.acumosELKHost }}:{{ .Values.global.acumosKibanaPort }}"
                    }
                   },
-                "client" : {
-                   "ssl" : {
-                      "key-store" : "/app/certs/acumos-k8s.pkcs12",
-                      "key-store-password" : "{{ .Values.global.acumosKeyStorePwd }}",
-                      "key-store-type" : "PKCS12",
-                      "key-password" : "{{ .Values.global.acumosKeyStorePwd }}",
-                      "trust-store" : "/app/certs/acumosTrustStore.jks",
-                      "trust-store-password" : "{{ .Values.global.acumosTrustStorePwd }}"
+                "client": {
+                   "ssl": {
+                      "key-store": "/app/certs/acumos-k8s.pkcs12",
+                      "key-store-password": "{{ .Values.global.acumosKeyStorePwd }}",
+                      "key-store-type": "PKCS12",
+                      "key-password": "{{ .Values.global.acumosKeyStorePwd }}",
+                      "trust-store": "/app/certs/acumosTrustStore.jks",
+                      "trust-store-password": "{{ .Values.global.acumosTrustStorePwd }}"
                    }
                  },
-                 "gateway" : {
-                    "url" : "https://acumos.acumos-ns01:{{ .Values.global.acumosFederationLocalPort }}"
+                 "gateway": {
+                    "url": "https://acumos.acumos-ns01:{{ .Values.global.acumosFederationLocalPort }}"
                  },
-                 "dcae" : {
-                    "model" : {
-                       "name" : {
-                          "prefix" : "ONAP"
+                 "dcae": {
+                    "model": {
+                       "name": {
+                          "prefix": "ONAP"
                        }
                     }
                 },
-                "jwt" : {
-                   "auth" : {
-                      "timeout" : "80000000"
+                "jwt": {
+                   "auth": {
+                      "timeout": "80000000"
                    }
                 },
-                 "cas"  : {
-                    "service" : {
-                       "validate" : {
-                            "url"  : "https://identity.linuxfoundation.org/cas/serviceValidate"
+                 "cas": {
+                    "service": {
+                       "validate": {
+                            "url": "https://identity.linuxfoundation.org/cas/serviceValidate"
                       }
                     }
                 } }'
@@ -212,7 +212,7 @@ spec:
            - name: LOGSTASH_HOST
              value: "{{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}"
            - name: LOGSTASH_PORT
-             value: {{ .Values.global.acumosLogstashPort | quote }}
+             value: "{{ .Values.global.acumosLogstashPort }}"
          volumeMounts:
            - mountPath: /filebeat-logs
              name: portal-be-logs

@@ -19,20 +19,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{ .Values.global.portal.portalFe.podName }}
+ name: {{ .Values.global.portal.portalFe.podName | quote }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{ .Values.global.portal.portalFe.name }}
+   app: {{ .Values.global.portal.portalFe.name | quote }}
 spec:
  selector:
    matchLabels:
-     app: {{ .Values.global.portal.portalFe.name }}
+     app: {{ .Values.global.portal.portalFe.name | quote }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{ .Values.global.portal.portalFe.name }}
+       app: {{ .Values.global.portal.portalFe.name | quote }}
    spec:
      containers:
        - name: acumos
@@ -44,37 +44,37 @@ spec:
             name: acumos
          env:
            - name: SPRING_APPLICATION_JSON
-             value: '{ "server" : {
+             value: '{ "server": {
                     "port" : "{{ .Values.global.acumosPortalFePort }}"
                 },
-                 "logging":{
-                    "level":{
+                 "logging": {
+                    "level": {
                         "root": "{{ .Values.logLevel }}"
                     }
                  },
-               "qanda" : {
-                        "url" : "https://stackoverflow.com/questions/tagged/acumos"
+               "qanda": {
+                        "url": "https://stackoverflow.com/questions/tagged/acumos"
                     },
-               "zuul" : {
-                   "routes" : {
-                      "api" : {
+               "zuul": {
+                   "routes": {
+                      "api": {
                         "url": "http://{{ .Values.global.portal.portalBe.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalBePort }}"
                       },
                       "dsce": {
                         "url": "http://{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalDsCompositionPort }}"
                       },
-                      "cmnt" : {
-                         "url" : "http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosPlatOnPort }}"
+                      "cmnt": {
+                         "url": "http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosPlatOnPort }}"
                       },
-                      "workbench" : {
-                         "path" : "/workbench/**",
-                         "url" : "http://acumos.{{ .Values.global.namespace }}:9087",
-                         "sensitiveHeaders" : ""
+                      "workbench": {
+                         "path": "/workbench/**",
+                         "url": "http://acumos.{{ .Values.global.namespace }}:9087",
+                         "sensitiveHeaders": ""
                       },
-                      "azure" : {
-                          "url" : "http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosAzureClientPort }}"
+                      "azure": {
+                          "url": "http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosAzureClientPort }}"
                       },
-                      "openstack" : {
+                      "openstack": {
                           "path": "/openstack/**",
                           "url": "http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosOpenStackClientPort }}",
                           "stripPrefix": "false",
@@ -87,16 +87,16 @@ spec:
                           "sensitiveHeaders": ""
                         }
                    },
-                   "host" : {
-                      "connect-timeout-millis" : 300000,
-                      "socket-timeout-millis" : 300000
+                   "host": {
+                      "connect-timeout-millis": "300000",
+                      "socket-timeout-millis": "300000"
                    }
                },
-               "spring" : {
-                  "http" : {
-                     "multipart" : {
-                        "max-file-size": -1,
-                        "max-request-size": -1
+               "spring": {
+                  "http": {
+                     "multipart": {
+                        "max-file-size": "-1",
+                        "max-request-size": "-1"
                      }
                   }
                }
@@ -112,7 +112,7 @@ spec:
            - name: LOGSTASH_HOST
              value: "{{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}"
            - name: LOGSTASH_PORT
-             value: {{ .Values.global.acumosLogstashPort | quote }}
+             value: "{{ .Values.global.acumosLogstashPort }}"
          volumeMounts:
            - mountPath: /filebeat-logs
              name: portal-fe-logs

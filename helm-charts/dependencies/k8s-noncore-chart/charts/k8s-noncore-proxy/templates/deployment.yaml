@@ -15,22 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "{{ .Values.global.acumosProxy }}"
+  name: {{ .Values.global.acumosProxy | quote }}
   namespace: "{{ .Values.global.namespace }}"
   labels:
-    app: "{{ .Values.global.acumosProxy }}"
+    app: {{ .Values.global.acumosProxy | quote }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: "{{ .Values.global.acumosProxy }}"
+      app: {{ .Values.global.acumosProxy | quote }}
   template:
     metadata:
       labels:
-        app: "{{ .Values.global.acumosProxy }}"
+        app: {{ .Values.global.acumosProxy | quote }}
     spec:
       containers:
         - image: sameersbn/squid:3.3.8-23
@@ -57,7 +58,7 @@ spec:
             initialDelaySeconds: 40
             timeoutSeconds: 4
           resources:
-            requests: 
+            requests:
               memory: "2048Mi"
               cpu: "0.5"
             limits:

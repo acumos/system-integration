@@ -19,20 +19,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{ .Values.global.cds.podName }}
+ name: {{ .Values.global.cds.podName | quote }}
  namespace: "{{ .Values.global.namespace }}"
  labels:
-   app: {{ .Values.global.cds.name }}
+   app: {{ .Values.global.cds.name | quote }}
 spec:
  selector:
    matchLabels:
-     app: {{ .Values.global.cds.name }}
+     app: {{ .Values.global.cds.name | quote }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{ .Values.global.cds.name }}
+       app: {{ .Values.global.cds.name | quote }}
    spec:
      containers:
        - name:  cds
@@ -53,28 +53,28 @@ spec:
                   name: ccdsclientsecret
                   key: password
            - name: SPRING_APPLICATION_JSON
-             value: '{ "server" : {
-                 "port" : "{{ .Values.global.acumosCommonDataSvcPort }}" },
-                 "logging":{
-                    "level":{
+             value: '{ "server": {
+                 "port": "{{ .Values.global.acumosCommonDataSvcPort }}" },
+                 "logging": {
+                    "level": {
                         "root": "{{ .Values.logLevel }}"
                     }
                  },
-                 "spring" : {
-                            "datasource" : {
-                                        "jdbc-url" : "jdbc:mariadb://{{ .Values.global.acumosCdsDbService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCdsDbPort }}/{{ .Values.global.acumosCdsDb }}?useLegacyDatetimeCode=false&useSSL=false",
-                                        "username" : "{{ .Values.global.acumosCdsDbUserName }}",
-                                        "password" : "{{ .Values.global.acumosCdsDbUserPassword }}"
+                 "spring": {
+                            "datasource": {
+                                        "jdbc-url": "jdbc:mariadb://{{ .Values.global.acumosCdsDbService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCdsDbPort }}/{{ .Values.global.acumosCdsDb }}?useLegacyDatetimeCode=false&useSSL=false",
+                                        "username": "{{ .Values.global.acumosCdsDbUserName }}",
+                                        "password": "{{ .Values.global.acumosCdsDbUserPassword }}"
                                         },
-                            "jpa" : {
-                                    "database-platform" : "org.hibernate.dialect.MariaDB102Dialect",
-                                     "hibernate" : {
-                                            "ddl-auto" : "validate"
+                            "jpa": {
+                                    "database-platform": "org.hibernate.dialect.MariaDB102Dialect",
+                                     "hibernate": {
+                                            "ddl-auto": "validate"
                                              },
-                                          "show-sql" : false
+                                          "show-sql": "false"
                                      },
-                             "security" : {
-                             "user" : {
+                             "security": {
+                             "user": {
                                       "name": "${spring_security_user_name}",
                                       "password": "${spring_security_user_password}"
                                       }
@@ -92,7 +92,7 @@ spec:
            - name: LOGSTASH_HOST
              value: "{{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}"
            - name: LOGSTASH_PORT
-             value: {{ .Values.global.acumosLogstashPort | quote }}
+             value: "{{ .Values.global.acumosLogstashPort }}"
          volumeMounts:
            - mountPath: /filebeat-logs
              name: common-data-svc-logs
