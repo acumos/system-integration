@@ -20,48 +20,29 @@
 # Makefile 	- targets for Acumos noncore dependencies
 #
 # 	target:
-#		config-helper 		- conconfig-helper (troubleshooting helper pod)
+#		config-helper 		- config-helper (troubleshooting helper pod)
 #		kong							- Kong API gateway
 # 	mariadb-cds				- MariaDB instance for Common Data Services
 # 	nexus							- Sonatype Nexus artifact repository
 #
 
-all : config-helper kong mariadb-cds nexus
-.PHONY : config-helper kong mariadb-cds nexus
+MODULES=config-helper kong mariadb-cds nexus
+all :  check-env $(MODULES)
+.PHONY : check-env $(MODULES)
+SHELL = /bin/bash
+.ONESHELL :
 
-# config-helper
-config-helper :
-	cp utils.sh.tpl config-helper/utils.sh
-config-helper_install : config-helper
-	cd config-helper && ./install-config-helper.sh
-config-helper_all : config-helper_install
+check-env:
+ifndef ACUMOS_GLOBAL_VALUE
+	$(error ACUMOS_GLOBAL_VALUE is undefined)
+endif
 
-# Kong
-kong :
-	cp utils.sh.tpl kong/utils.sh
-kong_install : kong
-	cd kong && ./install-kong.sh
-kong_config : kong
-	cd kong && ./config-kong.sh
-kong_all : kong_install kong_config
-
-# MariaDB/CDS
-mariadb-cds :
-	cp utils.sh.tpl mariadb-cds/utils.sh
-mariadb-cds_install : mariadb-cds
-	cd mariadb-cds && ./install-mariadb-cds.sh
-mariadb-cds_config : mariadb-cds
-	cd mariadb-cds && ./config-mariadb-cds.sh
-mariadb-cds_all : mariadb-cds_install mariadb-cds_config
-
-# Nexus
-nexus :
-	cp utils.sh.tpl nexus/utils.sh
-nexus_install : nexus
-	cd nexus && ./install-nexus.sh
-nexus_config : nexus
-	cd nexus && ./config-nexus.sh
-nexus_all : nexus_install nexus_config
+$(MODULES) : check-env
+	set -e
+	cp utils.sh.tpl $@/utils.sh
+	cd $@/
+	if [ -x install-$@.sh ] ; then ./install-$@.sh ; fi
+	if [ -x config-$@.sh ] ; then ./config-$@.sh ; fi
 
 clean :
 	rm  */utils.sh

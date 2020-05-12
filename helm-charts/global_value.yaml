@@ -70,9 +70,9 @@ global:
     # TODO: refactor to acumosCdsSvcPort
     acumosCommonDataSvcPort: "8000"
     cds:
-        name: 'acumos-common-data-svc'
-        podName: 'acumos-k8s-cds'
-        svcName: 'acumos-cds'
+        name: "acumos-common-data-svc"
+        podName: "acumos-k8s-cds"
+        svcName: "acumos-cds"
 
     # Data Broker
     acumosDataBrokerImage: "databroker-zipbroker:1.0.0"
@@ -97,15 +97,15 @@ global:
     acumosDesignStudioImage: "acumos/ds-compositionengine:3.0.3"
     acumosPortalDsCompositionPort: "8088"
     dsComposition:
-        name: 'acumos-ds-composition'
-        podName: 'acumos-k8s-ds-composition'
-        svcName: 'ds-composition'
+        name: "acumos-ds-composition"
+        podName: "acumos-k8s-ds-composition"
+        svcName: "ds-composition"
 
     # ELK
     acumosElasticsearch:
-        name: 'elasticsearch'
-        podName: 'elasticsearch'
-        svcName: 'elasticsearch'
+        name: "elasticsearch"
+        podName: "elasticsearch"
+        svcName: "elasticsearch"
     acumosElasticsearchImage: "acumos/acumos-elasticsearch:3.0.7"
     acumosElasticsearchName: "elasticsearch"
     acumosElasticSearchPort: "9200"
@@ -168,9 +168,9 @@ global:
     acumosMicroServiceGenerationImage: "acumos/microservice-generation:3.8.1"
     acumosMicroServiceGenerationPort: "8333"
     microserviceGeneration:
-        name: 'acumos-microservice-generation'
-        podName: 'acumos-k8s-microservice-generation'
-        svcName: 'microservice-generation'
+        name: "acumos-microservice-generation"
+        podName: "acumos-k8s-microservice-generation"
+        svcName: "microservice-generation"
 
     # Misc. Images
     # TODO: find a better home for these
@@ -188,7 +188,6 @@ global:
     # TODO: find a better home for these
     acumosHostname: "xxxxxx"
     acumosKeyStorePwd: "xxxxxx"
-    acumosProxy: "acumos-proxy"
     acumosQandAUrl: "xxxxxx"
     acumosTrustStorePwd: "xxxxxx"
 
@@ -197,7 +196,6 @@ global:
     acumosDeployedSolutionPort: "3330"
     acumosPlatOnPort: "9083"
     acumosProbePort: "5006"
-    acumosProxyPort: "3128"
 
     # Nexus Admin
     acumosNexusAdmin: "admin"
@@ -224,9 +222,9 @@ global:
     acumosOnboardingBaseRImage: "onboarding-base-r:1.0.0"
     acumosOnboardingImage: "acumos/onboarding-app:3.8.1"
     onboarding:
-        name: 'acumos-onboarding'
-        podName: 'acumos-k8s-onboarding'
-        svcName: 'onboarding-app'
+        name: "acumos-onboarding"
+        podName: "acumos-k8s-onboarding"
+        svcName: "onboarding-app"
 
     # OpenStack client
     acumosOpenStackClientPort: "8007"
@@ -248,13 +246,17 @@ global:
     acumosPortalFePort: "8085"
     portal:
         portalFe:
-            name: 'acumos-portal-front-end'
-            podName: 'acumos-k8s-portal-fe'
-            svcName: 'acumos-portal-fe'
+            name: "acumos-portal-front-end"
+            podName: "acumos-k8s-portal-fe"
+            svcName: "acumos-portal-fe"
         portalBe:
-            name: 'acumos-portal-back-end'
-            podName: 'acumos-k8s-portal-be'
-            svcName: 'acumos-portal-be'
+            name: "acumos-portal-back-end"
+            podName: "acumos-k8s-portal-be"
+            svcName: "acumos-portal-be"
+
+    # Proxy
+    acumosProxy: "acumos-proxy"
+    acumosProxyPort: "3128"
 
     # PVC
     acumosCdsDbPvcStorage: "1Gi"
@@ -266,14 +268,3 @@ global:
     acumosSecurityVerificationImage: "security-verification:0.0.24"
     acumosSecurityVerificationPort: "9099"
     acumosSVscan: "false"
-
-    # MLWB Images (moved to mlwb_value.yaml)
-    # TODO: remove from this file once MLWB charts are verified
-    acumosDashboardWebcomponentImage: "dashboard-webcomponent:2.0.9"
-    acumosHomeWebcomponentImage: "home-webcomponent:2.0.9"
-    acumosNotebookCatalogWebcomponentImage: "notebook-catalog-webcomponent:2.0.9"
-    acumosNotebookWebcomponentImage: "notebook-webcomponent:2.0.9"
-    acumosPipelineCatalogWebcomponentImage: "pipeline-catalog-webcomponent:2.0.9"
-    acumosPipelineWebcomponentImage: "pipeline-webcomponent:2.0.9"
-    acumosProjectCatalogWebcomponentImage: "project-catalog-webcomponent:2.0.9"
-    acumosProjectWebcomponentImage: "project-webcomponent:2.0.9"

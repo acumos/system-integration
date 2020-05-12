@@ -22,27 +22,31 @@
 # Name: z2a_value.tpl - mapping for ports externally exposed from KinD cluster
 #
 # Ports:
-#       -  443    - HTTPs - Kong SSL Port
-#       - 5601    - HTTP  - Kibana Service Port
-#       - 8081    - HTTPs - Sonatype Nexus Web Interface Port
-#       - 8443    - HTTPs - unused at this time
-#       - 9090    - HTTP  - default Kubernetes Dashboard#
+# -  443    - HTTPs - Kong SSL Port
+# - 5601    - HTTP  - Kibana Service Port
+# - 8081    - HTTPs - Sonatype Nexus Web Interface Port
+# - 8085    - HTTP  - Acumos Portal Frontend
+# - 8443    - HTTPs - unused at this time
+# - 9090    - HTTP  - default Kubernetes Dashboard
+#
 
 z2a:
   ports:
-    kibanaDst: "****"
-    kibanaSrc: "5601"
-    kibanaSvc: "****"
-    kongDst: "****"
-    kongSrc: "443"
-    kongSvc: "***"
-    nexusDst: "****"
-    nexusSrc: "8001"
-    nexusSvc: "****"
-    nexusAdminDst: "****"
-    nexusAdminSrc: "8081"
-    nexusAdminSvc: "****"
-    k8sDashDst: "*****"
+    k8sDashDst: "xxxx"
     k8sDashSrc: "9090"
-    k8sDashSvc: "****"
-
+    k8sDashSvc: "xxxx"
+    kibanaDst: "xxxx"
+    kibanaSrc: "5601"
+    kibanaSvc: "xxxx"
+    kongDst: "xxxx"
+    kongSrc: "443"
+    kongSvc: "xxxx"
+    nexusAdminDst: "xxxx"
+    nexusAdminSrc: "8081"
+    nexusAdminSvc: "xxxx"
+    nexusDst: "xxxx"
+    nexusSrc: "8001"
+    nexusSvc: "xxxx"
+    portalFeDst: "xxxx"
+    portalFeSrc: "8085"
+    portalFeSvc: "xxxx"

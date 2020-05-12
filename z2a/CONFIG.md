@@ -6,35 +6,24 @@
 
 >Acumos Post-Install Configuration steps (documentation in progress) ...
 
-### MariaDB
+### MariaDB - to support the Common Data Services (CDS)
 
-MariaDB - to support the Common Data Services (CDS)
+>NOTE: This configuration activity has been integrated into the `1-acumos/1-acumos.sh` installation/configuration script.
 
->NOTE: Scripts to automate the configuration of the MariaDB instance with the CDS schema have been created.
->These scripts have been integrated into the z2a framework.
+### Sonatype Nexus - to support artifact management
 
-### Sonatype Nexus
+>NOTE: This configuration activity has been integrated into the `1-acumos/1-acumos.sh` installation/configuration script.
 
-Nexus - to support artifact management
+### Kong - API Gateway for Acumos
 
->NOTE: Scripts to automate the configuration of Nexus have been created.
->These scripts have been integrated into the z2a framework.
-
-### Kong
-
-Kong - API Gateway for Acumos
-
->NOTE: Scripts to automate the configuration of Kong have been created.
->These scripts have been integrated into the z2a framework.
+>NOTE: This configuration activity has been integrated into the `1-acumos/1-acumos.sh` installation/configuration script.
 
 ## Kubernetes (kind) Configuration Tasks
 
-> At this time, all identified Kubernetes (kind) configuration tasks that have been identified and are included as part of the 0-kind/0c-cluster.sh installation/configuration script.
+>NOTE: Kubernetes (kind) configuration tasks that have been identified are folded into the `0-kind/0c-cluster.sh` installation/configuration script.
 
 ## MLWB Configuration Tasks
 
->NOTE: TODO
+TODO: MLWB Post-Install Configuration steps in progress ...*
 
-*MLWB Post-Install Configuration steps in progress ...*
-
-Last Edited: 2020-05-07
+Last Edited: 2020-05-12

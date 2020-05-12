@@ -64,16 +64,16 @@ echo "Installing Acumos noncore dependencies ...."
 # Install (or remove) the Acumos non-core charts, one by one in this order
 
 echo "Install Acumos noncore dependency: Kubernetes config helper ...."
-(cd $Z2A_BASE/noncore-config/ ; make config-helper_all)
+(cd $Z2A_BASE/noncore-config/ ; make config-helper)
 
 echo "Install Acumos noncore dependency: Sonatype Nexus (Oteemo Chart) ...."
-(cd $Z2A_BASE/noncore-config/ ; make nexus_all)
+(cd $Z2A_BASE/noncore-config/ ; make nexus)
 
 echo "Install Acumos noncore dependency: MariaDB (Bitnami Chart) ...."
-(cd $Z2A_BASE/noncore-config/ ; make mariadb-cds_all)
+(cd $Z2A_BASE/noncore-config/ ; make mariadb-cds)
 
 echo "Install Acumos noncore dependency: Kong & PostgreSQL (Bitnami Charts) ...."
-(cd $Z2A_BASE/noncore-config/ ; make kong_all)
+(cd $Z2A_BASE/noncore-config/ ; make kong)
 
 # The following charts are installed  directly via a helm deployment command
 # *this is a comment* helm install -name $CHARTNAME --namespace $NAMESPACE <PATH>$CHARTNAME -f <PATH>global_value.yaml
@@ -127,3 +127,4 @@ echo "Finished installing Acumos core Helm charts ...."
 
 echo "Please check the status of the Kubernetes pods at this time ...."
 echo "Please ensure that all pods are in a 'Running' status before proceeding ...."
+echo "You can now access the Acumos Portal by pointing your browser to:  "http://localhost:8085" ...."

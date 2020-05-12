@@ -70,9 +70,9 @@ global:
     # TODO: refactor to acumosCdsSvcPort
     acumosCommonDataSvcPort: "8000"
     cds:
-        name: 'acumos-common-data-svc'
-        podName: 'acumos-k8s-cds'
-        svcName: 'acumos-cds'
+        name: "acumos-common-data-svc"
+        podName: "acumos-k8s-cds"
+        svcName: "acumos-cds"
 
     # Data Broker
     acumosDataBrokerImage: "databroker-zipbroker:1.0.0"
@@ -97,9 +97,9 @@ global:
     acumosDesignStudioImage: "acumos/ds-compositionengine:3.0.3"
     acumosPortalDsCompositionPort: "8088"
     dsComposition:
-        name: 'acumos-ds-composition'
-        podName: 'acumos-k8s-ds-composition'
-        svcName: 'ds-composition'
+        name: "acumos-ds-composition"
+        podName: "acumos-k8s-ds-composition"
+        svcName: "ds-composition"
 
     # ELK
     acumosElasticsearchImage: "acumos/acumos-elasticsearch:3.0.7"
@@ -123,9 +123,9 @@ global:
     acumosELKPersistencePVCName: "elasticsearch-data"
     acumosELKPersistenceSize: "10Gi"
     acumosElasticsearch:
-        name: 'elasticsearch'
-        podName: 'elasticsearch'
-        svcName: 'elasticsearch'
+        name: "elasticsearch"
+        podName: "elasticsearch"
+        svcName: "elasticsearch"
 
     # Federation
     acumosFederationGatewayPort: "9084"
@@ -169,9 +169,9 @@ global:
     acumosMicroServiceGenerationImage: "acumos/microservice-generation:3.8.1"
     acumosMicroServiceGenerationPort: "8333"
     microserviceGeneration:
-        name: 'acumos-microservice-generation'
-        podName: 'acumos-k8s-microservice-generation'
-        svcName: 'microservice-generation'
+        name: "acumos-microservice-generation"
+        podName: "acumos-k8s-microservice-generation"
+        svcName: "microservice-generation"
 
     # Misc. Images
     # TODO: find a better home for these
@@ -189,22 +189,14 @@ global:
     # TODO: find a better home for these
     acumosHostname: "acumosk8s-test.eastus.cloudapp.example.com"
     acumosKeyStorePwd: "acumosk8s-test"
-    acumosProxy: "acumos-proxy"
     acumosQandAUrl: "stackoverflow.com"
     acumosTrustStorePwd: "changeit"
 
     # Misc. Ports
     # TODO: find a better home for these
     acumosDeployedSolutionPort: "3330"
-    acumosModelServicePort: "9091"
-    acumosNotebookServicePort: "9089"
-    acumosPipelineServicePort: "9090"
     acumosPlatOnPort: "9083"
-    acumosPredictorServicePort: "9094"
     acumosProbePort: "5006"
-    acumosProjectServicePort: "9088"
-    acumosProxyPort: "3128"
-    acumosValidationPort: "9603"
 
     # Nexus Admin
     acumosNexusAdmin: "admin"
@@ -231,9 +223,9 @@ global:
     acumosOnboardingBaseRImage: "onboarding-base-r:1.0.0"
     acumosOnboardingImage: "acumos/onboarding-app:3.8.1"
     onboarding:
-        name: 'acumos-onboarding'
-        podName: 'acumos-k8s-onboarding'
-        svcName: 'onboarding-app'
+        name: "acumos-onboarding"
+        podName: "acumos-k8s-onboarding"
+        svcName: "onboarding-app"
 
     # OpenStack client
     acumosOpenStackClientPort: "8007"
@@ -255,13 +247,17 @@ global:
     acumosPortalFePort: "8085"
     portal:
         portalFe:
-            name: 'acumos-portal-front-end'
-            podName: 'acumos-k8s-portal-fe'
-            svcName: 'acumos-portal-fe'
+            name: "acumos-portal-front-end"
+            podName: "acumos-k8s-portal-fe"
+            svcName: "acumos-portal-fe"
         portalBe:
-            name: 'acumos-portal-back-end'
-            podName: 'acumos-k8s-portal-be'
-            svcName: 'acumos-portal-be'
+            name: "acumos-portal-back-end"
+            podName: "acumos-k8s-portal-be"
+            svcName: "acumos-portal-be"
+
+    # Proxy
+    acumosProxy: "acumos-proxy"
+    acumosProxyPort: "3128"
 
     # PVC
     acumosCdsDbPvcStorage: "1Gi"
@@ -273,4 +269,3 @@ global:
     acumosSecurityVerificationImage: "security-verification:0.0.24"
     acumosSecurityVerificationPort: "9099"
     acumosSVscan: "false"
-

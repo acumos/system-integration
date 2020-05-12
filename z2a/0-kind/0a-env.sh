@@ -79,29 +79,34 @@ KIBANA_PORT=$(yq r $GV global.acumosKibanaPort)
 KONG_PORT=$(yq r $GV global.acumosKongPort)
 NEXUS_PORT=$(yq r $GV global.acumosNexusPort)
 NEXUS_ADMIN_PORT=$(yq r $GV global.acumosNexusEndpointPort)
+PORTAL_FE_PORT=$(yq r $GV global.acumosPortalFePort)
 
 # Write z2a port value into kind cluster config
 yq w -i $ZV z2a.ports.kibanaDst $KIBANA_PORT
 yq w -i $ZV z2a.ports.kongDst $KONG_PORT
 yq w -i $ZV z2a.ports.nexusDst $NEXUS_PORT
 yq w -i $ZV z2a.ports.nexusAdminDst $NEXUS_ADMIN_PORT
+yq w -i $ZV z2a.ports.portalFeDst $PORTAL_FE_PORT
 
 # Associate local variables with Acumos global value file
 KIBANA_SVC=$(yq r $GV global.acumosKibanaService)
 KONG_SVC=$(yq r $GV global.acumosKongService)
 NEXUS_SVC=$(yq r $GV global.acumosNexusService)
 NEXUS_ADMIN_SVC=$(yq r $GV global.acumosNexusService)
+PORTAL_FE_SVC=$(yq r $GV global.portal.portalFe.svcName)
 
 # Write z2a service names into kind cluster config
 yq w -i $ZV z2a.ports.kibanaSvc $KIBANA_SVC
 yq w -i $ZV z2a.ports.kongSvc $KONG_SVC
 yq w -i $ZV z2a.ports.nexusSvc $NEXUS_SVC
 yq w -i $ZV z2a.ports.nexusAdminSvc $NEXUS_ADMIN_SVC
+yq w -i $ZV z2a.ports.portalFeSvc $PORTAL_FE_SVC
 
 KIBANA_PORT=$(yq r $ZV z2a.ports.kibanaSrc)
 KONG_PORT=$(yq r $ZV z2a.ports.kongSrc)
 NEXUS_PORT=$(yq r $ZV z2a.ports.nexusSrc)
 NEXUS_ADMIN_PORT=$(yq r $ZV z2a.ports.nexusAdminSrc)
+PORTAL_FE_PORT=$(yq r $ZV z2a.ports.portalFeSrc)
 
 # Static Values - go here
 K8S_DASHBOARD_PORT=9090
@@ -119,7 +124,7 @@ yq d -i $KC $KEY.extraPortMappings
 
 # Loop thru placeholders and build YAML block for kind config
 i=0
-for PORT in $KIBANA_PORT $NEXUS_PORT $K8S_DASHBOARD_PORT ; do
+for PORT in $KIBANA_PORT $NEXUS_PORT $K8S_DASHBOARD_PORT $PORTAL_FE_PORT ; do
   yq w -i $KC $KEY.extraPortMappings[$i].containerPort $PORT
   yq w -i $KC $KEY.extraPortMappings[$i].hostPort $PORT
   yq w -i $KC $KEY.extraPortMappings[$i].listenAddress 0.0.0.0

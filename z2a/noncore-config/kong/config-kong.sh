@@ -62,19 +62,6 @@ ACUMOS_KONG_API_HOST_SNIS=$KONG_SVC.$NAMESPACE
 ACUMOS_KONG_API_PORT=8444
 # ADMIN_URL="https://${ACUMOS_KONG_API_HOST_NAME}:${ACUMOS_KONG_API_PORT}"
 ADMIN_URL="https://localhost:${ACUMOS_KONG_API_PORT}"
-ADMIN_POD=$(kubectl get po -l app=config-helper -n $NAMESPACE -o name)
-ADMIN_EXEC="kubectl exec -i $ADMIN_POD -n $NAMESPACE -- bash"
-
-#log "Copying certificate to config-helper pod .... "
-#CMD=(
-#    echo "$(base64 -w0 $ACUMOS_CRT)" \| base64 -d \> /tmp/acumos.crt
-#)
-#echo "${CMD[*]}" | $ADMIN_EXEC
-#
-#CMD=(
-#    echo "$(base64 -w0 $ACUMOS_KEY)" \| base64 -d \> /tmp/acumos.key
-#)
-#echo "${CMD[*]}" | $ADMIN_EXEC
 
 PORT_FWD=deployment/$RELEASE
 kubectl port-forward -n $NAMESPACE $PORT_FWD $ACUMOS_KONG_API_PORT:$ACUMOS_KONG_API_PORT &
@@ -91,25 +78,12 @@ curl -k -i -X POST $ADMIN_URL/certificates \
     -F "key=@$ACUMOS_KEY" \
     -F "snis=${ACUMOS_KONG_API_HOST_SNIS}"
 )
-# echo "${CMD[*]}" | $ADMIN_EXEC
 eval ${CMD[*]}
 
 log "\n\nAdding API to admin port.\n"
 
 log "Creating Root API ...."
 NAME=root
-# Create-root-api
-#CMD=(
-#curl -k -i -X POST \
-#  --url $ADMIN_URL/apis/ \
-#  --data "https_only=true" \
-#  --data "name=root" \
-#  --data "upstream_url=https://${ACUMOS_HOST_NAME}:${ACUMOS_HOME_PAGE_PORT}" \
-#  --data "hosts=${ACUMOS_KONG_API_HOST_SNIS}" \
-#  --data "uris=/"
-#)
-# echo "${CMD[*]}" | $ADMIN_EXEC
-#eval ${CMD[*]}
 
 log "Creating Root API Services Definition ...."
 # Root API Services definition
@@ -140,7 +114,6 @@ CMD=(
 curl -k -X POST $ADMIN_URL/services/$NAME/plugins \
     --data "name=bot-detection"
 )
-# echo "${CMD[*]}" | $ADMIN_EXEC
 eval ${CMD[*]}
 
 log "Enabling Rate-Limit for Root API ...."
@@ -151,25 +124,10 @@ curl -k -X POST $ADMIN_URL/services/$NAME/plugins \
     --data "config.second=150" \
     --data "config.hour=10000"
 )
-# echo "${CMD[*]}" | $ADMIN_EXEC
 eval ${CMD[*]}
 
 log "Creating Onboarding API ...."
 NAME=onboarding-app
-# Create-onboarding-local-api
-# CMD=(
-# curl -k -i -X POST \
-#   --url $ADMIN_UR/apis/ \
-#   --data "https_only=true" \
-#   --data "name=onboarding-app" \
-#   --data "upstream_url=https://${ACUMOS_HOST_NAME}:${ACUMOS_ONBOARDING_PORT}/onboarding-app" \
-#   --data "hosts=${ACUMOS_KONG_API_HOST_SNIS}" \
-#   --data "upstream_read_timeout=28800000" \
-#   --data "upstream_send_timeout=28800000" \
-#   --data "uris=/onboarding-app"
-# )
-# echo "${CMD[*]}" | $ADMIN_EXEC
-# eval ${CMD[*]}
 
 log "Creating Onboarding API Services Definition ...."
 # Onboarding API Services definition
@@ -202,7 +160,6 @@ CMD=(
 curl -k -X POST $ADMIN_URL/services/$NAME/plugins \
     --data "name=bot-detection"
 )
-# echo "${CMD[*]}" | $ADMIN_EXEC
 eval ${CMD[*]}
 
 log "Enabling Rate-Limit for Onboarding API ...."
@@ -213,68 +170,6 @@ curl -k -X POST $ADMIN_URL/services/$NAME/plugins \
     --data "config.second=50" \
     --data "config.hour=1000"
 )
-# echo "${CMD[*]}" | $ADMIN_EXEC
-eval ${CMD[*]}
-
-# TODO: Determine status of CMS - do we add CMS back into global_value.conf - OR -
-# TODO: do we remove CMS configuration directives from here
-
-log "Creating CMS API ...."
-NAME=cms
-# Create-CMS-api
-# CMD=(
-# curl -k -i -X POST \
-# --url $ADMIN_URL/apis/ \
-#   --data "https_only=true" \
-#   --data "name=cms" \
-#   --data "upstream_url=http://${ACUMOS_HOST_NAME}:${ACUMOS_CMS_PORT}/cms" \
-#   --data "hosts=${ACUMOS_KONG_API_HOST_SNIS}" \
-#   --data "uris=/cms"
-# )
-# echo "${CMD[*]}" | $ADMIN_EXEC
-# eval ${CMD[*]}
-
-log "Creating CMS API Services Definition ...."
-# CMS API Services definition
-CMD=(
-curl -i -k -X POST \
-    --url $ADMIN_URL/services/ \
-    --data "name=$NAME" \
-    --data "url=http://${ACUMOS_HOST_NAME}:${ACUMOS_CMS_PORT}/$NAME"
-)
-eval ${CMD[*]}
-
-log "Creating CMS API Route Definition ...."
-# CMS API Route definition
-CMD=(
-curl -i -k -X POST \
-    --url $ADMIN_URL/routes/ \
-    --data "service.name=$NAME" \
-    --data "name=$NAME" \
-    --data "protocols=https" \
-    --data "hosts[]=${ACUMOS_KONG_API_HOST_SNIS}" \
-    --data "paths[]=/$NAME"
-)
-eval ${CMD[*]}
-
-log "Enabling Bot-Detect for CMS API ...."
-# Enable Bot-Detect-cms-api
-CMD=(
-curl -k -X POST $ADMIN_URL/services/$NAME/plugins \
-    --data "name=bot-detection"
-)
-# echo "${CMD[*]}" | $ADMIN_EXEC
-eval ${CMD[*]}
-
-log "Enabling Rate-Limit for CMS API ...."
-# Enable Rate-Limit-cms-app-api
-CMD=(
-curl -k -X POST $ADMIN_URL/services/$NAME/plugins \
-    --data "name=rate-limiting"  \
-    --data "config.second=100" \
-    --data "config.hour=10000"
-)
-# echo "${CMD[*]}" | $ADMIN_EXEC
 eval ${CMD[*]}
 
 pkill -f -9 $PORT_FWD

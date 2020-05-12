@@ -21,11 +21,12 @@
 # Name: service.yaml - service proxy definitions for kind
 #
 # Ports:
-#       -  443    - HTTPs - Kong SSL Port
-#       - 5601    - HTTP  - Kibana Service Port
-#       - 8081    - HTTPs - Sonatype Nexus Web Interface Port
-#       - 8443    - HTTPs - unused at this time
-#       - 9090    - HTTP  - default Kubernetes Dashboard
+# -  443    - HTTPs - Kong SSL Port
+# - 5601    - HTTP  - Kibana Service Port
+# - 8081    - HTTPs - Sonatype Nexus Web Interface Port
+# - 8085    - HTTP  - Acumos Portal FrontEnd
+# - 8443    - HTTPs - unused at this time
+# - 9090    - HTTP  - default Kubernetes Dashboard
 
 apiVersion: v1
 kind: Pod
@@ -103,6 +104,21 @@ spec:
       protocol: TCP
       containerPort: {{ .Values.z2a.ports.k8sDashSrc }}
       hostPort: {{ .Values.z2a.ports.k8sDashSrc }}
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "0.1"
+      limits:
+        memory: "512Mi"
+        cpu: "0.5"
+  - name: z2a-svcs-proxy-portalfe
+    image: k8s-svc-proxy:v1.0
+    args: [ "tcp", {{ .Values.z2a.ports.portalFeSrc | quote }}, "{{ .Values.z2a.ports.portalFeSvc }}.{{ .Values.z2a.namespace }}.svc.cluster.local", {{ .Values.z2a.ports.portalFeDst | quote }} ]
+    ports:
+    - name: tcp
+      protocol: TCP
+      containerPort: {{ .Values.z2a.ports.portalFeSrc }}
+      hostPort: {{ .Values.z2a.ports.portalFeSrc }}
     resources:
       requests:
         memory: "128Mi"

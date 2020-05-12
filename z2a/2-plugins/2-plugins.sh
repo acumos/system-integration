@@ -53,20 +53,20 @@ echo "Starting Phase 2-plugins dependency installation ...."
 
 echo "Starting MLWB dependency - CouchDB installation ...".
 # Installation - MLWB plugin dependencies
-(cd $Z2A_BASE/plugins-setup/ ; make couchdb_install)
+(cd $Z2A_BASE/plugins-setup/ ; make couchdb)
 
 echo "Starting MLWB dependency - JupyterHub installation ...."
 # Installation - MLWB plugin dependencies
-(cd $Z2A_BASE/plugins-setup/ ; make jupyterhub_install)
+(cd $Z2A_BASE/plugins-setup/ ; make jupyterhub)
 
 echo "Starting MLWB dependency - NiFi installation ...."
 # Installation - MLWB plugin dependencies
-(cd $Z2A_BASE/plugins-setup/ ; make nifi_install)
+(cd $Z2A_BASE/plugins-setup/ ; make nifi)
 
 echo "Starting Phase 2-plugins installation ...."
 # Installation - Machine Learning WorkBench (MLWB)
 echo "Installing MLWB Components ...."
-(cd $Z2A_BASE/plugins-setup/ ; make mlwb_install)
+(cd $Z2A_BASE/plugins-setup/ ; make mlwb)
 
 echo "Please check the status of the K8s pods at this time .... "
 echo "Please ensure that all pods are in a 'Running' status before proceeding ...."

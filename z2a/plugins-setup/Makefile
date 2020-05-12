@@ -26,45 +26,23 @@
 #	mlwb				- MLWB installation (top-level)
 #
 
-all: couchdb jupyterhub nifi mlwb
-.PHONY: couchdb jupyterhub nifi mlwb
+MODULES=couchdb jupyterhub nifi mlwb
+all :  check-env $(MODULES)
+.PHONY : check-env $(MODULES)
+SHELL = /bin/bash
+.ONESHELL :
 
-# Couchdb
-couchdb :
-	cp utils.sh.tpl couchdb/utils.sh
-couchdb_install : couchdb
-	cd couchdb && ./install-couchdb.sh
-# couchdb_config : couchdb
-# cd couchdb && ./config-couchdb.sh
-couchdb_all : couchdb_install
-# couchdb_all : couchdb_install couchdb_config
+check-env:
+ifndef ACUMOS_GLOBAL_VALUE
+	$(error ACUMOS_GLOBAL_VALUE is undefined)
+endif
 
-# JupyterHub
-jupyterhub :
-	cp utils.sh.tpl jupyterhub/utils.sh
-jupyterhub_install : jupyterhub
-	cd jupyterhub && ./install-jupyterhub.sh
-# jupyterhub_config : jupyterhub
-# cd jupyterhub && ./config-jupyterhub.sh
-jupyterhub_all : jupyterhub_install
-# jupyterhub_all : jupyterhub_install jupyterhub_config
-
-# Nifi
-nifi:
-	cp utils.sh.tpl nifi/utils.sh
-nifi_install : nifi
-	cd nifi && ./install-nifi.sh
-# nifi_config : nifi
-# cd nifi && ./config-nifi.sh
-nifi_all : nifi_install
-# nifi_all : nifi_install nifi_config
-
-# MLWB
-mlwb :
-	cp utils.sh.tpl mlwb/utils.sh
-mlwb_install : mlwb
-	cd mlwb && ./install-mlwb.sh
-mlwb_all : mlwb_install
+$(MODULES) : check-env
+	set -e
+	cp utils.sh.tpl $@/utils.sh
+	cd $@/
+	if [ -x install-$@.sh ] ; then ./install-$@.sh ; fi
+	if [ -x config-$@.sh ] ; then ./config-$@.sh ; fi
 
 clean :
-	rm */utils.sh
+	rm  */utils.sh
