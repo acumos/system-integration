@@ -77,7 +77,7 @@ log "Deploying k8s-svc-proxy pod cluster ...."
 # Deploy the k8s-svc-proxy pod
 # kubectl apply -f $Z2A_BASE/k8s-svc-proxy/z2a-svcs-proxy.yaml --namespace=$Z2A_K8S_NAMESPACE
 kubectl create namespace z2a-svcs-proxy
-helm install z2a-svcs-proxy --namespace=z2a-svcs-proxy $HERE/z2a-svcs-proxy/ -f $Z2A_VALUE_OVERRIDE
+helm install z2a-svcs-proxy --namespace=z2a-svcs-proxy $HERE/z2a-svcs-proxy/ -f $Z2A_ACUMOS_BASE/global_value.yaml
 
 log "Install MetalLB ...."
 # Install MetalLB load Balancer
