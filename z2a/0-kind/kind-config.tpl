@@ -30,12 +30,6 @@
 #
 # Network subnet values are default.
 #
-# Ports:
-#       -  443    - HTTPs - Kong SSL Port
-#       - 5601    - HTTP  - Kibana Service Port
-#       - 8081    - HTTPs - Sonatype Nexus Web Interface Port
-#       - 8443    - HTTPs - unused at this time
-#       - 9090    - HTTP  - default Kubernetes Dashboard
 
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
@@ -51,22 +45,6 @@ nodes:
           node-labels: "svc-proxy=true"
           authorization-mode: "AlwaysAllow"
     extraPortMappings:
-    - containerPort: 443
-      hostPort: 443
-      listenAddress: "0.0.0.0"
-      protocol: TCP
-    - containerPort: 5601
-      hostPort: 5601
-      listenAddress: "0.0.0.0"
-      protocol: TCP
-    - containerPort: 8081
-      hostPort: 8081
-      listenAddress: "0.0.0.0"
-      protocol: TCP
-    - containerPort: 9090
-      hostPort: 9090
-      listenAddress: "0.0.0.0"
-      protocol: TCP
   - role: worker
   - role: worker
 networking:

@@ -33,7 +33,10 @@ helm repo add cetic https://cetic.github.io/helm-charts
 helm repo update
 
 # k/v map to set NiFi configuration values
+# TODO: research cetic/nifi Helm chart and populate the local override values below
 cat <<EOF | tee $HERE/nifi_value.yaml
+properties:
+  webProxyHost:
 EOF
 
 echo "Installing NiFi Helm Chart ...."
