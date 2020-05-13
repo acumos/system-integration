@@ -106,7 +106,7 @@ spec:
                    }
                 },
                 "microservice": {
-                   "url": "http://{{ .Values.global.namespace }}:{{ .Values.global.acumosMicroServiceGenerationPort }}/microservice-generation/v2/generateMicroservice"
+                   "url": "http://{{ .Values.global.microserviceGeneration.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosMicroServiceGenerationPort }}/microservice-generation/v2/generateMicroservice"
                 },
                 "doc": {
                    "url": "https://wiki.acumos.org"

@@ -148,6 +148,7 @@ global:
     acumosKongPostgresPort: "5432"
     acumosKongPostgresUser: "kong"
     acumosKongProxyPort: "8000"
+    acumosKongRelease: "acumos-kong"
     acumosKongService: "acumos-kong-proxy"
     acumosKongSslPort: "8443"
 

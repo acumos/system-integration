@@ -45,7 +45,7 @@ spec:
          env:
            - name: SPRING_APPLICATION_JSON
              value: '{ "server": {
-                    "port" : "{{ .Values.global.acumosPortalFePort }}"
+                    "port": "{{ .Values.global.acumosPortalFePort }}"
                 },
                  "logging": {
                     "level": {

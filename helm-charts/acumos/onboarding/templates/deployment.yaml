@@ -51,8 +51,8 @@ spec:
              valueFrom:
                 secretKeyRef: { name: ccdsclientsecret, key: password }
            - name: SPRING_APPLICATION_JSON
-             value: '{ "server" :{
-                   "port" : "{{ .Values.global.acumosOnboardingAppPort }}",
+             value: '{ "server": {
+                   "port": "{{ .Values.global.acumosOnboardingAppPort }}",
                    "servlet": {
                             "context-path": "/onboarding-app"
                                }
@@ -63,7 +63,7 @@ spec:
                     }
                  },
                  "docker" : {
-                            "host" : "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
+                            "host": "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
                             "port": "{{ .Values.global.acumosDockerPort }}",
                             "config": "/docker_host/.docker",
                             "registry": {"url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
@@ -99,7 +99,7 @@ spec:
                                   "extraIndexURL": "",
                                   "trustedHost": ""
                                  },
-                  "security" : {
+                  "security": {
                        "verificationEnableFlag": "{{ .Values.global.acumosSVscan }}",
                        "verificationApiUrl": "http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosSecurityVerificationPort }}"
                        },

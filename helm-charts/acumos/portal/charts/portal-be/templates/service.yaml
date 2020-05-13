@@ -19,16 +19,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.global.portal.portalBe.svcName }}
+  name: {{ .Values.global.portal.portalBe.svcName | quote }}
   namespace: "{{ .Values.namespace }}"
   labels:
-    app: {{ .Values.global.portal.portalBe.name }}
+    app: {{ .Values.global.portal.portalBe.name | quote }}
 spec:
   type: ClusterIP
   ports:
     - port: {{ .Values.global.acumosPortalBePort }}
       targetPort: {{ .Values.global.acumosPortalBePort }}
       protocol: TCP
-      name: acumos-portal-be
+      name: {{ .Values.global.portal.portalBe.svcName | quote }}
   selector:
-    app: {{ .Values.global.portal.portalBe.name }}
+    app: {{ .Values.global.portal.portalBe.name | quote }}

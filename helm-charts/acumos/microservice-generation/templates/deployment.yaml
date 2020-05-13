@@ -67,9 +67,9 @@ spec:
                      "host": "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
                      "port": "{{ .Values.global.acumosDockerPort }}",
                      "config": "/docker_host/.docker",
-                     "registry" : {"url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
-                     "username" : "{{ .Values.global.acumosNexusUsername }}",
-                     "password" : "{{ .Values.global.acumosNexusPassword }}",
+                     "registry": {"url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
+                     "username": "{{ .Values.global.acumosNexusUsername }}",
+                     "password": "{{ .Values.global.acumosNexusPassword }}",
                      "email": "{{ .Values.global.acumosDockerRegistryEmail }}"},
                      "tls": {
                        "verify": "false"
@@ -102,13 +102,13 @@ spec:
                      "extraIndexURL": "",
                      "trustedHost": ""
                    },
-                   "security" : {
-                     "verificationEnableFlag" : "{{ .Values.global.acumosSVscan }}",
-                     "verificationApiUrl" : " http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosSecurityVerificationPort }}"
+                   "security": {
+                     "verificationEnableFlag": "{{ .Values.global.acumosSVscan }}",
+                     "verificationApiUrl": " http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosSecurityVerificationPort }}"
                    },
-                   "modelrunnerVersion" : {
-                     "javaSpark" : "1.0.2",
-                     "H2O" : "2.2.3"
+                   "modelrunnerVersion": {
+                     "javaSpark": "1.0.2",
+                     "H2O": "2.2.3"
                    },
                    "base_image": {
                      "rimage": "{{ .Values.global.image.repository }}/{{ .Values.global.acumosmicroserviceGenerationBaseRImage }}",
