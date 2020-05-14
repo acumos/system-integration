@@ -127,5 +127,5 @@ echo "Finished installing Acumos core Helm charts ...."
 
 echo "Please check the status of the Kubernetes pods at this time ...."
 echo "Please ensure that all pods are in a 'Running' status before proceeding ...."
-echo "Once all pods become available, access the Acumos Portal by pointing your browser to:  "http://localhost:8085" ...."
-echo "Note: `localhost` is localhost on the VM running Acumos (not your desktop).  May require a tunnel to access! "
+echo "Once all pods become available, the Acumos Portal shortly by pointing your browser to:  http://localhost:8085 ...."
+echo "Note: 'localhost' is localhost on the VM running Acumos (not your desktop).  May require a tunnel to access! "

@@ -38,11 +38,11 @@ ifndef ACUMOS_GLOBAL_VALUE
 endif
 
 $(MODULES) : check-env
-	set -e
-	cp utils.sh.tpl $@/utils.sh
-	cd $@/
-	if [ -x install-$@.sh ] ; then ./install-$@.sh ; fi
-	if [ -x config-$@.sh ] ; then ./config-$@.sh ; fi
+	@set -e
+	@cp utils.sh.tpl $@/utils.sh
+	@cd $@/
+	@if [ -x install-$@.sh ] ; then ./install-$@.sh ; fi
+	@if [ -x config-$@.sh ] ; then ./config-$@.sh ; fi
 
 clean :
 	rm  */utils.sh

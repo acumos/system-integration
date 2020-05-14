@@ -53,9 +53,9 @@ ACUMOS_HOME_PAGE_PORT=$(gv_read global.acumosPortalFePort)
 ACUMOS_ONBOARDING_PORT=$(gv_read global.acumosOnboardingAppPort)
 
 # Kong Specific Values
-# TODO: dynamically lookup Kong service and back-populate global_value.conf
+# TODO: make Kong chart use global_value.yaml service name
 # KONG_SVC=$(svc_lookup $RELEASE $NAMESPACE)
-KONG_SVC=acumos-kong-kong-admin
+KONG_SVC=acumos-kong
 ACUMOS_KONG_API_HOST_NAME=$KONG_SVC.$NAMESPACE
 ACUMOS_KONG_API_HOST_SNIS=$KONG_SVC.$NAMESPACE
 # ACUMOS_KONG_API_PORT=$(gv_read global.acumosKongAdminPort)
@@ -91,7 +91,7 @@ CMD=(
 curl -i -k -X POST \
     --url $ADMIN_URL/services/ \
     --data "name=$NAME" \
-    --data "url=https://${ACUMOS_HOST_NAME}:${ACUMOS_HOME_PAGE_PORT}"
+    --data "url=http://${ACUMOS_HOST_NAME}:${ACUMOS_HOME_PAGE_PORT}"
 )
 eval ${CMD[*]}
 
@@ -102,7 +102,8 @@ curl -i -k -X POST \
     --url $ADMIN_URL/routes/ \
     --data "service.name=$NAME" \
     --data "name=$NAME" \
-    --data "protocols=https" \
+    --data "protocols[]=https" \
+    --data "protocols[]=http" \
     --data "hosts[]=${ACUMOS_KONG_API_HOST_SNIS}" \
     --data "paths[]=/"
 )
@@ -148,7 +149,7 @@ curl -i -k -X POST \
     --url $ADMIN_URL/routes/ \
     --data "service.name=$NAME" \
     --data "name=$NAME" \
-    --data "protocols=https" \
+    --data "protocols[]=https" \
     --data "hosts[]=${ACUMOS_KONG_API_HOST_SNIS}" \
     --data "paths[]=/$NAME"
 )
@@ -174,4 +175,4 @@ eval ${CMD[*]}
 
 pkill -f -9 $PORT_FWD
 
-log "\nAPIs added successfully.\n\n"
+log "\nKong API configuration completed successfully.\n\n"

@@ -64,7 +64,6 @@ kind create cluster --name=$Z2A_K8S_CLUSTERNAME --config $HERE/kind-config.yaml
 # Echo cluster-info - echo output to both log file and TTY
 log "\n\n$(kubectl cluster-info --context kind-$Z2A_K8S_CLUSTERNAME)\n"
 
-# source $Z2A_BASE/distro-setup/setup-k8s-helpers.sh
 log "Building k8s-svc-proxy local image ...."
 # Build local image of the k8s-svc-proxy
 (cd $HERE/k8s-svc-proxy ; docker build -t k8s-svc-proxy:v1.0 .)

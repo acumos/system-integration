@@ -42,6 +42,9 @@ hub:
   cookieSecret: "$ACUMOS_JUPYTERHUB_HUB_TOKEN"
 proxy:
   secretToken: "$ACUMOS_JUPYTERHUB_PROXY_TOKEN"
+prePuller:
+  hook:
+    enabled: false
 EOF
 
 echo "Installing JupyterHub Helm Chart ...."

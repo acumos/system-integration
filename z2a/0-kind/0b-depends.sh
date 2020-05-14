@@ -111,12 +111,12 @@ log "Installing kind (Kubernetes in Docker) ...."
 # Download and install kind (kubernetes in docker)
 # kind is NOT DESIGNED FOR PRODUCTION ENVIRONMENTS
 sudo curl -Lo /tmp/kind "https://github.com/kubernetes-sigs/kind/releases/download/v0.7.0/kind-$(uname)-amd64"
+# sudo curl -Lo /tmp/kind "https://github.com/kubernetes-sigs/kind/releases/download/v0.8.1/kind-$(uname)-amd64"
 sudo chmod +x /tmp/kind && sudo chown root:root /tmp/kind
 sudo mv /tmp/kind /usr/local/bin/kind
 
 log "Starting Phase 0b (Docker Community Edition) installation ...."
-# Installation - Phase 1a  Docker Community Edition
-# source $Z2A_BASE/distro-setup/setup-docker.sh
+# Installation - Phase 0b  Docker Community Edition
 
 log "Removing old Docker versions ...."
 # Remove old Docker versions (just in case) ; ignore if package does not exist
@@ -174,15 +174,15 @@ log "Creating the systemd docker.service directory ...."
 sudo mkdir -p /etc/systemd/system/docker.service.d
 
 # Setup Docker daemon proxy entries.
-PROXY_CONF=$Z2A_BASE/distro-setup/proxy.txt
+PROXY_CONF=$Z2A_BASE/0-kind/proxy.txt
 [[ -f $PROXY_CONF ]] && {
 	PROXY=$(<$PROXY_CONF) ;
 	log "Configuring /etc/systemd/system/docker.service.d/http-proxy.conf file ...."
 	cat <<EOF | sudo tee /etc/systemd/system/docker.service.d/http-proxy.conf
 [Service]
 Environment="HTTP_PROXY=http://$PROXY"
-Environment="HTTPS_PROXY=https://$PROXY"
-Environment="NO_PROXY=127.0.0.1,localhost,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+Environment="HTTPS_PROXY=http://$PROXY"
+Environment="NO_PROXY=127.0.0.1,localhost,.svc.cluster.local,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
 EOF
 }
 
@@ -190,7 +190,7 @@ log "Starting Docker service ...."
 # Start docker service
 sudo systemctl daemon-reload
 sudo systemctl enable docker.service
-sudo systemctl start docker.service
+sudo systemctl restart docker.service
 sudo systemctl show --property=Environment docker
 
 log "Adding USER to docker group ...."

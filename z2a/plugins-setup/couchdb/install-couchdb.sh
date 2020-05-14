@@ -24,7 +24,7 @@ HERE=$(realpath $(dirname $0))
 
 # Default values for Acumos CouchDB
 # Edit these values for custom values
-RELEASE=mlwb-db
+RELEASE=mlwbdb
 NAMESPACE=$(yq r $ACUMOS_GLOBAL_VALUE global.namespace)
 
 # Random UUID generated for CouchDB

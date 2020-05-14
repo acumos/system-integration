@@ -102,11 +102,21 @@ global:
         svcName: "ds-composition"
 
     # ELK
+    acumosElasticsearch:
+        name: "elasticsearch"
+        podName: "elasticsearch"
+        svcName: "elasticsearch"
     acumosElasticsearchImage: "acumos/acumos-elasticsearch:3.0.7"
     acumosElasticsearchName: "elasticsearch"
     acumosElasticSearchPort: "9200"
     acumosElasticsearchService: "elasticsearch-service"
     acumosElkClientImage: "acumos/elk-client:3.0.7"
+    acumosELKHost: "acumosk8s-test-elk.example.com"
+    acumosELKHostPort: "9600"
+    acumosELKImagePullPolicy: "IfNotPresent"
+    acumosELKPersistenceEnabled: "true"
+    acumosELKPersistencePVCName: "elasticsearch-data"
+    acumosELKPersistenceSize: "10Gi"
     acumosKibanaImage: "acumos/acumos-kibana:3.0.7"
     acumosKibanaName: "kibana"
     acumosKibanaPort: "5601"
@@ -116,16 +126,6 @@ global:
     acumosLogstashName: "logstash"
     acumosLogstashPort: "5044"
     acumosLogstashService: "logstash-service"
-    acumosELKHostPort: "9600"
-    acumosELKHost: "acumosk8s-test-elk.example.com"
-    acumosELKImagePullPolicy: "IfNotPresent"
-    acumosELKPersistenceEnabled: "true"
-    acumosELKPersistencePVCName: "elasticsearch-data"
-    acumosELKPersistenceSize: "10Gi"
-    acumosElasticsearch:
-        name: "elasticsearch"
-        podName: "elasticsearch"
-        svcName: "elasticsearch"
 
     # Federation
     acumosFederationGatewayPort: "9084"
@@ -149,7 +149,7 @@ global:
     acumosKongPostgresUser: "kong"
     acumosKongProxyPort: "8000"
     acumosKongRelease: "acumos-kong"
-    acumosKongService: "acumos-nexus-service"
+    acumosKongService: "acumos-kong"
     acumosKongSslPort: "8443"
 
     # Kubernetes Client
