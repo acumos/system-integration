@@ -1,6 +1,7 @@
 # Zero-to-Acumos
 
 > NOTE: This document is a work in progress - subject to change.
+>
 > NOTE: Additional wrapper scripts have been developed but require polish/testing.
 
 ## What is z2a
@@ -34,7 +35,7 @@ z2a/2-plugins/2-plugins.sh              # Acumos plugins setup (including depend
 
 Flow Two (Flow 2) creates an end-user environment and then performs the installation (and partial configuration) of Acumos noncore and core components. The second process flow is a new `z2a` process flow targeting pre-built Kubernetes cluster environments. (i.e. BYOC - Bring Your Own Cluster)
 
-Flow 1 consists of the following scripts (and descriptions):
+Flow 2 consists of the following scripts (and descriptions):
 
 ```sh
 # Step 0
@@ -51,10 +52,15 @@ z2a/2-plugins/2-plugins.sh              # Acumos plugins setup (including depend
 
 > NOTE: earlier versions of CentOS (v6) or Ubuntu (16.04) may be sufficient to run the z2a installation, but they have not been tested.
 
-* VM Sizing Recommendations
+* VM Resource Sizing Recommendations
   * four (4) vCPU (minimum)
   * 32GB of memory (minimum)
   * 30GB disk space (minimum) (40GB+ for MLWB)
+
+* VM Distribution Recommendations
+  * git (source code tool)
+    * git is not installed by default by Linux distributions
+    * git must be installed to allow for Acumos repo replication
 
 ### Miscellaneous Requirements
 
@@ -125,4 +131,4 @@ Please refer to the following documents for additional information:
 >
 > INSTALL.md  - the Acumos installation markdown document (in progress)
 
-Last Edited: 2020-05-14
+Last Edited: 2020-05-15

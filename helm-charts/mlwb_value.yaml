@@ -109,27 +109,27 @@ mlwb:
     #CouchDB
     acumosCouchDB:
         createdb: "true"
-        dbname: "******"
-        host: "******"
+        dbname: "xxxxxx"
+        host: "xxxxxx"
         port: "5984"
         protocol: "http"
-        pwd: "******"
-        user: "******"
+        pwd: "xxxxxx"
+        user: "xxxxxx"
 
     # Jupyter
     acumosJupyterHub:
         installcert: "false"
-        storepass: "******"
-        token: "******"
-        url: "******"
+        storepass: "xxxxxx"
+        token: "xxxxxx"
+        url: "xxxxxx"
     acumosJupyterNotebook:
-        url: "******"
+        url: "xxxxxx"
 
     #NIFI
     acumosNifi:
-        adminuser: "******"
+        adminuser: "xxxxxx"
         createpod: "false"
         namespace: "default"
-        registryname: "******"
-        registryurl: "******"
-        serviceurl: "******"
+        registryname: "xxxxxx"
+        registryurl: "xxxxxx"
+        serviceurl: "xxxxxx"

@@ -48,7 +48,7 @@ NAMESPACE=$(yq r $ACUMOS_GLOBAL_VALUE global.namespace)
 # Test to ensure that all Pods are running before proceeding
 kubectl wait pods --for=condition=Ready --all --namespace=$NAMESPACE --timeout=900s
 
-echo "Starting Phase 2-plugins dependency installation ...."
+echo "Starting 2-plugins dependency installation ...."
 # Installation - MLWB plugin dependencies
 
 echo "Starting MLWB dependency - CouchDB installation ...".
@@ -63,7 +63,7 @@ echo "Starting MLWB dependency - NiFi installation ...."
 # Installation - MLWB plugin dependencies
 (cd $Z2A_BASE/plugins-setup/ ; make nifi)
 
-echo "Starting Phase 2-plugins installation ...."
+echo "Starting 2-plugins installation ...."
 # Installation - Machine Learning WorkBench (MLWB)
 echo "Installing MLWB Components ...."
 (cd $Z2A_BASE/plugins-setup/ ; make mlwb)

@@ -20,6 +20,11 @@
 #
 # Name: install-skel.sh    - skeleton for a script to install a new component
 #
+# Version:
+#
+# 2020-05-15 - add explanations (and clarify a couple of items)
+# 2020-05-14 - initial version
+#
 # Notes:
 # The complete `z2a/dev1/skel` directory (including this skeleton script) should be
 # copied into either the 'z2a/noncore-config' or the 'z2a/plugins-setup' directory.
@@ -30,24 +35,29 @@
 # in the 'z2a/noncore-config' or 'z2a/plugins-setup' directory.
 #
 # TODO: take these notes and add them to a "HOWTO.md" document
+#
 
 # Anchor the base directory for the util.sh helper
 HERE=$(dirname $(readlink -f $0))
+# Makefile will copy the utils.sh.tpl template into $HERE
 source $HERE/utils.sh
+# redirect_to the install logfile $HERE
 redirect_to $HERE/install.log
 
-# Acumos Global Values Location
+# ACUMOS_GLOBAL_VALUE should be picked up from 0-kind/0a-env.sh script
+# Acumos global value file (global_value.yaml) location
 GV=$ACUMOS_GLOBAL_VALUE
 
-# Acquire NAMESPACE and RELEASE values
+# Acquire NAMESPACE and RELEASE values via the gv_read function (see utils.sh)
+# Note: this value HAS to be valid
 NAMESPACE=$(gv_read global.namespace)
-# Replace nameOfReleaseKeyValue with actual key read from global_value.yaml
+# Replace nameOfReleaseKeyValue with an actual key name added to global_value.yaml
 RELEASE=$(gv_read global.nameOfReleaseKeyValue)
 
 log "Installing NameOfChart ...."
-# K8s config-helper Pod Deployment
-helm install $RELEASE -n $NAMESPACE /LOCATION/ -f $ACUMOS_GLOBAL_VALUE
+# use Helm to deploy the chart using this command format
+helm install $RELEASE -n $NAMESPACE /LOCATION/ -f $GV -f local-override-values.yaml
 
 log "Waiting .... (up to 15 minutes) for pod ready status ...."
-# Wait for the pods to become available
+# Wait for the pods to become available - 15 minutes (900 seconds) is the default
 wait_for_pod_ready 900 $RELEASE

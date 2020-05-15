@@ -51,17 +51,16 @@ NAMESPACE=$Z2A_K8S_NAMESPACE
 # Test to ensure that the namespace we are installing into is clean
 # check_for_clean_namespace
 
-echo "Starting Phase 1-acumos installation ...."
+echo "Starting 1-acumos installation ...."
 echo "Creating k8s namespace : name = $Z2A_K8S_NAMESPACE"
-# Create an acumos-dev1 namespace in the kind-acumos cluster
+# Create an namespace in the kind-acumos cluster (default: acumos-dev1)
 kubectl create namespace $Z2A_K8S_NAMESPACE
 
-echo "Starting Phase 1-acumos (Acumos non-core dependencies) installation ...."
-# Installation - Acumos non-core dependencies
-# source $Z2A_BASE/acumos-setup/setup-acumos-noncore.sh
+echo "Starting 1-acumos (Acumos noncore dependencies) installation ...."
+# Installation - Acumos noncore dependencies
 
 echo "Installing Acumos noncore dependencies ...."
-# Install (or remove) the Acumos non-core charts, one by one in this order
+# Install the Acumos noncore charts, one by one in this order (configuration is performed by default)
 
 echo "Install Acumos noncore dependency: Kubernetes config helper ...."
 (cd $Z2A_BASE/noncore-config/ ; make config-helper)
@@ -76,7 +75,7 @@ echo "Install Acumos noncore dependency: Kong & PostgreSQL (Bitnami Charts) ....
 (cd $Z2A_BASE/noncore-config/ ; make kong)
 
 # The following charts are installed  directly via a helm deployment command
-# *this is a comment* helm install -name $CHARTNAME --namespace $NAMESPACE <PATH>$CHARTNAME -f <PATH>global_value.yaml
+# NOTE: *this is a comment* helm install -name $CHARTNAME --namespace $NAMESPACE <PATH>$CHARTNAME -f <PATH>global_value.yaml
 
 echo "Install Acumos noncore dependency: Docker ...."
 helm install -name k8s-noncore-docker --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-docker -f $Z2A_ACUMOS_BASE/global_value.yaml
@@ -84,7 +83,7 @@ helm install -name k8s-noncore-docker --namespace $NAMESPACE $Z2A_ACUMOS_NON_COR
 echo "Install Acumos noncore dependency: Proxy ...."
 helm install -name k8s-noncore-proxy --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-proxy -f $Z2A_ACUMOS_BASE/global_value.yaml
 
-# Install (or remove) the Acumos non-core charts for ELK, one by one in this order
+# Install (or remove) the Acumos noncore charts for ELK, one by one in this order
 echo "Install Acumos noncore dependency: Elasticsearch ...."
 helm install -name k8s-noncore-elasticsearch --namespace $NAMESPACE $Z2A_ACUMOS_NON_CORE/k8s-noncore-elasticsearch -f $Z2A_ACUMOS_BASE/global_value.yaml
 
@@ -96,12 +95,11 @@ helm install -name k8s-noncore-kibana --namespace $NAMESPACE $Z2A_ACUMOS_NON_COR
 
 echo "Finished installing Acumos noncore dependencies ...."
 
-echo "Starting Phase 1-acumos (Acumos core) installation ...."
+echo "Starting 1-acumos (Acumos core) installation ...."
 # Installation - Acumos core
-# source $Z2A_BASE/acumos-setup/setup-acumos-core.sh
 
 echo "Installing Acumos core Helm charts ...."
-# Install (or remove) the Acumos non-core charts, one by one in this order
+# Install (or remove) the Acumos core charts, one by one in this order
 echo "Installing Acumos prerequisite chart ...."
 helm install -name prerequisite --namespace $NAMESPACE $Z2A_ACUMOS_CORE/prerequisite/ -f $Z2A_ACUMOS_BASE/global_value.yaml
 
