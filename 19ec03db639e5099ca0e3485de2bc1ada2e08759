@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "379a86b0_42c54e84",
+        "filename": "AIO/docker-proxy/auth/nginx.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2020-05-19T13:51:58Z",
+      "side": 1,
+      "message": "remove this trailing ws change",
+      "range": {
+        "startLine": 38,
+        "startChar": 68,
+        "endLine": 38,
+        "endChar": 69
+      },
+      "revId": "19ec03db639e5099ca0e3485de2bc1ada2e08759",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "53377c7f_8297654b",
+        "filename": "AIO/docker-proxy/auth/nginx.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2020-05-19T13:51:58Z",
+      "side": 1,
+      "message": "Will this run IN ADDITION to the code starting at line 96?  I don\u0027t know the details of nginx",
+      "range": {
+        "startLine": 113,
+        "startChar": 0,
+        "endLine": 113,
+        "endChar": 3
+      },
+      "revId": "19ec03db639e5099ca0e3485de2bc1ada2e08759",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1955b00c_6d718fbb",
+        "filename": "AIO/docker-proxy/auth/nginx.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2020-05-19T13:51:58Z",
+      "side": 1,
+      "message": "restore old (correct) indentation",
+      "range": {
+        "startLine": 121,
+        "startChar": 1,
+        "endLine": 121,
+        "endChar": 2
+      },
+      "revId": "19ec03db639e5099ca0e3485de2bc1ada2e08759",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
