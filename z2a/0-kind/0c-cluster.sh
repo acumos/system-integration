@@ -89,7 +89,7 @@ kubectl apply -f $HERE/z2a-k8s-metallb/metallb.yaml --namespace=metallb-system
 
 log "Installing the Kubernetes Dashboard ...."
 # Download and install the Kubernetes Dashboard
-curl -o $HERE/z2a-k8s-dashboard/recommended.yaml https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-rc7/aio/deploy/recommended.yaml
+curl -o $HERE/z2a-k8s-dashboard/recommended.yaml https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
 egrep -v '^\s*#' $HERE/z2a-k8s-dashboard/recommended.yaml > $HERE/z2a-k8s-dashboard/main.yaml
 yq w -i -d'*' $HERE/z2a-k8s-dashboard/main.yaml '**.(.==443).' 9090
 yq w -i -d'*' $HERE/z2a-k8s-dashboard/main.yaml '**.(.==8443).' 9090

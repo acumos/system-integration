@@ -55,9 +55,9 @@ sudo mkdir -p /usr/local/bin
 sudo chown root:root /usr/local/bin
 sudo chmod 755 /usr/local/bin
 
-log "Adding EPEL repo ...."
 # Add EPEL repo to RHEL/Centos
 rhel && {
+  log "Adding EPEL repo ...."
 	rpm -qa | grep -q epel-release ||
 		sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 	sudo yum -y update
