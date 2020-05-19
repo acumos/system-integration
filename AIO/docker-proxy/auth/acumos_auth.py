@@ -140,6 +140,7 @@ def listener(environ, start_response):
 
     # Per https://docs.python.org/3/library/wsgiref.html
     log('request_uri: {0} '.format(request_uri(environ, include_query=True)))
+    log('authok_url: {0} '.format(authok_url))
     uri = environ.get('HTTP_X_ORIGINAL_URI')
     log('X-Original-URI: {0} '.format(uri))
     log('AUTHORIZATION: {0} '.format(environ.get('HTTP_AUTHORIZATION')))
@@ -172,7 +173,7 @@ def listener(environ, start_response):
                 start_response('403 Forbidden', [])
                 return []
             else:
-                start_response('302 Moved Temporarily', [('Location',authok_url)])
+                start_response('307 Temporarily Redirect', [('Location',authok_url)])
 #                body = {"token": jwtToken[username], "expires_in": 3600}
 #                return [json.dumps(body)]
                 return []
@@ -180,11 +181,11 @@ def listener(environ, start_response):
             log("Bearer token validation/refresh is a TODO!")
             if (image == 'None'):
                 log("Credentials verified, base /v2/ request allowed")
-                start_response('302 Moved Temporarily', [('Location',authok_url)])
+                start_response('307 Temporarily Redirect', [('Location',authok_url)])
                 return []
             elif (resource == 'blobs'):
                 log("Credentials verified, blob request allowed")
-                start_response('302 Moved Temporarily', [('Location',authok_url)])
+                start_response('307 Temporarily Redirect', [('Location',authok_url)])
                 return []
             elif cds_request('/solution/{0}'.format(solutionId)):
                 solution = response
@@ -197,12 +198,12 @@ def listener(environ, start_response):
                             if cds_request('/user/search?loginName={0}'.format(username)):
                                 if (revision_json.userId == username):
                                     log("User owns revision, allowed")
-                                    start_response('302 Moved Temporarily', [('Location',authok_url)])
+                                    start_response('307 Temporarily Redirect', [('Location',authok_url)])
                                     return []
                                 else:
                                     if (revision.accessTypeCode != 'PR'):
                                         log("Revision is not private, allowed")
-                                        start_response('302 Moved Temporarily', [('Location',authok_url)])
+                                        start_response('307 Temporarily Redirect', [('Location',authok_url)])
                                         return []
                                     else:
                                         log("Revision is private and not owned by user, denied")
