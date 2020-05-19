@@ -15,19 +15,19 @@ Directory containing the following scripts for `z2a`:
 
 ### 0-kind/z2a-k8s-dashboard
 
-Directory containing Kubernetes dashboard that is deployed into the kind (Kubernetes in Docker) cluster. (0-kind/0c-cluster.sh script only)
+Directory containing Kubernetes dashboard that is deployed into the `kind` (Kubernetes in Docker) cluster. (0-kind/0c-cluster.sh script only)
 
 ### 0-kind/z2a-k8s-metallb
 
-Directory containing MetalLB load-balancer that is deployed into the kind (Kubernetes in Docker) cluster. (0-kind/0c-cluster.sh script only)
+Directory containing MetalLB load-balancer that is deployed into the `kind` (Kubernetes in Docker) cluster. (0-kind/0c-cluster.sh script only)
 
 ### 0-kind/k8s-svc-proxy
 
-Directory containing Kubernetes (kind) service proxy that is deployed into the kind (Kubernetes in Docker) cluster. (0-kind/0c-cluster.sh script only)
+Directory containing Kubernetes service proxy that is deployed into the `kind` (Kubernetes in Docker) cluster. (0-kind/0c-cluster.sh script only)
 
 ### 0-kind/z2a-svcs-proxy
 
-Directory containing Kubernetes (kind) service proxy Helm chart. (0-kind/0c-cluster.sh script only)
+Directory containing z2a service proxy that is deployed into the `kind` (Kubernetes in Docker) cluster. (0-kind/0c-cluster.sh script only)
 
 ### 1-acumos
 
@@ -70,21 +70,25 @@ Directory containing scripts that install and configure Acumos noncore component
 
 ```sh
 install-config-helper    # Makefile target to install/configure config-helper
+config-helper            # Makefile target to install and configure config-helper
 ```
 
 ```sh
 install-kong             # Makefile target to install kong
 config-kong              # Makefile target to configure kong
+kong                     # Makefile target to install and configure kong
 ```
 
 ```sh
 install-mariadb-cds      # Makefile target to install mariadb-cds
 config-mariadb-cds       # Makefile target to configure mariadb-cds
+mariadb-cds              # Makefile target to install and configure mariadb-cds
 ```
 
 ```sh
 install-nexus            # Makefile target to install nexus
 config-nexus             # Makefile target to configure nexus
+nexus                    # Makefile target to install and configure nexus
 ```
 
 ### plugins-setup
@@ -92,19 +96,19 @@ config-nexus             # Makefile target to configure nexus
 Directory containing scripts that install and configure Acumos plugin components.   These scripts are used by `z2a` but can also be executed in a stand-alone manner using targets defined in the Makefile. The current Makefile targets are:
 
 ```sh
-install-couchdb          # Makefile target to install CouchDB
+couchdb                  # Makefile target to install CouchDB
 ```
 
 ```sh
-install-jupyterhub       # Makefile target to install Jupyterhub
+jupyterhub               # Makefile target to install Jupyterhub
 ```
 
 ```sh
-install-mlwb             # Makefile target to install MLWB (Machine Learning Workbench)
+mlwb                     # Makefile target to install MLWB (Machine Learning Workbench)
 ```
 
 ```sh
-install-nifi             # Makefile target to install NiFi
+nifi                     # Makefile target to install NiFi
 ```
 
 ## Files
@@ -141,4 +145,4 @@ Template file used to seed the user environment script.
 
 `z2a` shell script containing multiple utility functions that are used by `z2a`.  The `z2a` framework cannot execute correctly without the functions in this utility script.
 
-Last Edited: 2020-05-14
+Last Edited: 2020-05-19
