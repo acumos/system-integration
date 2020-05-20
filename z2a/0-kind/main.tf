@@ -18,21 +18,29 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: kind-config.tpl - kind cluster configuration template
+# Name:  main.tf - Terraform template for kind cluster
+#
+# NOTE: EXPERIMENTAL - uses 3rd party 'kind' provider
+# https://github.com/kyma-incubator/terraform-provider-kind.git
+#
+# NOTE: NOT INCORPORATED INTO z2a at this time
 #
 # Four node kind cluster config - one control-plane, three workers
-# One control plane node and three "workers".
 #
-# This kind configuration WILL NOT ADD MORE REAL COMPUTE CAPACITY and
-# have limited isolation, this can be useful for testing rolling updates
-# etc.
+# This kind configuration WILL NOT ADD MORE REAL COMPUTE CAPACITY and have limited
+# isolation, this can be useful for testing rolling updates etc.
 #
-# The API-server and other control plane components will be
-# on the control-plane node. Default values are shown.
+# The API-server and other control plane components will be on the control-plane
+# node. Default values are shown.
 #
 # Network subnet values are default.
 #
 
+provider "kind" {}
+
+resource "kind" "tfc" {
+  name = "test"
+  kind_config =<<EODOC
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
@@ -54,3 +62,5 @@ networking:
   apiServerPort: 6443
   podSubnet: "10.244.0.0/16"
   serviceSubnet: "10.96.0.0/12"
+EODOC
+}
