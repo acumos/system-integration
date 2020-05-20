@@ -33,6 +33,13 @@
 # Z2A_K8S_NAMESPACE=acumos-dev1
 #
 
+# Test for presence of 'yq' and install if necessary
+if !yq --version ; then
+  echo "Installing yq (YAML processor) to /usr/local/bin ...."
+  sudo wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/3.2.1/yq_linux_amd64
+  sudo chmod 755 /usr/local/bin/yq
+fi
+
 # Create user environment
 for v in $(set | grep ^Z2A_) ; do
 	unset ${v%=**}

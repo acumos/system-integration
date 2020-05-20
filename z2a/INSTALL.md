@@ -6,8 +6,9 @@
 
 ```sh
 # Obtain a Virtual Machine (VM) with sudo access ; Login to VM
+# Note: /usr/local/bin is a required element in your $PATH
 
-# Install 'git' distributed version-control tool
+# Install 'git' distributed version-control tool (Flow 1 and Flow 2)
 # For RPM-based distributions such as RHEL/CentOS, execute the following command:
 sudo yum install -y git
 # For Debian-based distributions such as Ubuntu, execute the following command:
@@ -30,22 +31,22 @@ vi ./0-kind/proxy.txt
 # copy the example values from z2a/dev1 to the helm-charts directory
 cp ./dev1/global_value.yaml ../helm-charts/global_value.yaml
 
-# Execute 0-kind/0a-env.sh (setup user environment)
-. ./0-kind/0a-env.sh
-# Execute 0-kind/0b-depends.sh (install / configure dependencies)
-. ./0-kind/0b-depends.sh
+# Execute 0-kind/0a-env.sh (setup user environment) (Flow 1 and Flow 2)
+./0-kind/0a-env.sh
+# Execute 0-kind/0b-depends.sh (install / configure dependencies) (Flow 1 only)
+./0-kind/0b-depends.sh
 
 # LOG OUT OF SESSION ; LOG IN TO NEW SESSION
 # ... this step is required for Docker group inclusion)
-# Execute 0-kind/0c-cluster.sh (build and configure k8s cluster)
+# Execute 0-kind/0c-cluster.sh (build and configure k8s cluster) (Flow 1 only)
 ACUMOS_HOME=$HOME/src/system-integration
 cd $ACUMOS_HOME/z2a
-. ./0-kind/0c-cluster.sh
+./0-kind/0c-cluster.sh
 
 # Ensure all k8s Pods created are in a 'Running' state.
 kubectl get pods -A
-# Execute 1-acumos.sh (install / configure noncore & core Acumos components)
-. ./1-acumos/1-acumos.sh
+# Execute 1-acumos.sh (install / configure noncore & core Acumos components) (Flow 1 and Flow 2)
+./1-acumos/1-acumos.sh
 
 # If Acumos plugins are to be installed in a new session:
 # Uncomment the ACUMOS_HOME line and paste into command-line
@@ -53,8 +54,8 @@ kubectl get pods -A
 
 # To install Acumos plugins ; proceed here
 cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml $ACUMOS_HOME/helm-charts/mlwb_value.yaml
-# Execute 2-plugins.sh (install / configure Acumos plugins and dependencies)
-. ./2-plugins/2-plugins.sh
+# Execute 2-plugins.sh (install / configure Acumos plugins and dependencies) (Flow 1 and Flow 2)
+./2-plugins/2-plugins.sh
 ```
 
 ## Requirements
@@ -62,12 +63,17 @@ cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml $ACUMOS_HOME/helm-charts/mlwb_value.yam
 * A SSH client with port-forward/tunnel/proxy capabilities
   * PuTTY (Windows SSH client)
   * SecureCRT (MacOS SSH client)
+  * OpenSSH (Linux SSH client)
 
 * The user **must** have sudo rights on the VM (i.e. must exist in the `/etc/sudoers` file).
 
 * The VM requires Internet access such that OS updates, OS supplemental packages and Helm chart installations can be performed. Either the VM has proxied access to the Internet or the user must be able to configure the proxy setting for the VM.
 
 > NOTE: internet proxy configurations are beyond the scope of the installation documentation.  A very simple proxy mechanism has been provided to assist with the installation process. Proxy configuration HOWTO references have been included in the Additional Documentation section to assist with more complex configuration.
+
+* z2a requires that the following tool be installed prior to execution of the z2a scripts:
+  * git (the distributed source code management tool)
+  * yq (the YAML file processing tool)
 
 ## Assumptions
 
@@ -80,16 +86,17 @@ It is assumed that the user who is performing this installation:
 
 > NOTE: `z2a` depends on being able to reach a number of up-to-date software repositories.  All efforts have been made to not bypass distribution-specific package managers and software update facilities.
 
-### Installation Location Creation
+### Installation Location Creation (Flow 1 and Flow 2)
 
 In the following section, the user will perform the following actions:
 
 1. Login to the Linux VM where the install will occur
 2. Install the 'git' distributed version-control tool
-3. Create a new directory that will be used to perform this installation (i.e. `src`)
-4. Change directory into this new directory
-5. Clone the gerrit.acumos.org `system-integration` repository into the new directory
-6. Change directory into the newly created `system-integration` directory
+3. Install the 'yq' YAML processing tool
+4. Create a new directory that will be used to perform this installation (i.e. `src`)
+5. Change directory into this new directory
+6. Clone the gerrit.acumos.org `system-integration` repository into the new directory
+7. Change directory into the newly created `system-integration` directory
 
 After completing Step #1 above (log into the VM), here are the commands to execute steps 2-6 above.
 
@@ -99,6 +106,10 @@ After completing Step #1 above (log into the VM), here are the commands to execu
 sudo yum install -y git
 # For Debian-based distributions such as Ubuntu, execute the following command:
 sudo apt-get install -y git
+
+# Install the 'yq' YAML tool
+sudo wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/3.2.1/yq_linux_amd64
+sudo chmod 755 /usr/local/bin/yq
 
 mkdir -p $HOME/src
 
@@ -208,7 +219,7 @@ global:
 
 For entries in the `global_value.conf` file that have an existing entry, do not edit these values as they are essential for correct installation.
 
-### Installation Process
+## Installation Process (Flow 1)
 
 >NOTE: This installation process is in the process of being modified to automate the status feedback (Step 5 thru Step 7) to make in the installation process smoother.
 
@@ -223,13 +234,13 @@ To perform an installation of Acumos, we will need to perform the following step
 2. Execute the z2a `0a-env.sh` script.
 
     ```sh
-    . ./0a-env.sh
+    ./0a-env.sh
     ```
 
 3. Execute the z2a `0b-depends.sh` script.
 
     ```sh
-    . ./0b-depends.sh
+    ./0b-depends.sh
     ```
 
 4. Once the z2a `0b-depends.sh` has completed, please log out of your session and log back in.  This step is required such that you (the installer) are added to the `docker` group, which is required in the next step.
@@ -242,7 +253,7 @@ To perform an installation of Acumos, we will need to perform the following step
 
     ```sh
     cd $HOME/src/system-integration/z2a/0-kind
-    . ./0c-cluster.sh
+    ./0c-cluster.sh
     ```
 
 6. After the z2a `0c-cluster.sh` script has completed, we will need to check the status of the newly created Kubernetes pods before we proceed with the Acumos installation.  We can ensure that all necessary Kubernetes pods are running by executing this `kubectl` command.
@@ -255,7 +266,7 @@ To perform an installation of Acumos, we will need to perform the following step
 
     ```sh
     cd $HOME/src/system-integration/z2a/1-acumos
-    . ./1-acumos.sh
+    ./1-acumos.sh
     ```
 
 8. The last step is to check the status of the Kubernetes pods create during the Acumos installation process.
@@ -266,17 +277,46 @@ To perform an installation of Acumos, we will need to perform the following step
 
 When all Kubernetes pods are in a `Running` state, the installation of the Acumos noncore  and core components has been completed.
 
------
+## Installation Process (Flow 2)
 
-## Addendum
+To perform an installation of Acumos using the Flow 2 technique, we will need to perform the following steps:
 
------
+NOTE:  The `global_value.yaml` file must be edited to provide the correct `clusterName` and `namespace`.  Please refer to the previous section on performing the edits to the `global_value.yaml` file.
+
+1. Change directory into the `z2a/0-kind` directory.
+
+    ```sh
+    cd $HOME/src/system-integration/z2a/0-kind
+    ```
+
+2. Execute the z2a `0a-env.sh` script.
+
+    ```sh
+    ./0a-env.sh
+    ```
+
+3. Proceed and execute the `1-kind.sh` script to install and configure Acumos.
+
+    ```sh
+    cd $HOME/src/system-integration/z2a/1-acumos
+    ./1-acumos.sh
+    ```
+
+4. The last step is to check the status of the Kubernetes pods create during the Acumos installation process.
+
+    ```sh
+    kubectl get pods -A
+    ```
+
+When all Kubernetes pods are in a `Running` state, the installation of the Acumos noncore  and core components has been completed.
+
+## Acumos Plugin Installation
 
 ### MLWB
 
 Machine Learning WorkBench is installed during the `2-plugins` steps of the installation process discussed in this document.  Below are details of the installation process.
 
-#### Editing the `mlwb_value.yaml` File
+### Editing the `mlwb_value.yaml` File
 
 > NOTE: `z2a` includes an example value file for MLWB in the `$HOME/src/system-integration/z2a/dev1` directory.  The MLWB example values file is provided for both illustrative purposes and to assist in performing a quick installation (see: TL;DR section).  The example MLWB values file from that directory could be used here and these edits are not required.
 >
@@ -353,8 +393,44 @@ To perform an installation of MLWB, we will need to perform the following steps:
 
 ```sh
 cd $HOME/src/system-integration/z2a/2-plugins
-. ./2-plugins.sh
+./2-plugins.sh
 ```
+
+-----
+
+## Addendum
+
+-----
+
+## Troubleshooting
+
+Does z2a create log files? Where can I find them?
+
+Each `z2a` script creates a separate and distinct log file.  Below is a listing of these log files and their locations.
+
+| Script Name & Location     |     | Log File & Location                 |
+| :------------------------- | :-: | :---------------------------------- |
+| z2a/0-kind/0a-env.sh       |     | no log file created                 |
+| z2a/0-kind/0b-depends.sh   |     | z2a/0-kind/0b-depends-install.log   |
+| z2a/0-kind/0c-cluster.sh   |     | z2a/0-kind/0c-cluster-install.log   |
+| z2a/1-acumos/1-acumos.sh   |     | z2a/1-acumos/1-acumos-install.log   |
+| z2a/2-plugins/2-plugins.sh |     | z2a/2-plugins/2-plugins-install.log |
+
+How do I decode an on-screen error?
+
+The `z2a` scripts use a shared function to display errors on-screen during execution.  You can decode the information to determine where to look to troubleshoot the problem.   Below is an example error:
+
+```sh
+“2020-05-20T15:28:19+00:00 z2a-utils.sh:42:(fail) unknown failure at ./0-kind/0c-cluster.sh:62”
+```
+
+Here is how to decode the above error:
+
+> 2020-05-20T15:28:19+00:00   - is the timestamp of the failure
+>
+> z2a-utils.sh:42:(fail)      - is the 'fail' function (line 42) of the z2a-utils.sh script
+>
+> ./0-kind/0c-cluster.sh:62   - the failure occurred at line 62 of the ./0-kind/0c-cluster.sh script
 
 ## Additional Documentation
 
@@ -370,4 +446,4 @@ For post-installation Machine Learning WorkBench configuration steps, please see
 
 TODO: Add section on accessing the Acumos Portal once installation is completed.
 
-Last Edited: 2020-05-15
+Last Edited: 2020-05-20

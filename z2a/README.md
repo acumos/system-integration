@@ -56,6 +56,7 @@ z2a/2-plugins/2-plugins.sh              # Acumos plugins setup (including depend
   * four (4) vCPU (minimum)
   * 32GB of memory (minimum)
   * 30GB disk space (minimum) (40GB+ for MLWB)
+  * additional disk space for models (based on developer requirements)
 
 * VM Distribution Recommendations
   * git (source code tool)
@@ -131,4 +132,4 @@ Please refer to the following documents for additional information:
 >
 > INSTALL.md  - the Acumos installation markdown document (in progress)
 
-Last Edited: 2020-05-15
+Last Edited: 2020-05-19
