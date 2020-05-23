@@ -16,5 +16,6 @@ z2a/**/kind-config.yaml
 z2a/noncore-config/*/*_value.yaml
 z2a/noncore-config/*/admin.password
 z2a/noncore-config/*/utils.sh
+z2a/plugins-setup/*/*_value.yaml
 z2a/**/z2a-k8s-dashboard/main.yaml
 z2a/**/z2a-k8s-dashboard/recommended.yaml

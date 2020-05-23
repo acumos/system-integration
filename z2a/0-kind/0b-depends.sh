@@ -55,7 +55,7 @@ sudo mkdir -p /usr/local/bin
 sudo chown root:root /usr/local/bin
 sudo chmod 755 /usr/local/bin
 
-# Add EPEL repo to RHEL/Centos
+# Add EPEL repo to RHEL/CentOS
 rhel && {
   log "Adding EPEL repo ...."
 	rpm -qa | grep -q epel-release ||
@@ -64,7 +64,7 @@ rhel && {
 }
 
 log "Adding miscellaneous prerequisites ...."
-# RHEL/Centos Distribution misc. requirements
+# RHEL/CentOS Distribution misc. requirements
 rhel && sudo yum install -y --setopt=skip_missing_names_on_install=False \
 	yum-utils device-mapper-persistent-data lvm2 git jq make socat
 # Ubuntu Distribution misc. requirements
@@ -104,7 +104,7 @@ sudo mv /tmp/helm /usr/local/bin/helm
 
 log "Installing kind (Kubernetes in Docker) ...."
 # Download and install kind (kubernetes in docker)
-# kind is NOT DESIGNED FOR PRODUCTION ENVIRONMENTS
+# NOTE: kind is NOT DESIGNED FOR PRODUCTION ENVIRONMENTS
 sudo curl -Lo /tmp/kind "https://github.com/kubernetes-sigs/kind/releases/download/v0.7.0/kind-$(uname)-amd64"
 # sudo curl -Lo /tmp/kind "https://github.com/kubernetes-sigs/kind/releases/download/v0.8.1/kind-$(uname)-amd64"
 sudo chmod +x /tmp/kind && sudo chown root:root /tmp/kind

@@ -19,6 +19,14 @@
 # ===============LICENSE_END=========================================================
 #
 # Name: install-kong.sh    - helper script to install the Kong Service for Acumos
+#
+# Notes:
+#
+# Please note that at this time there are two options for installing Kong.
+# Option 1: uses the Helm Chart from HelmHQ
+# Option 2: uses the Helm Chart from Bitnami
+#
+
 
 # Anchor the base directory for the util.sh helper
 HERE=$(dirname $(readlink -f $0))
@@ -38,6 +46,11 @@ log "Adding Bitnami repo ...."
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
 
+# Comment out Bitnami above and uncomment below for alternative KongHQ chart
+# log "Adding KongHQ repo ...."
+# helm repo add kong https://charts.konghq.com
+# helm repo update
+
 # Local override values for KongHQ chart & PostgreSQL chart go here
 # Note: KongHQ Chart pulls in the Bitnami PostgreSQL chart when enabled
 POSTGRES_DATABASE=$(gv_read global.acumosKongPostgresDB)
@@ -48,9 +61,11 @@ ingressController:
   installCRDs: false
 EOF
 
-log "Installing Bitnami Kong & PostgreSQL Helm Charts ...."
-# Install the Bitnami Kong & PostgreSQL Helm Charts
+log "Installing Kong & PostgreSQL Helm Charts ...."
+# Install the Kong & PostgreSQL Helm Charts
+# Install the KongHQ Helm chart
 # helm install $RELEASE --namespace $NAMESPACE -f $GV -f $HERE/kong_value.yaml kong/kong
+# Install the Bitnami Helm chart
 helm install $RELEASE --namespace $NAMESPACE -f $GV -f $HERE/kong_value.yaml bitnami/kong
 
 log "Waiting .... (up to 15 minutes) for pod ready status ...."

@@ -18,23 +18,30 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: install-skel.sh    - skeleton for a script to install a new component
+# Name: install-skel.sh    - script skeleton to aid in installing a new component
 #
 # Version:
 #
+# 2020-05-21 - add step-wise notes section
+# 2020-05-19 - add block for local-overrides
+#            - add section for new repos
 # 2020-05-15 - add explanations (and clarify a couple of items)
 # 2020-05-14 - initial version
 #
 # Notes:
+#
+# Step 1
 # The complete `z2a/dev1/skel` directory (including this skeleton script) should be
 # copied into either the 'z2a/noncore-config' or the 'z2a/plugins-setup' directory.
-#
-# The newly copied 'skel' directory should be renamed appropriately.
-# This file should be renamed to `install-nameOfDirectory.sh`
+# Step 2
+# The newly copied 'skel' directory should be renamed appropriately. `<name-of-new-plugin>`
+# Step 3:
+# The `z2a/plugins/<name-of-new-plugin>/install-skel.sh` file should be renamed to `install-nameOfDirectory.sh`
+# Step 4
 # A new Makefile target corresponding to the new directory name should be created
-# in the 'z2a/noncore-config' or 'z2a/plugins-setup' directory.
+# in the `z2a/noncore-config` or `z2a/plugins-setup` directory.
 #
-# TODO: take these notes and add them to a "HOWTO.md" document
+# TODO: Take these notes and add them to a "HOWTO.md" document (In progress)
 #
 
 # Anchor the base directory for the util.sh helper
@@ -51,13 +58,24 @@ GV=$ACUMOS_GLOBAL_VALUE
 # Acquire NAMESPACE and RELEASE values via the gv_read function (see utils.sh)
 # Note: this value HAS to be valid
 NAMESPACE=$(gv_read global.namespace)
-# Replace nameOfReleaseKeyValue with an actual key name added to global_value.yaml
+# Replace nameOfReleaseKeyValue with an actual `plugin` key name added to global_value.yaml
+# TODO: how to add key/values to global_value.yaml?
 RELEASE=$(gv_read global.nameOfReleaseKeyValue)
+
+# Uncomment the following 3 lines to add a new Helm Chart repo here
+# echo "Adding <Name Of> repo ...."
+# helm repo add name https://location-of.repo.com
+# helm repo update
+
+# k/v map for local override values should be added here
+cat <<EOF | tee $HERE/local-override-values.yaml
+EOF
 
 log "Installing NameOfChart ...."
 # use Helm to deploy the chart using this command format
 helm install $RELEASE -n $NAMESPACE /LOCATION/ -f $GV -f local-override-values.yaml
 
-log "Waiting .... (up to 15 minutes) for pod ready status ...."
+# If pods need time to reach a ready state, uncomment the 'log' and 'wait_for_pod_ready lines below
+# log "Waiting .... (up to 15 minutes) for pod ready status ...."
 # Wait for the pods to become available - 15 minutes (900 seconds) is the default
-wait_for_pod_ready 900 $RELEASE
+# wait_for_pod_ready 900 $RELEASE

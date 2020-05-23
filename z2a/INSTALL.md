@@ -1,6 +1,6 @@
 # Installation
 
-> Note: Work in progress.  Subject to change.
+> Note: Work in progress.  Subject to frequent changes.
 
 ## TL;DR
 
@@ -27,9 +27,24 @@ cd $ACUMOS_HOME/z2a
 # Using the vi editor (substitute with your editor of choice)
 # Add hostname or hostname:port to proxy.txt ; if necessary
 vi ./0-kind/proxy.txt
-# Assumption: you are using the example values;
+
+# Choose one of the following methods to create a global_value.yaml file
+
+# Method 1 - example values
+#
+# To use the example global_value.yaml file;
 # copy the example values from z2a/dev1 to the helm-charts directory
 cp ./dev1/global_value.yaml ../helm-charts/global_value.yaml
+
+# Method 2 - customized values
+#
+# To use a customized global_value.yaml file;
+# edit $HOME/src/system-integration/helm-charts/global_value.yaml
+# using an editor and command similar to this:
+# vi $HOME/src/system-integration/helm-charts/global_value.yaml
+
+# Once the global_value.yaml file has been copied or edited;
+# you can proceed with the installation
 
 # Execute 0-kind/0a-env.sh (setup user environment) (Flow 1 and Flow 2)
 ./0-kind/0a-env.sh
@@ -92,11 +107,10 @@ In the following section, the user will perform the following actions:
 
 1. Login to the Linux VM where the install will occur
 2. Install the 'git' distributed version-control tool
-3. Install the 'yq' YAML processing tool
-4. Create a new directory that will be used to perform this installation (i.e. `src`)
-5. Change directory into this new directory
-6. Clone the gerrit.acumos.org `system-integration` repository into the new directory
-7. Change directory into the newly created `system-integration` directory
+3. Create a new directory that will be used to perform this installation (i.e. `src`)
+4. Change directory into this new directory
+5. Clone the gerrit.acumos.org `system-integration` repository into the new directory
+6. Change directory into the newly created `system-integration` directory
 
 After completing Step #1 above (log into the VM), here are the commands to execute steps 2-6 above.
 
@@ -106,10 +120,6 @@ After completing Step #1 above (log into the VM), here are the commands to execu
 sudo yum install -y git
 # For Debian-based distributions such as Ubuntu, execute the following command:
 sudo apt-get install -y git
-
-# Install the 'yq' YAML tool
-sudo wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/3.2.1/yq_linux_amd64
-sudo chmod 755 /usr/local/bin/yq
 
 mkdir -p $HOME/src
 
@@ -221,8 +231,6 @@ For entries in the `global_value.conf` file that have an existing entry, do not 
 
 ## Installation Process (Flow 1)
 
->NOTE: This installation process is in the process of being modified to automate the status feedback (Step 5 thru Step 7) to make in the installation process smoother.
-
 To perform an installation of Acumos, we will need to perform the following steps:
 
 1. Change directory into the `z2a/0-kind` directory.
@@ -237,7 +245,7 @@ To perform an installation of Acumos, we will need to perform the following step
     ./0a-env.sh
     ```
 
-3. Execute the z2a `0b-depends.sh` script.
+3. After successful execution of the `0a-env.sh` script, execute the z2a `0b-depends.sh` script.
 
     ```sh
     ./0b-depends.sh
@@ -295,7 +303,7 @@ NOTE:  The `global_value.yaml` file must be edited to provide the correct `clust
     ./0a-env.sh
     ```
 
-3. Proceed and execute the `1-kind.sh` script to install and configure Acumos.
+3. After successful execution of the `0a-env.sh` script, execute the `1-kind.sh` script to install and configure Acumos.
 
     ```sh
     cd $HOME/src/system-integration/z2a/1-acumos
@@ -391,10 +399,10 @@ To perform an installation of MLWB, we will need to perform the following steps:
 1. change directory into the `z2a/2-plugins` directory
 2. execute the `2-plugins.sh` script which install the MLWB dependencies and the MLWB components
 
-```sh
-cd $HOME/src/system-integration/z2a/2-plugins
-./2-plugins.sh
-```
+    ```sh
+    cd $HOME/src/system-integration/z2a/2-plugins
+    ./2-plugins.sh
+    ```
 
 -----
 
@@ -426,11 +434,11 @@ The `z2a` scripts use a shared function to display errors on-screen during execu
 
 Here is how to decode the above error:
 
-> 2020-05-20T15:28:19+00:00   - is the timestamp of the failure
+> `2020-05-20T15:28:19+00:00`   - is the timestamp of the failure
 >
-> z2a-utils.sh:42:(fail)      - is the 'fail' function (line 42) of the z2a-utils.sh script
+> `z2a-utils.sh:42:(fail)`      - is the 'fail' function (line 42) of the z2a-utils.sh script
 >
-> ./0-kind/0c-cluster.sh:62   - the failure occurred at line 62 of the ./0-kind/0c-cluster.sh script
+> `./0-kind/0c-cluster.sh:62`   - the failure occurred at line 62 of the ./0-kind/0c-cluster.sh script
 
 ## Additional Documentation
 
@@ -446,4 +454,4 @@ For post-installation Machine Learning WorkBench configuration steps, please see
 
 TODO: Add section on accessing the Acumos Portal once installation is completed.
 
-Last Edited: 2020-05-20
+Last Edited: 2020-05-21
