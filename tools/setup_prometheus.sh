@@ -43,7 +43,7 @@
 function setup_prereqs() {
 	log "Setup prerequisites"
   if [[ "$dist" == "ubuntu" ]]; then
-    sudo apt-get install -y golang-go jq
+    sudo apt-get --no-install-recommends install -y golang-go jq
   else
     sudo yum install -y golang-go jq
   fi

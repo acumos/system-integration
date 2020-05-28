@@ -80,7 +80,7 @@ function setup_prereqs() {
     # services and they then stay in "pending", blocking k8s-based deployment
     # Also on bionic can cause a hang at 'Preparing to unpack .../00-systemd-sysv_237-3ubuntu10.11_amd64.deb ...'
     #  wait_dpkg; sudo apt-get upgrade -y
-    wait_dpkg; sudo apt-get install -y wget git jq netcat
+    wait_dpkg; sudo apt-get --no-install-recommends install -y wget git jq netcat
   else
     # For centos, only deployment under k8s is supported
     # docker is assumed to be pre-installed as part of the k8s install process
@@ -104,7 +104,7 @@ setup_keystore() {
   if [[ ! $(which keytool) ]]; then
     log "Install keytool"
     if [[ "$HOST_OS" == "ubuntu" ]]; then
-      sudo apt-get install -y openjdk-8-jre-headless
+      sudo apt-get --no-install-recommends install -y openjdk-8-jre-headless
     else
       sudo yum install -y java-1.8.0-openjdk-headless
     fi
@@ -220,7 +220,7 @@ setup_docker() {
       echo "Purged docker-ce docker docker-engine docker.io"
     fi
     wait_dpkg; sudo apt-get update
-    wait_dpkg; sudo apt-get install -y \
+    wait_dpkg; sudo apt-get --no-install-recommends install -y \
       apt-transport-https \
       ca-certificates \
       curl \
@@ -229,7 +229,7 @@ setup_docker() {
     sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
     wait_dpkg; sudo apt-get update
     apt-cache madison docker-ce
-    wait_dpkg; sudo apt-get install -y docker-ce=18.06.3~ce~3-0~ubuntu
+    wait_dpkg; sudo apt-get --no-install-recommends install -y docker-ce=18.06.3~ce~3-0~ubuntu
   fi
   log "Install latest docker-compose"
   # Required, to use docker compose version 3.2 templates

@@ -21,7 +21,7 @@
 
 FROM ubuntu:bionic
 RUN apt-get update && \
-  apt-get install -y wget curl git jq uuid-runtime openjdk-8-jre-headless \
+  apt-get --no-install-recommends install -y wget curl git jq uuid-runtime openjdk-8-jre-headless \
   iproute2 dnsutils netcat apt-transport-https ca-certificates \
   software-properties-common nano
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
@@ -29,13 +29,13 @@ RUN add-apt-repository "deb [arch=amd64] \
   https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" && \
   apt-get update && \
   apt-cache madison docker-ce && \
-  apt-get install -y docker-ce=18.06.3~ce~3-0~ubuntu
+  apt-get --no-install-recommends install -y docker-ce=18.06.3~ce~3-0~ubuntu
 ENV MARIADB_MIRROR sfo1.mirrors.digitalocean.com
 ENV MARIADB_VERSION 10.2
 RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8 && \
   add-apt-repository "deb [arch=amd64,arm64,ppc64el] http://$MARIADB_MIRROR/mariadb/repo/$MARIADB_VERSION/ubuntu bionic main" && \
-  apt-get update -y && apt-get install -y mariadb-client
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y tshark
+  apt-get update -y && apt-get --no-install-recommends install -y mariadb-client
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get --no-install-recommends install -y tshark
 ENV DESIRED_VERSION '--version v2.12.3'
 RUN curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
 RUN chmod 700 get_helm.sh && ./get_helm.sh $DESIRED_VERSION && helm init --client-only

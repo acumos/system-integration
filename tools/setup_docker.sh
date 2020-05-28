@@ -48,7 +48,7 @@ setup() {
       sudo rm /etc/docker/daemon.json
     fi
     wait_dpkg; sudo apt-get update
-    wait_dpkg; sudo apt-get install -y \
+    wait_dpkg; sudo apt-get --no-install-recommends install -y \
       apt-transport-https \
       ca-certificates \
       curl \
@@ -57,7 +57,7 @@ setup() {
     sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
     wait_dpkg; sudo apt-get update
     apt-cache madison docker-ce
-    wait_dpkg; sudo apt-get install -y docker-ce=18.06.3~ce~3-0~ubuntu
+    wait_dpkg; sudo apt-get --no-install-recommends install -y docker-ce=18.06.3~ce~3-0~ubuntu
   elif [[ "$HOST_OS" == "centos" ]]; then
     log "Install latest docker-ce in Centos"
     # per https://docs.docker.com/engine/installation/linux/docker-ce/centos/#install-from-a-package

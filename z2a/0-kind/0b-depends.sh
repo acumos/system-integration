@@ -68,7 +68,7 @@ log "Adding miscellaneous prerequisites ...."
 rhel && sudo yum install -y --setopt=skip_missing_names_on_install=False \
 	yum-utils device-mapper-persistent-data lvm2 git jq make socat
 # Ubuntu Distribution misc. requirements
-ubuntu && sudo apt-get update -y && sudo apt-get install -y apt-transport-https ca-certificates \
+ubuntu && sudo apt-get update -y && sudo apt-get --no-install-recommends install -y apt-transport-https ca-certificates \
 	curl gnupg-agent software-properties-common git jq make socat
 
 log "Setting resources limits ...."
@@ -129,7 +129,7 @@ ubuntu && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key
 log "Setting up Docker Community-Edition ...."
 # Install Docker-CE
 rhel && sudo yum -y install docker-ce docker-ce-cli containerd.io
-ubuntu && sudo apt-get -y update && sudo apt-get -y install docker-ce docker-ce-cli containerd.io
+ubuntu && sudo apt-get -y update && sudo apt-get -y --no-install-recommends install docker-ce docker-ce-cli containerd.io
 
 log "Creating /etc/docker directory ...."
 ## Create /etc/docker directory.

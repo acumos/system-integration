@@ -1749,7 +1749,7 @@ errors in the msg log, that you can see by:
   2019-11-28T11:31:35.429Z    http-nio-8336-exec-2    ERROR   org.acumos.microservice.services.impl.GenerateMicroserviceController
   User=f3c25ebe-572e-4e69-a9a4-84728b06d836, RequestID=55d69f4e-4489-48e6-b089-08d5a0640240, ServiceName=/onboarding-app/v2/models,
   ResponseDescription=com.github.dockerjava.api.exception.DockerClientException: Could not build image:
-  The command '/bin/sh -c apt-get clean && apt-get update && apt-get -y install libgtk2.0-dev' returned a non-zero code: 100
+  The command '/bin/sh -c apt-get clean && apt-get update && apt-get -y --no-install-recommends install libgtk2.0-dev' returned a non-zero code: 100
   ...
   2019-11-28T14:15:04.570Z    dockerjava-netty-28-1   INFO    org.acumos.microservice.component.docker.cmd.CreateImageCommand
   Severity=DEBUG      E: You don't have enough free space in /var/cache/apt/archives/.

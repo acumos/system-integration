@@ -25,7 +25,7 @@ data:
   setup.sh: |-
     #!/bin/bash
     apt-get update -y
-    apt-get install -y jq curl gawk
+    apt-get --no-install-recommends install -y jq curl gawk
     #
     K8S_RELEASE=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
     curl -L -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$K8S_RELEASE/bin/linux/amd64/kubectl

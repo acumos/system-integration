@@ -76,7 +76,7 @@ if [[ "$HOST_OS" == "ubuntu" ]]; then
     echo "Purged docker-ce docker docker-engine docker.io"
   fi
   wait_dpkg; sudo apt-get update
-  wait_dpkg; sudo apt-get install -y \
+  wait_dpkg; sudo apt-get --no-install-recommends install -y \
     apt-transport-https \
     ca-certificates \
     curl \
@@ -85,7 +85,7 @@ if [[ "$HOST_OS" == "ubuntu" ]]; then
   sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
   wait_dpkg; sudo apt-get update
   apt-cache madison docker-ce
-  wait_dpkg; sudo apt-get install -y docker-ce=18.06.3~ce~3-0~ubuntu
+  wait_dpkg; sudo apt-get --no-install-recommends install -y docker-ce=18.06.3~ce~3-0~ubuntu
 
   echo; echo "prereqs.sh: ($(date)) Move /var/lib/docker to /mnt/docker to avoid out of space issues on root volume"
   sudo service docker stop
@@ -110,20 +110,20 @@ if [[ "$HOST_OS" == "ubuntu" ]]; then
   # per https://github.com/kubernetes/kubeadm/issues/610
   sudo swapoff -a
   sudo sed -i -- '/swap/d' /etc/fstab
-  wait_dpkg; sudo apt-get update && sudo apt-get install -y apt-transport-https
+  wait_dpkg; sudo apt-get update && sudo apt-get --no-install-recommends install -y apt-transport-https
   curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
   cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
 deb http://apt.kubernetes.io/ kubernetes-xenial main
 EOF
   wait_dpkg; sudo apt-get update
   echo; echo "prereqs.sh: ($(date)) Install kubectl, kubelet, kubeadm"
-  wait_dpkg; sudo apt-get -y install --allow-downgrades kubernetes-cni=${KUBE_CNI_VERSION}-00 \
+  wait_dpkg; sudo apt-get -y --no-install-recommends install --allow-downgrades kubernetes-cni=${KUBE_CNI_VERSION}-00 \
     kubectl=${KUBE_VERSION}-00 kubelet=${KUBE_VERSION}-00 kubeadm=${KUBE_VERSION}-00
   wait_dpkg; sudo apt-mark hold kubelet kubeadm kubectl
   # end of instructions per https://kubernetes.io/docs/setup/independent/install-kubeadm/
 
   echo; echo "prereqs.sh: ($(date)) Install jq for API output parsing"
-  wait_dpkg; sudo apt-get install -y jq
+  wait_dpkg; sudo apt-get --no-install-recommends install -y jq
   if [[ "$(sudo ufw status)" == "Status: active" ]]; then
     echo; echo "prereqs.sh: ($(date)) Set firewall rules"
     if [[ "$1" == "master" ]]; then

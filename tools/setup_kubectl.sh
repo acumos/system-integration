@@ -55,17 +55,17 @@ function setup_prereqs() {
     get_dist
     KUBE_VERSION=1.13.8
     if [[ "$dist" == "ubuntu" ]]; then
-      sudo apt-get install -y curl
+      sudo apt-get --no-install-recommends install -y curl
       if [[ $(dpkg -l | grep -c kubectl) -eq 0 ]]; then
         log "Install kubectl"
         # Install kubectl per https://kubernetes.io/docs/setup/independent/install-kubeadm/
-        sudo apt-get update && sudo apt-get install -y apt-transport-https
+        sudo apt-get update && sudo apt-get --no-install-recommends install -y apt-transport-https
         curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
         cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
 deb http://apt.kubernetes.io/ kubernetes-xenial main
 EOF
         sudo apt-get update
-        sudo apt-get -y install --allow-downgrades kubectl=${KUBE_VERSION}-00
+        sudo apt-get -y --no-install-recommends install --allow-downgrades kubectl=${KUBE_VERSION}-00
       fi
     elif [[ "$dist" == "centos" ]]; then
       sudo yum -y update

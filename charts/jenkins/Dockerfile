@@ -21,14 +21,14 @@
 
 FROM jenkins/jenkins:lts
 USER root
-RUN apt-get update && apt-get install -y jq uuid-runtime
+RUN apt-get update && apt-get --no-install-recommends install -y jq uuid-runtime
 # Install kubectl per https://kubernetes.io/docs/setup/independent/install-kubeadm/
 ENV KUBE_VERSION=1.13.8
-RUN apt-get install -y apt-transport-https && \
+RUN apt-get --no-install-recommends install -y apt-transport-https && \
   curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
   echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" >/etc/apt/sources.list.d/kubernetes.list && \
   apt-get update && \
-  apt-get -y install --allow-downgrades kubectl=${KUBE_VERSION}-00
+  apt-get -y --no-install-recommends install --allow-downgrades kubectl=${KUBE_VERSION}-00
 RUN mkdir /acumos && mkdir /acumos/sv && mkdir /acumos/sv/licenses && \
   mkdir /acumos/sv/rules && chown -R jenkins /acumos 
 USER jenkins

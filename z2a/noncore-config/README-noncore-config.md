@@ -18,7 +18,7 @@ If the above prerequisites are missing, you will need to install the above prere
 sudo yum install -y --setopt=skip_missing_names_on_install=False jq make socat
 
 # Ubuntu Distribution misc. requirements
-sudo apt-get update -y && sudo apt-get install -y git jq make socat
+sudo apt-get update -y && sudo apt-get --no-install-recommends install -y git jq make socat
   ```
 
 ## Setting up the environment

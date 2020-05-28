@@ -12,7 +12,7 @@
 # For RPM-based distributions such as RHEL/CentOS, execute the following command:
 sudo yum install -y git
 # For Debian-based distributions such as Ubuntu, execute the following command:
-sudo apt-get install -y git
+sudo apt-get --no-install-recommends install -y git
 
 # Make src directory ; change directory to that location
 mkdir -p $HOME/src ; cd $HOME/src

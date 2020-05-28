@@ -52,7 +52,7 @@ setup_mariadb_client() {
     log "Remove any prior reference to mariadb in /etc/apt/sources.list"
     $sudo_cmd sed -i -- '/mariadb/d' /etc/apt/sources.list
 
-    $sudo_cmd apt-get install software-properties-common -y
+    $sudo_cmd apt-get --no-install-recommends install software-properties-common -y
     case "$HOST_OS_VER" in
       "16.04")
         MARIADB_REPO="deb [arch=amd64,i386,ppc64el] http://$MARIADB_MIRROR/mariadb/repo/$ACUMOS_MARIADB_VERSION/ubuntu xenial main"
@@ -68,7 +68,7 @@ setup_mariadb_client() {
     $sudo_cmd apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
     $sudo_cmd add-apt-repository "$MARIADB_REPO"
     $sudo_cmd apt-get update -y
-    $sudo_cmd apt-get install -y mariadb-client
+    $sudo_cmd apt-get --no-install-recommends install -y mariadb-client
   else
   # Add MariaDB 10 external yum repo
     cat << EOF | $sudo_cmd tee -a /etc/yum.repos.d/MariaDB.repo

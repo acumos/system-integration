@@ -86,7 +86,7 @@ spec:
             do sleep 10;
                echo "Waiting for temporary DNS resolution issue to be fixed";
             done;
-          while ! apt-get install -y python python-pip;
+          while ! apt-get --no-install-recommends install -y python python-pip;
             do sleep 10;
                echo "Waiting for temporary DNS resolution issue to be fixed";
             done;
