@@ -97,7 +97,8 @@ sudo chmod +x /usr/local/bin/kubectl & sudo chown root:root /usr/local/bin/kubec
 
 log "Installing Helm v3 ...."
 # Download and install helm v3 (to /usr/local/bin)
-HELM_RELEASE=$(curl -Ls https://github.com/helm/helm/releases| awk '$0 ~ pat {print gensub(/.*".*\/(.*)".*/, "\\1","g");exit}' pat='href="/helm/helm/releases/tag/v3')
+# HELM_RELEASE=$(curl -Ls https://github.com/helm/helm/releases| awk '$0 ~ pat {print gensub(/.*".*\/(.*)".*/, "\\1","g");exit}' pat='href="/helm/helm/releases/tag/v3')
+HELM_RELEASE=$(curl -Ls https://github.com/helm/helm/releases | grep /helm/helm/releases/tag/v3 | grep -P -o 'v\d+\.\d+\.\d+' | head -1)
 sudo curl -s https://get.helm.sh/helm-${HELM_RELEASE}-linux-amd64.tar.gz | tar -zxO linux-amd64/helm > /tmp/helm
 sudo chmod +x /tmp/helm && sudo chown root:root /tmp/helm
 sudo mv /tmp/helm /usr/local/bin/helm

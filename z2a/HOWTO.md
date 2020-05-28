@@ -93,7 +93,6 @@ Step 1: Clone the `z2a/dev1/skel` directory into the `z2a/plugins-setup` directo
 Step 2: The newly copied 'skel' directory should be renamed appropriately. `<name-of-new-plugin>`
 Step 3: The `z2a/plugins/<name-of-new-plugin>/install-skel.sh` file should be renamed to `install-nameOfDirectory.sh`
 
-
 ```sh
 cd $HOME/src/system-integration/z2a
 cp -rp ./dev1/skel ./plugins-setup/.
@@ -116,10 +115,8 @@ MODULES=couchdb jupyterhub lum nifi mlwb <name-of-new-plugin>
 
 Step 3: Edit the `z2a/plugins-setup/<name-of-new-plugin/>install-<name-of-new-plugin>.sh
 
-
-
 ## How to add a new plugin to be installed and configured
 
 * where to start ; what to do
 
-Last Edited: 2020-05-21
+Last Edited: 2020-05-28

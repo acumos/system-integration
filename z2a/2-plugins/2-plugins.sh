@@ -67,6 +67,3 @@ echo "Starting 2-plugins installation ...."
 # Installation - Machine Learning WorkBench (MLWB)
 echo "Installing MLWB Components ...."
 (cd $Z2A_BASE/plugins-setup/ ; make mlwb)
-
-echo "Please check the status of the K8s pods at this time .... "
-echo "Please ensure that all pods are in a 'Running' status before proceeding ...."

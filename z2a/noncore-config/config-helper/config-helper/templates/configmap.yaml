@@ -31,7 +31,8 @@ data:
     curl -L -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$K8S_RELEASE/bin/linux/amd64/kubectl
     chmod 755 /usr/local/bin/kubectl
     #
-    HELM_RELEASE=$(curl -Ls https://github.com/helm/helm/releases| awk '$0 ~ pat {print gensub(/.*".*\/(.*)".*/, "\\1","g");exit}' pat='href="/helm/helm/releases/tag/v3')
+    # HELM_RELEASE=$(curl -Ls https://github.com/helm/helm/releases| awk '$0 ~ pat {print gensub(/.*".*\/(.*)".*/, "\\1","g");exit}' pat='href="/helm/helm/releases/tag/v3')
+    HELM_RELEASE=$(curl -Ls https://github.com/helm/helm/releases | grep /helm/helm/releases/tag/v3 | grep -P -o 'v\d+\.\d+\.\d+' | head -1)
     curl -s https://get.helm.sh/helm-${HELM_RELEASE}-linux-amd64.tar.gz | tar -zxO linux-amd64/helm > /usr/local/bin/helm
     chmod 755 /usr/local/bin/helm
     #

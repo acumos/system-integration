@@ -114,7 +114,7 @@ Currently, the only Acumos plugin supported is MLWB (Machine Learning WorkBench)
 
 ## Known Issues
 
-ISSUE: At the time of this writing, the `kind` (Kubernetes in Docker) cluster does not persist across a VM reboot OR a Docker service reconfigure/restart operation. Development activities to add this cluster recovery capability is being performed by the upstream developers.  At this time, if (for some reason) the VM is rebooted or the Docker service is restarted, portions of the `z2a` installation process must be executed again and any "work" may be lost.  End-users must ensure that they have any work performed in the current `z2a` environment saved outside of z2a.
+ISSUE: At the time of this writing, the `kind` (Kubernetes in Docker) cluster does not persist across a VM reboot OR a Docker service reconfigure/restart operation. Development activities to add this cluster recovery capability are being performed by the upstream developers.  At this time, if (for some reason) the VM is rebooted or the Docker service is restarted, portions of the `z2a` installation process must be executed again and any "work" may be lost.  End-users must ensure that they have any work performed in the current `z2a` environment saved outside of z2a.
 
 ISSUE: `z2a` performs minimal post-installation component configuration.  The `z2a` scripts perform a complete installation of Acumos and where automation can be applied, automated configuration is performed. As `z2a` matures, additional post-installation configuration will be added to configurations that can be easily maintained.
 
@@ -132,4 +132,4 @@ Please refer to the following documents for additional information:
 >
 > INSTALL.md  - the Acumos installation markdown document (in progress)
 
-Last Edited: 2020-05-19
+Last Edited: 2020-05-28
