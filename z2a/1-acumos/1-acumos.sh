@@ -47,13 +47,11 @@ set -e
 export ACUMOS_GLOBAL_VALUE=$Z2A_ACUMOS_BASE/global_value.yaml
 NAMESPACE=$Z2A_K8S_NAMESPACE
 
-# TODO: correct the test logic here for BYOC vs. `kind`
-# Test to ensure that the namespace we are installing into is clean
-# check_for_clean_namespace
-
 echo "Starting 1-acumos installation ...."
 echo "Creating k8s namespace : name = $Z2A_K8S_NAMESPACE"
-# Create an namespace in the kind-acumos cluster (default: acumos-dev1)
+# Create an namespace on the k8s cluster
+# - for `Flow 1` - default z2a `kind` cluster namespace: acumos-dev1
+# - for `Flow 2` - Bring-Your-Own-Cluster`, see: global_value.yaml (global.namespace)
 kubectl create namespace $Z2A_K8S_NAMESPACE
 
 echo "Starting 1-acumos (Acumos noncore dependencies) installation ...."
@@ -61,6 +59,9 @@ echo "Starting 1-acumos (Acumos noncore dependencies) installation ...."
 
 echo "Installing Acumos noncore dependencies ...."
 # Install the Acumos noncore charts, one by one in this order (configuration is performed by default)
+
+echo "Install Acumos noncore dependency: Kubernetes ingress ...."
+(cd $Z2A_BASE/noncore-config/ ; make ingress)
 
 echo "Install Acumos noncore dependency: Kubernetes config helper ...."
 (cd $Z2A_BASE/noncore-config/ ; make config-helper)
@@ -71,8 +72,9 @@ echo "Install Acumos noncore dependency: Sonatype Nexus (Oteemo Chart) ...."
 echo "Install Acumos noncore dependency: MariaDB (Bitnami Chart) ...."
 (cd $Z2A_BASE/noncore-config/ ; make mariadb-cds)
 
-echo "Install Acumos noncore dependency: Kong & PostgreSQL (Bitnami Charts) ...."
-(cd $Z2A_BASE/noncore-config/ ; make kong)
+# Kong is currently disabled. To enable Kong, uncomment the following lines.
+# echo "Install Acumos noncore dependency: Kong & PostgreSQL (Bitnami Charts) ...."
+# (cd $Z2A_BASE/noncore-config/ ; make kong)
 
 # The following charts are installed  directly via a helm deployment command
 # NOTE: *this is a comment* helm install -name $CHARTNAME --namespace $NAMESPACE <PATH>$CHARTNAME -f <PATH>global_value.yaml

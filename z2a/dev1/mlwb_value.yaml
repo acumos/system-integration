@@ -24,6 +24,10 @@
 #
 
 mlwb:
+    # MLWB-specific values
+    namespace: "mlwb"
+    clusterName: "kind-acumos"
+
     # Ports
     acumosDashboardWebcomponentPort: "9083"
     acumosHomeWebcomponentPort: "9082"

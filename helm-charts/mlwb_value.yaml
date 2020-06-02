@@ -20,6 +20,10 @@
 # ============LICENSE_END=========================================================
 
 mlwb:
+    # MLWB-specific values
+    namespace: "xxxxxx"
+    clusterName: "xxxxxx"
+
     # Ports
     acumosDashboardWebcomponentPort: "9083"
     acumosHomeWebcomponentPort: "9082"

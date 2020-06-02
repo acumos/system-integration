@@ -36,19 +36,23 @@
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
-  - role: control-plane
-  - role: worker
-    kubeadmConfigPatches:
-    - |
-      apiVersion: kubeadm.k8s.io/v1beta2
-      kind: JoinConfiguration
-      nodeRegistration:
-        kubeletExtraArgs:
-          node-labels: "svc-proxy=true"
-          authorization-mode: "AlwaysAllow"
-    extraPortMappings:
-  - role: worker
-  - role: worker
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  extraPortMappings:
+  - containerPort: 80
+    hostPort: 80
+    protocol: TCP
+  - containerPort: 443
+    hostPort: 443
+    protocol: TCP
+- role: worker
+- role: worker
+- role: worker
 networking:
   apiServerAddress: "127.0.0.1"
   apiServerPort: 6443

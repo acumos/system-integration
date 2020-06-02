@@ -76,20 +76,6 @@ egrep -v '^\s*#' $KT > $KC
 # Create a key from kind-config.yaml file
 KEY=$(yq r -p p $KC 'nodes.(kubeadmConfigPatches==*)')
 
-# Remove the extraPortMappings block using KEY
-yq d -i $KC $KEY.extraPortMappings
-
-# Loop thru placeholders and build YAML block for kind config
-i=0
-for PORT in $(yq r $HERE/z2a-svcs-proxy/values.yaml z2a.svcProxies.[*].src); do
-  yq w -i $KC $KEY.extraPortMappings[$i].containerPort $PORT
-  yq w -i $KC $KEY.extraPortMappings[$i].hostPort $PORT
-  yq w -i $KC $KEY.extraPortMappings[$i].listenAddress 0.0.0.0
-  yq w -i $KC $KEY.extraPortMappings[$i].protocol TCP
-  ((i=i+1))
-done
-
-redirect_to /dev/null
 echo ""
-log "Phase 0a-env (end-user environment) creation complete ...."
+echo "Phase 0a-env (end-user environment) creation complete ...."
 echo ""

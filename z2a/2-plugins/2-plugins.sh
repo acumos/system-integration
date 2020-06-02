@@ -42,11 +42,19 @@ load_env
 set -e
 
 export ACUMOS_BASE=$Z2A_ACUMOS_BASE
-export ACUMOS_GLOBAL_VALUE=$Z2A_ACUMOS_BASE/global_value.yaml
-NAMESPACE=$(yq r $ACUMOS_GLOBAL_VALUE global.namespace)
+# export ACUMOS_GLOBAL_VALUE=$Z2A_ACUMOS_BASE/global_value.yaml
+export MLWB_GLOBAL_VALUE=$Z2A_ACUMOS_BASE/mlwb_value.yaml
+# NAMESPACE=$(yq r $ACUMOS_GLOBAL_VALUE global.namespace)
+MLWB_NAMESPACE=$(yq r $MLWB_GLOBAL_VALUE mlwb.namespace)
+
+# Create namespace for the MLWB plugins
+echo "Starting 2-plugins installation ...."
+echo "Creating k8s namespace : name = $MLWB_NAMESPACE"
+# Create an namespace in the kind-acumos cluster (default: acumos-dev1)
+kubectl create namespace $MLWB_NAMESPACE
 
 # Test to ensure that all Pods are running before proceeding
-kubectl wait pods --for=condition=Ready --all --namespace=$NAMESPACE --timeout=900s
+# kubectl wait pods --for=condition=Ready --all --namespace=$MLWB_NAMESPACE --timeout=900s
 
 echo "Starting 2-plugins dependency installation ...."
 # Installation - MLWB plugin dependencies

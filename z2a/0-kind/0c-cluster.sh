@@ -64,20 +64,6 @@ kind create cluster --name=$Z2A_K8S_CLUSTERNAME --config $HERE/kind-config.yaml
 # Echo cluster-info - echo output to both log file and TTY
 log "\n\n$(kubectl cluster-info --context kind-$Z2A_K8S_CLUSTERNAME)\n"
 
-log "Building k8s-svc-proxy local image ...."
-# Build local image of the k8s-svc-proxy
-(cd $HERE/k8s-svc-proxy ; docker build -t k8s-svc-proxy:v1.0 .)
-
-log "Loading k8s-svc-proxy image into kind cluster ...."
-# Load image into kind
-kind load docker-image k8s-svc-proxy:v1.0 --name $Z2A_K8S_CLUSTERNAME
-
-log "Deploying k8s-svc-proxy pod cluster ...."
-# Deploy the k8s-svc-proxy pod
-# kubectl apply -f $Z2A_BASE/k8s-svc-proxy/z2a-svcs-proxy.yaml --namespace=$Z2A_K8S_NAMESPACE
-kubectl create namespace z2a-svcs-proxy
-helm install z2a-svcs-proxy --namespace=z2a-svcs-proxy $HERE/z2a-svcs-proxy/ -f $Z2A_ACUMOS_BASE/global_value.yaml
-
 log "Install MetalLB ...."
 # Install MetalLB load Balancer
 kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.9.3/manifests/namespace.yaml
@@ -104,6 +90,10 @@ kubectl apply -f $HERE/z2a-k8s-dashboard/admin-user.yaml
 log "Creating Kubernetes Dashboard ClusterRole Binding ...."
 # Create k8s Cluster Role Binding
 kubectl apply -f $HERE/z2a-k8s-dashboard/clusterrolebinding.yaml
+
+log "Installing Kubernetes native ingress controller (nginX) ...."
+# Note: this k8s manifest is `kind` specific - do not install this as an ingress controller on a real k8s cluster
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
 
 log "Capturing Kubernetes Cluster Status ...."
 # Capture k8s cluster status

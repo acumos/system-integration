@@ -65,6 +65,7 @@ function join(){ local IFS=','; echo "$*" ; }
 # wait for pods to become ready
 wait_for_pod_ready 900 $RELEASE  #seconds
 
+log "Creating temporary port-forward ...."
 PORT_FWD=service/$RELEASE
 kubectl port-forward -n $NAMESPACE $PORT_FWD $NEXUS_API_PORT:$NEXUS_API_PORT &
 while : ; do
@@ -72,6 +73,7 @@ while : ; do
     sleep 1
 done
 
+log "Performing Nexus configuration tasks ...."
 # Nexus Setup - Task 1 - Set the Nexus Administrator Password
 api PUT /beta/security/users/admin/change-password $NEXUS_ADMIN_PASSWORD
 echo $NEXUS_ADMIN_PASSWORD > $HERE/admin.password
