@@ -22,7 +22,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
  name: {{ .Values.mlwb.notebookCatalogWebcomponent.podName | quote }}
- namespace: "{{ .Values.global.namespace }}"
+ namespace: "{{ .Values.mlwb.namespace }}"
  labels:
    app: {{ .Values.mlwb.notebookCatalogWebcomponent.name | quote }}
 spec:

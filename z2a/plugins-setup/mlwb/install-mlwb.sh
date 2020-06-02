@@ -23,21 +23,22 @@
 # Prerequisites:
 # acumos installed and configured
 # mlwb plugin dependencies installed and configured
-#		 - make couchdb_install
-#		 - make jupyterhub_install
-#		 - make nifi_install
+#		 - make couchdb
+#		 - make jupyterhub
+#		 - make nifi
 #
 # HERE
 HERE=$(realpath $(dirname $0))
 
-# Default values for Acumos CouchDB
+# Default values for Acumos plugins - MLWB
 # Edit these values for custom values
-NAMESPACE=$(yq r $ACUMOS_GLOBAL_VALUE global.namespace)
 MLWB_CORE=$ACUMOS_BASE/acumos-plugins/mlwb
 MLWB_CHARTS=$MLWB_CORE/charts
+MLWB_GLOBAL_VALUE=$ACUMOS_BASE/mlwb_value.yaml
+MLWB_NAMESPACE=$(yq r $MLWB_GLOBAL_VALUE mlwb.namespace)
 
-# Individual MLWB charts
-# helm install -name $CHARTNAME --namespace $NAMESPACE ./$CHARTNAME/ -f ./global_value.yaml
+# Individual MLWB charts (using this format)
+# helm install -name $CHARTNAME --namespace $NAMESPACE ./$CHARTNAME/ -f ./global_value.yaml -f ./plugin_value.yaml
 # where $CHARTNAME is one of the following charts
 #  - project-service
 #  - notebook-service
@@ -56,43 +57,43 @@ MLWB_CHARTS=$MLWB_CORE/charts
 echo "Installing MLWB Helm charts ...."
 # Install (or remove) the MLWB charts, one by one in this order
 echo "Installing MLWB Project-Service chart ...."
-helm install project-service --namespace $NAMESPACE $MLWB_CHARTS/project-service/ -f $ACUMOS_GLOBAL_VALUE -f $ACUMOS_BASE/mlwb_value.yaml
+helm install project-service --namespace $MLWB_NAMESPACE $MLWB_CHARTS/project-service/ -f $ACUMOS_GLOBAL_VALUE -f $MLWB_GLOBAL_VALUE
 
 echo "Installing MLWB NoteBook-Service chart ...."
-helm install notebook-service --namespace $NAMESPACE $MLWB_CHARTS/notebook-service/ -f $ACUMOS_GLOBAL_VALUE -f $ACUMOS_BASE/mlwb_value.yaml
+helm install notebook-service --namespace $MLWB_NAMESPACE $MLWB_CHARTS/notebook-service/ -f $ACUMOS_GLOBAL_VALUE -f $MLWB_GLOBAL_VALUE
 
 echo "Installing MLWB Pipeline-Service chart ...."
-helm install pipeline-service --namespace $NAMESPACE $MLWB_CHARTS/pipeline-service/ -f $ACUMOS_GLOBAL_VALUE -f $ACUMOS_BASE/mlwb_value.yaml
+helm install pipeline-service --namespace $MLWB_NAMESPACE $MLWB_CHARTS/pipeline-service/ -f $ACUMOS_GLOBAL_VALUE -f $MLWB_GLOBAL_VALUE
 
 echo "Installing MLWB Model-Service chart ...."
-helm install model-service --namespace $NAMESPACE $MLWB_CHARTS/model-service/ -f $ACUMOS_GLOBAL_VALUE -f $ACUMOS_BASE/mlwb_value.yaml
+helm install model-service --namespace $MLWB_NAMESPACE $MLWB_CHARTS/model-service/ -f $ACUMOS_GLOBAL_VALUE -f $MLWB_GLOBAL_VALUE
 
 echo "Installing MLWB Predictor-Service chart ...."
-helm install predictor-service --namespace $NAMESPACE $MLWB_CHARTS/predictor-service/ -f $ACUMOS_GLOBAL_VALUE -f $ACUMOS_BASE/mlwb_value.yaml
+helm install predictor-service --namespace $MLWB_NAMESPACE $MLWB_CHARTS/predictor-service/ -f $ACUMOS_GLOBAL_VALUE -f $MLWB_GLOBAL_VALUE
 
 echo "Installing MLWB Dashboard-WebComponent chart ...."
-helm install dashboard-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/dashboard-webcomponent/ -f $ACUMOS_GLOBAL_VALUE -f $ACUMOS_BASE/mlwb_value.yaml
+helm install dashboard-webcomponent --namespace $MLWB_NAMESPACE $MLWB_CHARTS/dashboard-webcomponent/ -f $ACUMOS_GLOBAL_VALUE -f $MLWB_GLOBAL_VALUE
 
 echo "Installing MLWB Home-WebComponent chart ...."
-helm install home-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/home-webcomponent/ -f $ACUMOS_GLOBAL_VALUE -f $ACUMOS_BASE/mlwb_value.yaml
+helm install home-webcomponent --namespace $MLWB_NAMESPACE $MLWB_CHARTS/home-webcomponent/ -f $ACUMOS_GLOBAL_VALUE -f $MLWB_GLOBAL_VALUE
 
 echo "Installing MLWB NoteBook-Catalog-WebComponent chart ...."
-helm install notebook-catalog-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/notebook-catalog-webcomponent/ -f $ACUMOS_GLOBAL_VALUE -f $ACUMOS_BASE/mlwb_value.yaml
+helm install notebook-catalog-webcomponent --namespace $MLWB_NAMESPACE $MLWB_CHARTS/notebook-catalog-webcomponent/ -f $ACUMOS_GLOBAL_VALUE -f $MLWB_GLOBAL_VALUE
 
 echo "Installing MLWB NoteBook-WebComponent chart ...."
-helm install notebook-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/notebook-webcomponent/ -f $ACUMOS_GLOBAL_VALUE -f $ACUMOS_BASE/mlwb_value.yaml
+helm install notebook-webcomponent --namespace $MLWB_NAMESPACE $MLWB_CHARTS/notebook-webcomponent/ -f $ACUMOS_GLOBAL_VALUE -f $MLWB_GLOBAL_VALUE
 
 echo "Installing MLWB Pipeline-Catalog-WebComponent chart ...."
-helm install pipeline-catalog-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/pipeline-catalog-webcomponent/ -f $ACUMOS_GLOBAL_VALUE -f $ACUMOS_BASE/mlwb_value.yaml
+helm install pipeline-catalog-webcomponent --namespace $MLWB_NAMESPACE $MLWB_CHARTS/pipeline-catalog-webcomponent/ -f $ACUMOS_GLOBAL_VALUE -f $MLWB_GLOBAL_VALUE
 
 echo "Installing MLWB Pipeline-WebComponent chart ...."
-helm install pipeline-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/pipeline-webcomponent/ -f $ACUMOS_GLOBAL_VALUE -f $ACUMOS_BASE/mlwb_value.yaml
+helm install pipeline-webcomponent --namespace $MLWB_NAMESPACE $MLWB_CHARTS/pipeline-webcomponent/ -f $ACUMOS_GLOBAL_VALUE -f $MLWB_GLOBAL_VALUE
 
 echo "Installing MLWB Project-Catalog-WebComponent chart ...."
-helm install project-catalog-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-catalog-webcomponent/ -f $ACUMOS_GLOBAL_VALUE -f $ACUMOS_BASE/mlwb_value.yaml
+helm install project-catalog-webcomponent --namespace $MLWB_NAMESPACE $MLWB_CHARTS/project-catalog-webcomponent/ -f $ACUMOS_GLOBAL_VALUE -f $MLWB_GLOBAL_VALUE
 
 echo "Installing MLWB Project-WebComponent chart ...."
-helm install project-webcomponent --namespace $NAMESPACE $MLWB_CHARTS/project-webcomponent/ -f $ACUMOS_GLOBAL_VALUE -f $ACUMOS_BASE/mlwb_value.yaml
+helm install project-webcomponent --namespace $MLWB_NAMESPACE $MLWB_CHARTS/project-webcomponent/ -f $ACUMOS_GLOBAL_VALUE -f $MLWB_GLOBAL_VALUE
 
 echo "Finished installing MLWB Helm charts ...."
 echo "Success!!! You have successfully installed Acumos and MLWB!"

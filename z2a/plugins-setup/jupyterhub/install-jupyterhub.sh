@@ -25,7 +25,8 @@ HERE=$(realpath $(dirname $0))
 # Default values for Acumos JupyterHub
 # Edit these values for custom values
 RELEASE=mlwb-jupyterhub
-NAMESPACE=$(yq r $ACUMOS_GLOBAL_VALUE global.namespace)
+# NAMESPACE=$(yq r $ACUMOS_GLOBAL_VALUE global.namespace)
+MLWB_NAMESPACE=$(yq r $MLWB_GLOBAL_VALUE mlwb.namespace)
 
 # Random 32-byte hex string generated for JupyterHub
 export ACUMOS_JUPYTERHUB_HUB_TOKEN=$(openssl rand -hex 32)
@@ -48,14 +49,14 @@ prePuller:
 EOF
 
 echo "Installing JupyterHub Helm Chart ...."
-helm upgrade --install $RELEASE --namespace $NAMESPACE -f $ACUMOS_GLOBAL_VALUE \
+helm upgrade --install $RELEASE --namespace $MLWB_NAMESPACE -f $ACUMOS_GLOBAL_VALUE \
   -f $ACUMOS_BASE/mlwb_value.yaml -f $HERE/jhub_value.yaml \
   --version=0.8.2 jupyterhub/jupyterhub
 
 sleep 10
 echo "Waiting for JupyterHub to become available ...."
 # Loop for JupyterHub to become available
-kubectl wait pods --for=condition=Ready --all --namespace=$NAMESPACE --timeout=900s
+kubectl wait pods --for=condition=Ready --all --namespace=$MLWB_NAMESPACE --timeout=900s
 for i in $(seq 1 20) ; do
   sleep 10
   # TODO: craft a query to determine the status of JupyterHub
@@ -66,10 +67,10 @@ done
 echo "\n"
 
 echo "Determining JupyterHub Cluster setup ...."
-echo "$(kubectl --namespace=$NAMESPACE get pod)"
+echo "$(kubectl --namespace=$MLWB_NAMESPACE get pod)"
 
 echo "Retrieving JupyterHub Public IP Address ...."
-echo "$(kubectl --namespace=$NAMESPACE get svc proxy-public)"
+echo "$(kubectl --namespace=$MLWB_NAMESPACE get svc proxy-public)"
 
 echo "JupyterHub installation complete."
 echo "To use JupyterHub, enter the external IP for the proxy-public service into a browser."
