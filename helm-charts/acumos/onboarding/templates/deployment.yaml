@@ -74,6 +74,7 @@ spec:
                             "api": { "version": "1.23" },
                             "imagetag": {
                                 "prefix": "{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}"
+                                "ProxyPrefix": "{{ .Values.global.namespace }}:{{ .Values.global.acumosProxyPort }}" 
                                     },
                             "max_total_connections":  "1", "max_per_route_connections": "1"
                             },
