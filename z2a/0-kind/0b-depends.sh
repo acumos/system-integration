@@ -173,13 +173,15 @@ sudo mkdir -p /etc/systemd/system/docker.service.d
 PROXY_CONF=$Z2A_BASE/0-kind/proxy.txt
 [[ -f $PROXY_CONF ]] && {
 	PROXY=$(<$PROXY_CONF) ;
-	log "Configuring /etc/systemd/system/docker.service.d/http-proxy.conf file ...."
-	cat <<EOF | sudo tee /etc/systemd/system/docker.service.d/http-proxy.conf
+	if [[ -n $PROXY_CONF ]] ; then
+		log "Configuring /etc/systemd/system/docker.service.d/http-proxy.conf file ...."
+		cat <<EOF | sudo tee /etc/systemd/system/docker.service.d/http-proxy.conf
 [Service]
 Environment="HTTP_PROXY=http://$PROXY"
 Environment="HTTPS_PROXY=http://$PROXY"
-Environment="NO_PROXY=127.0.0.1,localhost,.svc.cluster.local,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+Environment="NO_PROXY=127.0.0.1,localhost,.svc,.svc.cluster.local,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16"
 EOF
+	fi
 }
 
 log "Starting Docker service ...."

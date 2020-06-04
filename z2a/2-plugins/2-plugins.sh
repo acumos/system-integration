@@ -25,10 +25,12 @@
 #
 # - It is assumed, that the user running this script:
 #		- has sudo access on the VM
-#		- has successfully completed the Phase 2 (Acumos) installation OR
+#		- has successfully completed the 1-acumos installation step OR
 #			has installed Acumos by other methods
 #
-# Usage:
+# - Note: to run this script stand-alone,
+#   run 0-kind/0a-env.sh to setup the environment first
+#
 
 # Anchor Z2A_BASE
 HERE=$(realpath $(dirname $0))
@@ -42,10 +44,22 @@ load_env
 set -e
 
 export ACUMOS_BASE=$Z2A_ACUMOS_BASE
+<<<<<<< Updated upstream
 # export ACUMOS_GLOBAL_VALUE=$Z2A_ACUMOS_BASE/global_value.yaml
 export MLWB_GLOBAL_VALUE=$Z2A_ACUMOS_BASE/mlwb_value.yaml
 # NAMESPACE=$(yq r $ACUMOS_GLOBAL_VALUE global.namespace)
 MLWB_NAMESPACE=$(yq r $MLWB_GLOBAL_VALUE mlwb.namespace)
+
+# Create namespace for the MLWB plugins
+echo "Starting 2-plugins installation ...."
+echo "Creating k8s namespace : name = $MLWB_NAMESPACE"
+# Create an namespace in the kind-acumos cluster (default: acumos-dev1)
+kubectl create namespace $MLWB_NAMESPACE
+=======
+export MLWB_GLOBAL_VALUE=$Z2A_ACUMOS_BASE/mlwb_value.yaml
+MLWB_NAMESPACE=$(yq r $MLWB_GLOBAL_VALUE mlwb.namespace)
+NAMESPACE=$(yq r $ACUMOS_GLOBAL_VALUE global.namespace)
+>>>>>>> Stashed changes
 
 # Create namespace for the MLWB plugins
 echo "Starting 2-plugins installation ...."
@@ -59,7 +73,7 @@ kubectl create namespace $MLWB_NAMESPACE
 echo "Starting 2-plugins dependency installation ...."
 # Installation - MLWB plugin dependencies
 
-echo "Starting MLWB dependency - CouchDB installation ...".
+echo "Starting MLWB dependency - CouchDB installation ...."
 # Installation - MLWB plugin dependencies
 (cd $Z2A_BASE/plugins-setup/ ; make couchdb)
 

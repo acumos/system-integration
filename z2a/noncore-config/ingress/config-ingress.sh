@@ -1,3 +1,4 @@
+#!/bin/bash
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -17,33 +18,15 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Makefile 	- targets for Acumos noncore dependencies
+# Name: config-ingress.sh    - helper script to configure ingress for Acumos core
 #
-# 	target:
-#		config-helper 		- config-helper (troubleshooting helper pod)
-#   ingress						- ingress configuration for Acumos
-#		kong							- Kong API gateway
-# 	mariadb-cds				- MariaDB instance for Common Data Services
-# 	nexus							- Sonatype Nexus artifact repository
-#
+# Anchor the base directory for the util.sh helper
+HERE=$(dirname $(readlink -f $0))
+source $HERE/utils.sh
+redirect_to $HERE/config.log
 
-MODULES=config-helper ingress kong mariadb-cds nexus
-all :  check-env $(MODULES)
-.PHONY : check-env $(MODULES)
-SHELL = /bin/bash
-.ONESHELL :
+# Acumos Specific Values
+NAMESPACE=$(gv_read global.namespace)
 
-check-env:
-ifndef ACUMOS_GLOBAL_VALUE
-	$(error ACUMOS_GLOBAL_VALUE is undefined)
-endif
-
-$(MODULES) : check-env
-	@set -e
-	@cp utils.sh.tpl $@/utils.sh
-	@cd $@/
-	@if [ -x install-$@.sh ] ; then ./install-$@.sh ; else true ; fi
-	@if [ -x config-$@.sh ] ; then ./config-$@.sh ; else true ; fi
-
-clean :
-	rm  */utils.sh
+log "Configure Acumos noncore dependency: Ingress ...."
+helm install -name acumos-ingress --namespace $NAMESPACE $HERE/ingress
