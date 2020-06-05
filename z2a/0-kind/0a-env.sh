@@ -33,11 +33,20 @@
 # Z2A_K8S_NAMESPACE=acumos-dev1
 #
 
+# check & create /usr/local/bin (binary dependencies installation location)
+if [[ ! -d /usr/local/bin ]] ; then
+  sudo mkdir -p /usr/local/bin
+  sudo chown root:root /usr/local/bin
+  sudo chmod 755 /usr/local/bin
+fi
+
 # Test for presence of 'yq' and install if necessary
 if ! yq --version ; then
   echo "Installing yq (YAML processor) to /usr/local/bin ...."
-  sudo wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/3.2.1/yq_linux_amd64
-  sudo chmod 755 /usr/local/bin/yq
+  wget -O /tmp/yq https://github.com/mikefarah/yq/releases/download/3.2.1/yq_linux_amd64
+  sudo chown root:root /tmp/yq
+  sudo chmod 755 /tmp/yq
+  sudo mv /tmp/yq /usr/local/bin/
 fi
 
 # Create user environment

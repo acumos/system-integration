@@ -44,22 +44,9 @@ load_env
 set -e
 
 export ACUMOS_BASE=$Z2A_ACUMOS_BASE
-<<<<<<< Updated upstream
-# export ACUMOS_GLOBAL_VALUE=$Z2A_ACUMOS_BASE/global_value.yaml
-export MLWB_GLOBAL_VALUE=$Z2A_ACUMOS_BASE/mlwb_value.yaml
-# NAMESPACE=$(yq r $ACUMOS_GLOBAL_VALUE global.namespace)
-MLWB_NAMESPACE=$(yq r $MLWB_GLOBAL_VALUE mlwb.namespace)
-
-# Create namespace for the MLWB plugins
-echo "Starting 2-plugins installation ...."
-echo "Creating k8s namespace : name = $MLWB_NAMESPACE"
-# Create an namespace in the kind-acumos cluster (default: acumos-dev1)
-kubectl create namespace $MLWB_NAMESPACE
-=======
 export MLWB_GLOBAL_VALUE=$Z2A_ACUMOS_BASE/mlwb_value.yaml
 MLWB_NAMESPACE=$(yq r $MLWB_GLOBAL_VALUE mlwb.namespace)
 NAMESPACE=$(yq r $ACUMOS_GLOBAL_VALUE global.namespace)
->>>>>>> Stashed changes
 
 # Create namespace for the MLWB plugins
 echo "Starting 2-plugins installation ...."

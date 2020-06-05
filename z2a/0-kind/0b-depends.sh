@@ -50,11 +50,6 @@ log "Starting Phase 0b-depends (Distribution Specific Dependencies) installation
 # Determine the end-user actual GID
 [[ -z GID ]] && GID=$(id -rg) ; export GID
 
-# check & create /usr/local/bin (binary dependencies installation location)
-sudo mkdir -p /usr/local/bin
-sudo chown root:root /usr/local/bin
-sudo chmod 755 /usr/local/bin
-
 # Add EPEL repo to RHEL/CentOS
 rhel && {
   log "Adding EPEL repo ...."
@@ -92,23 +87,27 @@ EOF
 log "Installing kubectl binary ...."
 # Download and install kubectl
 K8S_RELEASE=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
-sudo curl -L -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$K8S_RELEASE/bin/linux/amd64/kubectl
-sudo chmod +x /usr/local/bin/kubectl & sudo chown root:root /usr/local/bin/kubectl
+curl -L -o /tmp/kubectl https://storage.googleapis.com/kubernetes-release/release/$K8S_RELEASE/bin/linux/amd64/kubectl
+sudo chown root:root /tmp/kubectl
+sudo chmod 755 /tmp/kubectl
+sudo mv /tmp/kubectl /usr/local/bin/
 
 log "Installing Helm v3 ...."
 # Download and install helm v3 (to /usr/local/bin)
 # HELM_RELEASE=$(curl -Ls https://github.com/helm/helm/releases| awk '$0 ~ pat {print gensub(/.*".*\/(.*)".*/, "\\1","g");exit}' pat='href="/helm/helm/releases/tag/v3')
 HELM_RELEASE=$(curl -Ls https://github.com/helm/helm/releases | grep /helm/helm/releases/tag/v3 | grep -P -o 'v\d+\.\d+\.\d+' | head -1)
-sudo curl -s https://get.helm.sh/helm-${HELM_RELEASE}-linux-amd64.tar.gz | tar -zxO linux-amd64/helm > /tmp/helm
-sudo chmod +x /tmp/helm && sudo chown root:root /tmp/helm
+curl -s https://get.helm.sh/helm-${HELM_RELEASE}-linux-amd64.tar.gz | tar -zxO linux-amd64/helm > /tmp/helm
+sudo chown root:root /tmp/helm
+sudo chmod 755 /tmp/helm
 sudo mv /tmp/helm /usr/local/bin/helm
 
 log "Installing kind (Kubernetes in Docker) ...."
 # Download and install kind (kubernetes in docker)
 # NOTE: kind is NOT DESIGNED FOR PRODUCTION ENVIRONMENTS
-sudo curl -Lo /tmp/kind "https://github.com/kubernetes-sigs/kind/releases/download/v0.7.0/kind-$(uname)-amd64"
-# sudo curl -Lo /tmp/kind "https://github.com/kubernetes-sigs/kind/releases/download/v0.8.1/kind-$(uname)-amd64"
-sudo chmod +x /tmp/kind && sudo chown root:root /tmp/kind
+curl -L -o /tmp/kind "https://github.com/kubernetes-sigs/kind/releases/download/v0.7.0/kind-$(uname)-amd64"
+# curl -L -o /tmp/kind "https://github.com/kubernetes-sigs/kind/releases/download/v0.8.1/kind-$(uname)-amd64"
+sudo chown root:root /tmp/kind
+sudo chmod 755 /tmp/kind
 sudo mv /tmp/kind /usr/local/bin/kind
 
 log "Starting Phase 0b (Docker Community Edition) installation ...."
@@ -173,7 +172,7 @@ sudo mkdir -p /etc/systemd/system/docker.service.d
 PROXY_CONF=$Z2A_BASE/0-kind/proxy.txt
 [[ -f $PROXY_CONF ]] && {
 	PROXY=$(<$PROXY_CONF) ;
-	if [[ -n $PROXY_CONF ]] ; then
+	if [[ -n $PROXY ]] ; then
 		log "Configuring /etc/systemd/system/docker.service.d/http-proxy.conf file ...."
 		cat <<EOF | sudo tee /etc/systemd/system/docker.service.d/http-proxy.conf
 [Service]
