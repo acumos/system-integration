@@ -73,7 +73,7 @@ function setup_lum() {
     ## TODO change to master once merged in
     ## TODO use a helm registry -- would be better location
     rm -frd kubernetes/license-usage-manager
-    git clone "https://gerrit.acumos.org/r/license-usage-manager" \
+    git clone --depth 1 "https://gerrit.acumos.org/r/license-usage-manager" \
       kubernetes/license-usage-manager
     pathToLumHelmChart=./kubernetes/license-usage-manager/lum-helm
     create_acumos_registry_secret ${LUM_NAMESPACE}

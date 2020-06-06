@@ -55,7 +55,7 @@ function setup_jenkins() {
 
   if [[ ! -e deploy/security-verification ]]; then
     log "Downloading default security-verification-scan job config"
-    git clone https://gerrit.acumos.org/r/security-verification deploy/security-verification
+    git clone --depth 1 https://gerrit.acumos.org/r/security-verification deploy/security-verification
   else
     log "Using existing security-verification-scan job config (presumably customized)"
   fi

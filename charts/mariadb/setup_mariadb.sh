@@ -52,7 +52,7 @@ function mariadb_customize_chart() {
   trap 'fail' ERR
   CURR_DIR=$(pwd)
   rm -rf /tmp/charts
-  git clone https://github.com/helm/charts.git /tmp/charts
+  git clone --depth 1 https://github.com/helm/charts.git /tmp/charts
   cd /tmp/charts
   git checkout ed137af792e51f08d9bebfe344a8c045f3a3e2bc
   cd $CURR_DIR

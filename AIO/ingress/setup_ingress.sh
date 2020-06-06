@@ -34,7 +34,7 @@
 # oc login -u system:admin
 # oc project default
 # oc get -o yaml service/router dc/router clusterrolebinding/router-router-role serviceaccount/router > default-router-backup.yam
-# git clone https://github.com/nginxinc/nginx-openshift-router
+# git clone --depth 1 https://github.com/nginxinc/nginx-openshift-router
 # cd nginx-openshift-router/src/nginx
 # docker build -t nginx-openshift-router:0.2 .
 # cd ~

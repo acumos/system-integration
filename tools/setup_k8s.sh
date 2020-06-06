@@ -33,7 +33,7 @@
 #     # coredns will stays "containerCreating" if no available pod IPs
 #
 # Usage: on the master node,
-# $ git clone git clone https://gerrit.acumos.org/r/system-integration
+# $ git clone --depth 1 git clone --depth 1 https://gerrit.acumos.org/r/system-integration
 # $ cd system-integration/tools
 # $ bash setup_k8s.sh "[nodes]"
 #   nodes: quoted, space-separated list of k8s worker nodes. If no nodes are

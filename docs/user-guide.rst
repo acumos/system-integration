@@ -90,7 +90,7 @@ Steps
 
 .. code-block:: bash
 
-   $ git clone https://gerrit.acumos.org/r/system-integration
+   $ git clone --depth 1 https://gerrit.acumos.org/r/system-integration
 
 2. Builds, (re)creates, starts, and attaches to containers for kong, postgres.
 
@@ -265,7 +265,7 @@ Step-by-Step Guide
 
 .. code-block:: bash
 
-   $ git clone https://gerrit.acumos.org/r/system-integration
+   $ git clone --depth 1 https://gerrit.acumos.org/r/system-integration
 
 2. Change directory to  acumosk8s-public-cloud/azure
 
@@ -568,7 +568,7 @@ Set up using Helm Charts
 
 .. code-block:: bash
 
-   $ git clone https://gerrit.acumos.org/r/system-integration
+   $ git clone --depth 1 https://gerrit.acumos.org/r/system-integration
 
 2. Change directory to  acumosk8s-public-cloud/azure/HELM
 

@@ -37,7 +37,7 @@ function build_images() {
 
   log "Prepare ELK stack component configs for AIO deploy"
   if [[ -d platform-oam ]]; then rm -rf platform-oam; fi
-  git clone https://gerrit.acumos.org/r/platform-oam
+  git clone --depth 1 https://gerrit.acumos.org/r/platform-oam
   log "Correct references to elasticsearch-service for AIO deploy"
   sedi 's/elasticsearch:9200/elasticsearch-service:9200/g' \
     platform-oam/elk-stack/logstash/pipeline/logstash.conf

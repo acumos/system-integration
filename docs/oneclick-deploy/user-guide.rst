@@ -306,7 +306,7 @@ RAM and admin (sudo) permission, follow the process below.
 
   .. code-block:: bash
 
-    $ git clone https://gerrit.acumos.org/r/system-integration
+    $ git clone --depth 1 https://gerrit.acumos.org/r/system-integration
   ..
 
 * using bash, check if the user is part of the docker group, and add if not
@@ -1292,7 +1292,7 @@ an example scripted process for a clean install of the Acumos platform is:
   cp linux-amd64/tiller deploy/.
   echo "Clone system-integration"
   rm -rf deploy/system-integration
-  git clone "https://gerrit.acumos.org/r/system-integration" deploy/system-integration
+  git clone --depth 1 "https://gerrit.acumos.org/r/system-integration" deploy/system-integration
   # optional: env scripts to be copied into system-integration/AIO/ by customize_env.sh
   rm deploy/env/*
   cp -r env deploy/.
@@ -1344,7 +1344,7 @@ above by:
   cp linux-amd64/tiller deploy/.
   echo "Clone system-integration"
   rm -rf deploy/system-integration
-  git clone "https://gerrit.acumos.org/r/system-integration" deploy/system-integration
+  git clone --depth 1 "https://gerrit.acumos.org/r/system-integration" deploy/system-integration
   # optional: env scripts to be copied into system-integration/AIO/ by customize_env.sh
   rm deploy/env/*
   cp -r env deploy/.

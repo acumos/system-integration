@@ -36,7 +36,7 @@ function build_images() {
   trap 'fail' ERR
   log "Prepare $beat stack component image"
   if [[ -d platform-oam ]]; then rm -rf platform-oam; fi
-  git clone https://gerrit.acumos.org/r/platform-oam
+  git clone --depth 1 https://gerrit.acumos.org/r/platform-oam
 
   if [[ "$beat" == "filebeat" ]]; then
     log "Building local acumos-filebeat image"
@@ -88,7 +88,7 @@ function metricbeat_configmap() {
   log "Create kubernetes configmaps for metricbeat"
   # fix bug in metricbeat.yaml
   if [[ -d platform-oam ]]; then rm -rf platform-oam; fi
-  git clone https://gerrit.acumos.org/r/platform-oam
+  git clone --depth 1 https://gerrit.acumos.org/r/platform-oam
   cp platform-oam/metricbeat/config/metricbeat.yml .
   cp -r platform-oam/metricbeat/module.d .
   mv module.d modules.d

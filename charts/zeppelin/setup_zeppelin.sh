@@ -76,7 +76,7 @@ function setup() {
 
   log "Clone helm charts repo"
   tmp=/tmp/$(uuidgen)
-  git clone https://github.com/helm/charts.git $tmp
+  git clone --depth 1 https://github.com/helm/charts.git $tmp
   cd $tmp/stable/zeppelin
 
   log "Update zepellin chart to reference image apache/zeppelin"

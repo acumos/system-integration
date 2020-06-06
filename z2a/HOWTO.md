@@ -17,7 +17,7 @@ sudo apt-get install -y git
 # Make src directory ; change directory to that location
 mkdir -p $HOME/src ; cd $HOME/src
 # clone Acumos 'system-integration' repo
-git clone https://gerrit.acumos.org/r/system-integration
+git clone --depth 1 https://gerrit.acumos.org/r/system-integration
 
 # set ACUMOS_HOME environment variable
 ACUMOS_HOME=$HOME/src/system-integration
