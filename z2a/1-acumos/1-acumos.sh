@@ -50,20 +50,21 @@ NAMESPACE=$Z2A_K8S_NAMESPACE
 echo "Starting 1-acumos installation ...."
 echo "Creating k8s namespace : name = $Z2A_K8S_NAMESPACE"
 # Create an namespace on the k8s cluster
-# - for `Flow 1` - default z2a `kind` cluster namespace: acumos-dev1
+# - for `Flow 1` - default z2a `kind` cluster namespace: z2a-test
 # - for `Flow 2` - Bring-Your-Own-Cluster`, see: global_value.yaml (global.namespace)
+#TODO: add logic to determine if this namespace exists
 kubectl create namespace $Z2A_K8S_NAMESPACE
 
 echo "Starting 1-acumos (Acumos noncore dependencies) installation ...."
 # Installation - Acumos noncore dependencies
-
-echo "Installing Acumos noncore dependencies ...."
 # Install the Acumos noncore charts, one by one in this order (configuration is performed by default)
 
 echo "Install Acumos noncore dependency: Kubernetes ingress ...."
+#TODO: add logic to determine which Flow this is
 (cd $Z2A_BASE/noncore-config/ ; make ingress)
 
 echo "Install Acumos noncore dependency: Kubernetes config helper ...."
+#TODO: add logic to determine which Flow this is
 (cd $Z2A_BASE/noncore-config/ ; make config-helper)
 
 echo "Install Acumos noncore dependency: Sonatype Nexus (Oteemo Chart) ...."
@@ -99,9 +100,8 @@ echo "Finished installing Acumos noncore dependencies ...."
 
 echo "Starting 1-acumos (Acumos core) installation ...."
 # Installation - Acumos core
-
-echo "Installing Acumos core Helm charts ...."
 # Install (or remove) the Acumos core charts, one by one in this order
+
 echo "Installing Acumos prerequisite chart ...."
 helm install -name prerequisite --namespace $NAMESPACE $Z2A_ACUMOS_CORE/prerequisite/ -f $Z2A_ACUMOS_BASE/global_value.yaml
 

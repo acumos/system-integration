@@ -51,7 +51,8 @@ NAMESPACE=$(yq r $ACUMOS_GLOBAL_VALUE global.namespace)
 # Create namespace for the MLWB plugins
 echo "Starting 2-plugins installation ...."
 echo "Creating k8s namespace : name = $MLWB_NAMESPACE"
-# Create an namespace in the kind-acumos cluster (default: acumos-dev1)
+# Create an namespace in the kind-acumos cluster (default: mlwb)
+#TODO: add logic to determine if this namespace exists
 kubectl create namespace $MLWB_NAMESPACE
 
 # Test to ensure that all Pods are running before proceeding
