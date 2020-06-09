@@ -21,8 +21,8 @@
 #
 # 	target:
 #		config-helper 		- config-helper (troubleshooting helper pod)
-#   ingress						- ingress configuration for Acumos
-#		kong							- Kong API gateway
+#   ingress						- ingress configuration for Acumos (new)
+#		kong							- Kong API gateway (deprecated)
 # 	mariadb-cds				- MariaDB instance for Common Data Services
 # 	nexus							- Sonatype Nexus artifact repository
 #

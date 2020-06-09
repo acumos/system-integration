@@ -54,7 +54,6 @@ MLWB_NAMESPACE=$(yq r $MLWB_GLOBAL_VALUE mlwb.namespace)
 #  - project-catalog-webcomponent
 #  - project-webcomponent
 
-echo "Installing MLWB Helm charts ...."
 # Install (or remove) the MLWB charts, one by one in this order
 echo "Installing MLWB Project-Service chart ...."
 helm install project-service --namespace $MLWB_NAMESPACE $MLWB_CHARTS/project-service/ -f $ACUMOS_GLOBAL_VALUE -f $MLWB_GLOBAL_VALUE
