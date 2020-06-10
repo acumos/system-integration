@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "abffd147_92669dc9",
+        "filename": "helm-charts/acumos/onboarding/templates/deployment.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 387
+      },
+      "writtenOn": "2020-06-10T21:28:23Z",
+      "side": 1,
+      "message": "Isn\u0027t there supposed to be a comma here between the \"prefix\" and the \"ProxyPrefix\" ... ???\n\ni.e. {{ .Values.global.acumosNexusPort }}\",",
+      "range": {
+        "startLine": 76,
+        "startChar": 148,
+        "endLine": 76,
+        "endChar": 151
+      },
+      "revId": "68a98923257565ec3690fb846a2b56b78245104d",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
