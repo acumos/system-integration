@@ -47,21 +47,21 @@ spec:
            - name: ENVIRONMENT
              value: "deploy"
            - name: dashboardComponent
-             value: "http://{{ .Values.mlwb.dashboardWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosDashboardWebcomponentPort }}"
+             value: "https://{{ .Values.global.domainName }}/{{ .Values.mlwb.dashboardWebcomponent.svcName }}"
            - name: projectComponent
-             value: "http://{{ .Values.mlwb.projectWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosProjectWebcomponentPort }}"
+             value: "https://{{ .Values.global.domainName }}/{{ .Values.mlwb.projectWebcomponent.svcName }}"
            - name: projectCatalogComponent
-             value: "http://{{ .Values.mlwb.projectCatalogWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosProjectCatalogWebcomponentPort }}"
+             value: "https://{{ .Values.global.domainName }}/{{ .Values.mlwb.projectCatalogWebcomponent.svcName }}"
            - name: notebookComponent
-             value: "http://{{ .Values.mlwb.notebookWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosNotebookWebcomponentPort }}"
+             value: "https://{{ .Values.global.domainName }}/{{ .Values.mlwb.notebookWebcomponent.svcName }}"
            - name: notebookCatalogComponent
-             value: "http://{{ .Values.mlwb.notebookCatalogWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosNotebookCatalogWebcomponentPort }}"
+             value: "https://{{ .Values.global.domainName }}/{{ .Values.mlwb.notebookCatalogWebcomponent.svcName }}"
            - name: pipelineComponent
-             value: "http://{{ .Values.mlwb.pipelineWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosPipelineWebcomponentPort }}"
+             value: "https://{{ .Values.global.domainName }}/{{ .Values.mlwb.pipelineWebcomponent.svcName }}"
            - name: pipelineCatalogComponent
-             value: "http://{{ .Values.mlwb.pipelineCatalogWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosPipelineCatalogWebcomponentPort }}"
+             value: "https://{{ .Values.global.domainName }}/{{ .Values.mlwb.pipelineCatalogWebcomponent.svcName }}"
            - name: portalFEURL
-             value: "http://{{ .Values.global.portal.portalFe.svcName }}.{{ .Values.global.namespace }}"
+             value: "https://{{ .Values.global.domainName }}"
            - name: menuItems
              value: '[{"title": "Dashboard", "icon": "fa fa-tachometer-alt", "link": "/pages/dashboard", "home": true}, {"title": "Projects", "icon": "fa fa-project-diagram", "link": "/pages/projects/catalog"}, {"title": "Notebooks", "icon": "fas fa-book-open", "link": "/pages/notebook/catalog"}, {"title": "Data Pipelines", "icon": "fa fa-code-branch", "link": "/pages/pipeline/catalog"}, {"title": "AcuCompose", "icon": "fas fa-crop-alt", "link": "/pages/acuCompose"}]'
          volumeMounts:
