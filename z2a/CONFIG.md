@@ -6,15 +6,19 @@
 
 >Acumos Post-Install Configuration steps (documentation in progress) ...
 
+### Ingress - Native k8s service proxy and Ingress Controller (Nginx)
+
+>NOTE: This configuration activity has been integrated into the `1-acumos/1-acumos.sh` installation/configuration script. This is new and there are work items in progress.
+
+### Kong - API Gateway for Acumos (deprecated)
+
+>NOTE: This configuration activity has been integrated into the `1-acumos/1-acumos.sh` installation/configuration script.
+
 ### MariaDB - to support the Common Data Services (CDS)
 
 >NOTE: This configuration activity has been integrated into the `1-acumos/1-acumos.sh` installation/configuration script.
 
 ### Sonatype Nexus - to support artifact management
-
->NOTE: This configuration activity has been integrated into the `1-acumos/1-acumos.sh` installation/configuration script.
-
-### Kong - API Gateway for Acumos
 
 >NOTE: This configuration activity has been integrated into the `1-acumos/1-acumos.sh` installation/configuration script.
 
@@ -26,4 +30,4 @@
 
 TODO: MLWB Post-Install Configuration steps in progress ...*
 
-Last Edited: 2020-05-14
+Last Edited: 2020-06-09

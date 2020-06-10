@@ -50,7 +50,7 @@ redirect_to $HERE/0c-cluster-install.log
 # Exit with an error on any non-zero return code
 trap 'fail' ERR
 
-log "Starting Phase 0c-cluster (k8s, helm, kind) installation ...."
+log "Starting Phase 0c-cluster creation (kind, metalLB, k8s dashboard, ingress) ...."
 
 log "Initializing official Helm stable chart repo ...."
 # Initialize the official helm stable chart repo ; perform update
@@ -59,7 +59,7 @@ helm repo update
 
 log "Creating kind cluster : name = $Z2A_K8S_CLUSTERNAME (this may take a few minutes .... relax!!!!)"
 # Create kind cluster (named kind-acumos)
-kind create cluster --name=$Z2A_K8S_CLUSTERNAME --config $HERE/kind-config.yaml
+kind create cluster --name=$Z2A_K8S_CLUSTERNAME --config $HERE/kind-config.yaml -v 9
 
 # Echo cluster-info - echo output to both log file and TTY
 log "\n\n$(kubectl cluster-info --context kind-$Z2A_K8S_CLUSTERNAME)\n"
@@ -110,4 +110,4 @@ log "Waiting for all cluster pods to attain 'Ready' status ...."
 # Query `kind` cluster for the condition of the deployed pods
 kubectl wait pods --for=condition=Ready --all -A --timeout=180s
 
-log "Completed Phase 0c-cluster (k8s, helm, kind) installation ...."
+log "Completed Phase 0c-cluster creation (kind, metalLB, k8s dashboard, ingress) ...."
