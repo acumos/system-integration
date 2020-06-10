@@ -22,7 +22,7 @@
 FROM ubuntu
 
 RUN apt-get update
-RUN apt-get -y install socat
+RUN apt-get -y --no-install-recommends install socat
 
 RUN echo '#!/bin/bash' > /start.sh
 RUN echo 'exec socat ${5:+-T$5} ${1^^}-LISTEN:$2,reuseaddr,fork ${1^^}:$3:$4' >> /start.sh
