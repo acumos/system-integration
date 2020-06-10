@@ -8,11 +8,11 @@
 # Obtain a Virtual Machine (VM) with sudo access ; Login to VM
 # Note: /usr/local/bin is a required element in your $PATH
 
-# Install 'git' distributed version-control tool (Flow 1 and Flow 2)
+# Install 'git' distributed version-control tool (Flow-1 and Flow-2)
 # For RPM-based distributions such as RHEL/CentOS, execute the following command:
 sudo yum install -y git
 # For Debian-based distributions such as Ubuntu, execute the following command:
-sudo apt-get install -y git
+sudo apt-get install --no-install-recommends -y git
 
 # Make src directory ; change directory to that location
 mkdir -p $HOME/src ; cd $HOME/src
@@ -34,7 +34,7 @@ vi ./0-kind/proxy.txt
 #
 # To use the example global_value.yaml file;
 # copy the example values from z2a/dev1 to the helm-charts directory
-cp ./dev1/global_value.yaml ../helm-charts/global_value.yaml
+cp ./dev1/global_value.yaml.dev1 ../helm-charts/global_value.yaml
 
 # Method 2 - customized values
 #
@@ -46,21 +46,21 @@ cp ./dev1/global_value.yaml ../helm-charts/global_value.yaml
 # Once the global_value.yaml file has been copied or edited;
 # you can proceed with the installation
 
-# Execute 0-kind/0a-env.sh (setup user environment) (Flow 1 and Flow 2)
+# Execute 0-kind/0a-env.sh (setup user environment) (Flow-1 and Flow-2)
 ./0-kind/0a-env.sh
-# Execute 0-kind/0b-depends.sh (install / configure dependencies) (Flow 1 only)
+# Execute 0-kind/0b-depends.sh (install / configure dependencies) (Flow-1 only)
 ./0-kind/0b-depends.sh
 
 # LOG OUT OF SESSION ; LOG IN TO NEW SESSION
 # ... this step is required for Docker group inclusion)
-# Execute 0-kind/0c-cluster.sh (build and configure k8s cluster) (Flow 1 only)
+# Execute 0-kind/0c-cluster.sh (build and configure k8s cluster) (Flow-1 only)
 ACUMOS_HOME=$HOME/src/system-integration
 cd $ACUMOS_HOME/z2a
 ./0-kind/0c-cluster.sh
 
 # Ensure all k8s Pods created are in a 'Running' state.
 kubectl get pods -A
-# Execute 1-acumos.sh (install / configure noncore & core Acumos components) (Flow 1 and Flow 2)
+# Execute 1-acumos.sh (install / configure noncore & core Acumos components) (Flow-1 and Flow-2)
 ./1-acumos/1-acumos.sh
 
 # If Acumos plugins are to be installed in a new session:
@@ -68,8 +68,8 @@ kubectl get pods -A
 # ACUMOS_HOME=$HOME/src/system-integration
 
 # To install Acumos plugins ; proceed here
-cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml $ACUMOS_HOME/helm-charts/mlwb_value.yaml
-# Execute 2-plugins.sh (install / configure Acumos plugins and dependencies) (Flow 1 and Flow 2)
+cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml.mlwb $ACUMOS_HOME/helm-charts/mlwb_value.yaml
+# Execute 2-plugins.sh (install / configure Acumos plugins and dependencies) (Flow-1 and Flow-2)
 ./2-plugins/2-plugins.sh
 ```
 
@@ -101,7 +101,7 @@ It is assumed that the user who is performing this installation:
 
 > NOTE: `z2a` depends on being able to reach a number of up-to-date software repositories.  All efforts have been made to not bypass distribution-specific package managers and software update facilities.
 
-### Installation Location Creation (Flow 1 and Flow 2)
+### Installation Location Creation (Flow-1 and Flow-2)
 
 In the following section, the user will perform the following actions:
 
@@ -119,7 +119,7 @@ After completing Step #1 above (log into the VM), here are the commands to execu
 # For RPM-based distributions such as RHEL/CentOS, execute the following command:
 sudo yum install -y git
 # For Debian-based distributions such as Ubuntu, execute the following command:
-sudo apt-get install -y git
+sudo apt-get install --no-install-recommends -y git
 
 mkdir -p $HOME/src
 
@@ -150,8 +150,8 @@ drwxr-xr-x.  5 userID groupID  235 Mar 20 18:35 z2a
 
 In the directory listing shown above, two (2) directories are of special interest:
 
-* `helm_charts` is the location of the Helm charts used in this installation process
-* `z2a` is the location of the `z2a` scripts and supporting utilities.  We will refer to that directory as the Z2A_BASE directory.
+* `helm_charts` is the location of the Acumos core Helm charts used in this installation process
+* `z2a` is the location of the `z2a` scripts and supporting utilities.  We will refer to that directory as the Z2A_BASE directory.  This directory also contains some of the Acumos noncore dependency Helm charts.
 
 > NOTE: The `z2a` installation log files will be created in the Z2A_BASE directory.
 
@@ -185,7 +185,7 @@ The commands to use the Acumos example values are:
 
 ```sh
 ACUMOS_HOME=$HOME/src/system-integration
-cp $ACUMOS_HOME/z2a/dev1/global_value.yaml $ACUMOS_HOME/z2a/helm-charts/global_value.yaml
+cp $ACUMOS_HOME/z2a/dev1/global_value.yaml.dev1 $ACUMOS_HOME/z2a/helm-charts/global_value.yaml
 ```
 
 > NOTE: The Acumos example values can be used for a private development environment that is non-shared, non-production and not exposed to the Internet.  The values provided in the Acumos example file are for demonstration purposes only.
@@ -229,7 +229,7 @@ global:
 
 For entries in the `global_value.conf` file that have an existing entry, do not edit these values as they are essential for correct installation.
 
-## Installation Process (Flow 1)
+## Installation Process (Flow-1)
 
 To perform an installation of Acumos, we will need to perform the following steps:
 
@@ -285,9 +285,9 @@ To perform an installation of Acumos, we will need to perform the following step
 
 When all Kubernetes pods are in a `Running` state, the installation of the Acumos noncore  and core components has been completed.
 
-## Installation Process (Flow 2)
+## Installation Process (Flow-2)
 
-To perform an installation of Acumos using the Flow 2 technique, we will need to perform the following steps:
+To perform an installation of Acumos using the Flow-2 technique, we will need to perform the following steps:
 
 NOTE:  The `global_value.yaml` file must be edited to provide the correct `clusterName` and `namespace`.  Please refer to the previous section on performing the edits to the `global_value.yaml` file.
 
@@ -332,7 +332,7 @@ Machine Learning WorkBench is installed during the `2-plugins` steps of the inst
 >
 ```sh
 ACUMOS_HOME=$HOME/src/system-integration
-cp ${ACUMOS_HOME}/z2a/dev1/mlwb_value.yaml ${ACUMOS_HOME}/z2a/helm-charts/mlwb_value.yaml
+cp ${ACUMOS_HOME}/z2a/dev1/mlwb_value.yaml.mlwb ${ACUMOS_HOME}/z2a/helm-charts/mlwb_value.yaml
 ```
 >
 > The MLWB example values can be used for a private development environment that is non-shared, non-production and not exposed to the Internet.  The values in the MLWB example file are for demonstration purposes only
@@ -399,10 +399,10 @@ To perform an installation of MLWB, we will need to perform the following steps:
 1. change directory into the `z2a/2-plugins` directory
 2. execute the `2-plugins.sh` script which install the MLWB dependencies and the MLWB components
 
-    ```sh
-    cd $HOME/src/system-integration/z2a/2-plugins
-    ./2-plugins.sh
-    ```
+```sh
+cd $HOME/src/system-integration/z2a/2-plugins
+./2-plugins.sh
+```
 
 -----
 
@@ -454,4 +454,4 @@ For post-installation Machine Learning WorkBench configuration steps, please see
 
 TODO: Add section on accessing the Acumos Portal once installation is completed.
 
-Last Edited: 2020-05-21
+Last Edited: 2020-06-09

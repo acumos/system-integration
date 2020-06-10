@@ -19,7 +19,7 @@ cd $HOME/src/system-integration/z2a
 
 ## ACUMOS_GLOBAL_VALUE
 
-For the scripts in the `plugins-setup` directory to run stand-alone (i.e. outside the `z2a` Flow 1 or Flow 2 context), the `ACUMOS_GLOBAL_VALUE` environment variable MUST be set BEFORE executing `make` to install or configure any of the defined targets in the `noncore-config/Makefile`.
+For the scripts in the `plugins-setup` directory to run stand-alone (i.e. outside the `z2a` Flow-1 or Flow-2 context), the `ACUMOS_GLOBAL_VALUE` environment variable MUST be set BEFORE executing `make` to install or configure any of the defined targets in the `noncore-config/Makefile`.
 
 If you have downloaded the Acumos `system-integration` repository from `gerrit.acumos.org` then the following command would set the `ACUMOS_GLOBAL_VALUE` environment variable:
 
@@ -39,18 +39,18 @@ export ACUMOS_GLOBAL_VALUE=$HOME/src/system-integration/helm-charts/global_value
 
 ### Installing and Configuring - MLWB (ML WorkBench)
 
-TBD
+Execute `make mlwb` will install (and configure based on the target script) MLWB.
 
 #### Installing and Configuring - CouchDB (MLWB Dependency)
 
-TBD
+Execute `make couchdb` will install (and configure based on the target script) CouchDB.
 
 #### Installing and Configuring - JupyterHub (MLWB Dependency)
 
-TBD
+Execute `make jupyterhub` will install (and configure based on the target script) JupyterHub.
 
 #### Installing and Configuring - NiFi (MLWB Dependency)
 
-TBD
+Execute `make nifi` will install (and configure based on the target script) NiFi.
 
-Last Edited: 2020-05-22
+Last Edited: 2020-06-09
