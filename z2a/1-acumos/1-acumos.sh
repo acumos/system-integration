@@ -108,8 +108,11 @@ helm install -name prerequisite --namespace $NAMESPACE $Z2A_ACUMOS_CORE/prerequi
 echo "Installing Acumos Common Data Services chart ...."
 helm install -name common-data-svc --namespace $NAMESPACE $Z2A_ACUMOS_CORE/common-data-svc/ -f $Z2A_ACUMOS_BASE/global_value.yaml
 
-echo "Installing Acumos Portal chart ...."
-helm install -name portal --namespace $NAMESPACE $Z2A_ACUMOS_CORE/portal/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
+echo "Installing Acumos Portal BE chart ...."
+helm install -name portal --namespace $NAMESPACE $Z2A_ACUMOS_CORE/portal-be/ -f $Z2A_ACUMOS_BASE/global_value.yaml
+
+echo "Installing Acumos Portal FE chart ...."
+helm install -name portal --namespace $NAMESPACE $Z2A_ACUMOS_CORE/portal-fe/ -f $Z2A_ACUMOS_BASE/global_value.yaml -f $Z2A_ACUMOS_BASE/mlwb_value.yaml
 
 echo "Installing Acumos Onboarding chart ...."
 helm install -name onboarding --namespace $NAMESPACE $Z2A_ACUMOS_CORE/onboarding/ -f $Z2A_ACUMOS_BASE/global_value.yaml
