@@ -221,7 +221,7 @@ global:
     # Onboarding
     acumosOnboardingAppPort: "8090"
     acumosOnboardingCli: "xxxxxx"
-    acumosOnboardingBaseRImage: "onboarding-base-r:1.0.0"
+    acumosOnboardingBaseRImage: "onboarding-base-r:1.2.1"
     acumosOnboardingImage: "acumos/onboarding-app:3.8.1"
     onboarding:
         name: "acumos-onboarding"
