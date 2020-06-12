@@ -4,7 +4,7 @@ This is the README for the `2-plugins` stage of `z2a`.
 
 ## Shell Scripts
 
-> This directory contains the following scripts for `z2a`:
+>This directory contains the following scripts for `z2a`:
 
 ```sh
 # Script name and purpose
@@ -13,7 +13,7 @@ This is the README for the `2-plugins` stage of `z2a`.
 
 ## Files
 
-> This directory contains the following files for `z2a`:
+>This directory contains the following files for `z2a`:
 
 ```sh
 README.md                # this markdown document

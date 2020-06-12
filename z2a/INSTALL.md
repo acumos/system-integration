@@ -157,25 +157,9 @@ In the directory listing shown above, two (2) directories are of special interes
 
 ### Editing the proxy.txt File
 
-> NOTE: `z2a` includes 'example' values for Acumos and MLWB that are provided to assist in performing a quick installation (see: *TL;DR* section).  The Acumos example values shown here can be used for a private development environment that is non-shared, non-production and not exposed to the Internet.  The values provided are for demonstration purposes only.
-
-The `proxy.txt` file is located in the `z2a/0-kind` directory.  This file needs to be edited such that the Docker installation can proceed cleanly.  We will need to change directories into that location to perform the necessary edits required for the Acumos installation.
-
-This file will contain a single entry in the form of `hostname` OR `hostname:port` (this is not a URL).
-
-Here is the `change directory` command to execute.
-
-```sh
-cd $HOME/src/system-integration/z2a/0-kind
-```
-
-Using your editor of choice (vi, nano, pico etc.) please open the `proxy.txt` file such that we can edit it's contents. Examples for the single-line entry required in this file are:
-
-```sh
-proxy-hostname.example.com
-OR
-proxy-hostname.example.com:3128
-```
+>NOTE: this section has been moved to the README-PROXY.md file.
+>
+>Please refer to the README-PROXY.md file for configuring `z2a` for proper operation in a proxied environment.
 
 ### Using the Example `global_value.yaml` File
 
@@ -209,7 +193,7 @@ All entries with the masked values must be changed to values that will be used d
 
 Using your editor of choice (vi, nano, pico etc.) please open the `global_value.yaml` file such that we can edit it's contents.
 
-Before edit (these are examples - please substitute proper values for your environment):
+Before edit (these are examples - please substitute values that are appropriate for your environment):
 
 ```sh
 global:
@@ -218,12 +202,21 @@ global:
     clusterName: "xxxxxx"
 ```
 
-After edit:
+After edit: (Example 1)
 
 ```sh
 global:
     appVersion: "1.0.0"
     namespace: "acumos-dev1"
+    clusterName: "kind-acumos"
+```
+
+After edit: (Example 2)
+
+```sh
+global:
+    appVersion: "1.0.0"
+    namespace: "z2a-test"
     clusterName: "kind-acumos"
 ```
 
@@ -326,7 +319,7 @@ Machine Learning WorkBench is installed during the `2-plugins` steps of the inst
 
 ### Editing the `mlwb_value.yaml` File
 
-> NOTE: `z2a` includes an example value file for MLWB in the `$HOME/src/system-integration/z2a/dev1` directory.  The MLWB example values file is provided for both illustrative purposes and to assist in performing a quick installation (see: TL;DR section).  The example MLWB values file from that directory could be used here and these edits are not required.
+>NOTE: `z2a` includes an example value file for MLWB in the `$HOME/src/system-integration/z2a/dev1` directory.  The MLWB example values file is provided for both illustrative purposes and to assist in performing a quick installation (see: TL;DR section).  The example MLWB values file from that directory could be used here and these edits are not required.
 >
 > The commands to use the MLWB example values are:
 >
@@ -335,7 +328,7 @@ ACUMOS_HOME=$HOME/src/system-integration
 cp ${ACUMOS_HOME}/z2a/dev1/mlwb_value.yaml.mlwb ${ACUMOS_HOME}/z2a/helm-charts/mlwb_value.yaml
 ```
 >
-> The MLWB example values can be used for a private development environment that is non-shared, non-production and not exposed to the Internet.  The values in the MLWB example file are for demonstration purposes only
+>The MLWB example values can be used for a private development environment that is non-shared, non-production and not exposed to the Internet.  The values in the MLWB example file are for demonstration purposes only
 
 The `mlwb_value.yaml` file is located in the `$HOME/src/system-integration/helm_charts` directory.  We will need to change directories into that location to perform the edits necessary to perform the installation.
 
@@ -416,13 +409,18 @@ Does z2a create log files? Where can I find them?
 
 Each `z2a` script creates a separate and distinct log file.  Below is a listing of these log files and their locations.
 
-| Script Name & Location     |     | Log File & Location                 |
-| :------------------------- | :-: | :---------------------------------- |
-| z2a/0-kind/0a-env.sh       |     | no log file created                 |
-| z2a/0-kind/0b-depends.sh   |     | z2a/0-kind/0b-depends-install.log   |
-| z2a/0-kind/0c-cluster.sh   |     | z2a/0-kind/0c-cluster-install.log   |
-| z2a/1-acumos/1-acumos.sh   |     | z2a/1-acumos/1-acumos-install.log   |
-| z2a/2-plugins/2-plugins.sh |     | z2a/2-plugins/2-plugins-install.log |
+| Script Name & Location | | Log File & Location |
+| :--------------------- | :-: | :-------------- |
+| z2a/0-kind/0a-env.sh       | | no log file created                 |
+| z2a/0-kind/0b-depends.sh   | | z2a/0-kind/0b-depends-install.log   |
+| z2a/0-kind/0c-cluster.sh   | | z2a/0-kind/0c-cluster-install.log   |
+| z2a/1-acumos/1-acumos.sh   | | z2a/1-acumos/1-acumos-install.log   |
+| z2a/2-plugins/2-plugins.sh | | z2a/2-plugins/2-plugins-install.log |
+| z2a/noncore-config/ingress/config-ingress.sh | | z2a/noncore-config/ingress/config-ingress.log |
+| z2a/noncore-config/mariadb-cds/config-mariadb-cds.sh | | z2a/noncore-config/mariadb-cds/config-mariadb-cds.log |
+| z2a/noncore-config/mariadb-cds/install-mariadb-cds.sh | | z2a/noncore-config/mariadb-cds/install-mariadb-cds.log |
+| z2a/noncore-config/nexus/install-nexus.sh | | z2a/noncore-config/nexus/install-nexus.log |
+| z2a/noncore-config/nexus/config-nexus.sh | | z2a/noncore-config/nexus/config-nexus.log |
 
 How do I decode an on-screen error?
 
@@ -434,24 +432,20 @@ The `z2a` scripts use a shared function to display errors on-screen during execu
 
 Here is how to decode the above error:
 
-> `2020-05-20T15:28:19+00:00`   - is the timestamp of the failure
+> `2020-05-20T15:28:19+00:00` - is the timestamp of the failure
 >
-> `z2a-utils.sh:42:(fail)`      - is the 'fail' function (line 42) of the z2a-utils.sh script
+> `z2a-utils.sh:42:(fail)` - is the 'fail' function (line 42) of the z2a-utils.sh script
 >
-> `./0-kind/0c-cluster.sh:62`   - the failure occurred at line 62 of the ./0-kind/0c-cluster.sh script
+> `./0-kind/0c-cluster.sh:62` - the failure occurred at line 62 of the ./0-kind/0c-cluster.sh script
 
 ## Additional Documentation
 
 Below are links to supplementary sources of information.
 
-Docker Proxy Configuration: <https://docs.docker.com/network/proxy/>
-
 Kind: <https://kind.sigs.k8s.io/>
-
-Proxy Setup: <https://www.shellhacks.com/linux-proxy-server-settings-set-proxy-command-line/>
 
 For post-installation Machine Learning WorkBench configuration steps, please see the MLWB section of the CONFIG.md document.
 
 TODO: Add section on accessing the Acumos Portal once installation is completed.
 
-Last Edited: 2020-06-09
+Last Edited: 2020-06-16

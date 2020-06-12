@@ -18,10 +18,10 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: 0b-depends.sh - z2a 0-kind/0b-depends setup script
+# Name: 0b-depends.sh - z2a 0-kind/0b-depends.sh setup script
 #
 # Prerequisites:
-# - Ubuntu Xenial (16.04), Bionic (18.04), or Centos 7 VM
+# - Ubuntu 20.04 or Centos 7/8 VM (recommended)
 #
 # - It is assumed, that the user running this script:
 #		- has sudo access on the VM
@@ -44,8 +44,7 @@ trap 'fail' ERR
 rhel || ubuntu || { log "Sorry, only Centos/RHEL or Ubuntu are currently supported." ; exit 1 ; }
 
 log "Starting Phase 0b-depends (Distribution Specific Dependencies) installation ...."
-# Installation - Phase 0b Distribution-specific setup
-# source $Z2A_BASE/distro-setup/setup-distro.sh
+# Installation - Phase 0b-depends distribution specific setup
 
 # Determine the end-user actual GID
 [[ -z GID ]] && GID=$(id -rg) ; export GID
@@ -95,7 +94,6 @@ sudo mv /tmp/kubectl /usr/local/bin/
 HELM_RELEASE=$(curl -Ls https://github.com/helm/helm/releases | grep /helm/helm/releases/tag/v3 | grep -P -o 'v\d+\.\d+\.\d+' | head -1)
 log "Installing Helm ${HELM_RELEASE} ...."
 # Download and install helm v3 (to /usr/local/bin)
-# HELM_RELEASE=$(curl -Ls https://github.com/helm/helm/releases| awk '$0 ~ pat {print gensub(/.*".*\/(.*)".*/, "\\1","g");exit}' pat='href="/helm/helm/releases/tag/v3')
 curl -s https://get.helm.sh/helm-${HELM_RELEASE}-linux-amd64.tar.gz | tar -zxO linux-amd64/helm > /tmp/helm
 sudo chown root:root /tmp/helm
 sudo chmod 755 /tmp/helm

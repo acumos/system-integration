@@ -23,7 +23,7 @@
 # Anchor the base directory for the util.sh helper
 HERE=$(dirname $(readlink -f $0))
 source $HERE/utils.sh
-redirect_to $HERE/config.log
+setup_logging
 
 # Acumos Values
 GV=$ACUMOS_GLOBAL_VALUE
@@ -118,3 +118,6 @@ api POST /beta/security/users "$GV_NEXUS_USER_JSON"
 
 # Explicitly pkill running port-forward
 pkill -f -9 $PORT_FWD
+
+# write out logfile name
+success

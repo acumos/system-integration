@@ -20,12 +20,18 @@
 #
 # Name: utils.sh.tpl - assortment of useful shell utility functions as a template
 #
-#
 
 # fail function
 function fail() {
 	eval "echo FAIL: $@"
 	exit 1
+}
+
+# success function
+function success() {
+	CALLER=( $(caller 0) )
+	LOGF=${CALLER[2]} ; LOGF=${LOGF%.sh}.log
+	log "${CALLER[2]} successful. See ${LOGF} for complete log."
 }
 
 # read global value from the global_value.yaml file
@@ -48,10 +54,12 @@ function logc() {
 	echo -e "$@" >&3
 }
 
-# Redirect function for logging (etc.)
-function redirect_to() {
-	exec 3>&1						# duplicate stdout before redirect
-	exec >&$1 2>&1 			# redirect stdout/stderr to file
+# function to setup consistent logging (etc.)
+function setup_logging() {
+	CALLER=( $(caller 0) )
+	LOGF=${CALLER[2]} ; LOGF=${LOGF%.sh}.log
+	exec 3>&1									# duplicate stdout before redirect
+	exec >&${LOGF} 2>&1 			# redirect stdout/stderr to file
 }
 
 # Test to ensure that a specific Pod is ready before proceeding

@@ -18,14 +18,14 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: 0c-cluster.sh - z2a 0c-cluster setup script
+# Name: 0c-cluster.sh - z2a 0-kind/0c-cluster.sh setup script
 #
 # Prerequisites:
-# - Ubuntu Xenial (16.04), Bionic (18.04), or Centos 7 VM
+# - Ubuntu 20.04 or Centos 7/8 VM (recommended)
 #
 # - It is assumed, that the user running this script:
 #		- has sudo access on the VM
-#		- has successfully ran the accompanying z2a_ph1a.sh script
+#		- has successfully ran the accompanying 0a-env.sh & 0b-depends.sh scripts
 #   - has logged out and back in to a new session
 #
 # Usage:
@@ -91,7 +91,7 @@ log "Creating Kubernetes Dashboard ClusterRole Binding ...."
 # Create k8s Cluster Role Binding
 kubectl apply -f $HERE/z2a-k8s-dashboard/clusterrolebinding.yaml
 
-log "Installing Kubernetes native ingress controller (nginX) ...."
+log "Installing Kubernetes native ingress controller (Nginx) ...."
 # Note: this k8s manifest is `kind` specific - do not install this as an ingress controller on a real k8s cluster
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
 

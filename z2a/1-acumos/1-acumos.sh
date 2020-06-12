@@ -21,7 +21,7 @@
 # Name: 1-acumos.sh - z2a 1-acumos.sh script (Acumos)
 #
 # Prerequisites:
-# - Ubuntu Xenial (16.04), Bionic (18.04), or Centos 7 VM
+# - Ubuntu 20.04 or Centos 7/8 VM (recommended)
 #
 # - It is assumed, that the user running this script:
 #		- has sudo access on their VM and
@@ -52,7 +52,14 @@ echo "Creating k8s namespace : name = $Z2A_K8S_NAMESPACE"
 # Create an namespace on the k8s cluster
 # - for `Flow 1` - default z2a `kind` cluster namespace: z2a-test
 # - for `Flow 2` - Bring-Your-Own-Cluster`, see: global_value.yaml (global.namespace)
-#TODO: add logic to determine if this namespace exists
+#
+# NOTE: the expected behavior is that the k8s cluster DOES NOT CONTAIN the defined namespace.
+# NOTE: if the script generates an error here, you can perform one of the following actions:
+#
+# 1) edit the global_value.yaml file and provide a new namespace
+# 2) remove the existing namespace
+# 3) comment out the `kubectl create` command below
+#
 kubectl create namespace $Z2A_K8S_NAMESPACE
 
 echo "Starting 1-acumos (Acumos noncore dependencies) installation ...."
@@ -60,12 +67,12 @@ echo "Starting 1-acumos (Acumos noncore dependencies) installation ...."
 # Install the Acumos noncore charts, one by one in this order (configuration is performed by default)
 
 echo "Install Acumos noncore dependency: Kubernetes ingress ...."
-#TODO: add logic to determine which Flow this is
 (cd $Z2A_BASE/noncore-config/ ; make ingress)
 
-echo "Install Acumos noncore dependency: Kubernetes config helper ...."
-#TODO: add logic to determine which Flow this is
-(cd $Z2A_BASE/noncore-config/ ; make config-helper)
+# echo "Install Acumos noncore dependency: Kubernetes config helper ...."
+# Default: config-helper is disabled by default ;
+# Uncomment the following line to enable for extended troubleshooting.
+# (cd $Z2A_BASE/noncore-config/ ; make config-helper)
 
 echo "Install Acumos noncore dependency: Sonatype Nexus (Oteemo Chart) ...."
 (cd $Z2A_BASE/noncore-config/ ; make nexus)
@@ -130,5 +137,5 @@ echo "Finished installing Acumos core Helm charts ...."
 
 echo "Please check the status of the Kubernetes pods at this time ...."
 echo "Please ensure that all pods are in a 'Running' status before proceeding ...."
-echo "Once all pods become available, access the Acumos Portal by pointing your browser to:  http://localhost:8085 ...."
+echo "Once all pods become available, access the Acumos Portal by pointing your browser to:  http://localhost:443 ...."
 echo "Note: 'localhost' is localhost on the VM running Acumos (not your desktop).  May require a SSH tunnel to access! "

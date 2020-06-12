@@ -31,7 +31,7 @@
 # Anchor the base directory for the util.sh helper
 HERE=$(dirname $(readlink -f $0))
 source $HERE/utils.sh
-redirect_to $HERE/install.log
+setup_logging
 
 # Acumos Global Values Location
 GV=$ACUMOS_GLOBAL_VALUE
@@ -74,3 +74,6 @@ wait_for_pod_ready 900 $RELEASE   # seconds
 
 # Invocation to retrieve the PostgreSQL password
 # kubectl get secret --namespace z2a-test acumos-kong-postgresql -o jsonpath="{.data.postgresql-password}" | base64 --decode
+
+# write out logfile name
+success
