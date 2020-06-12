@@ -69,16 +69,6 @@
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
-        <hudson.model.ChoiceParameterDefinition>
-          <name>FOLLOW</name>
-          <description></description>
-          <choices class="java.util.Arrays$ArrayList">
-            <a class="string-array">
-              <string>false</string>
-              <string>true</string>
-            </a>
-          </choices>
-        </hudson.model.ChoiceParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -92,14 +82,12 @@
   <builders>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
+set -x
 export KUBECONFIG=/var/jenkins_home/kube-config
-pod=$(kubectl get pods | awk &quot;/$COMPONENT/{print \$1}&quot;)
-if [[ &quot;$FOLLOW&quot; == &quot;true&quot; ]]; then
-  kubectl logs -f $pod
-else
+pods=$(kubectl get pods | awk &quot;/$COMPONENT/{print \$1}&quot;)
+for pod in $pods; do
   kubectl logs $pod
-fi
-</command>
+done</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>

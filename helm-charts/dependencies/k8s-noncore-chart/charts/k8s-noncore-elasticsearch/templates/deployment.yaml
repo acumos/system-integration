@@ -1,0 +1,137 @@
+# ===============LICENSE_START==================================================
+# Acumos Apache-2.0
+# ==============================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ==============================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END====================================================
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.global.acumosElasticsearch.podName | quote }}
+  namespace: "{{ .Values.global.namespace }}"
+  labels:
+    app: {{ .Values.global.acumosElasticsearch.name | quote }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: elasticsearch-deployment
+      app: {{ .Values.global.acumosElasticsearch.name | quote }}
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: elasticsearch-deployment
+        app: {{ .Values.global.acumosElasticsearch.name | quote }}
+      annotations:
+        # releasetime:
+        # releasetime: needs to be updated to function `now` for Helm 3
+    spec:
+      initContainers:
+      - name: set-vm-max-map-count
+        image: quay.io/giantswarm/busybox:1.28.3
+        imagePullPolicy: IfNotPresent
+        command: ['sysctl', '-w', 'vm.max_map_count=262144']
+        securityContext:
+          privileged: true
+      {{- if .Values.global.acumosELKPersistenceEnabled }}
+      - name: volume-mount-hack
+        image: quay.io/giantswarm/busybox:1.28.3
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c", "chown -R 1000:1000 /usr/share/elasticsearch/data"]
+        volumeMounts:
+        - name: elasticsearch-data
+          mountPath: /usr/share/elasticsearch/data
+      {{- end }}
+      containers:
+      - name: elasticsearch
+        image: "{{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.global.acumosElasticsearchImage }}"
+        imagePullPolicy: {{ .Values.global.acumosELKImagePullPolicy | quote }}
+        env:
+        - name: ES_JAVA_OPTS
+          value: "-Djava.net.preferIPv4Stack=true -Xms1024m -Xmx1024m"
+        ports:
+        - containerPort: {{ .Values.global.acumosElasticSearchPort }}
+        volumeMounts:
+        - name: elasticsearch
+          mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+          subPath: elasticsearch.yml
+        - name: elasticsearch-data
+          mountPath: /usr/share/elasticsearch/data
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+      - name: elkclient
+        image: "{{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.global.acumosElkClientImage }}"
+        imagePullPolicy: {{ .Values.global.acumosELKImagePullPolicy | quote }}
+        env:
+        - name: SPRING_APPLICATION_JSON
+          value: '{
+              "server": {
+                   "port": "{{ .Values.global.acumosELKHostPort }}"
+               },
+               "elk": {
+                   "host": {
+                       "url": "{{ .Values.global.acumosElasticsearch.name }}.{{ .Values.global.namespace }}"
+                   },
+                   "elasticssearch": {
+                               "port": "{{ .Values.global.acumosElasticSearchPort }}"
+                   },
+                   "cronschedule": {
+                       "createsnapshot": {
+                           "time": "0 0 * * * *"
+                       }
+                   }
+               }
+          }'
+        ports:
+        - containerPort: {{ .Values.global.acumosELKHostPort }}
+        volumeMounts:
+        - name: elk-client-logs
+          mountPath: /usr/share/maven/logs
+        - name: elasticsearch-data
+          mountPath: /elasticsearch/data
+      - name: filebeat
+        image: "{{ .Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}"
+        ports:
+          - containerPort: {{ .Values.global.acumosFilebeatPort }}
+        env:
+          - name: LOGSTASH_HOST
+            value: "{{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}"
+          - name: LOGSTASH_PORT
+            value: "{{ .Values.global.acumosLogstashPort }}"
+        volumeMounts:
+          - mountPath: /filebeat-logs
+            name: elk-client-logs
+      restartPolicy: Always
+      volumes:
+        - name: elk-client-logs
+          emptyDir: {}
+        - name: elasticsearch
+          configMap:
+            name: elasticsearch
+            items:
+            - key: elasticsearch.yml
+              path: elasticsearch.yml
+        - name: elasticsearch-data
+      {{- if .Values.global.acumosELKPersistenceEnabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.acumosELKPersistencePVCName }}
+      {{- else }}
+          emptyDir: {}
+      {{- end }}
+      imagePullSecrets:
+        - name: acumossecret

@@ -24,6 +24,14 @@ System Integration Release Notes
 ================================
 
 --------------------------
+Version 3.0.3, 19 Dec 2019
+--------------------------
+
+* `ACUMOS-3862: Update to weekly assembly Acumos_Clio_1912161300 <https://jira.acumos.org/browse/ACUMOS-3862>`_
+
+  * `6162: Update to weekly assembly Acumos_Clio_1912161300 <https://gerrit.acumos.org/r/#/c/system-integration/+/6162/>`_
+
+--------------------------
 Version 3.0.2, 19 Dec 2019
 --------------------------
 

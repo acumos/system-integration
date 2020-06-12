@@ -1,0 +1,82 @@
+#
+#============LICENSE_START=======================================================
+# Acumos Apache-2.0
+#================================================================================
+# Copyright (C) 2020 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+#================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============LICENSE_END=========================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: {{ .Values.mlwb.notebookService.podName | quote }}
+ namespace: "{{ .Values.mlwb.namespace }}"
+ labels:
+   app: {{ .Values.mlwb.notebookService.name | quote }}
+spec:
+ selector:
+   matchLabels:
+     app: {{ .Values.mlwb.notebookService.name | quote }}
+ replicas: 1
+ revisionHistoryLimit: 10
+ template:
+   metadata:
+     labels:
+       app: {{ .Values.mlwb.notebookService.name | quote }}
+   spec:
+     containers:
+       - name: notebook-service
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.mlwb.acumosNotebookServiceImage }}
+         ports:
+           - containerPort: {{ .Values.mlwb.acumosNotebookServicePort }}
+         env:
+           - name: SPRING_APPLICATION_JSON
+             value: '{
+                "server":{
+                    "port":"{{ .Values.mlwb.acumosNotebookServicePort }}"
+                },
+                "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
+                "resultsetSize" : "2000",
+                "outputFolder": "/tmp",
+                "cmndatasvc": {
+                    "endpointurl": "http://{{ .Values.global.cds.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
+                    "user": "{{ .Values.global.acumosCdsUser }}",
+                    "pwd": "{{ .Values.global.acumosCdsPassword }}"
+                },
+                "projectservice": {
+                    "url" : "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosProjectServicePort }}/mlWorkbench/v1/project"
+                },
+                "jupyterhub": {
+                    "url" : "{{ .Values.mlwb.acumosJupyterHub.url }}",
+                    "token" : "{{ .Values.mlwb.acumosJupyterHub.url }}",
+                    "storepass": "{{ .Values.mlwb.acumosJupyterHub.storepass }}",
+                    "installcert": "{{ .Values.mlwb.acumosJupyterHub.installcert }}"
+                },
+                "jupyternotebook":{
+                    "url": "{{ .Values.mlwb.acumosJupyterNotebook.url }}"
+                },
+                "jwt": {
+                    "secretkey":"secret"
+                },
+                "useexternalnotebook": "{{ .Values.mlwb.useexternalnotebook }}"
+                }'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: notebook-service-logs
+     volumes:
+       - name: notebook-service-logs
+         emptyDir: {}
+     imagePullSecrets:
+       - name: acumossecret

@@ -20,7 +20,7 @@
 -->
 <project>
   <actions/>
-  <description></description>
+  <description>Cleans up SV scan data.</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
