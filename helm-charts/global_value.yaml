@@ -1,0 +1,272 @@
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2017-2020 AT&T Intellectual Property & Tech Mahindra.
+# All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+#
+# Notes:
+#   - all sections alphabetically sorted
+#   - see Misc. blocks for miscellaneous values
+#   - see TODO notes for proposed improvements
+
+global:
+    appVersion: "1.0.0"
+    namespace: "xxxxxx"
+    clusterName: "xxxxxx"
+    domainName: "ingress.controller.domain.name"
+
+    image:
+        repository: "nexus3.acumos.org:10002"
+        #enable this session  if the docker repository has credentials
+#       pullSecrets: acumos-registry
+#       username: docker
+#       password: docker
+
+    # Linux Foundation Component Image Location
+    nexus3ReleaseRegistryLf: "nexus3.acumos.org:10002"
+    nexus3StagingRegistryLf: "nexus3.acumos.org:10004"
+    nexus3RegistryName: "nexus3.acumos.org"
+
+    # Azure client
+    acumosAzureClientImage: "acumos-azure-client:2.0.15"
+    acumosAzureClientPort: "9081"
+    acumosAzureContainerNamePrefix: "xxxxxx"
+    acumosAzureNetworkGroupName: "xxxxxx"
+    acumosAzureSubnet: "xxxxxx"
+    acumosAzureVnet: "xxxxxx"
+    # TODO: need to be refactored as acumosAzure*
+    acumosDeployedVMPassword: "xxxxxx"
+    acumosDeployedVMUser: "xxxxxx"
+    acumosRWUserName: "xxxxxx"
+    acumosRWUserPassword: "xxxxxx"
+
+    # Blueprint
+    acumosBluePrintOrchestratorImage: "blueprint-orchestrator:2.0.13"
+    acumosBluePrintPort: "8555"
+
+    # Common Data Service (CDS/Cds)
+    acumosCdsDb: "CDS"
+    acumosCdsDbHelmRelease: "acumos-cds-db"
+    acumosCdsDbPort: "3306"
+    acumosCdsDbRootPassword: "xxxxxx"
+    acumosCdsDbService: "xxxxxx"
+    acumosCdsDbUserName: "xxxxxx"
+    acumosCdsDbUserPassword: "xxxxxx"
+    acumosCdsImage: "acumos/common-dataservice:3.1.0"
+    acumosCdsPassword: "ccds_client"
+    acumosCdsUser: "ccds_client"
+    # TODO: refactor to acumosCdsSvcPort
+    acumosCommonDataSvcPort: "8000"
+    cds:
+        name: "acumos-common-data-svc"
+        podName: "acumos-k8s-cds"
+        svcName: "acumos-cds"
+
+    # Data Broker
+    acumosDataBrokerImage: "databroker-zipbroker:1.0.0"
+    acumosDataBrokerInternalPort: "8080"
+    acumosDataBrokerPort: "8556"
+
+    # Docker
+    acumosDockerHost: "acumos-docker-service"
+    acumosDockerPassword: "docker"
+    acumosDockerPlatformPort: "8002"
+    acumosDockerPort: "2375"
+    acumosDockerProxyHost: "acumos-docker-proxy-service"
+    acumosDockerProxyPort: "8883"
+    acumosDockerRegistryEmail: "xxxxxx"
+    acumosDockerUsername: "docker"
+    docker:
+        image:
+            repository: "docker"
+            tag: "17.06.0-dind"
+
+    # DesignStudio Composition
+    acumosDesignStudioImage: "acumos/ds-compositionengine:3.0.3"
+    acumosPortalDsCompositionPort: "8088"
+    dsComposition:
+        name: "acumos-ds-composition"
+        podName: "acumos-k8s-ds-composition"
+        svcName: "ds-composition"
+
+    # ELK
+    acumosElasticsearch:
+        name: "elasticsearch"
+        podName: "elasticsearch"
+        svcName: "elasticsearch"
+    acumosElasticsearchImage: "acumos/acumos-elasticsearch:3.0.7"
+    acumosElasticsearchName: "elasticsearch"
+    acumosElasticSearchPort: "9200"
+    acumosElasticsearchService: "elasticsearch-service"
+    acumosElkClientImage: "acumos/elk-client:3.0.7"
+    acumosELKHost: "xxxxxx"
+    acumosELKHostPort: "9600"
+    acumosELKImagePullPolicy: "IfNotPresent"
+    acumosELKPersistenceEnabled: "true"
+    acumosELKPersistencePVCName: "elasticsearch-data"
+    acumosELKPersistenceSize: "10Gi"
+    acumosKibanaImage: "acumos/acumos-kibana:3.0.7"
+    acumosKibanaName: "kibana"
+    acumosKibanaPort: "5601"
+    acumosKibanaService: "kibana-service"
+    acumosLogstashHost: "logstash-service"
+    acumosLogstashImage: "acumos/acumos-logstash:3.0.7"
+    acumosLogstashName: "logstash"
+    acumosLogstashPort: "5044"
+    acumosLogstashService: "logstash-service"
+
+    # Federation
+    acumosFederationGatewayPort: "9084"
+    acumosFederationImage: "acumos/federation-gateway:3.1.0"
+    acumosFederationLocalPort: "9884"
+    acumosFederationName: "acumos-k8s-federation"
+
+    # Filebeat
+    acumosFilebeatImage: "acumos/acumos-filebeat:3.0.5"
+    acumosFilebeatPort: "5000"
+
+    # Kong
+    acumosKongAdminPort: "8001"
+    acumosKongAdmSslPort: "8444"
+    acumosKongPGName: "acumos-postgres"
+    acumosKongPGPassword: "kong"
+    acumosKongPort: "443"
+    acumosKongPostgresDB: "kong"
+    acumosKongPostgresPassword: "kong"
+    acumosKongPostgresPort: "5432"
+    acumosKongPostgresUser: "kong"
+    acumosKongProxyPort: "8000"
+    acumosKongRelease: "acumos-kong"
+    acumosKongService: "acumos-kong-proxy"
+    acumosKongSslPort: "8443"
+
+    # Kubernetes Client
+    acumosKubernetesClientImage: "kubernetes-client:2.0.11"
+    acumosKubernetesClientPort: "8082"
+
+    # MailJet
+    acumosMailJetApiKey: "xxxxxx"
+    acumosMailJetId: "xxxxxx"
+    acumosMailJetSecretKey: "xxxxxx"
+
+    # MetricBeat
+    acumosMetricBeatImage: "acumos-metricbeat:2.2.2"
+    acumosMetricBeatPort: "8098"
+
+    # Microservice Generation
+    acumosMicroServiceGenerationImage: "acumos/microservice-generation:3.8.1"
+    acumosMicroServiceGenerationPort: "8333"
+    microserviceGeneration:
+        name: "acumos-microservice-generation"
+        podName: "acumos-k8s-microservice-generation"
+        svcName: "microservice-generation"
+
+    # Misc. Images
+    # TODO: find a better home for these
+    acumosCsvDataBrokerImage: "csvdatabroker:1.4.0"
+    acumosH20GenericJavaModelRunnerImage: "h2o-genericjava-modelrunner-2.2.3"
+    acumosModelServiceImage: "model-service:2.0.3"
+    acumosNotebookServiceImage: "notebook-service:2.0.3"
+    acumosPipelineServiceImage: "pipeline-service:2.0.4"
+    acumosPredictorServiceImage: "predictor-service:1.0.3"
+    acumosProjectServiceImage: "project-service:2.0.4"
+    acumosProtoViewerImage: "acumos_proto_viewer:1.5.7"
+    acumosSqlDataBrokerImage: "sqldatabroker:1.2.0"
+
+    # Misc. Keys
+    # TODO: find a better home for these
+    acumosHostname: "xxxxxx"
+    acumosKeyStorePwd: "xxxxxx"
+    acumosQandAUrl: "xxxxxx"
+    acumosTrustStorePwd: "xxxxxx"
+
+    # Misc. Ports
+    # TODO: find a better home for these
+    acumosDeployedSolutionPort: "3330"
+    acumosPlatOnPort: "9083"
+    acumosProbePort: "5006"
+
+    # Nexus Admin
+    acumosNexusAdmin: "admin"
+    acumosNexusAdminPassword: "xxxxxx"
+    acumosNexusBlobStore: "acumos-blob-store"
+    acumosNexusDataPath: "nexus-data"
+    acumosNexusDockerPort: "10002"
+    acumosNexusDockerRepo: "acumos-docker-repo"
+    acumosNexusEndpointPort: "8081"
+    acumosNexusMavenRepo: "acumos-maven-repo"
+    acumosNexusPort: "8001"
+    acumosNexusRelease: "acumos-nexus"
+    acumosNexusService: "acumos-nexus-service"
+
+    # Nexus User
+    acumosNexusUserEmail: "xxxxxx"
+    acumosNexusUserName: "xxxxxx"
+    acumosNexusUserPassword: "xxxxxx"
+    acumosNexusRole: "acumos-k8-role"
+
+    # Onboarding
+    acumosOnboardingAppPort: "8090"
+    acumosOnboardingCli: "xxxxxx"
+    acumosOnboardingBaseRImage: "onboarding-base-r:1.2.1"
+    acumosOnboardingImage: "acumos/onboarding-app:3.8.1"
+    onboarding:
+        name: "acumos-onboarding"
+        podName: "acumos-k8s-onboarding"
+        svcName: "onboarding-app"
+
+    # OpenStack client
+    acumosOpenStackClientPort: "8007"
+    acumosOpenStackEndpoint: "xxxxxx"
+    acumosOpenStackEndpointPassword: "xxxxxx"
+    acumosOpenStackEndpointUsername: "xxxxxx"
+    acumosOpenStackHostUsername: "xxxxxx"
+    acumosOpenStackImage: "openstack-client:2.0.12"
+    acumosOpenStackProxyIp: "xxxxxx"
+    acumosOpenStackSolutionPort: "8336"
+    acumosOpenStackVMUsername: "xxxxxx"
+    # TODO: refactor to acumosOpenStackSecurityGroupName (or similar)
+    acumosSecurityGroupName: "xxxxxx"
+
+    # Portal FE/BE
+    acumosPortalBeImage: "acumos/acumos-portal-be:3.0.28"
+    acumosPortalBePort: "8083"
+    acumosPortalFeImage: "acumos/acumos-portal-fe:3.0.28"
+    acumosPortalFePort: "8085"
+    portal:
+        portalFe:
+            name: "acumos-portal-front-end"
+            podName: "acumos-k8s-portal-fe"
+            svcName: "acumos-portal-fe"
+        portalBe:
+            name: "acumos-portal-back-end"
+            podName: "acumos-k8s-portal-be"
+            svcName: "acumos-portal-be"
+
+    # Proxy
+    acumosProxy: "acumos-proxy"
+    acumosProxyPort: "3128"
+
+    # PVC
+    acumosCdsDbPvcStorage: "1Gi"
+    acumosDockerPVCStorage: "50Gi"
+    acumosNexusPVCStorage: "50Gi"
+    acumosPVCStorage: "2Gi"
+
+    # Security Verification (sv)
+    acumosSecurityVerificationImage: "security-verification:0.0.24"
+    acumosSecurityVerificationPort: "9099"
+    acumosSVscan: "false"

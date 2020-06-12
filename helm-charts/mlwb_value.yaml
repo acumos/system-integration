@@ -1,0 +1,139 @@
+#
+#============LICENSE_START=======================================================
+# Acumos Apache-2.0
+#================================================================================
+# Copyright (C) 2017-2020 AT&T Intellectual Property & Tech Mahindra.
+# All rights reserved.
+#================================================================================
+# This Acumos software file is distributed by AT&T
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============LICENSE_END=========================================================
+
+mlwb:
+    # MLWB-specific values
+    namespace: "xxxxxx"
+    clusterName: "xxxxxx"
+
+    # Ports
+    acumosDashboardWebcomponentPort: "9083"
+    acumosHomeWebcomponentPort: "9082"
+    acumosModelServicePort: "9091"
+    acumosNotebookCatalogWebcomponentPort: "9087"
+    acumosNotebookServicePort: "9089"
+    acumosNotebookWebcomponentPort: "9086"
+    acumosPipelineCatalogWebcomponentPort: "9092"
+    acumosPipelineServicePort: "9090"
+    acumosPipelineWebcomponentPort: "9091"
+    acumosPredictorServicePort: "9094"
+    acumosProjectCatalogWebcomponentPort: "9085"
+    acumosProjectServicePort: "9088"
+    acumosProjectWebcomponentPort: "9084"
+    acumosValidationPort: "9603"
+
+    # Images
+    acumosDashboardWebcomponentImage: "dashboard-webcomponent:2.0.9"
+    acumosHomeWebcomponentImage: "home-webcomponent:2.0.9"
+    acumosModelServiceImage: "model-service:2.0.3"
+    acumosNotebookCatalogWebcomponentImage: "notebook-catalog-webcomponent:2.0.9"
+    acumosNotebookServiceImage: "notebook-service:2.0.3"
+    acumosNotebookWebcomponentImage: "notebook-webcomponent:2.0.9"
+    acumosPipelineCatalogWebcomponentImage: "pipeline-catalog-webcomponent:2.0.9"
+    acumosPipelineServiceImage: "pipeline-service:2.0.4"
+    acumosPipelineWebcomponentImage: "pipeline-webcomponent:2.0.9"
+    acumosPredictorServiceImage: "predictor-service:1.0.3"
+    acumosProjectCatalogWebcomponentImage: "project-catalog-webcomponent:2.0.9"
+    acumosProjectServiceImage: "project-service:2.0.4"
+    acumosProjectWebcomponentImage: "project-webcomponent:2.0.9"
+
+    useexternalpipeline: "true"
+    useexternalnotebook: "true"
+    dashboardWebcomponent:
+        name: "acumos-mlwb-dashboard-webcomponent"
+        podName: "acumos-k8s-mlwb-dashboard-webcomponent"
+        svcName: "mlwb-dashboard-webcomponent"
+    homeWebcomponent:
+        name: "acumos-mlwb-home-webcomponent"
+        podName: "acumos-k8s-mlwb-home-webcomponent"
+        svcName: "mlwb-home-webcomponent"
+    modelService:
+        name: "acumos-mlwb-model-service"
+        podName: "acumos-k8s-mlwb-model-service"
+        svcName: "mlwb-model-service"
+    notebookService:
+        name: "acumos-mlwb-notebook-service"
+        podName: "acumos-k8s-mlwb-notebook-service"
+        svcName: "mlwb-notebook-service"
+    notebookCatalogWebcomponent:
+        name: "acumos-mlwb-notebook-catalog-webcomponent"
+        podName: "acumos-k8s-mlwb-notebook-catalog-webcomponent"
+        svcName: "mlwb-notebook-catalog-webcomponent"
+    notebookWebcomponent:
+        name: "acumos-mlwb-notebook-webcomponent"
+        podName: "acumos-k8s-mlwb-notebook-webcomponent"
+        svcName: "mlwb-notebook-webcomponent"
+    pipelineCatalogWebcomponent:
+        name: "acumos-mlwb-pipeline-catalog-webcomponent"
+        podName: "acumos-k8s-mlwb-pipeline-catalog-webcomponent"
+        svcName: "mlwb-pipeline-catalog-webcomponent"
+    pipelineService:
+        name: "acumos-mlwb-pipeline-service"
+        podName: "acumos-k8s-mlwb-pipeline-service"
+        svcName: "mlwb-pipeline-service"
+    pipelineWebcomponent:
+        name: "acumos-mlwb-pipeline-webcomponent"
+        podName: "acumos-k8s-mlwb-pipeline-webcomponent"
+        svcName: "mlwb-pipeline-webcomponent"
+    predictorService:
+        name: "acumos-mlwb-predictor-service"
+        podName: "acumos-k8s-mlwb-predictor-service"
+        svcName: "mlwb-predictor-service"
+    projectCatalogWebcomponent:
+        name: "acumos-mlwb-project-catalog-webcomponent"
+        podName: "acumos-k8s-mlwb-project-catalog-webcomponent"
+        svcName: "mlwb-project-catalog-webcomponent"
+    projectService:
+        name: "acumos-mlwb-project-service"
+        podName: "acumos-k8s-mlwb-project-service"
+        svcName: "mlwb-project-service"
+    projectWebcomponent:
+        name: "acumos-mlwb-project-webcomponent"
+        podName: "acumos-k8s-mlwb-project-webcomponent"
+        svcName: "mlwb-project-webcomponent"
+
+    #CouchDB
+    acumosCouchDB:
+        createdb: "true"
+        dbname: "xxxxxx"
+        host: "xxxxxx"
+        port: "5984"
+        protocol: "http"
+        pwd: "xxxxxx"
+        user: "xxxxxx"
+
+    # Jupyter
+    acumosJupyterHub:
+        installcert: "false"
+        storepass: "xxxxxx"
+        token: "xxxxxx"
+        url: "xxxxxx"
+    acumosJupyterNotebook:
+        url: "xxxxxx"
+
+    #NIFI
+    acumosNifi:
+        adminuser: "xxxxxx"
+        createpod: "false"
+        namespace: "default"
+        registryname: "xxxxxx"
+        registryurl: "xxxxxx"
+        serviceurl: "xxxxxx"

@@ -1,0 +1,132 @@
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: {{ .Values.global.acumosFederationName | quote }}
+ namespace: "{{ .Values.global.namespace }}"
+ labels:
+   app: {{ .Values.global.acumosFederationName | quote }}
+spec:
+ selector:
+   matchLabels:
+     app: {{ .Values.global.acumosFederationName | quote }}
+     tier: frontend
+ replicas: 1
+ revisionHistoryLimit: 10
+ template:
+   metadata:
+     labels:
+       app: {{ .Values.global.acumosFederationName | quote }}
+       tier: frontend
+   spec:
+     containers:
+       - name:  federation-gateway
+         image: "{{ .Values.global.image.repository }}/{{ .Values.global.acumosFederationImage }}"
+         resources:
+           {{- toYaml .Values.resources | nindent 10 }}
+         ports:
+           - containerPort: {{ .Values.global.acumosFederationGatewayPort }}
+         env:
+           - name: "cdms.client.url"
+             value: "http://{{ .Values.global.cds.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds"
+           - name: "cdms.client.username"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: username }
+           - name: "cdms.client.password"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: password }
+           - name: SPRING_APPLICATION_JSON
+             value: '{
+               "logging": {
+               "level": {
+                  "root": "{{ .Values.logLevel }}"
+               }
+             },
+            "federation": {
+               "instance": "gateway",
+               "instance.name": "k8",
+               "operator": "d468656f-57d0-46e3-9f94-7ffa4f66dc03",
+               "address": "0.0.0.0",
+               "server": {
+                 "port": "{{ .Values.global.acumosFederationGatewayPort }}"
+               },
+               "ssl": {
+                 "key-store": "/app/certs/acumos-k8s.pkcs12",
+                 "key-store-password": "{{ .Values.global.acumosKeyStorePwd }}",
+                 "key-store-type": "PKCS12",
+                 "key-password": "{{ .Values.global.acumosKeyStorePwd }}",
+                 "trust-store": "/app/certs/acumosTrustStore.jks",
+                 "trust-store-password": "{{ .Values.global.acumosTrustStorePwd }}"
+               }
+             },
+             "local": {
+               "address": "0.0.0.0",
+               "server": {
+                 "port": "{{ .Values.global.acumosFederationLocalPort }}"
+               },
+               "ssl": {
+                 "key-store": "/app/certs/acumos-k8s.pkcs12",
+                 "key-store-password": "{{ .Values.global.acumosKeyStorePwd }}",
+                 "key-store-type": "PKCS12",
+                 "key-password": "{{ .Values.global.acumosKeyStorePwd }}",
+                 "trust-store": "/app/certs/acumosTrustStore.jks",
+                 "trust-store-password": "{{ .Values.global.acumosTrustStorePwd }}"
+               }
+             },
+             "nexus": {
+               "nexusendpointurl": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}/repository/{{ .Values.global.acumosNexusMavenRepo }}/",
+               "nexusproxy": "",
+               "nexuspassword": "{{ .Values.global.acumosNexusPassword }}",
+               "nexususername": "{{ .Values.global.acumosNexusUsername }}",
+               "nexusgroupid": "com.artifact"
+             },
+             "peer": {
+               "jobchecker": {
+                 "interval": "300"
+               }
+             }
+             }}'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: acumos-federation-logs
+           - mountPath: /app/certs
+             name: acumos-certs
+       - name: filebeat
+         image: "{{ .Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}"
+         ports:
+           - containerPort: {{ .Values.global.acumosFilebeatPort }}
+         env:
+           - name: LOGSTASH_HOST
+             value: "{{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}"
+           - name: LOGSTASH_PORT
+             value: "{{ .Values.global.acumosLogstashPort }}"
+         volumeMounts:
+           - mountPath: /filebeat-logs
+             name: acumos-federation-logs
+     volumes:
+       - name: acumos-certs
+         secret:
+           secretName: acumos-certs
+       - name: acumos-federation-logs
+         emptyDir: {}
+     {{ if .Values.global.image.pullSecrets -}}
+     imagePullSecrets:
+       - name: {{ .Values.global.image.pullSecrets }}
+     {{- end }}
