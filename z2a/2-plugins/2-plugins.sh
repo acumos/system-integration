@@ -21,7 +21,7 @@
 # Name: 2-plugins.sh - z2a 2-plugins setup script
 #
 # Prerequisites:
-# - Ubuntu Xenial (16.04), Bionic (18.04), or Centos 7 VM
+# - Ubuntu 20.04 or Centos 7/8 VM (recommended)
 #
 # - It is assumed, that the user running this script:
 #		- has sudo access on the VM
@@ -52,7 +52,14 @@ NAMESPACE=$(yq r $ACUMOS_GLOBAL_VALUE global.namespace)
 echo "Starting 2-plugins installation ...."
 echo "Creating k8s namespace : name = $MLWB_NAMESPACE"
 # Create an namespace in the kind-acumos cluster (default: mlwb)
-#TODO: add logic to determine if this namespace exists
+#
+# NOTE: the expected behavior is that the k8s cluster DOES NOT CONTAIN the defined namespace.
+# NOTE: if the script generates an error here, you can perform one of the following actions:
+#
+# 1) edit the mlwb_value.yaml file and provide a new namespace
+# 2) remove the existing namespace
+# 3) comment out the `kubectl create` command below
+#
 kubectl create namespace $MLWB_NAMESPACE
 
 # Test to ensure that all Pods are running before proceeding

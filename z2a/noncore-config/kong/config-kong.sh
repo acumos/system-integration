@@ -37,7 +37,7 @@
 # Anchor the base directory for the util.sh helper
 HERE=$(dirname $(readlink -f $0))
 source $HERE/utils.sh
-redirect_to $HERE/config.log
+setup_logging
 
 # Acumos Specific Values
 NAMESPACE=$(gv_read global.namespace)
@@ -176,3 +176,6 @@ eval ${CMD[*]}
 pkill -f -9 $PORT_FWD
 
 log "\nKong API configuration completed successfully.\n\n"
+
+# write out logfile name
+success

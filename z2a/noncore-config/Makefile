@@ -19,16 +19,16 @@
 #
 # Makefile 	- targets for Acumos noncore dependencies
 #
-# 	target:
-#		config-helper 		- config-helper (troubleshooting helper pod)
-#   ingress						- ingress configuration for Acumos (new)
-#		kong							- Kong API gateway (deprecated)
-# 	mariadb-cds				- MariaDB instance for Common Data Services
-# 	nexus							- Sonatype Nexus artifact repository
+#	target:
+#	config-helper     - config-helper (troubleshooting helper pod) (default: disabled)
+# ingress           - ingress configuration for Acumos (new)
+#	kong              - Kong API gateway (deprecated)
+# mariadb-cds       - MariaDB instance for Common Data Services
+#	nexus             - Sonatype Nexus artifact repository
 #
 
-MODULES=config-helper ingress kong mariadb-cds nexus
-all :  check-env $(MODULES)
+# MODULES=config-helper ingress kong mariadb-cds nexus
+MODULES=ingress mariadb-cds nexus
 .PHONY : check-env $(MODULES)
 SHELL = /bin/bash
 .ONESHELL :

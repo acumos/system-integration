@@ -48,8 +48,8 @@
 HERE=$(dirname $(readlink -f $0))
 # Makefile will copy the utils.sh.tpl template into $HERE
 source $HERE/utils.sh
-# redirect_to the install logfile $HERE
-redirect_to $HERE/install.log
+# setup logging
+setup_logging
 
 # ACUMOS_GLOBAL_VALUE should be picked up from 0-kind/0a-env.sh script
 # Acumos global value file (global_value.yaml) location

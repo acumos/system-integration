@@ -23,10 +23,13 @@
 # Anchor the base directory for the util.sh helper
 HERE=$(dirname $(readlink -f $0))
 source $HERE/utils.sh
-redirect_to $HERE/config.log
+setup_logging
 
 # Acumos Specific Values
 NAMESPACE=$(gv_read global.namespace)
 
 log "Configure Acumos noncore dependency: Ingress ...."
 helm install -name acumos-ingress --namespace $NAMESPACE $HERE/ingress
+
+# write out logfile name
+success

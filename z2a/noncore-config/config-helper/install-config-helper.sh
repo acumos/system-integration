@@ -23,7 +23,7 @@
 # Anchor the base directory for the util.sh helper
 HERE=$(dirname $(readlink -f $0))
 source $HERE/utils.sh
-redirect_to $HERE/install.log
+setup_logging
 
 # Acumos Global Values Location
 GV=$ACUMOS_GLOBAL_VALUE
@@ -43,3 +43,6 @@ helm install $RELEASE -n $NAMESPACE $HERE/config-helper/ -f $ACUMOS_GLOBAL_VALUE
 log "Waiting .... (up to 15 minutes) for pod ready status ...."
 # Wait for the Nexus pods to become available
 wait_for_pod_ready 900 $RELEASE
+
+# write out logfile name
+success

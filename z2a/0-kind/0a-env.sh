@@ -18,9 +18,9 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: 0a-env.sh      - end-user environment initialization script
+# Name: 0a-env.sh      - z2a 0-kind/0a-env.sh environment initialization script
 #
-# Usage: execute this script prior to running any of the Phase 2 subordinate scripts
+# Usage: execute this script prior to running any of the subordinate z2a scripts
 # for installation or configuration of Acumos core and/or non-core components.
 #
 # Example values:
@@ -29,8 +29,8 @@
 # Z2A_ACUMOS_DEPENDENCIES=$HOME/src/local/system-integration/helm-charts/dependencies
 # Z2A_ACUMOS_NON_CORE=$HOME/src/local/system-integration/helm-charts/dependencies/k8s-noncore-chart/charts
 # Z2A_BASE=$HOME/src/local/system-integration/z2a
-# Z2A_K8S_CLUSTERNAME=acumos
-# Z2A_K8S_NAMESPACE=acumos-dev1
+# Z2A_K8S_CLUSTERNAME=kind-acumos
+# Z2A_K8S_NAMESPACE=z2a-test
 #
 
 # check & create /usr/local/bin (binary dependencies installation location)

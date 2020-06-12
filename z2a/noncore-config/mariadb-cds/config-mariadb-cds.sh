@@ -23,7 +23,7 @@
 # Anchor the base directory for the util.sh helper
 HERE=$(dirname $(readlink -f $0))
 source $HERE/utils.sh
-redirect_to $HERE/install.log
+setup_logging
 
 # Default values for Common Data Services (CDS)
 # Edit these values for custom values
@@ -69,3 +69,6 @@ $HERE/cds-user-exec.sh < $HERE/db-files/db-init.sql
 log "Verify CDS Database ...."
 # Verify that the CDS Database has been created, and the DDL/DML has been applied
 $HERE/cds-root-exec.sh < $HERE/db-files/db-verify.sql
+
+# write out logfile name
+success

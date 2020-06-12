@@ -1,14 +1,14 @@
-# HOW TO
+# HOW TO ....
 
->NOTE: Under Construction ..
+>NOTE: Under Construction ....
 
-## How to install z2a from scratch on a VM with `kind` (default - flow-1)
+## How to install z2a from scratch on a VM with `kind` (default - Flow-1)
 
 ```sh
 # Obtain a Virtual Machine (VM) with sudo access ; Login to VM
 # Note: /usr/local/bin is a required element in your $PATH
 
-# Install 'git' distributed version-control tool (Flow-1 and Flow-2)
+# Install 'git' distributed version-control tool
 # For RPM-based distributions such as RHEL/CentOS, execute the following command:
 sudo yum install -y git
 # For Debian-based distributions such as Ubuntu, execute the following command:
@@ -34,7 +34,7 @@ vi ./0-kind/proxy.txt
 #
 # To use the example global_value.yaml file;
 # copy the example values from z2a/dev1 to the helm-charts directory
-cp ./dev1/global_value.yaml ../helm-charts/global_value.yaml
+cp ./dev1/global_value.yaml.dev1 ../helm-charts/global_value.yaml
 
 # Method 2 - customized values
 #
@@ -60,7 +60,7 @@ cd $ACUMOS_HOME/z2a
 
 # Ensure all k8s Pods created are in a 'Running' state.
 kubectl get pods -A
-# Execute 1-acumos.sh (install / configure noncore & core Acumos components) (Flow-1 and Flow-2)
+# Execute 1-acumos.sh (install / configure noncore & core Acumos components)
 ./1-acumos/1-acumos.sh
 
 # If Acumos plugins are to be installed in a new session:
@@ -103,7 +103,9 @@ mv install-skel.sh install-<name-of-new-plugin>.sh
 cd ..
 ```
 
-Step 2: Edit the `z2a/plugins-setup/Makefile` file ; add a new target to the `MODULES` line
+Step 2: Edit the `z2a/plugins-setup/Makefile` file
+
+The `plugins-setup` Makefile will need to be edited to add a new target to the `MODULES` line.
 
 ```sh
 BEFORE edit:
@@ -113,10 +115,17 @@ AFTER edit:
 MODULES=couchdb jupyterhub lum nifi mlwb <name-of-new-plugin>
 ```
 
-Step 3: Edit the `z2a/plugins-setup/<name-of-new-plugin/>install-<name-of-new-plugin>.sh
+Step 3: Edit new plugin shell script
+
+The `z2a/plugins-setup/name-of-new-plugin/install-name-of-new-plugin.sh` will need to be edited to execute properly.
+
+```sh
+TBD
+Provide an example here ....
+```
 
 ## How to add a new plugin to be installed and configured
 
 * where to start ; what to do
 
-Last Edited: 2020-05-28
+Last Edited: 2020-06-10

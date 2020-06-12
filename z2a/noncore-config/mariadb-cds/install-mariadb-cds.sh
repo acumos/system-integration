@@ -23,7 +23,7 @@
 # Anchor the base directory for the util.sh helper
 HERE=$(dirname $(readlink -f $0))
 source $HERE/utils.sh
-redirect_to $HERE/install.log
+setup_logging
 
 # Default values for Common Data Services (CDS)
 # Edit these values for custom values
@@ -70,3 +70,6 @@ logc ""
 # Extract the DB root password from the K8s secrets ; insert the K/V into the global_values.yaml file
 ROOT_PASSWORD=$(kubectl get secret --namespace $NAMESPACE $RELEASE -o jsonpath="{.data.mariadb-root-password}" | base64 --decode)
 yq w -i $ACUMOS_GLOBAL_VALUE global.acumosCdsDbRootPassword $ROOT_PASSWORD
+
+# write out logfile name
+success
