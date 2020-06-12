@@ -1,0 +1,118 @@
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: {{ .Values.global.dsComposition.podName | quote }}
+ namespace: "{{ .Values.global.namespace }}"
+ labels:
+   app: {{ .Values.global.dsComposition.name | quote }}
+spec:
+ selector:
+   matchLabels:
+     app: {{ .Values.global.dsComposition.name | quote }}
+ replicas: 1
+ revisionHistoryLimit: 10
+ template:
+   metadata:
+     labels:
+       app: {{ .Values.global.dsComposition.name | quote }}
+   spec:
+     containers:
+       - name: ds-compositionengine
+         image: "{{ .Values.global.image.repository }}/{{ .Values.global.acumosDesignStudioImage }}"
+         resources:
+           {{- toYaml .Values.resources | nindent 10 }}
+         ports:
+           - containerPort: {{ .Values.global.acumosPortalDsCompositionPort }}
+         env:
+           - name: "cmndatasvc.cmndatasvcendpoinurl"
+             value: "http://{{ .Values.global.cds.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds"
+           - name: "cmndatasvc.cmndatasvcuser"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: username }
+           - name: "cmndatasvc.cmndatasvcpwd"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: password }
+           - name: SPRING_APPLICATION_JSON
+             value: '{ "server": {
+                    "port": "{{ .Values.global.acumosPortalDsCompositionPort }}" },
+                    "logging": {
+                      "level": {
+                          "root": "{{ .Values.logLevel }}"
+                      }
+                    },
+                    "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
+                    "solutionResultsetSize": "2000",
+                    "gdmJarName": "gdmservice-1.2.0.jar",
+                    "cdsCheckInterval": "20000",
+                    "cdsCheckAttempt": "7",
+                    "imagedatabrokerURI": "{{ .Values.global.image.repository }}/{{ .Values.global.acumosDataBrokerImage }}",
+                    "csvdatabrokerURI": "{{ .Values.global.image.repository }}/{{ .Values.global.acumosCsvDataBrokerImage }}",
+                    "sqldatabrokerURI": "{{ .Values.global.image.repository }}/{{ .Values.global.acumosSqlDataBrokerImage }}",
+                    "jsondatabrokerURI": "NA",
+                    "lib":"/maven/",
+                    "tosca": { "outputfolder": "/temp/output/" },
+                "nexus": {
+                         "nexusendpointurl": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}/repository/{{ .Values.global.acumosNexusMavenRepo }}/",
+                         "nexusproxy": "",
+                         "nexuspassword": "{{ .Values.global.acumosNexusPassword }}",
+                         "nexususername": "{{ .Values.global.acumosNexusUsername }}",
+                         "nexusgroupid": "com.artifact"
+                         },
+                "docker": {
+                           "host": "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
+                           "port": {{ .Values.global.acumosDockerPort }},
+                           "config": "/docker_host/.docker",
+                           "registry": {
+                                        "url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
+                                        "username": "{{ .Values.global.acumosNexusUsername }}",
+                                        "password": "{{ .Values.global.acumosNexusPassword }}",
+                                        "email": "{{ .Values.global.acumosDockerRegistryEmail }}"
+                                            },
+                            "tls": {"verify": "false"},
+                            "api": {"version": "1.23"},
+                            "imagetag": {
+                                        "prefix": "{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}"
+                                            },
+                            "max_total_connections": "1",
+                            "max_per_route_connections": "1"
+                            } }'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: acumos-ds-composition-logs
+       - name: filebeat
+         image: "{{ .Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}"
+         ports:
+           - containerPort: {{ .Values.global.acumosFilebeatPort }}
+         env:
+           - name: LOGSTASH_HOST
+             value: "{{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}"
+           - name: LOGSTASH_PORT
+             value: "{{ .Values.global.acumosLogstashPort }}"
+         volumeMounts:
+           - mountPath: /filebeat-logs
+             name: acumos-ds-composition-logs
+     volumes:
+       - name: acumos-ds-composition-logs
+         emptyDir: {}
+     {{ if .Values.global.image.pullSecrets -}}
+     imagePullSecrets:
+       - name: {{ .Values.global.image.pullSecrets }}
+     {{- end }}

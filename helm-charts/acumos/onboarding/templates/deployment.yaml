@@ -1,0 +1,139 @@
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: {{ .Values.global.onboarding.podName | quote }}
+ namespace: "{{ .Values.global.namespace }}"
+ labels:
+   app: {{ .Values.global.onboarding.name | quote }}
+spec:
+ selector:
+   matchLabels:
+     app: {{ .Values.global.onboarding.name | quote }}
+ replicas: 1
+ revisionHistoryLimit: 10
+ template:
+   metadata:
+     labels:
+       app: {{ .Values.global.onboarding.name | quote }}
+   spec:
+     containers:
+       - name: onboarding-app
+         image: "{{ .Values.global.image.repository }}/{{ .Values.global.acumosOnboardingImage }}"
+         resources:
+           {{- toYaml .Values.resources | nindent 10 }}
+         ports:
+           - containerPort: {{ .Values.global.acumosOnboardingAppPort }}
+         env:
+           - name: "cmndatasvc.cmnDataSvcEndPoinURL"
+             value: "http://{{ .Values.global.cds.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds"
+           - name: "cmndatasvc.cmnDataSvcUser"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: username }
+           - name: "cmndatasvc.cmnDataSvcPwd"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: password }
+           - name: SPRING_APPLICATION_JSON
+             value: '{ "server": {
+                   "port": "{{ .Values.global.acumosOnboardingAppPort }}",
+                   "servlet": {
+                            "context-path": "/onboarding-app"
+                               }
+                      },
+                   "logging": {
+                      "level": {
+                          "root": "{{ .Values.logLevel }}"
+                    }
+                 },
+                 "docker" : {
+                            "host": "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
+                            "port": "{{ .Values.global.acumosDockerPort }}",
+                            "config": "/docker_host/.docker",
+                            "registry": {"url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
+                            "username": "{{ .Values.global.acumosNexusUsername }}",
+                            "password": "{{ .Values.global.acumosNexusPassword }}",
+                            "email": "{{ .Values.global.acumosDockerRegistryEmail }}"},
+                            "tls": { "verify": "false" },
+                            "api": { "version": "1.23" },
+                            "imagetag": {
+                                "prefix": "{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}",
+                                "ProxyPrefix": "{{ .Values.global.namespace }}:{{ .Values.global.acumosProxyPort }}"
+                                    },
+                            "max_total_connections":  "1", "max_per_route_connections": "1"
+                            },
+                 "http_proxy": "http://{{ .Values.global.acumosProxy }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosProxyPort }}",
+                 "nexus": {
+                            "nexusEndPointURL": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}/repository/{{ .Values.global.acumosNexusMavenRepo }} }}/",
+                            "nexusUserName": "{{ .Values.global.acumosNexusUsername }}",
+                            "nexusPassword": "{{ .Values.global.acumosNexusPassword }}",
+                            "nexusproxy": "",
+                            "nexusGroupId": "com.artifact"
+                           },
+                 "tosca": {
+                            "OutputFolder": "/temp/",
+                            "GeneratorEndPointURL": "http://acumos.acumos-ns01:8080/model_create"
+                          },
+                 "mktPlace": {
+                              "mktPlaceEndPointURL": "http://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalBePort }}"
+                              },
+                 "microService": {
+                     "microServiceEndPointURL": "http://{{ .Values.global.microserviceGeneration.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosMicroServiceGenerationPort }}/microservice-generation"
+                   },
+                 "requirements": {
+                                  "extraIndexURL": "",
+                                  "trustedHost": ""
+                                 },
+                  "security": {
+                       "verificationEnableFlag": "{{ .Values.global.acumosSVscan }}",
+                       "verificationApiUrl": "http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosSecurityVerificationPort }}"
+                       },
+                 "authenticationServiceURL": "http://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalBePort }}",
+                 "spring": {
+                     "servlet": {
+                       "multipart": {
+                          "max-file-size": "-1",
+                          "max-request-size": "-1"
+                       }
+                     }
+                   },
+                 "base_image": { "rimage": "{{ .Values.global.image.repository }}/{{ .Values.global.acumosOnboardingBaseRImage }}","dockerusername": "{{ .Values.global.acumosDockerUsername }}","dockerpassword": "{{ .Values.global.acumosDockerPassword }}"}
+                 }'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: acumos-onboarding-logs
+       - name: filebeat
+         image: "{{ .Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}"
+         ports:
+           - containerPort: {{ .Values.global.acumosFilebeatPort }}
+         env:
+           - name: LOGSTASH_HOST
+             value: "{{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}"
+           - name: LOGSTASH_PORT
+             value: "{{ .Values.global.acumosLogstashPort }}"
+         volumeMounts:
+           - mountPath: /filebeat-logs
+             name: acumos-onboarding-logs
+     volumes:
+       - name: acumos-onboarding-logs
+         emptyDir: {}
+     {{ if .Values.global.image.pullSecrets -}}
+     imagePullSecrets:
+       - name: {{ .Values.global.image.pullSecrets }}
+     {{- end }}

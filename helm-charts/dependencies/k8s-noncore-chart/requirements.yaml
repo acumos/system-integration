@@ -1,0 +1,53 @@
+#
+#============LICENSE_START======================================================
+#
+# ===================================================================================
+# Copyright (C) 2017-2020 AT&T Intellectual Property & Tech Mahindra.
+# All rights reserved.
+# ===================================================================================
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============LICENSE_END=======================================================
+#
+dependencies:
+  - name: k8s-noncore-docker
+    repository: 'file://charts/k8s-noncore-docker'
+    alias: k8s-noncore-docker
+    version: ~3.x-0
+  - name: k8s-noncore-mariadb
+    repository: 'file://charts/k8s-noncore-mariadb'
+    alias: k8s-noncore-mariadb
+    version: ~3.x-0
+  - name: k8s-noncore-nexus
+    repository: 'file://charts/k8s-noncore-nexus'
+    alias: k8s-noncore-nexus
+    version: ~3.x-0
+  - name: acumos-proxy
+    repository: 'file://charts/k8s-noncore-proxy'
+    alias: k8s-noncore--proxy
+    version: ~3.x-0
+  - name: k8s-noncore-kong
+    repository: 'file://charts/k8s-noncore-kong'
+    alias: k8s-noncore-kong
+    version: ~3.x-0
+  - name: elasticsearch
+    repository: 'file://charts/k8s-noncore-elasticsearch'
+    alias: elasticsearch
+    version: ~3.x-0
+  - name: logstash
+    repository: 'file://charts/k8s-noncore-logstash'
+    alias: logstash
+    version: ~3.x-0
+  - name: kibana
+    repository: 'file://charts/k8s-noncore-kibana'
+    alias: kibana
+    version: ~3.x-0
