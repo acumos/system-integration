@@ -29,3 +29,10 @@ resources: {}
   # requests:
   #  cpu: 100m
   #  memory: 128Mi
+
+pushSelfRequestEnable: "true"
+publicationEnable: "true"
+emailService: "mailjet"
+casEnable: "false"
+verifyAccount: "false"
+tokenExpTime: 24
