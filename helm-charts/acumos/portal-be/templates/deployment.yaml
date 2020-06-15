@@ -81,6 +81,23 @@ spec:
                 "qanda": {
                    "url": "https://{{ .Values.global.acumosQandAUrl }}"
                 },
+                "concurrency" : {
+                   "async": {
+                      "core-pool-size" : 10, "max-pool-size" : 50, "queue-capacity" : 10000
+                   }
+                },
+                "elk" : {
+                   "url" : "{{ .Values.global.acumosElasticsearch.svcName  }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosELKHostPort }}/elkclient"
+                },
+                "license_profile" : {
+                   "url" : "https://{{ .Values.global.domainName }}/license-profile-editor/"
+                },
+                "k8_deploy" : {
+                   "url" : ""
+                },
+                "lum" : {
+                   "url" : "https://{{ .Values.global.domainName }}/lum"
+                },
                 "image": {
                    "size": "800KB"
                 },
@@ -94,8 +111,10 @@ spec:
                                    "url": "http://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/advancedModel"
                                }
                        },
-                   "cliPushUrl": "http://{{ .Values.global.acumosOnboardingCli }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/push",
-                   "cliAuthUrl": "http://{{ .Values.global.acumosOnboardingCli }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/auth",
+                   "cliPushModelBundleUrl" : "https://{{ .Values.global.domainName }}/onboarding-app/v2/models",
+                   "cliPushModelUrl" : "https://{{ .Values.global.domainName }}/onboarding-app/v2/advancedModel",
+                   "cliPushUrl": "https://{{ .Values.global.domainName }}/onboarding-app/v2/push",
+                   "cliAuthUrl": "https://{{ .Values.global.domainName }}/onboarding-app/v2/auth",
                    "tokenmode": "apiToken"
                    },
                 "model": {
