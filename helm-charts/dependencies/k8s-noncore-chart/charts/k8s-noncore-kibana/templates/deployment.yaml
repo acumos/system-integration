@@ -1,0 +1,66 @@
+# ===============LICENSE_START==================================================
+# Acumos Apache-2.0
+# ==============================================================================
+# Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ==============================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END====================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.global.acumosKibanaName | quote }}
+  namespace: "{{ .Values.global.namespace }}"
+  labels:
+    app: {{ .Values.global.acumosKibanaName | quote }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: kibana-deployment
+      app: {{ .Values.global.acumosKibanaName | quote }}
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: kibana-deployment
+        app: {{ .Values.global.acumosKibanaName | quote }}
+      annotations:
+        # releasetime: needs to be updated to function `now` for Helm 3
+    spec:
+      containers:
+      - name: kibana
+        image: "{{ .Values.global.nexus3ReleaseRegistryLf}}/{{ .Values.global.acumosKibanaImage }}"
+        imagePullPolicy: {{ .Values.global.elasticsearchImagePullPolicy | quote }}
+        ports:
+        - containerPort: {{ .Values.global.acumosKibanaPort }}
+        volumeMounts:
+          - name: kibana
+            mountPath: /usr/share/kibana/config/kibana.yml
+            subPath: kibana.yml
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        env:
+        - name: ELASTICSEARCH_URL
+          value: "http://elasticsearch.{{ .Values.global.namespace }}:{{ .Values.global.acumosElasticSearchPort }}"
+      volumes:
+        - name: kibana
+          configMap:
+            name: kibana
+            items:
+            - key: kibana.yml
+              path: kibana.yml
+      imagePullSecrets:
+        - name: acumossecret

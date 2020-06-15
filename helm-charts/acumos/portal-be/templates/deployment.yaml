@@ -1,0 +1,230 @@
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# ===================================================================================
+# This Acumos software file is distributed by AT&T and Tech Mahindra
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: {{ .Values.global.portal.portalBe.podName | quote }}
+ namespace: "{{ .Values.global.namespace }}"
+ labels:
+   app: {{ .Values.global.portal.portalBe.name | quote }}
+spec:
+ selector:
+   matchLabels:
+     app: {{ .Values.global.portal.portalBe.name | quote }}
+ replicas: 1
+ revisionHistoryLimit: 10
+ template:
+   metadata:
+     labels:
+       app: {{ .Values.global.portal.portalBe.name | quote }}
+   spec:
+     containers:
+       - name: acumos-portal-be
+         image: "{{ .Values.global.image.repository }}/{{ .Values.global.acumosPortalBeImage }}"
+         resources:
+           {{- toYaml .Values.resources | nindent 10 }}
+         ports:
+           - containerPort: {{ .Values.global.acumosPortalBePort }}
+         env:
+           - name: "cdms.client.url"
+             value: "http://{{ .Values.global.cds.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds"
+           - name: "cdms.client.username"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: username }
+           - name: "cdms.client.password"
+             valueFrom:
+                secretKeyRef: { name: ccdsclientsecret, key: password }
+           - name: SPRING_APPLICATION_JSON
+             value: '{ "server" : {
+                   "port": "{{ .Values.global.acumosPortalBePort }}"
+                },
+                "logging": {
+                    "level": {
+                        "root": "{{ .Values.logLevel }}"
+                    }
+                 },
+                "nexus": {
+                        "url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}/repository/{{ .Values.global.acumosNexusMavenRepo }}",
+                        "proxy": "",
+                        "password": "{{ .Values.global.acumosNexusPassword }}",
+                        "username": "{{ .Values.global.acumosNexusUsername }}",
+                        "groupid": "com.artifact"
+                },
+                "docker": {
+                   "host": "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
+                   "registry": {
+                      "url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
+                      "username": "{{ .Values.global.acumosNexusUsername }}",
+                      "password": "{{ .Values.global.acumosNexusPassword }}",
+                      "email": "admin@acumos.com"
+                   },
+                   "imagetag": {
+                       "prefix": "{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}"
+                   }
+                },
+                "qanda": {
+                   "url": "https://{{ .Values.global.acumosQandAUrl }}"
+                },
+                "image": {
+                   "size": "800KB"
+                },
+                "onboarding": {
+                   "push": {
+                       "model": {
+                          "url": "http://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/models",
+                          "dcae_url": "http://{{ .Values.global.namespace }}:{{ .Values.global.acumosMicroServiceGenerationPort }}/microservice-generation/v2/generateMicroservice"
+                          },
+                         "advancedmodel": {
+                                   "url": "http://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/advancedModel"
+                               }
+                       },
+                   "cliPushUrl": "http://{{ .Values.global.acumosOnboardingCli }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/push",
+                   "cliAuthUrl": "http://{{ .Values.global.acumosOnboardingCli }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/auth",
+                   "tokenmode": "apiToken"
+                   },
+                "model": {
+                   "storage": {
+                      "folder": {
+                         "name": "/acumosWebOnboarding"
+                      }
+                   }
+                },
+                "microservice": {
+                   "url": "http://{{ .Values.global.microserviceGeneration.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosMicroServiceGenerationPort }}/microservice-generation/v2/generateMicroservice"
+                },
+                "doc": {
+                   "url": "https://wiki.acumos.org"
+                },
+                "document": {
+                   "size": "10000000"
+                },
+                "jupyter": {
+                   "url": "https://acumos.{{ .Values.global.namespace }}:8086"
+                },
+                "elk": {
+                   "url": "http://{{ .Values.global.acumosElasticsearch.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosELKHostPort }}/elkclient"
+                },
+                "kubernetes": {
+                   "doc": {
+                      "url": "http://docs.acumos.org/"
+                   }
+                },
+                "portal": {
+                   "mailjet": {
+                      "api": {
+                         "key": "{{ .Values.global.acumosMailJetApiKey }}"
+                      },
+                      "secret": {
+                         "key": "{{ .Values.global.acumosMailJetSecretKey }}"
+                      },
+                      "address": {
+                         "from": "{{ .Values.global.acumosMailJetId }}"
+                      }
+                   },
+                   "feature": {
+                      "publishSelfRequestEnabled": "true",
+                      "enablePublication": "true",
+                      "email_service": "mailjet",
+                      "cas_enabled": "false",
+                      "verifyAccount": "false",
+                      "verifyToken": {
+                          "exp_time": "24"
+                        },
+                      "ds": {
+                          "menu": "{\"workbenchActive\":true,\"acucomposeActive\":true,\"blocks\":[{\"active\":true,\"title\":\"AT&T Test 2\",\"description\":\"This another new test of the DS TILE THAT IS CONFIGURABLE VIA YML.\",\"url\":\"http://att.com\",\"imagePath\":\"/images/sidebar-icons/lfai-landscape-icon-color.png\"},{\"active\":true,\"title\":\"AT&T Test\",\"description\":\"This a new test of the DS TILE THAT IS CONFIGURABLE VIA YML.\",\"url\":\"http://att.com\",\"imagePath\":\"/images/sidebar-icons/AI_Ethics.png\"}]}"
+                    },
+                      "sv": {
+                         "enabled": "{{ .Values.global.acumosSVscan }}",
+                         "api": " http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosSecurityVerificationPort }}/scan"
+                      },
+                      "menu": "[{\"name\" : \"ML Learning Path\", \"url\" : \"\", \"imagePath\" : \"/images/sidebar-icons/ML_learning_path_selected.png\" }]",
+                      "cloud_enabled": "[{\"cloudEnabled\" : \"true\", \"cloudName\" : \"azure\", \"cloudDisplayText\" : \"Microsoft Azure\", \"imageUrl\": \"/images/deploy-cloud/microsoft_azure.png\" },{ \"cloudEnabled\" : \"false\", \"cloudName\" : \"rackspace\", \"cloudDisplayText\" : \"Rackspace\", \"imageUrl\": \"/images/deploy-cloud/rackspace.png\" },{ \"cloudEnabled\" : \"false\",  \"cloudName\" : \"gcp\", \"cloudDisplayText\" : \"Google Cloud Platform\", \"imageUrl\": \"/images/deploy-cloud/google_cloud_platform.png\" },{ \"cloudEnabled\" : \"true\",  \"cloudName\" : \"deploylocal\", \"cloudDisplayText\" : \"Deploy To Local\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_local.png\" },{ \"cloudEnabled\" : \"false\",  \"cloudName\" : \"whitebox\", \"cloudDisplayText\" : \"Deploy To White Box\", \"imageUrl\": \"/images/deploy-cloud/deploy_to_whitebox.png\" }]"
+                   },
+                   "ui": {
+                      "server": {
+                           "address": "https://{{ .Values.global.acumosHostname }}"
+                      }
+                   },
+                   "dashboard": {
+                       "url": "http://{{ .Values.global.acumosELKHost }}:{{ .Values.global.acumosKibanaPort }}"
+                   }
+                  },
+                "client": {
+                   "ssl": {
+                      "key-store": "/app/certs/acumos-k8s.pkcs12",
+                      "key-store-password": "{{ .Values.global.acumosKeyStorePwd }}",
+                      "key-store-type": "PKCS12",
+                      "key-password": "{{ .Values.global.acumosKeyStorePwd }}",
+                      "trust-store": "/app/certs/acumosTrustStore.jks",
+                      "trust-store-password": "{{ .Values.global.acumosTrustStorePwd }}"
+                   }
+                 },
+                 "gateway": {
+                    "url": "https://acumos.acumos-ns01:{{ .Values.global.acumosFederationLocalPort }}"
+                 },
+                 "dcae": {
+                    "model": {
+                       "name": {
+                          "prefix": "ONAP"
+                       }
+                    }
+                },
+                "jwt": {
+                   "auth": {
+                      "timeout": "80000000"
+                   }
+                },
+                 "cas": {
+                    "service": {
+                       "validate": {
+                            "url": "https://identity.linuxfoundation.org/cas/serviceValidate"
+                      }
+                    }
+                } }'
+         volumeMounts:
+           - mountPath: /maven/logs
+             name: portal-be-logs
+           - mountPath: /app/certs
+             name: acumos-certs
+           - mountPath: /images/sidebar-icons
+             name: acumos-images
+       - name: filebeat
+         image: "{{ .Values.global.image.repository }}/{{ .Values.global.acumosFilebeatImage }}"
+         ports:
+           - containerPort: {{ .Values.global.acumosFilebeatPort }}
+         env:
+           - name: LOGSTASH_HOST
+             value: "{{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}"
+           - name: LOGSTASH_PORT
+             value: "{{ .Values.global.acumosLogstashPort }}"
+         volumeMounts:
+           - mountPath: /filebeat-logs
+             name: portal-be-logs
+     volumes:
+       - name: portal-be-logs
+         emptyDir: {}
+       - name: acumos-images
+         emptyDir: {}
+       - name: acumos-certs
+         secret:
+           secretName: acumos-certs
+     {{ if .Values.global.image.pullSecrets -}}
+     imagePullSecrets:
+       - name: {{ .Values.global.image.pullSecrets }}
+     {{- end }}
