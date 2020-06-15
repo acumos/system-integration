@@ -81,6 +81,23 @@ spec:
                 "qanda": {
                    "url": "https://{{ .Values.global.acumosQandAUrl }}"
                 },
+                "concurrency" : {
+                   "async": {
+                      "core-pool-size" : 10, "max-pool-size" : 50, "queue-capacity" : 10000
+                   }
+                },
+                "elk" : {
+                   "url" : "{{ .Values.global.acumosElasticsearch.svcName  }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosELKHostPort }}/elkclient"
+                },
+                "license_profile" : {
+                   "url" : "https://{{ .Values.global.domainName }}/license-profile-editor/"
+                },
+                "k8_deploy" : {
+                   "url" : ""
+                },
+                "lum" : {
+                   "url" : "https://{{ .Values.global.domainName }}/lum"
+                },
                 "image": {
                    "size": "800KB"
                 },
@@ -94,8 +111,10 @@ spec:
                                    "url": "http://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/advancedModel"
                                }
                        },
-                   "cliPushUrl": "http://{{ .Values.global.acumosOnboardingCli }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/push",
-                   "cliAuthUrl": "http://{{ .Values.global.acumosOnboardingCli }}:{{ .Values.global.acumosOnboardingAppPort }}/onboarding-app/v2/auth",
+                   "cliPushModelBundleUrl" : "https://{{ .Values.global.domainName }}/onboarding-app/v2/models",
+                   "cliPushModelUrl" : "https://{{ .Values.global.domainName }}/onboarding-app/v2/advancedModel",
+                   "cliPushUrl": "https://{{ .Values.global.domainName }}/onboarding-app/v2/push",
+                   "cliAuthUrl": "https://{{ .Values.global.domainName }}/onboarding-app/v2/auth",
                    "tokenmode": "apiToken"
                    },
                 "model": {
@@ -138,14 +157,32 @@ spec:
                       }
                    },
                    "feature": {
-                      "publishSelfRequestEnabled": "true",
-                      "enablePublication": "true",
-                      "email_service": "mailjet",
-                      "cas_enabled": "false",
-                      "verifyAccount": "false",
+                      "publishSelfRequestEnabled": "{{ .Values.pushSelfRequestEnable }}",
+                      "enablePublication": "{{ .Values.publicationEnable }}",
+                      "email_service": "{{ .Values.emailService }}",
+                      "cas_enabled": "{{ .Values.casEnable }}",
+                      "verifyAccount": "{{ .Values.verifyAccount }}",
                       "verifyToken": {
-                          "exp_time": "24"
+                          "exp_time": "{{ .Values.tokenExpTime }}"
                         },
+                      "cas" : {
+                         "login" : "http://identity.linuxfoundation.org/cas/login?service=",
+                         "logout" : "https://identity.linuxfoundation.org/cas/logout?url="
+                      },
+                      "mail" : {
+                         "sender" : "customerservice@acumos.org",
+                         "subject" : {
+                                  "changepass" : "Acumos Change Password Notification",
+                                  "forgotpass" : "Acumos Forgot Password",
+                                  "newpass" : "Acumos New User Password"
+                                 }
+                      },
+                      "rtueditor" : {
+                         "url" : "https://{{ .Values.global.acumosHostname }}/license-rtu-editor/"
+                      },
+                      "loginExpire" : {
+                         "duration" : "1M"
+                      },
                       "ds": {
                           "menu": "{\"workbenchActive\":true,\"acucomposeActive\":true,\"blocks\":[{\"active\":true,\"title\":\"AT&T Test 2\",\"description\":\"This another new test of the DS TILE THAT IS CONFIGURABLE VIA YML.\",\"url\":\"http://att.com\",\"imagePath\":\"/images/sidebar-icons/lfai-landscape-icon-color.png\"},{\"active\":true,\"title\":\"AT&T Test\",\"description\":\"This a new test of the DS TILE THAT IS CONFIGURABLE VIA YML.\",\"url\":\"http://att.com\",\"imagePath\":\"/images/sidebar-icons/AI_Ethics.png\"}]}"
                     },

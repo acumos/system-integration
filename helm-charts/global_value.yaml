@@ -65,7 +65,7 @@ global:
     acumosCdsDbService: "xxxxxx"
     acumosCdsDbUserName: "xxxxxx"
     acumosCdsDbUserPassword: "xxxxxx"
-    acumosCdsImage: "acumos/common-dataservice:3.1.0"
+    acumosCdsImage: "acumos/common-dataservice:3.1.1"
     acumosCdsPassword: "ccds_client"
     acumosCdsUser: "ccds_client"
     # TODO: refactor to acumosCdsSvcPort
@@ -95,7 +95,7 @@ global:
             tag: "17.06.0-dind"
 
     # DesignStudio Composition
-    acumosDesignStudioImage: "acumos/ds-compositionengine:3.0.3"
+    acumosDesignStudioImage: "acumos/ds-compositionengine:3.0.6"
     acumosPortalDsCompositionPort: "8088"
     dsComposition:
         name: "acumos-ds-composition"
@@ -221,8 +221,8 @@ global:
     # Onboarding
     acumosOnboardingAppPort: "8090"
     acumosOnboardingCli: "xxxxxx"
-    acumosOnboardingBaseRImage: "onboarding-base-r:1.2.1"
-    acumosOnboardingImage: "acumos/onboarding-app:3.8.1"
+    acumosOnboardingBaseRImage: "acumos/onboarding-base-r:1.2.0"
+    acumosOnboardingImage: "acumos/onboarding-app:4.6.3"
     onboarding:
         name: "acumos-onboarding"
         podName: "acumos-k8s-onboarding"
@@ -242,9 +242,9 @@ global:
     acumosSecurityGroupName: "xxxxxx"
 
     # Portal FE/BE
-    acumosPortalBeImage: "acumos/acumos-portal-be:3.0.28"
+    acumosPortalBeImage: "acumos/acumos-portal-be:4.0.12"
     acumosPortalBePort: "8083"
-    acumosPortalFeImage: "acumos/acumos-portal-fe:3.0.28"
+    acumosPortalFeImage: "acumos/acumos-portal-fe:4.0.12"
     acumosPortalFePort: "8085"
     portal:
         portalFe:
