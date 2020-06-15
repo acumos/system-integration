@@ -24,9 +24,9 @@
 
 global:
     appVersion: "1.0.0"
-    namespace: "xxxxxx"
-    clusterName: "xxxxxx"
-    domainName: "ingress.controller.domain.name"
+    namespace: "acumos-dev1"
+    clusterName: "acumos-dev1"
+    domainName: "acumosk8s-dev1.westus.cloudapp.azure.com"
 
     image:
         repository: "nexus3.acumos.org:10002"
@@ -242,7 +242,7 @@ global:
     acumosSecurityGroupName: "xxxxxx"
 
     # Portal FE/BE
-    acumosPortalBeImage: "acumos/acumos-portal-be:3.0.28"
+    acumosPortalBeImage: "acumos/acumos-portal-be:4.0.12"
     acumosPortalBePort: "8083"
     acumosPortalFeImage: "acumos/acumos-portal-fe:3.0.28"
     acumosPortalFePort: "8085"
