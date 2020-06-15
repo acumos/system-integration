@@ -69,14 +69,18 @@ spec:
                     "jsondatabrokerURI": "NA",
                     "lib":"/maven/",
                     "tosca": { "outputfolder": "/temp/output/" },
-                "nexus": {
+                    "nexus": {
                          "nexusendpointurl": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}/repository/{{ .Values.global.acumosNexusMavenRepo }}/",
                          "nexusproxy": "",
                          "nexuspassword": "{{ .Values.global.acumosNexusPassword }}",
                          "nexususername": "{{ .Values.global.acumosNexusUsername }}",
                          "nexusgroupid": "com.artifact"
                          },
-                "docker": {
+                     "lum":{
+                            "on":true,
+                            "url" : "https://{{ .Values.global.domainName }}/lum"
+                          },
+                    "docker": {
                            "host": "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
                            "port": {{ .Values.global.acumosDockerPort }},
                            "config": "/docker_host/.docker",
