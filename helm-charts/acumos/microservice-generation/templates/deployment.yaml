@@ -67,10 +67,12 @@ spec:
                      "host": "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
                      "port": "{{ .Values.global.acumosDockerPort }}",
                      "config": "/docker_host/.docker",
-                     "registry": {"url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
-                     "username": "{{ .Values.global.acumosNexusUsername }}",
-                     "password": "{{ .Values.global.acumosNexusPassword }}",
-                     "email": "{{ .Values.global.acumosDockerRegistryEmail }}"},
+                     "registry": {
+                        "url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
+                        "username": "{{ .Values.global.acumosNexusUsername }}",
+                        "password": "{{ .Values.global.acumosNexusPassword }}",
+                        "email": "{{ .Values.global.acumosDockerRegistryEmail }}"
+                        },
                      "tls": {
                        "verify": "false"
                      },
@@ -96,11 +98,22 @@ spec:
                    },
                    "microService": {
                      "microServiceEndPointURL": "http://{{ .Values.global.microserviceGeneration.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosMicroServiceGenerationPort }}/microservice-generation",
-                     "microServiceAsyncFlag": "true"
+                     "microServiceAsyncFlag": "true",
+                     "createImageViaJenkins": "{{ .Values.microserviceJenkinsFlag }}"
                    },
                    "requirements": {
                      "extraIndexURL": "",
-                     "trustedHost": ""
+                     "trustedHost": "{{ .Values.global.domainName }}"
+                   },
+                   "modelrunnerUrl": {
+                          "h2o":"https://nexus.acumos.org/content/repositories/staging/org/acumos/generic-model-runner/h2o-genericjava-modelrunner/2.3.0/h2o-genericjava-modelrunner-2.3.0.jar",
+                          "javaSpark":"https://nexus.acumos.org/content/repositories/staging/org/acumos/spark-model-runner/spark-modelrunner/1.0.4/spark-modelrunner-1.0.4.jar"
+                   },
+                   "jenkins_config": {
+                         "jenkinsUri":"",
+                         "jenkinsUsername":"",
+                         "jenkinsPassword":"",
+                         "solutionLocation": "" 
                    },
                    "security": {
                      "verificationEnableFlag": "{{ .Values.global.acumosSVscan }}",

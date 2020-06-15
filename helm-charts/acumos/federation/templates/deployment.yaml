@@ -97,6 +97,22 @@ spec:
                "nexususername": "{{ .Values.global.acumosNexusUsername }}",
                "nexusgroupid": "com.artifact"
              },
+             "docker" : {
+                "host": "tcp://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosOnboardingAppPort }}",
+                "registryUrl": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}",
+                "registryUsername" : "{{ .Values.global.acumosNexusUserName }}",
+                "registryPassword" : "{{ .Values.global.acumosNexusUserPassword }}",
+                "registryEmail": "{{ .Values.global.acumosNexusUserEmail }}"
+             },
+             "license-manager" : {
+                "url" : "https://{{ .Values.global.domainName }}/lum"
+             },
+             "verification" : {
+                 "url" : ""
+             },
+             "logstash": {
+                 "url": "http://{{ .Values.global.acumosLogstashHost }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosLogstashPort }}"
+             },
              "peer": {
                "jobchecker": {
                  "interval": "300"
