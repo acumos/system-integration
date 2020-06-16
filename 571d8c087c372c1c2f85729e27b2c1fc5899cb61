@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fc64fbbf_b6b6c7bd",
+        "filename": "helm-charts/acumos/portal-be/values.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 57
+      },
+      "writtenOn": "2020-06-16T18:13:15Z",
+      "side": 1,
+      "message": "Leave mailjet out as it is up to the installer what mail service to use and configure",
+      "revId": "571d8c087c372c1c2f85729e27b2c1fc5899cb61",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
