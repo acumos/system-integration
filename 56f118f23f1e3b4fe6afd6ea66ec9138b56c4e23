@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "89675b57_53484177",
+        "filename": "helm-charts/acumos/portal-be/templates/deployment.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 57
+      },
+      "writtenOn": "2020-06-16T21:05:35Z",
+      "side": 1,
+      "message": "Could this be moved up to the lum section (line98)",
+      "range": {
+        "startLine": 180,
+        "startChar": 21,
+        "endLine": 182,
+        "endChar": 24
+      },
+      "revId": "56f118f23f1e3b4fe6afd6ea66ec9138b56c4e23",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
