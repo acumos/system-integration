@@ -48,6 +48,8 @@ EOF
 
 echo "Installing CouchDB Helm Chart ...."
 helm install $RELEASE --namespace $MLWB_NAMESPACE -f $ACUMOS_GLOBAL_VALUE -f $ACUMOS_BASE/mlwb_value.yaml -f $HERE/couchdb_value.yaml --set allowAdminParty=true couchdb/couchdb
+SVC=$(svc_lookup $RELEASE $MLWB_NAMESPACE)
+yq w -i $ACUMOS_BASE/mlwb_value.yaml mlwb.couchdbSvcName $SVC
 
 echo "Waiting for pods to become ready ...."
 # Wait for pods to become available
