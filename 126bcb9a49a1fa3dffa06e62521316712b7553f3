@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9c3c81cd_3041dd99",
+        "filename": "z2a/dev1/mlwb_value.yaml.mlwb",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-06-17T17:44:39Z",
+      "side": 1,
+      "message": "do not push real infrastructure data to opensource",
+      "range": {
+        "startLine": 28,
+        "startChar": 16,
+        "endLine": 28,
+        "endChar": 27
+      },
+      "revId": "126bcb9a49a1fa3dffa06e62521316712b7553f3",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6287d495_5ff82115",
+        "filename": "z2a/dev1/mlwb_value.yaml.mlwb",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-06-17T17:44:39Z",
+      "side": 1,
+      "message": "How do you get that svc name?",
+      "range": {
+        "startLine": 30,
+        "startChar": 21,
+        "endLine": 30,
+        "endChar": 39
+      },
+      "revId": "126bcb9a49a1fa3dffa06e62521316712b7553f3",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4691d076_c4020354",
+        "filename": "z2a/dev1/mlwb_value.yaml.mlwb",
+        "patchSetId": 2
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-06-17T17:44:39Z",
+      "side": 1,
+      "message": "wrong helm syntax. Please run helm lint to verify syntax",
+      "range": {
+        "startLine": 123,
+        "startChar": 8,
+        "endLine": 123,
+        "endChar": 49
+      },
+      "revId": "126bcb9a49a1fa3dffa06e62521316712b7553f3",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
