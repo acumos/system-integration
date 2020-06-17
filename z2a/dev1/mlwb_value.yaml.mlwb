@@ -118,11 +118,12 @@ mlwb:
     acumosCouchDB:
         createdb: "true"
         dbname: "acumos-couchdb"
-        host: "localhost"
+		#host will be : couchdb_service.namespace 
+        host: "mlwbdb-svc-couchdb.acumos-dev1"
         port: "5984"
         protocol: "http"
-        pwd: "changeMePlease"
-        user: "couch-admin"
+        pwd: "nopassword1234"
+        user: "acumosadmin"
 
     # Jupyter
     acumosJupyterHub:

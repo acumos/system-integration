@@ -56,7 +56,7 @@ spec:
                     "pwd": "{{ .Values.global.acumosCdsPassword }}"
                 },
                 "projectservice": {
-                    "url" : "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.acumosProjectServicePort }}/mlWorkbench/v1/project"
+                    "url" : "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosProjectServicePort }}/mlWorkbench/v1/project"
                 },
                 "jupyterhub": {
                     "url" : "{{ .Values.mlwb.acumosJupyterHub.url }}",
