@@ -22,6 +22,30 @@
       "revId": "56f118f23f1e3b4fe6afd6ea66ec9138b56c4e23",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "56d30b21_06290158",
+        "filename": "helm-charts/acumos/portal-be/templates/deployment.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-06-17T14:25:41Z",
+      "side": 1,
+      "message": "Ken, this \"rtu section\" is under portal.feature. It cannot be moved out.",
+      "parentUuid": "89675b57_53484177",
+      "range": {
+        "startLine": 180,
+        "startChar": 21,
+        "endLine": 182,
+        "endChar": 24
+      },
+      "revId": "56f118f23f1e3b4fe6afd6ea66ec9138b56c4e23",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
     }
   ]
 }
