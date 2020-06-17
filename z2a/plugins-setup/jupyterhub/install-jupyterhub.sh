@@ -21,6 +21,7 @@
 
 # HERE
 HERE=$(realpath $(dirname $0))
+source $HERE/utils.sh
 
 # Default values for Acumos JupyterHub
 # Edit these values for custom values
