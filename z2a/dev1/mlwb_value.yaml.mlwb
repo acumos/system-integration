@@ -25,9 +25,10 @@
 
 mlwb:
     # MLWB-specific values
-    namespace: "mlwb"
+    namespace: "acumos-dev1"
     clusterName: "kind-acumos"
-
+    couchdbSvcName: "mlwbdb-svc-couchdb"
+	
     # Ports
     acumosDashboardWebcomponentPort: "9083"
     acumosHomeWebcomponentPort: "9082"
@@ -118,11 +119,12 @@ mlwb:
     acumosCouchDB:
         createdb: "true"
         dbname: "acumos-couchdb"
-        host: "localhost"
+        #host will be : couchdb_service.namespace 
+        host: "{{couchdbSvcName}}.{{namespace}}" 
         port: "5984"
         protocol: "http"
-        pwd: "changeMePlease"
-        user: "couch-admin"
+        pwd: "nopassword1234"
+        user: "acumosadmin"
 
     # Jupyter
     acumosJupyterHub:

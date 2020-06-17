@@ -67,9 +67,9 @@ spec:
            - name: predictorWikiURL
              value: "https://wiki.acumos.org/display/TRAIN"
            - name: portalFEURL
-             value: "http://{{ .Values.global.cds.svcName }}.{{ .Values.global.namespace }}"
+             value: "http://{{ .Values.global.portal.portalFe.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalFePort }}"
            - name: portalBEURL
-             value: "http://{{ .Values.global.cds.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalBePort }}"
+             value: "http://{{ .Values.global.portal.portalBe.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalBePort }}"
            - name: pipelineFlag
              value: "true"
            - name: createTimeout
