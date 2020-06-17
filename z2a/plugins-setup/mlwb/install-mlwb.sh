@@ -29,6 +29,7 @@
 #
 # HERE
 HERE=$(realpath $(dirname $0))
+source $HERE/utils.sh
 
 # Default values for Acumos plugins - MLWB
 # Edit these values for custom values
