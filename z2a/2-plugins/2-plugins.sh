@@ -44,6 +44,7 @@ load_env
 set -e
 
 export ACUMOS_BASE=$Z2A_ACUMOS_BASE
+export ACUMOS_GLOBAL_VALUE=$Z2A_ACUMOS_BASE/global_value.yaml
 export MLWB_GLOBAL_VALUE=$Z2A_ACUMOS_BASE/mlwb_value.yaml
 MLWB_NAMESPACE=$(yq r $MLWB_GLOBAL_VALUE mlwb.namespace)
 NAMESPACE=$(yq r $ACUMOS_GLOBAL_VALUE global.namespace)
