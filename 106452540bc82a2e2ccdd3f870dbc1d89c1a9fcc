@@ -22,6 +22,30 @@
       "revId": "106452540bc82a2e2ccdd3f870dbc1d89c1a9fcc",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "52e8c596_5c5efa4a",
+        "filename": "z2a/dev1/mlwb_value.yaml.mlwb",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 387
+      },
+      "writtenOn": "2020-06-17T15:25:03Z",
+      "side": 1,
+      "message": "I concur.",
+      "parentUuid": "1cd6c755_30311915",
+      "range": {
+        "startLine": 122,
+        "startChar": 34,
+        "endLine": 122,
+        "endChar": 45
+      },
+      "revId": "106452540bc82a2e2ccdd3f870dbc1d89c1a9fcc",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
     }
   ]
 }
