@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ae591921_a0ea7ec4",
+        "filename": "z2a/plugins-setup/couchdb/install-couchdb.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 11
+      },
+      "writtenOn": "2020-06-18T07:38:39Z",
+      "side": 1,
+      "message": "Will this resolve the hard code value issue in my commit?",
+      "revId": "5b8ee6251d74dcedbb59227694047221ec998d2a",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
