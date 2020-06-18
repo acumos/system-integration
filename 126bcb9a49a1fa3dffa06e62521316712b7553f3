@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "6a22873d_c53ecf63",
+        "filename": "z2a/dev1/mlwb_value.yaml.mlwb",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-06-18T13:31:17Z",
+      "side": 1,
+      "message": "oh,this is the mlwb_value.yaml.mlwb. It\u0027s ok to put testing data here.",
+      "parentUuid": "8c3ff8fd_f2e1fe74",
+      "range": {
+        "startLine": 28,
+        "startChar": 16,
+        "endLine": 28,
+        "endChar": 27
+      },
+      "revId": "126bcb9a49a1fa3dffa06e62521316712b7553f3",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6287d495_5ff82115",
         "filename": "z2a/dev1/mlwb_value.yaml.mlwb",
         "patchSetId": 2
@@ -120,6 +144,30 @@
     },
     {
       "key": {
+        "uuid": "e2c120f4_ff441aeb",
+        "filename": "z2a/dev1/mlwb_value.yaml.mlwb",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-06-18T13:31:17Z",
+      "side": 1,
+      "message": "You added new parameter in testing mlwb_value.yaml.mlwb. You should also update the mlwb_value.yaml under helm-charts.\nhttps://gerrit.acumos.org/r/gitweb?p\u003dsystem-integration.git;a\u003dblob;f\u003dhelm-charts/mlwb_value.yaml;h\u003dcacef082803ecfc7523c594661587d5f606ea19c;hb\u003dHEAD",
+      "parentUuid": "b029fe2a_320a0a18",
+      "range": {
+        "startLine": 30,
+        "startChar": 21,
+        "endLine": 30,
+        "endChar": 39
+      },
+      "revId": "126bcb9a49a1fa3dffa06e62521316712b7553f3",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "4691d076_c4020354",
         "filename": "z2a/dev1/mlwb_value.yaml.mlwb",
         "patchSetId": 2
@@ -155,6 +203,30 @@
       "side": 1,
       "message": "Sorry but I am not Helm or K8s guy, so just updated as per your comment.  Also I am bit confused, we have hard coded values for #Jupyter properties viz., \n           - On line no. 134 url:\"http://jupyterhub.acumos-dev1\"\n           - On line no. 136 url: \"http://jupyter-notebook.acumos-dev1\"\n\nAnd similar is case with #NIFI configuration.",
       "parentUuid": "4691d076_c4020354",
+      "range": {
+        "startLine": 123,
+        "startChar": 8,
+        "endLine": 123,
+        "endChar": 49
+      },
+      "revId": "126bcb9a49a1fa3dffa06e62521316712b7553f3",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5aecb8b8_2b604710",
+        "filename": "z2a/dev1/mlwb_value.yaml.mlwb",
+        "patchSetId": 2
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 381
+      },
+      "writtenOn": "2020-06-18T13:31:17Z",
+      "side": 1,
+      "message": "I suggested that in helm template you should use couchdbSvcName plus namespace to replace that host, not in the values file.\n\nHere is one example \nhttps://gerrit.acumos.org/r/gitweb?p\u003dsystem-integration.git;a\u003dblob_plain;f\u003dhelm-charts/acumos-plugins/mlwb/charts/notebook-catalog-webcomponent/templates/deployment.yaml;hb\u003dHEAD\n\nline50\nvalue: \"http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}\n\nThis approach only work with the couchDB in Kubernetes. If the application still require the capability to communicate with external couchDB (Non-k8s). We should set a quick call with Gerard to discuss the details.",
+      "parentUuid": "f24e307d_e3016959",
       "range": {
         "startLine": 123,
         "startChar": 8,
