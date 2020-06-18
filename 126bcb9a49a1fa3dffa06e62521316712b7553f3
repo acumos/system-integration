@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "8c3ff8fd_f2e1fe74",
+        "filename": "z2a/dev1/mlwb_value.yaml.mlwb",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 11
+      },
+      "writtenOn": "2020-06-18T06:52:05Z",
+      "side": 1,
+      "message": "Just update value to in sync with z2a/dev1/global_value.yaml.dev1",
+      "parentUuid": "9c3c81cd_3041dd99",
+      "range": {
+        "startLine": 28,
+        "startChar": 16,
+        "endLine": 28,
+        "endChar": 27
+      },
+      "revId": "126bcb9a49a1fa3dffa06e62521316712b7553f3",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6287d495_5ff82115",
         "filename": "z2a/dev1/mlwb_value.yaml.mlwb",
         "patchSetId": 2
@@ -72,6 +96,30 @@
     },
     {
       "key": {
+        "uuid": "b029fe2a_320a0a18",
+        "filename": "z2a/dev1/mlwb_value.yaml.mlwb",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 11
+      },
+      "writtenOn": "2020-06-18T06:52:05Z",
+      "side": 1,
+      "message": "Yes, in z2a/plugins-setup/couchdb/install-couchdb.sh file RELEASE is \u0027mlwddb\u0027",
+      "parentUuid": "3fb27586_cb476420",
+      "range": {
+        "startLine": 30,
+        "startChar": 21,
+        "endLine": 30,
+        "endChar": 39
+      },
+      "revId": "126bcb9a49a1fa3dffa06e62521316712b7553f3",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "4691d076_c4020354",
         "filename": "z2a/dev1/mlwb_value.yaml.mlwb",
         "patchSetId": 2
@@ -83,6 +131,30 @@
       "writtenOn": "2020-06-17T17:44:39Z",
       "side": 1,
       "message": "wrong helm syntax. Please run helm lint to verify syntax",
+      "range": {
+        "startLine": 123,
+        "startChar": 8,
+        "endLine": 123,
+        "endChar": 49
+      },
+      "revId": "126bcb9a49a1fa3dffa06e62521316712b7553f3",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f24e307d_e3016959",
+        "filename": "z2a/dev1/mlwb_value.yaml.mlwb",
+        "patchSetId": 2
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 11
+      },
+      "writtenOn": "2020-06-18T06:52:05Z",
+      "side": 1,
+      "message": "Sorry but I am not Helm or K8s guy, so just updated as per your comment.  Also I am bit confused, we have hard coded values for #Jupyter properties viz., \n           - On line no. 134 url:\"http://jupyterhub.acumos-dev1\"\n           - On line no. 136 url: \"http://jupyter-notebook.acumos-dev1\"\n\nAnd similar is case with #NIFI configuration.",
+      "parentUuid": "4691d076_c4020354",
       "range": {
         "startLine": 123,
         "startChar": 8,
