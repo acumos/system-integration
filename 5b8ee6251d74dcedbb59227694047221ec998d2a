@@ -16,6 +16,24 @@
       "revId": "5b8ee6251d74dcedbb59227694047221ec998d2a",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5cdaece8_591beb0d",
+        "filename": "z2a/plugins-setup/couchdb/install-couchdb.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 387
+      },
+      "writtenOn": "2020-06-18T16:42:29Z",
+      "side": 1,
+      "message": "It should - if this is what you\u0027d like to accomplish:\n\n1) use the svc_lookup function (see: utils.sh.tpl) to lookup the k8s service ; assign that value is assigned to the SVC variable\n2) use \u0027yq\u0027 to back populate the mlwb_value.yaml file with the value of the SVC variable \n\nz2a has a function defined to read values from the value_yaml_files on the fly.  \nWe use custom expressions to write back to these values files.",
+      "parentUuid": "ae591921_a0ea7ec4",
+      "revId": "5b8ee6251d74dcedbb59227694047221ec998d2a",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
     }
   ]
 }
