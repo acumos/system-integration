@@ -30,7 +30,7 @@ global:
 
     image:
         repository: "nexus3.acumos.org:10002"
-        #enable this session  if the docker repository has credentials
+        #enable this session if the docker repository has credentials
 #       pullSecrets: acumos-registry
 #       username: docker
 #       password: docker

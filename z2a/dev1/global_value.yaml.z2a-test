@@ -30,7 +30,7 @@ global:
 
     image:
         repository: "nexus3.acumos.org:10002"
-        #=enable this session if the docker repository has credentials
+        #enable this session if the docker repository has credentials
 #       pullSecrets: acumos-registry
 #       username: docker
 #       password: docker
@@ -65,7 +65,7 @@ global:
     acumosCdsDbService: "acumos-cds-db"
     acumosCdsDbUserName: "CDS_USER"
     acumosCdsDbUserPassword: "CDS_PASS"
-    acumosCdsImage: "acumos/common-dataservice:3.1.0"
+    acumosCdsImage: "acumos/common-dataservice:3.1.1"
     acumosCdsPassword: "ccds_client"
     acumosCdsUser: "ccds_client"
     # TODO: refactor to acumosCdsSvcPort
@@ -95,7 +95,7 @@ global:
             tag: "17.06.0-dind"
 
     # DesignStudio Composition
-    acumosDesignStudioImage: "acumos/ds-compositionengine:3.0.3"
+    acumosDesignStudioImage: "acumos/ds-compositionengine:3.0.6"
     acumosPortalDsCompositionPort: "8088"
     dsComposition:
         name: "acumos-ds-composition"
@@ -130,7 +130,7 @@ global:
 
     # Federation
     acumosFederationGatewayPort: "9084"
-    acumosFederationImage: "acumos/federation-gateway:3.1.0"
+    acumosFederationImage: "acumos/federation-gateway:3.2.2"
     acumosFederationLocalPort: "9884"
     acumosFederationName: "acumos-k8s-federation"
 
@@ -150,7 +150,7 @@ global:
     acumosKongPostgresUser: "kong"
     acumosKongProxyPort: "8000"
     acumosKongRelease: "acumos-kong"
-    acumosKongService: "acumos-kong"
+    acumosKongService: "acumos-kong-proxy"
     acumosKongSslPort: "8443"
 
     # Kubernetes Client
@@ -167,7 +167,7 @@ global:
     acumosMetricBeatPort: "8098"
 
     # Microservice Generation
-    acumosMicroServiceGenerationImage: "acumos/microservice-generation:3.8.1"
+    acumosMicroServiceGenerationImage: "acumos/microservice-generation:4.7.0"
     acumosMicroServiceGenerationPort: "8333"
     microserviceGeneration:
         name: "acumos-microservice-generation"
@@ -210,7 +210,7 @@ global:
     acumosNexusMavenRepo: "acumos-maven-repo"
     acumosNexusPort: "8001"
     acumosNexusRelease: "acumos-nexus"
-    acumosNexusService: "xxxxxx"
+    acumosNexusService: "acumos-nexus-service"
 
     # Nexus User
     acumosNexusUserEmail: "nobody@example.com"
@@ -221,8 +221,8 @@ global:
     # Onboarding
     acumosOnboardingAppPort: "8090"
     acumosOnboardingCli: "12.32.123.210"
-    acumosOnboardingBaseRImage: "onboarding-base-r:1.0.0"
-    acumosOnboardingImage: "acumos/onboarding-app:3.8.1"
+    acumosOnboardingBaseRImage: "acumos/onboarding-base-r:1.2.0"
+    acumosOnboardingImage: "acumos/onboarding-app:4.6.3"
     onboarding:
         name: "acumos-onboarding"
         podName: "acumos-k8s-onboarding"
@@ -242,9 +242,9 @@ global:
     acumosSecurityGroupName: "E6E-Access"
 
     # Portal FE/BE
-    acumosPortalBeImage: "acumos/acumos-portal-be:3.0.28"
+    acumosPortalBeImage: "acumos/acumos-portal-be:4.0.12"
     acumosPortalBePort: "8083"
-    acumosPortalFeImage: "acumos/acumos-portal-fe:3.0.28"
+    acumosPortalFeImage: "acumos/acumos-portal-fe:4.0.12"
     acumosPortalFePort: "8085"
     portal:
         portalFe:
