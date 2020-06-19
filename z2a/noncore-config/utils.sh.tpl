@@ -30,8 +30,9 @@ function fail() {
 # success function
 function success() {
 	CALLER=( $(caller 0) )
-	LOGF=${CALLER[2]} ; LOGF=${LOGF%.sh}.log
-	log "${CALLER[2]} successful. See ${LOGF} for complete log."
+	LOGF=${CALLER[2]} ; LOGF=${LOGF%.sh}.log ; LOGF=$(realpath $LOGF)
+	log "${CALLER[2]} successful."
+	log "See ${LOGF} for complete log."
 }
 
 # read global value from the global_value.yaml file

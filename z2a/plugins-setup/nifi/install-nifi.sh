@@ -22,6 +22,7 @@
 # HERE
 HERE=$(realpath $(dirname $0))
 source $HERE/utils.sh
+setup_logging
 
 # Default values for Acumos NiFi
 # Edit these values for custom values
@@ -30,7 +31,7 @@ RELEASE=mlwb-nifi
 MLWB_NAMESPACE=$(yq r $MLWB_GLOBAL_VALUE mlwb.namespace)
 
 # Add NiFi repo to Helm
-echo "Adding NiFi repo ...."
+log "Adding NiFi repo ...."
 helm repo add cetic https://cetic.github.io/helm-charts
 helm repo update
 
@@ -41,7 +42,7 @@ properties:
   webProxyHost:
 EOF
 
-echo "Installing NiFi Helm Chart ...."
+log "Installing NiFi Helm Chart ...."
 helm install $RELEASE --namespace $MLWB_NAMESPACE -f $ACUMOS_GLOBAL_VALUE \
   -f $ACUMOS_BASE/mlwb_value.yaml -f $HERE/nifi_value.yaml cetic/nifi
 
@@ -52,14 +53,17 @@ for i in $(seq 1 20) ; do
   # TODO: craft a query to determine the status of NiFi
   # kubectl exec --namespace $NAMESPACE $RELEASE
   break
-  if [ $i -eq 20 ] ; then echo "\nTimeout waiting for Nifi to become available ...." ; exit ; fi
+  if [ $i -eq 20 ] ; then log "\nTimeout waiting for Nifi to become available ...." ; exit ; fi
 done
-echo "\n"
+log "\n"
 
-echo "NiFi Cluster setup information ...."
-echo "$(kubectl get svc $RELEASE -n $MLWB_NAMESPACE)"
-echo "Cluster endpoint IP address will be available at:"
-echo "$(kubectl get svc $RELEASE -n $MLWB_NAMESPACE -o jsonpath='{.status.loadBalancer.ingress[*].ip}')"
+log "NiFi Cluster setup information ...."
+log "$(kubectl get svc $RELEASE -n $MLWB_NAMESPACE)"
+log "Cluster endpoint IP address will be available at:"
+log "$(kubectl get svc $RELEASE -n $MLWB_NAMESPACE -o jsonpath='{.status.loadBalancer.ingress[*].ip}')"
 
-echo "NiFi installation complete."
-echo "Note:  DNS and/or /etc/hosts will need to be updated with the NiFi cluster information."
+log "NiFi installation complete."
+log "Note:  DNS and/or /etc/hosts will need to be updated with the NiFi cluster information."
+
+# write out logfile name
+success

@@ -22,6 +22,7 @@
 # HERE
 HERE=$(realpath $(dirname $0))
 source $HERE/utils.sh
+setup_logging
 
 # Default values for Acumos CouchDB
 # Edit these values for custom values
@@ -32,7 +33,7 @@ MLWB_NAMESPACE=$(yq r $MLWB_GLOBAL_VALUE mlwb.namespace)
 # Random UUID generated for CouchDB
 ACUMOS_COUCHDB_UUID=$(uuidgen)
 
-echo "Adding Apache CouchDB repo ...."
+log "Adding Apache CouchDB repo ...."
 # Add Apache CouchDB repo to Helm
 helm repo add couchdb https://apache.github.io/couchdb-helm
 helm repo update
@@ -47,29 +48,32 @@ couchdbConfig:
     require_valid_user: true
 EOF
 
-echo "Installing CouchDB Helm Chart ...."
+log "Installing CouchDB Helm Chart ...."
 helm install $RELEASE --namespace $MLWB_NAMESPACE -f $ACUMOS_GLOBAL_VALUE -f $ACUMOS_BASE/mlwb_value.yaml -f $HERE/couchdb_value.yaml --set allowAdminParty=true couchdb/couchdb
 SVC=$(svc_lookup $RELEASE $MLWB_NAMESPACE)
 yq w -i $ACUMOS_BASE/mlwb_value.yaml mlwb.couchdbSvcName $SVC
 
-echo "Waiting for pods to become ready ...."
+log "Waiting for pods to become ready ...."
 # Wait for pods to become available
 kubectl wait pods --for=condition=Ready --all --namespace=$MLWB_NAMESPACE --timeout=900s
 
-echo "Waiting for CouchDB instance to become ready ...."
+log "Waiting for CouchDB instance to become ready ...."
 # Loop for CouchDB to become available"
 for i in $(seq 1 20) ; do
   sleep 10
   kubectl exec --namespace $MLWB_NAMESPACE $RELEASE-couchdb-0 -c couchdb -- curl -s http://127.0.0.1:5984/ && break
-  if [ $i -eq 20 ] ; then echo "\nTimeout waiting for CouchDB to become available ...." ; exit ; fi
+  if [ $i -eq 20 ] ; then log "\nTimeout waiting for CouchDB to become available ...." ; exit ; fi
 done
-echo "\n"
+log "\n"
 
-echo "Performing CouchDB Cluster setup ...."
+log "Performing CouchDB Cluster setup ...."
 kubectl exec --namespace $MLWB_NAMESPACE $RELEASE-couchdb-0 -c couchdb -- curl -s http://127.0.0.1:5984/_cluster_setup -X POST -H "Content-Type: application/json" -d '{"action": "finish_cluster"}'
 
 # TODO: write this value back to mlwb_value.yaml
-echo "Retrieving CouchDB Admin secret ...."
+log "Retrieving CouchDB Admin secret ...."
 MLWB_COUCHDB_PASSWORD=$(kubectl get secret --namespace $MLWB_NAMESPACE $RELEASE-couchdb -o go-template='{{ .data.adminPassword }}' | base64 --decode)
 
-echo "CouchDB installation complete."
+log "CouchDB installation complete."
+
+# write out logfile name
+success
