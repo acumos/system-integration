@@ -189,9 +189,9 @@ global:
     # Misc. Keys
     # TODO: find a better home for these
     acumosHostname: "xxxxxx"
+    acumosKeyStoreName: "xxxxxx"
     acumosKeyStorePwd: "xxxxxx"
     acumosQandAUrl: "xxxxxx"
-    acumosTrustStorePwd: "xxxxxx"
 
     # Misc. Ports
     # TODO: find a better home for these
