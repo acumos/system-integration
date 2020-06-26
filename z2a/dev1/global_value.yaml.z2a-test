@@ -189,9 +189,9 @@ global:
     # Misc. Keys
     # TODO: find a better home for these
     acumosHostname: "acumosk8s-test.eastus.cloudapp.example.com"
+    acumosKeyStoreName: "xxxxxx"
     acumosKeyStorePwd: "acumosk8s-test"
     acumosQandAUrl: "stackoverflow.com"
-    acumosTrustStorePwd: "changeit"
 
     # Misc. Ports
     # TODO: find a better home for these

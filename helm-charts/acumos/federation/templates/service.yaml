@@ -21,10 +21,15 @@ kind: Service
 metadata:
   name: {{ .Values.global.acumosFederationName | quote }}
   namespace: "{{ .Values.global.namespace }}"
+  annotations:
+    {{- toYaml .Values.annotations | nindent 4 }}
   labels:
     app: {{ .Values.global.acumosFederationName | quote }}
 spec:
-  type: ClusterIP
+  type: LoadBalancer
+  {{ if .Values.loadBalancerIP -}}
+  loadBalancerIP: {{ .Values.loadBalancerIP }}
+  {{- end }}
   ports:
     - port: {{ .Values.global.acumosFederationGatewayPort }}
       targetPort: {{ .Values.global.acumosFederationGatewayPort }}
