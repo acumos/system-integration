@@ -68,12 +68,10 @@ spec:
                  "port": "{{ .Values.global.acumosFederationGatewayPort }}"
                },
                "ssl": {
-                 "key-store": "/app/certs/acumos-k8s.pkcs12",
+                 "key-store": "/app/certs/{{ .Values.global.acumosKeyStoreName }}",
                  "key-store-password": "{{ .Values.global.acumosKeyStorePwd }}",
                  "key-store-type": "PKCS12",
-                 "key-password": "{{ .Values.global.acumosKeyStorePwd }}",
-                 "trust-store": "/app/certs/acumosTrustStore.jks",
-                 "trust-store-password": "{{ .Values.global.acumosTrustStorePwd }}"
+                 "key-password": "{{ .Values.global.acumosKeyStorePwd }}"
                }
              },
              "local": {
@@ -82,12 +80,10 @@ spec:
                  "port": "{{ .Values.global.acumosFederationLocalPort }}"
                },
                "ssl": {
-                 "key-store": "/app/certs/acumos-k8s.pkcs12",
+                 "key-store": "/app/certs/{{ .Values.global.acumosKeyStoreName }}",
                  "key-store-password": "{{ .Values.global.acumosKeyStorePwd }}",
                  "key-store-type": "PKCS12",
-                 "key-password": "{{ .Values.global.acumosKeyStorePwd }}",
-                 "trust-store": "/app/certs/acumosTrustStore.jks",
-                 "trust-store-password": "{{ .Values.global.acumosTrustStorePwd }}"
+                 "key-password": "{{ .Values.global.acumosKeyStorePwd }}"
                }
              },
              "nexus": {
