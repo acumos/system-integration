@@ -213,7 +213,7 @@ spec:
                    }
                  },
                  "gateway": {
-                    "url": "https://acumos.acumos-ns01:{{ .Values.global.acumosFederationLocalPort }}"
+                    "url": "https://{{ .Values.global.acumosFederationName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosFederationLocalPort }}"
                  },
                  "dcae": {
                     "model": {

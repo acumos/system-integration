@@ -24,7 +24,10 @@ metadata:
   labels:
     app: {{ .Values.global.acumosFederationName | quote }}
 spec:
-  type: ClusterIP
+  type: LoadBalancer
+  {{ if .Values.loadBalancerIP -}}
+  loadBalancerIP: {{ .Values.loadBalancerIP }}
+  {{- end }}
   ports:
     - port: {{ .Values.global.acumosFederationGatewayPort }}
       targetPort: {{ .Values.global.acumosFederationGatewayPort }}
