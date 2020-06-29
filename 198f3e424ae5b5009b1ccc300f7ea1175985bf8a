@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c7059c22_059e86ba",
+        "filename": "helm-charts/acumos/federation/templates/deployment.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 24
+      },
+      "writtenOn": "2020-06-29T20:16:09Z",
+      "side": 0,
+      "message": "Please check how we can replace trust-store. One way is replace with secrets, keeping some example values like we did in others.",
+      "range": {
+        "startLine": 75,
+        "startChar": 18,
+        "endLine": 76,
+        "endChar": 83
+      },
+      "revId": "198f3e424ae5b5009b1ccc300f7ea1175985bf8a",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
