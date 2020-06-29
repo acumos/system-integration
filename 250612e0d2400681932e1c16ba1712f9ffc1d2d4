@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bc00f36a_f3960bfd",
+        "filename": "helm-charts/global_value.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 387
+      },
+      "writtenOn": "2020-06-29T19:08:58Z",
+      "side": 1,
+      "message": "Nicholas - can you add this key to the ~/z2a/dev1/global_value.* example files?",
+      "range": {
+        "startLine": 192,
+        "startChar": 0,
+        "endLine": 192,
+        "endChar": 4
+      },
+      "revId": "250612e0d2400681932e1c16ba1712f9ffc1d2d4",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
