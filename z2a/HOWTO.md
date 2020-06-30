@@ -1,4 +1,4 @@
-# HOW TO ....
+# HOWTO
 
 >NOTE: Under Construction ....
 
@@ -73,7 +73,7 @@ cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml $ACUMOS_HOME/helm-charts/mlwb_value.yam
 ./2-plugins/2-plugins.sh
 ```
 
-## How to install z2a from scratch on an existing `k8s` cluster (flow-2)
+## How to install z2a from scratch on an existing `k8s` cluster (Flow-2)
 
 TBD
 
@@ -128,4 +128,7 @@ Provide an example here ....
 
 * where to start ; what to do
 
-Last Edited: 2020-06-10
+```
+// Created: 2020/05/14
+// Last modified: 2020/06/30
+```

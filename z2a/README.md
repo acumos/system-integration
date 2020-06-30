@@ -1,8 +1,6 @@
 # Zero-to-Acumos
 
->NOTE: This document is a work in progress - subject to change.
->
->NOTE: Additional wrapper scripts are being actively developed (require testing).
+>NOTE: Work in progress - subject to change.
 
 ## What is z2a
 
@@ -57,7 +55,7 @@ z2a/2-plugins/2-plugins.sh              # Acumos plugins setup (including depend
 * VM Resource Sizing Recommendations
   * four (4) vCPU (minimum)
   * 32GB of memory (minimum)
-  * 40GB disk space (minimum) (60GB+ for MLWB)
+  * 60GB disk space (minimum) (~100GB+ for MLWB and other plugins)
   * additional disk space for models (based on developer requirements)
 
 * VM Distribution Recommendations
@@ -81,7 +79,7 @@ z2a/2-plugins/2-plugins.sh              # Acumos plugins setup (including depend
 
 Flow One (Flow-1) performs a complete `z2a` Acumos installation including environment creation, VM Operating System preparation, dependency installation, Kubernetes cluster creation and deployment of Acumos noncore and core components. Flow-1 is based on the original `z2a` process flow targeting development/test environments where a Kubernetes cluster is build from scratch on a single VM.
 
-### Steps 0[a-c]-*
+### Flow 1 - Steps 0[a-c]-*
 
 In the directory `z2a/0-kind` there are three (3) scripts which perform the following tasks:
 
@@ -94,18 +92,14 @@ In the directory `z2a/0-kind` there are three (3) scripts which perform the foll
 >
 >NOTE: For 1st time users, the user performing the installation MUST log out of their session after the successful completion of `z2a/0-kind/0b-depends.sh` script.  The logout is required such that the user (installer) can join the `docker` group that has just been created.  Upon logging back into a session, the user (installer) will be a member of the `docker` group and can proceed by executing the `0c-cluster.sh` script located in the `~/system-integration/z2a/0-kind` directory.  Any subsequent re-run of the `z2a/0-kind/0b-depends.sh` script does not require the user to log out (one time requirement).
 
-### Step 1-acumos
-
-> NOTE: Execution of the `z2a/0-kind/0a-env.sh` script is required for both Flow-1 (vanilla VM) installation and Flow-2 (pre-built Kubernetes cluster) installation.  The `z2a/0-kind/0a-env.sh` script creates and populates environment variables necessary for proper operation of subsequent scripts.
+### Flow 1 - Step 1-acumos
 
 In the directory `z2a/1-acumos` there is a single (1) script which performs:
 
 * the installation of the Acumos non-core components (`1-acumos.sh` script)
 * the installation of the Acumos core components (`1-acumos.sh` script)
 
-### Step 2-plugins
-
-> NOTE: Execution of the `z2a/0-kind/0a-env.sh` script is required for both Flow-1 (vanilla VM) installation and Flow-2 (pre-built Kubernetes cluster) installation.  The `z2a/0-kind/0a-env.sh` script creates and populates environment variables necessary for proper operation of subsequent scripts.
+### Flow 1 - Step 2-plugins
 
 In the directory `z2a/2-plugins` there is a single (1) script which performs:
 
@@ -113,6 +107,36 @@ In the directory `z2a/2-plugins` there is a single (1) script which performs:
 * the installation of the Acumos plugins (`2-plugins.sh` script)
 
 Currently, the only Acumos plugin supported is MLWB (Machine Learning WorkBench).
+
+## Flow-2 Deployment (writeup in progress)
+
+Flow Two (Flow-2) performs a `z2a` Acumos installation including environment creation and deployment of Acumos noncore and core components. Flow-2 is based on the original `z2a` process flow, but is targeted at Acumos installations onto a Kubernetes cluster that is already built and ready for application installation.
+
+### Flow 2 - Step 0a
+
+In the directory `z2a/0-kind` there is one (3) script which perform the following task:
+
+* End-user environment setup (`0a-env.sh` script)
+
+>NOTE: Execution of the `z2a/0-kind/0a-env.sh` script is required for both Flow-1 (vanilla VM) installation and Flow-2 (pre-built Kubernetes cluster) installation.  The `z2a/0-kind/0a-env.sh` script creates and populates environment variables necessary for proper operation of subsequent scripts.
+
+### Flow 2 - Step 1-acumos
+
+In the directory `z2a/1-acumos` there is a single (1) script which performs:
+
+* the installation of the Acumos non-core components (`1-acumos.sh` script)
+* the installation of the Acumos core components (`1-acumos.sh` script)
+
+### Flow 2 - Step 2-plugins
+
+In the directory `z2a/2-plugins` there is a single (1) script which performs:
+
+* the installation of the Acumos plugin dependencies (`2-plugins.sh` script)
+* the installation of the Acumos plugins (`2-plugins.sh` script)
+
+Currently, the only Acumos plugin supported is MLWB (Machine Learning WorkBench).
+
+-----
 
 ## Known Issues
 
@@ -127,15 +151,24 @@ At this time, automated configuration of only the following components is being 
 * MariaDB (for Common Data Services)
 * Sonatype Nexus
 * Kong (and PostgreSQL)
-  * Note: Kong has been deprecated. To be replaced with native k8s ingress w/ Nginx.
+  * Note: Kong has been deprecated. Replaced with native k8s ingress w/ Nginx.
 * Nginx (for k8s ingress and native service proxies)
 
 ## Addendum
 
 Please refer to the following documents for additional information:
 
-> CONFIG.md   - the Acumos configuration markdown document (in progress)
+> CONFIG.md   - Acumos configuration document (in progress)
 >
-> INSTALL.md  - the Acumos installation markdown document (in progress)
+> INSTALL.md  - Acumos installation document (in progress)
+>
+> HOWTO.md    - Acumos task document (in progress)
+>
+> README-proxy.md - proxy configuration guidance (in progress)
+>
+> START-HERE.md - brief Acumos introduction document - (in progress)
 
-Last Edited: 2020-06-16
+```sh
+// Created: 2020/03/20
+// Last modified: 2020/06/29
+```

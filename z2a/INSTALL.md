@@ -1,14 +1,20 @@
 # Installation
 
-> Note: Work in progress.  Subject to frequent changes.
+> Note: Work in progress.  Subject to change.
 
-## TL;DR
+## TL;DR - Choose a Flow
+
+>If you have a vanilla VM (new, no tooling) and want to build a k8s cluster and install Acumos (and plugins) : choose Flow-1.
+>
+>If you have a pre-built k8s cluster and want to install Acumos (and plugins) : choose Flow-2.
+
+## TL;DR (Flow-1)
 
 ```sh
 # Obtain a Virtual Machine (VM) with sudo access ; Login to VM
 # Note: /usr/local/bin is a required element in your $PATH
 
-# Install 'git' distributed version-control tool (Flow-1 and Flow-2)
+# Install 'git' distributed version-control tool
 # For RPM-based distributions such as RHEL/CentOS, execute the following command:
 sudo yum install -y git
 # For Debian-based distributions such as Ubuntu, execute the following command:
@@ -46,21 +52,21 @@ cp ./dev1/global_value.yaml.dev1 ../helm-charts/global_value.yaml
 # Once the global_value.yaml file has been copied or edited;
 # you can proceed with the installation
 
-# Execute 0-kind/0a-env.sh (setup user environment) (Flow-1 and Flow-2)
+# Execute 0-kind/0a-env.sh (setup user environment)
 ./0-kind/0a-env.sh
-# Execute 0-kind/0b-depends.sh (install / configure dependencies) (Flow-1 only)
+# Execute 0-kind/0b-depends.sh (install / configure dependencies)
 ./0-kind/0b-depends.sh
 
 # LOG OUT OF SESSION ; LOG IN TO NEW SESSION
 # ... this step is required for Docker group inclusion)
-# Execute 0-kind/0c-cluster.sh (build and configure k8s cluster) (Flow-1 only)
+# Execute 0-kind/0c-cluster.sh (build and configure k8s cluster)
 ACUMOS_HOME=$HOME/src/system-integration
 cd $ACUMOS_HOME/z2a
 ./0-kind/0c-cluster.sh
 
 # Ensure all k8s Pods created are in a 'Running' state.
 kubectl get pods -A
-# Execute 1-acumos.sh (install / configure noncore & core Acumos components) (Flow-1 and Flow-2)
+# Execute 1-acumos.sh (install / configure noncore & core Acumos components)
 ./1-acumos/1-acumos.sh
 
 # If Acumos plugins are to be installed in a new session:
@@ -69,7 +75,69 @@ kubectl get pods -A
 
 # To install Acumos plugins ; proceed here
 cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml.mlwb $ACUMOS_HOME/helm-charts/mlwb_value.yaml
-# Execute 2-plugins.sh (install / configure Acumos plugins and dependencies) (Flow-1 and Flow-2)
+# Execute 2-plugins.sh (install / configure Acumos plugins and dependencies)
+./2-plugins/2-plugins.sh
+```
+
+## TL;DR (Flow-2)
+
+```sh
+# Obtain a Virtual Machine (VM) with sudo access ; Login to VM
+# Note: /usr/local/bin is a required element in your $PATH
+
+# Install 'git' distributed version-control tool
+# For RPM-based distributions such as RHEL/CentOS, execute the following command:
+sudo yum install -y git
+# For Debian-based distributions such as Ubuntu, execute the following command:
+sudo apt-get install --no-install-recommends -y git
+
+# Make src directory ; change directory to that location
+mkdir -p $HOME/src ; cd $HOME/src
+# clone Acumos 'system-integration' repo
+git clone https://gerrit.acumos.org/r/system-integration
+
+# set ACUMOS_HOME environment variable
+ACUMOS_HOME=$HOME/src/system-integration
+# Change directory
+cd $ACUMOS_HOME/z2a
+
+# Using the vi editor (substitute with your editor of choice)
+# Add hostname or hostname:port to proxy.txt ; if necessary
+vi ./0-kind/proxy.txt
+
+# Choose one of the following methods to create a global_value.yaml file
+
+# Method 1 - example values
+#
+# To use the example global_value.yaml file;
+# copy the example values from z2a/dev1 to the helm-charts directory
+cp ./dev1/global_value.yaml.dev1 ../helm-charts/global_value.yaml
+
+# Method 2 - customized values
+#
+# To use a customized global_value.yaml file;
+# edit $HOME/src/system-integration/helm-charts/global_value.yaml
+# using an editor and command similar to this:
+# vi $HOME/src/system-integration/helm-charts/global_value.yaml
+
+# Once the global_value.yaml file has been copied or edited;
+# you can proceed with the installation
+
+# Execute 0-kind/0a-env.sh (setup user environment)
+./0-kind/0a-env.sh
+
+# Ensure all k8s Pods created are in a 'Running' state.
+kubectl get pods -A
+# Execute 1-acumos.sh (install / configure noncore & core Acumos components)
+./1-acumos/1-acumos.sh
+
+# If Acumos plugins are to be installed in a new session:
+# Uncomment the ACUMOS_HOME line and paste into command-line
+# ACUMOS_HOME=$HOME/src/system-integration
+
+# To install Acumos plugins ; proceed here
+cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml.mlwb $ACUMOS_HOME/helm-charts/mlwb_value.yaml
+# Execute 2-plugins.sh (install / configure Acumos plugins and dependencies)
 ./2-plugins/2-plugins.sh
 ```
 
@@ -414,13 +482,15 @@ Each `z2a` script creates a separate and distinct log file.  Below is a listing 
 | z2a/0-kind/0a-env.sh       | | no log file created                 |
 | z2a/0-kind/0b-depends.sh   | | z2a/0-kind/0b-depends-install.log   |
 | z2a/0-kind/0c-cluster.sh   | | z2a/0-kind/0c-cluster-install.log   |
-| z2a/1-acumos/1-acumos.sh   | | z2a/1-acumos/1-acumos-install.log   |
-| z2a/2-plugins/2-plugins.sh | | z2a/2-plugins/2-plugins-install.log |
 | z2a/noncore-config/ingress/config-ingress.sh | | z2a/noncore-config/ingress/config-ingress.log |
 | z2a/noncore-config/mariadb-cds/config-mariadb-cds.sh | | z2a/noncore-config/mariadb-cds/config-mariadb-cds.log |
 | z2a/noncore-config/mariadb-cds/install-mariadb-cds.sh | | z2a/noncore-config/mariadb-cds/install-mariadb-cds.log |
-| z2a/noncore-config/nexus/install-nexus.sh | | z2a/noncore-config/nexus/install-nexus.log |
 | z2a/noncore-config/nexus/config-nexus.sh | | z2a/noncore-config/nexus/config-nexus.log |
+| z2a/noncore-config/nexus/install-nexus.sh | | z2a/noncore-config/nexus/install-nexus.log |
+| z2a/plugins-setup/couchdb/install-couchdb.sh | | z2a/plugins-setup/couchdb/install-couchdb.log |
+| z2a/plugins-setup/jupyterhub/install-jupyterhub.sh | | z2a/plugins-setup/jupyterhub/install-jupyterhub.log |
+| z2a/plugins-setup/mlwb/install-mlwb.sh | | z2a/plugins-setup/mlwb/install-mlwb.log |
+| z2a/plugins-setup/nifi/install-nifi.sh | | z2a/plugins-setup/nifi/install-nifi.log |
 
 How do I decode an on-screen error?
 
@@ -448,4 +518,7 @@ For post-installation Machine Learning WorkBench configuration steps, please see
 
 TODO: Add section on accessing the Acumos Portal once installation is completed.
 
-Last Edited: 2020-06-16
+```sh
+// Created: 2020/03/22
+// Last modified: 2020/06/30
+```

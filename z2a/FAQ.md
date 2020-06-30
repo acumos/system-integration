@@ -8,6 +8,9 @@
 
 ## Is z2a going to replace AIO
 
-No.  AIO and z2a have different use cases.  z2a is an installation tool for Acumos and Acumos plugins in a Kubernetes environment only.  There are no plans to add life-cycle management functions to z2a or to extend it to other environments (Docker, OpenShift, Minikube etc.) at this time.
+Not at this time.  `AIO` and `z2a` have different use cases.  `z2a` is an installation tool for Acumos and Acumos plugins into a Kubernetes environment only.  There are no plans to add life-cycle management functions to `z2a` or to extend it to other environments (Docker, OpenShift, Minikube etc.) at this time.
 
-Last Edited: 2020-05-14
+```
+// Created: 2020/05/14
+// Last modified: 2020/06/30
+```

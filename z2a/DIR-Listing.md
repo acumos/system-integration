@@ -199,6 +199,10 @@ This document.
 
 Frequently Asked Questions document.
 
+### HOWTO.md
+
+A HOWTO document on performing various tasks.
+
 ### INSTALL.md
 
 z2a INSTALL markdown document.
@@ -206,6 +210,10 @@ z2a INSTALL markdown document.
 ### README.md
 
 z2a README markdown document.
+
+### START-HERE.md
+
+Abbreviated introduction document for new Acumos users.
 
 ### TODO.md
 
@@ -219,4 +227,7 @@ Template file used to seed the user environment script. (./0-kind/0a-env.sh)
 
 `z2a` shell script containing multiple utility functions that are used by `z2a`.  The `z2a` framework cannot execute correctly without the functions in this utility script.
 
-Last Edited: 2020-06-09
+```sh
+// Created: 2020/04/29
+// Last modified: 2020/06/30
+```
