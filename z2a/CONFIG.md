@@ -8,7 +8,7 @@
 
 ### Ingress - Native k8s service proxy and Ingress Controller (Nginx)
 
->NOTE: This configuration activity has been integrated into the `1-acumos/1-acumos.sh` installation/configuration script. This is new and there are work items in progress.
+>NOTE: This configuration activity has been integrated into the `1-acumos/1-acumos.sh` installation/configuration script.
 
 ### Kong - API Gateway for Acumos (deprecated)
 
@@ -26,8 +26,25 @@
 
 >NOTE: Kubernetes (kind) configuration tasks that have been identified are folded into the `0-kind/0c-cluster.sh` installation/configuration script.
 
-## MLWB Configuration Tasks
+## MLWB Plugin Configuration Tasks
+
+>NOTE: Please refer to the `plugins-setup/README-plugins-setup.md documentation for additional tips/pointers.
+
+### CouchDB
+
+>NOTE: CouchDB configuration has been integrated into the `plugins-setup/couchdb/install-couchdb.sh` installation/configuration script.
+
+### JupyterHub
+
+>NOTE: JupyterHub configuration has been integrated into the `plugins-setup/jupyterhub/install-jupyterhub.sh` installation/configuration script.
+
+### NiFi
+
+>NOTE: NiFi configuration has been integrated into the `plugins-setup/nifi/install-nifi.sh` installation/configuration script.
 
 TODO: MLWB Post-Install Configuration steps in progress ...*
 
-Last Edited: 2020-06-10
+```sh
+// Created: 2020/06/10
+// Last modified: 2020/07/01
+```

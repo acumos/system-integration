@@ -1,6 +1,4 @@
-# z2a Listing
-
->NOTE: Work in progress.
+# z2a Directory Listing
 
 ## Directories
 
@@ -17,21 +15,21 @@ Directory containing the following scripts for `z2a`:
 
 ### 0-kind/z2a-k8s-dashboard/
 
-Directory containing Kubernetes dashboard that is deployed into the `kind` (Kubernetes in Docker) cluster. (0-kind/0c-cluster.sh script only)
+Directory containing Kubernetes dashboard that is deployed into the `kind` (Kubernetes in Docker) cluster. (Flow-1 only, used by 0-kind/0c-cluster.sh script)
 
 ### 0-kind/z2a-k8s-metallb/
 
-Directory containing MetalLB load-balancer that is deployed into the `kind` (Kubernetes in Docker) cluster. (0-kind/0c-cluster.sh script only)
+Directory containing MetalLB load-balancer that is deployed into the `kind` (Kubernetes in Docker) cluster. (Flow-1 only, used by 0-kind/0c-cluster.sh script)
 
 ### 0-kind/k8s-svc-proxy/ (deprecated)
 
-Directory containing Kubernetes service proxy that is deployed into the `kind` (Kubernetes in Docker) cluster. (0-kind/0c-cluster.sh script only)
+Directory containing Kubernetes service proxy that is deployed into the `kind` (Kubernetes in Docker) cluster. (Flow-1 only, used by 0-kind/0c-cluster.sh script)
 
 >Note: `k8s-svc-proxy` has been deprecated and replaced with a k8s service proxy based on the Nginx Ingress controller.  This directory is historical and will be removed in the future.
 
 ### 0-kind/z2a-svcs-proxy/ (deprecated)
 
-Directory containing z2a service proxy that is deployed into the `kind` (Kubernetes in Docker) cluster. (0-kind/0c-cluster.sh script only)
+Directory containing z2a service proxy that is deployed into the `kind` (Kubernetes in Docker) cluster. (Flow-1 only, used by 0-kind/0c-cluster.sh script)
 
 >Note: `z2a-svc-proxy` has been deprecated and replaced with a z2a service proxy using the Nginx Ingress controller.  This directory is historical and will be removed in the future.
 
@@ -53,7 +51,7 @@ Directory containing the following scripts for `z2a`:
 2-plugins.sh             # Acumos plugins setup (including dependencies) script
 ```
 
->Note: Currently, this directory only installs Machine Learning WorkBench (MLWB).
+>Note: Currently, this directory installs the Machine Learning WorkBench (MLWB).
 
 ### dev1/
 
@@ -92,22 +90,24 @@ config-helper/              # directory containing config-helper Helm chart
 
 ### noncore-config/ingress/
 
-Entries in the `ingress` directory:
+Entries in the `ingress` (Nginx) directory:
 
 ```sh
 config-ingress.sh           # configure ingress shell script
 ingress/                    # directory containing ingress Helm chart
 ```
 
-### noncore-config/kong/
+### noncore-config/kong/ (deprecated)
 
 Entries in the `kong` directory:
 
 ```sh
 config-kong.sh              # configure kong shell script
 install-kong.sh             # install kong shell script
-certs/                      # directory containing SSL certificates for Kong
+certs/                      # directory containing example SSL certificates for Kong
 ```
+
+>Note: `kong` has been deprecated and replaced with Nginx.  This directory is historical and will be removed in the future.
 
 ### noncore-config/mariadb-cds/
 
@@ -229,5 +229,5 @@ Template file used to seed the user environment script. (./0-kind/0a-env.sh)
 
 ```sh
 // Created: 2020/04/29
-// Last modified: 2020/06/30
+// Last modified: 2020/07/01
 ```
