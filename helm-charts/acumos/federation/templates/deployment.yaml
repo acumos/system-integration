@@ -1,7 +1,7 @@
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
-# Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# Copyright (C) 2018-2020 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
 # ===================================================================================
 # This Acumos software file is distributed by AT&T and Tech Mahindra
 # under the Apache License, Version 2.0 (the "License");
@@ -89,15 +89,15 @@ spec:
              "nexus": {
                "nexusendpointurl": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}/repository/{{ .Values.global.acumosNexusMavenRepo }}/",
                "nexusproxy": "",
-               "nexuspassword": "{{ .Values.global.acumosNexusPassword }}",
-               "nexususername": "{{ .Values.global.acumosNexusUsername }}",
+               "nexuspassword": "{{ .Values.global.acumosNexusUserPassword }}",
+               "nexususername": "{{ .Values.global.acumosNexusUserName }}",
                "nexusgroupid": "com.artifact"
              },
              "docker" : {
                 "host": "tcp://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosOnboardingAppPort }}",
                 "registryUrl": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}",
                 "registryUsername" : "{{ .Values.global.acumosNexusUserName }}",
-                "registryPassword" : "{{ .Values.global.acumosNexusUserPassword }}",
+                "registryPassword" : "{{ .Values.global.acumosNexusUserPassword  }}",
                 "registryEmail": "{{ .Values.global.acumosNexusUserEmail }}"
              },
              "license-manager" : {

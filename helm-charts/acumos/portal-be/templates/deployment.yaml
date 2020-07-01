@@ -1,7 +1,7 @@
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
-# Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# Copyright (C) 2018-2020 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
 # ===================================================================================
 # This Acumos software file is distributed by AT&T and Tech Mahindra
 # under the Apache License, Version 2.0 (the "License");
@@ -62,16 +62,16 @@ spec:
                 "nexus": {
                         "url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}/repository/{{ .Values.global.acumosNexusMavenRepo }}",
                         "proxy": "",
-                        "password": "{{ .Values.global.acumosNexusPassword }}",
-                        "username": "{{ .Values.global.acumosNexusUsername }}",
+                        "password": "{{ .Values.global.acumosNexusUserPassword }}",
+                        "username": "{{ .Values.global.acumosNexusUserName }}",
                         "groupid": "com.artifact"
                 },
                 "docker": {
                    "host": "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
                    "registry": {
                       "url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
-                      "username": "{{ .Values.global.acumosNexusUsername }}",
-                      "password": "{{ .Values.global.acumosNexusPassword }}",
+                      "username": "{{ .Values.global.acumosNexusUserName }}",
+                      "password": "{{ .Values.global.acumosNexusUserPassword }}",
                       "email": "admin@acumos.com"
                    },
                    "imagetag": {
