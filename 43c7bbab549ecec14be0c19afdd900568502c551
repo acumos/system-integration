@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b10e1942_3b2176fe",
+        "filename": "z2a/HOWTO.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 57
+      },
+      "writtenOn": "2020-07-01T22:02:42Z",
+      "side": 1,
+      "message": "How to install from scratch?  I thought from scratch was for a VM and not a k8 cluster?",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 72
+      },
+      "revId": "43c7bbab549ecec14be0c19afdd900568502c551",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f00d67b3_5d933635",
+        "filename": "z2a/HOWTO.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 57
+      },
+      "writtenOn": "2020-07-01T22:02:42Z",
+      "side": 1,
+      "message": "Why do I need sudo?  The installation I am doing in Azue I do not need sudo.",
+      "revId": "43c7bbab549ecec14be0c19afdd900568502c551",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b382b44d_8c22b29f",
+        "filename": "z2a/HOWTO.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 57
+      },
+      "writtenOn": "2020-07-01T22:02:42Z",
+      "side": 1,
+      "message": "Could this be a prereq for Flow 2 and then don\u0027t need sudo?",
+      "revId": "43c7bbab549ecec14be0c19afdd900568502c551",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
