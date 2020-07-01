@@ -525,5 +525,5 @@ TODO: Add section on accessing the Acumos Portal once installation is completed.
 
 ```sh
 // Created: 2020/03/22
-// Last modified: 2020/07/01
+// Last modified: 2020/07/07
 ```

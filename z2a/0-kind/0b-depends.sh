@@ -91,10 +91,14 @@ sudo chown root:root /tmp/kubectl
 sudo chmod 755 /tmp/kubectl
 sudo mv /tmp/kubectl /usr/local/bin/
 
-HELM_RELEASE=$(curl -Ls https://github.com/helm/helm/releases | grep /helm/helm/releases/tag/v3 | grep -P -o 'v\d+\.\d+\.\d+' | head -1)
+HELM_RELEASE=$(curl -Ls https://github.com/helm/helm/releases \
+  | grep 'href="/helm/helm/releases/tag/v3.[0-9]*.[0-9]*\"' \
+  | grep -P -o 'v\d+\.\d+\.\d+' \
+  | head -1
+)
 log "Installing Helm ${HELM_RELEASE} ...."
 # Download and install helm v3 (to /usr/local/bin)
-curl -s https://get.helm.sh/helm-${HELM_RELEASE}-linux-amd64.tar.gz | tar -zxO linux-amd64/helm > /tmp/helm
+curl -L -s https://get.helm.sh/helm-${HELM_RELEASE}-linux-amd64.tar.gz | tar -zxO linux-amd64/helm > /tmp/helm
 sudo chown root:root /tmp/helm
 sudo chmod 755 /tmp/helm
 sudo mv /tmp/helm /usr/local/bin/helm
@@ -163,25 +167,6 @@ ubuntu && {
   "storage-driver": "overlay2"
 	}
 EOF
-}
-
-log "Creating the systemd docker.service directory ...."
-# Create the systemd docker.service directory
-sudo mkdir -p /etc/systemd/system/docker.service.d
-
-# Setup Docker daemon proxy entries.
-PROXY_CONF=$Z2A_BASE/0-kind/proxy.txt
-[[ -f $PROXY_CONF ]] && {
-	PROXY=$(<$PROXY_CONF) ;
-	if [[ -n $PROXY ]] ; then
-		log "Configuring /etc/systemd/system/docker.service.d/http-proxy.conf file ...."
-		cat <<EOF | sudo tee /etc/systemd/system/docker.service.d/http-proxy.conf
-[Service]
-Environment="HTTP_PROXY=http://$PROXY"
-Environment="HTTPS_PROXY=http://$PROXY"
-Environment="NO_PROXY=127.0.0.1,localhost,.svc,.local,kind-acumos-control-plane,169.254.0.0/16,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
-EOF
-	fi
 }
 
 log "Starting Docker service ...."

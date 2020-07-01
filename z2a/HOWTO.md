@@ -48,7 +48,7 @@ cp ./dev1/global_value.yaml.dev1 ../helm-charts/global_value.yaml
 
 # Execute 0-kind/0a-env.sh (setup user z2a environment)
 ./0-kind/0a-env.sh
-# Execute 0-kind/0b-depends.sh (install / configure dependencies) 
+# Execute 0-kind/0b-depends.sh (install / configure dependencies)
 ./0-kind/0b-depends.sh
 
 # LOG OUT OF SESSION ; LOG IN TO NEW SESSION
@@ -79,7 +79,7 @@ cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml $ACUMOS_HOME/helm-charts/mlwb_value.yam
 
 ```sh
 # To execute Flow-2, we will use a VM-based host for command & control.
-# Note: You MAY require sudo access on the command & control VM to allow you to install git
+# Note: You will require sudo access on this VM
 # Note: /usr/local/bin is a required element in your $PATH
 
 # Login to the VM

@@ -1,33 +1,27 @@
 # README-PROXY
 
-If you are running `kind` in an environment that requires a proxy, you may need to configure `kind` to use that proxy.
+TL;DR
 
-You can configure kind to use a proxy using one or more of the following environment variables (uppercase takes precedence):
+If you are behind a proxy; here is the list of items that need to be configured:
 
-```sh
-HTTP_PROXY or http_proxy
-HTTPS_PROXY or https_proxy
-NO_PROXY or no_proxy
-```
+* package manager application (apt/yum)
+* user environment (.profile, .bashrc, .kshrc etc.)
+* docker client
+* docker service
+* MITM (man-in-the-middle) SSL certificate considerations
 
-## Editing the proxy.txt file  (Note: deprecated, subject to change)
 
-The `proxy.txt` file is located in the `z2a/0-kind` directory.  This file needs to be edited such that the Docker installation can proceed cleanly.  We will need to change directories into that location to perform the necessary edits required for the Acumos installation.
+If you are running `kind` in an environment that requires a proxy for Internet access, you may need to configure `kind` to use that proxy.
 
-This file will contain a single entry in the form of `hostname` OR `hostname:port` (this is not a URL).
-
-Here is the `change directory` command to execute.
+You can configure `kind` to use a proxy using one or more of the following environment variables (uppercase takes precedence):
 
 ```sh
-cd $HOME/src/system-integration/z2a/0-kind
-```
-
-Using your editor of choice (vi, nano, pico etc.) please open the `proxy.txt` file such that we can edit it's contents. Examples for the single-line entry required in this file are:
-
-```sh
-proxy-hostname.example.com
-OR
-proxy-hostname.example.com:3128
+http_proxy=
+https_proxy=
+no_proxy=
+HTTP_PROXY=
+HTTPS_PROXY=
+NO_PROXY=
 ```
 
 ### Proxy Rework TODO list
@@ -45,7 +39,35 @@ proxy-hostname.example.com:3128
 >
 > * provide instructions for the user to install themselves (STARTED)
 
+----- Addendum -----
+
+```bash
+log "Creating the systemd docker.service directory ...."
+# Create the systemd docker.service directory
+sudo mkdir -p /etc/systemd/system/docker.service.d
+
+# Setup Docker daemon proxy entries.
+PROXY_CONF=$Z2A_BASE/0-kind/proxy.txt
+[[ -f $PROXY_CONF ]] && {
+	PROXY=$(<$PROXY_CONF) ;
+	if [[ -n $PROXY ]] ; then
+		log "Configuring /etc/systemd/system/docker.service.d/http-proxy.conf file ...."
+		cat <<EOF | sudo tee /etc/systemd/system/docker.service.d/http-proxy.conf
+[Service]
+Environment="HTTP_PROXY=http://$PROXY"
+Environment="HTTPS_PROXY=http://$PROXY"
+Environment="NO_PROXY=127.0.0.1,localhost,.svc,.local,kind-acumos-control-plane,169.254.0.0/16,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+EOF
+	fi
+}
+
+# Reload docker service configuration
+sudo systemctl daemon-reload
+```
+
+----- End Addendum -----
+
 ```sh
 // Created: 2020/06/16
-// Last modified: 2020/06/30
+// Last modified: 2020/07/07
 ```
