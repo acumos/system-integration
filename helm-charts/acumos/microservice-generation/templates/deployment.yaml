@@ -1,7 +1,7 @@
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
-# Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+# Copyright (C) 2018-2020 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
 # ===================================================================================
 # This Acumos software file is distributed by AT&T and Tech Mahindra
 # under the Apache License, Version 2.0 (the "License");
@@ -69,8 +69,8 @@ spec:
                      "config": "/docker_host/.docker",
                      "registry": {
                         "url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
-                        "username": "{{ .Values.global.acumosNexusUsername }}",
-                        "password": "{{ .Values.global.acumosNexusPassword }}",
+                        "username": "{{ .Values.global.acumosNexusUserName }}",
+                        "password": "{{ .Values.global.acumosNexusUserPassword }}",
                         "email": "{{ .Values.global.acumosDockerRegistryEmail }}"
                         },
                      "tls": {
@@ -88,8 +88,8 @@ spec:
                    "http_proxy": "http://{{ .Values.global.acumosProxy }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosProxyPort }}",
                    "nexus": {
                             "nexusEndPointURL": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}/repository/{{ .Values.global.acumosNexusMavenRepo }}/",
-                            "nexusUserName": "{{ .Values.global.acumosNexusUsername }}",
-                            "nexusPassword": "{{ .Values.global.acumosNexusPassword }}",
+                            "nexusUserName": "{{ .Values.global.acumosNexusUserName }}",
+                            "nexusPassword": "{{ .Values.global.acumosNexusUserPassword }}",
                             "nexusproxy": "",
                             "nexusGroupId": "com.artifact"
                            },
