@@ -82,8 +82,11 @@ cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml.mlwb $ACUMOS_HOME/helm-charts/mlwb_valu
 ## TL;DR (Flow-2)
 
 ```sh
-# Obtain a Virtual Machine (VM) with sudo access ; Login to VM
+# To execute Flow-2, we will use a VM-based host for command & control.
+# Note: You will require sudo access on this VM
 # Note: /usr/local/bin is a required element in your $PATH
+
+# Login to the VM
 
 # Install 'git' distributed version-control tool
 # For RPM-based distributions such as RHEL/CentOS, execute the following command:
@@ -520,5 +523,5 @@ TODO: Add section on accessing the Acumos Portal once installation is completed.
 
 ```sh
 // Created: 2020/03/22
-// Last modified: 2020/06/30
+// Last modified: 2020/07/01
 ```
