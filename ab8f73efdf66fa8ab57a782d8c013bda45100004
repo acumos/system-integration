@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dbbca165_ada55894",
+        "filename": "helm-charts/acumos/ds-compositionengine/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 24
+      },
+      "writtenOn": "2020-07-01T15:00:07Z",
+      "side": 1,
+      "message": "check for the space here",
+      "range": {
+        "startLine": 90,
+        "startChar": 93,
+        "endLine": 90,
+        "endChar": 96
+      },
+      "revId": "ab8f73efdf66fa8ab57a782d8c013bda45100004",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "51de8f1b_eb6a2c81",
+        "filename": "helm-charts/acumos/federation/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 24
+      },
+      "writtenOn": "2020-07-01T15:00:07Z",
+      "side": 1,
+      "message": "check for the space here.",
+      "range": {
+        "startLine": 92,
+        "startChar": 73,
+        "endLine": 92,
+        "endChar": 75
+      },
+      "revId": "ab8f73efdf66fa8ab57a782d8c013bda45100004",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
