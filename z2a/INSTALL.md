@@ -59,9 +59,11 @@ cp ./dev1/global_value.yaml.dev1 ../helm-charts/global_value.yaml
 
 # LOG OUT OF SESSION ; LOG IN TO NEW SESSION
 # ... this step is required for Docker group inclusion)
+# Reinitialize the user z2a environment
 # Execute 0-kind/0c-cluster.sh (build and configure k8s cluster)
 ACUMOS_HOME=$HOME/src/system-integration
 cd $ACUMOS_HOME/z2a
+./0-kind/oa-env.sh
 ./0-kind/0c-cluster.sh
 
 # Ensure all k8s Pods created are in a 'Running' state.
@@ -82,8 +84,11 @@ cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml.mlwb $ACUMOS_HOME/helm-charts/mlwb_valu
 ## TL;DR (Flow-2)
 
 ```sh
-# Obtain a Virtual Machine (VM) with sudo access ; Login to VM
+# To execute Flow-2, we will use a VM-based host for command & control
+# Note: You MAY require sudo access on the command & control VM to allow you to install git
 # Note: /usr/local/bin is a required element in your $PATH
+
+# Login to the VM
 
 # Install 'git' distributed version-control tool
 # For RPM-based distributions such as RHEL/CentOS, execute the following command:
@@ -520,5 +525,5 @@ TODO: Add section on accessing the Acumos Portal once installation is completed.
 
 ```sh
 // Created: 2020/03/22
-// Last modified: 2020/06/30
+// Last modified: 2020/07/01
 ```
