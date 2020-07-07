@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df4aa2d2_31fb0c6f",
+        "filename": "z2a/INSTALL.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 57
+      },
+      "writtenOn": "2020-07-07T18:35:56Z",
+      "side": 1,
+      "message": "Is it oa0env or is it 0a-env?",
+      "revId": "afd4b4c99a26d95c80131b5d42b5aefbc471fa23",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
