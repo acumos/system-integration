@@ -1,10 +1,10 @@
 # HOWTO
 
->NOTE: Under Construction ....
+>NOTE: Under Construction (gaps exist in some methods of procedure) ....
 
 ## How to install z2a from scratch on a VM with `kind` (default - Flow-1)
 
-```sh
+```bash
 # Obtain a Virtual Machine (VM) with sudo access ; Login to VM
 # Note: /usr/local/bin is a required element in your $PATH
 
@@ -23,10 +23,6 @@ git clone https://gerrit.acumos.org/r/system-integration
 ACUMOS_HOME=$HOME/src/system-integration
 # Change directory
 cd $ACUMOS_HOME/z2a
-
-# Using the vi editor (substitute with your editor of choice)
-# Add hostname or hostname:port to proxy.txt ; if necessary
-vi ./0-kind/proxy.txt
 
 # Choose one of the following methods to create a global_value.yaml file
 
@@ -77,9 +73,9 @@ cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml $ACUMOS_HOME/helm-charts/mlwb_value.yam
 
 ## How to use z2a to install Acumos onto an existing `k8s` cluster (Flow-2)
 
-```sh
+```bash
 # To execute Flow-2, we will use a VM-based host for command & control.
-# Note: You will require sudo access on this VM
+# Note: You MAY require sudo access on the command & control VM to allow you to install git
 # Note: /usr/local/bin is a required element in your $PATH
 
 # Login to the VM
@@ -99,10 +95,6 @@ git clone https://gerrit.acumos.org/r/system-integration
 ACUMOS_HOME=$HOME/src/system-integration
 # Change directory
 cd $ACUMOS_HOME/z2a
-
-# Using the vi editor (substitute with your editor of choice)
-# Add hostname or hostname:port to proxy.txt ; if necessary
-vi ./0-kind/proxy.txt
 
 # Choose one of the following methods to create a global_value.yaml file
 
@@ -158,7 +150,7 @@ To add a new 'plugin' to the z2a installation framework, a series of steps need 
 
   3: The `z2a/plugins/<name-of-new-plugin>/install-skel.sh` file should be renamed to `install-nameOfDirectory.sh`
 
-```sh
+```bash
 cd $HOME/src/system-integration/z2a
 cp -rp ./dev1/skel ./plugins-setup/.
 cd plugins-setup
@@ -172,7 +164,7 @@ cd ..
 
 The `plugins-setup` Makefile will need to be edited to add a new target to the `MODULES` line.
 
-```sh
+```bash
 BEFORE edit:
 MODULES=couchdb jupyterhub lum nifi mlwb
 
@@ -184,7 +176,7 @@ MODULES=couchdb jupyterhub lum nifi mlwb <name-of-new-plugin>
 
 The `z2a/plugins-setup/name-of-new-plugin/install-name-of-new-plugin.sh` will need to be edited to execute properly.
 
-```sh
+```bash
 TODO: Provide an example here ....
 ```
 
@@ -192,7 +184,7 @@ TODO: Provide an example here ....
 
 * where to start ; what to do
 
-```sh
+```bash
 // Created: 2020/05/14
-// Last modified: 2020/07/07
+// Last modified: 2020/07/09
 ```

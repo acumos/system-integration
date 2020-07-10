@@ -1,66 +1,67 @@
 # README-PROXY
 
-TL;DR
+If you are using `z2a` behind a proxy; here is the list of items that need to be configured before you execute the `z2a` framework:
 
-If you are behind a proxy; here is the list of items that need to be configured:
-
-* package manager application (apt/yum)
 * user environment (.profile, .bashrc, .kshrc etc.)
-* docker client
-* docker service
+* package manager application (apt for Ubuntu, yum/dnf for Redhat/CentOS)
+* Docker client
+* Docker service
 * MITM (man-in-the-middle) SSL certificate considerations
 
+## User Environment
 
-If you are running `kind` in an environment that requires a proxy for Internet access, you may need to configure `kind` to use that proxy.
+Configuration of end-user environments is beyond the scope of this document.  Numerous on-line resources exist which provide step-by-step details on how to configure user environments to use proxy servers.  Below  is an example on-line resource found with a simple Google search.
 
-You can configure `kind` to use a proxy using one or more of the following environment variables (uppercase takes precedence):
+Shellhacks: <https://www.shellhacks.com/linux-proxy-server-settings-set-proxy-command-line/>
 
-```sh
-http_proxy=
-https_proxy=
-no_proxy=
-HTTP_PROXY=
-HTTPS_PROXY=
-NO_PROXY=
-```
+>NOTE: Check with your network administrator for the correct value/values for your environment.
 
-### Proxy Rework TODO list
->
-#### TODO: review proxies (in general) including Docker Proxy and k8s tooling proxies
->
-> * get users to fully populate proxy.txt with:
-> * http_proxy, https_proxy, and no_proxy assignments...
->
-#### TODO: force proxy OFF in the install scripts
->
-> * except for where we download utils from the internet...
->
-#### TODO: use 3 vars to spit out a .docker/config.json
->
-> * provide instructions for the user to install themselves (STARTED)
+## Package Manager Configuration
 
------ Addendum -----
+## Docker Client
+
+To configure the Docker client, please consult the Docker documentation at the link provided below.
+
+Docker Client: <https://docs.docker.com/network/proxy/>
+
+## Docker Service
+
+To configure the Docker service, please consult the **HTTP/HTTPS proxy** section of the Docker documentation at the link provided below.
+
+Docker Service: <https://docs.docker.com/config/daemon/systemd/>
+
+## MITM (man-in-the-middle) SSL certificate considerations
+
+### TODO: review proxies (in general) including Docker Proxy and k8s tooling
+
+----- Code Snippet Addendum -----
+
+>NOTE: Code snippets below are deprecated.
 
 ```bash
-log "Creating the systemd docker.service directory ...."
+echo "Creating the systemd docker.service directory ...."
 # Create the systemd docker.service directory
 sudo mkdir -p /etc/systemd/system/docker.service.d
+```
 
+```bash
 # Setup Docker daemon proxy entries.
 PROXY_CONF=$Z2A_BASE/0-kind/proxy.txt
 [[ -f $PROXY_CONF ]] && {
-	PROXY=$(<$PROXY_CONF) ;
-	if [[ -n $PROXY ]] ; then
-		log "Configuring /etc/systemd/system/docker.service.d/http-proxy.conf file ...."
-		cat <<EOF | sudo tee /etc/systemd/system/docker.service.d/http-proxy.conf
+ PROXY=$(<$PROXY_CONF) ;
+  if [[ -n $PROXY ]] ; then
+    log "Configuring /etc/systemd/system/docker.service.d/http-proxy.conf file ...."
+    cat <<EOF | sudo tee /etc/systemd/system/docker.service.d/http-proxy.conf
 [Service]
 Environment="HTTP_PROXY=http://$PROXY"
 Environment="HTTPS_PROXY=http://$PROXY"
 Environment="NO_PROXY=127.0.0.1,localhost,.svc,.local,kind-acumos-control-plane,169.254.0.0/16,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
 EOF
-	fi
+  fi
 }
+```
 
+```bash
 # Reload docker service configuration
 sudo systemctl daemon-reload
 ```
@@ -69,5 +70,5 @@ sudo systemctl daemon-reload
 
 ```sh
 // Created: 2020/06/16
-// Last modified: 2020/07/07
+// Last modified: 2020/07/09
 ```

@@ -1,8 +1,7 @@
-
 .. ===============LICENSE_START=======================================================
 .. Acumos CC-BY-4.0
 .. ===================================================================================
-.. Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+.. Copyright (C) 2017-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
 .. ===================================================================================
 .. This Acumos documentation file is distributed by AT&T and Tech Mahindra
 .. under the Creative Commons Attribution 4.0 International License (the "License");
@@ -12,24 +11,10 @@
 .. http://creativecommons.org/licenses/by/4.0
 ..
 .. This file is distributed on an "AS IS" BASIS,
-.. WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 .. See the License for the specific language governing permissions and
 .. limitations under the License.
 .. ===============LICENSE_END=========================================================
 
-==================
-System Integration
-==================
-
-.. toctree::
-       :maxdepth: 2
-
-       release-notes
-       oneclick-deploy/index
-       oneclick-deploy/configuration
-       oneclick-deploy/developer-guide
-       z2a/index
-       z2a/configuration
-       z2a/installation-guide
-
-* :ref:`search`
+=======================================
+Zero-to-Acumos (z2a) Installation Guide
+=======================================
