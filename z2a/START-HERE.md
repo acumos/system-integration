@@ -14,7 +14,7 @@ If you are here, you may know what Acumos is but you probably don't know:
 
 ## What is `z2a` Flow-1
 
-`z2a` Flow-1 performs an Acumos installation including:
+`z2a` Flow-1 (default) performs an Acumos installation including:
 
 * end-user environment creation;
 * VM Operating System preparation;
@@ -30,7 +30,8 @@ If you are here, you may know what Acumos is but you probably don't know:
 
 `z2a` Flow-2 performs an Acumos installation including:
 
-* end-user environment creation; and,
+* end-user environment creation;
+* `z2a` dependency installation;
 * deployment of Acumos noncore and core components on an existing Kubernetes cluster.
 
 The second process flow is a new `z2a` process flow targeting pre-built Kubernetes cluster environments. (i.e. BYOC - Bring Your Own Cluster)
@@ -53,5 +54,5 @@ Please refer to the following documents for additional information:
 
 ```sh
 // Created: 2020/06/23
-// Last modified: 2020/07/09
+// Last modified: 2020/07/13
 ```

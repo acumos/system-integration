@@ -21,19 +21,6 @@ z2a/2-plugins/2-plugins.sh              # Acumos plugins setup (including depend
 
 > NOTE: In Flow-1, the `z2a` environment creation script (01-env.sh) will have to be executed during the initial setup and again after logging out and logging back into the new session.
 
-## Flow-2
-
-Flow-2 consists of three (3) steps using the following scripts (and descriptions):
-
-```bash
-# Step 0
-z2a/0-kind/0a-env.sh                    # z2a environment creation
-# Step 1
-z2a/1-acumos/1-acumos.sh                # Acumos noncore and core component setup
-# Step 2 (optional)
-z2a/2-plugins/2-plugins.sh              # Acumos plugins setup (including dependencies)
-```
-
 ## Flow-1 VM Requirements
 
 * At the time of this writing, the Operating System installed on the VM must be either RedHat/CentOS (v7 or greater, v8 recommended) or Ubuntu (18.04 or greater, 20.04 recommended).

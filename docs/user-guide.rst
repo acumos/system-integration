@@ -30,7 +30,7 @@ Kong API helps in reducing the rewriting of the same piece of code again and aga
 
 Backend Architecture
 
-.. image:: images/AcumosKongAPI.jpg	
+.. image:: images/AcumosKongAPI.jpg
 
 *Note*: All the configuration data sent through the Admin API is stored in Kong's data store. Kong is capable of supporting both Postgres and Cassandra as storage backend. We have chosen Postgres.
 
@@ -58,26 +58,26 @@ The entire configuration data is stored in Kong's data store. The kong-migration
 By default Kong listens on the following ports:
 
 	:8000 on which Kong listens for incoming HTTP traffic from your clients, and forwards it to your upstream services.
-	
+
 	:8443 on which Kong listens for incoming HTTPS traffic. This port has a similar behavior as the :8000 port, except that it expects HTTPS traffic only. This port can be disabled via the configuration file.
-	
+
 	:8001 on which the Admin API used to configure Kong listens.
-	
+
 	:8444 on which the Admin API listens for HTTPS traffic.
-	
+
 Acumos Kong is running on port
 
 	:7000 on which Acumos Kong listens for incoming HTTP traffic from your clients, and forwards it to your upstream services.
-	
+
 	:443 on which Acumos Kong listens for incoming HTTPS traffic. This port has a similar behavior as the :7000 port, except that it expects HTTPS traffic only. This port can be disabled via the configuration file.
-	
+
 	:7001 on which the Admin API used to configure Acumos Kong listens.
-	
+
 	:7004 on which the Admin API listens for HTTPS traffic.
-	
-	
+
+
 *Note*: Acumos Kong API docker-compose.yml and shell script can be run before or after the main docker-compose. Ensure before access the service URL via acumos Kong API all the services which we are going to access should be up and running.
-	
+
 Prerequisites
 -------------
 `Docker <https://docs.docker.com/>`_ and `Docker Compose <https://docs.docker.com/compose/install/>`_ installed
@@ -95,16 +95,15 @@ Steps
 2. Builds, (re)creates, starts, and attaches to containers for kong, postgres.
 
 .. code-block:: bash
-	
-   $ ./docker-compose-kong.sh up -d  	
-				
+
+   $ ./docker-compose-kong.sh up -d
+
 
 3. To stop the running containers without removing them
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ ./docker-compose-kong.sh stop
-
 
 
 Steps to create self signed in certificate
@@ -200,11 +199,11 @@ This user guide describes how to deploy Acumos platform using Kubernetes an open
 In system-integration repo folder acumosk8s-public-cloud/azure:
 
 *  deployments/all_start_stop.sh: the main script that kicks off the deployment, to setup
-   pods Acumos , elk, docker, kong, nexus ,proxy and mariadb under a kubernetes environment.
-*  acumos-kubectl.env: environment setup file that is customized as new environment parameters get generated (e.g. passwords). Used by various scripts in this toolset, to set shell environment variables that they need.  
+   pods Acumos, elk, docker, kong, nexus, proxy and mariadb under a kubernetes environment.
+*  acumos-kubectl.env: environment setup file that is customized as new environment parameters get generated (e.g. passwords). Used by various scripts in this toolset, to set shell environment variables that they need.
 * deployments/: kubernetes deployment templates for all system components.
 *  services/all_start_stop.sh: the script that gets all the services started, to setup
-   service for Acumos , elk, docker, kong, nexus ,proxy, mariadb and federation under a kubernetes 
+   service for Acumos, elk, docker, kong, nexus, proxy, mariadb and federation under a kubernetes
    environment.
 * services/: kubernetes service templates for all system components.
 * configmap/: kubernetes configmap templates for ELK stack.
@@ -214,16 +213,16 @@ In system-integration repo folder acumosk8s-public-cloud/azure:
 .. code-block:: bash
 
    Release Scope
-   
+
 **Current Release (Athena)**
 
 The Athena release includes these capabilities that have been implemented/tested:
 
-* Multi-Node deployment of the Acumos platform under kubernetes.        
+* Multi-Node deployment of the Acumos platform under kubernetes.
 * deployment with a new Acumos database or redeployment with a current database
   and components compatible with that database version.
 * Component services under kubernetes as named below (deployed as
-  one pod-based service k.a acumos):
+  one pod-based service a.k.a acumos):
 
   * core components of the Acumos platform
 
@@ -243,7 +242,7 @@ The Athena release includes these capabilities that have been implemented/tested
 
     * docker engine/API: acumos-docker-service under kubernetes.
     * MariaDB: mariadb running as acumos-mysql service under kubernetes.
-    * Kong proxy: running as acumos-kong-proxy , acumos-postgres service under kubernetes.
+    * Kong proxy: running as acumos-kong-proxy, acumos-postgres service under kubernetes.
     * Nexus: running as acumos-nexus-service under kubernetes.
     * Proxy: running as acumos-proxy under kubernetes.
 
@@ -270,58 +269,56 @@ Step-by-Step Guide
 2. Change directory to  acumosk8s-public-cloud/azure
 
 .. code-block:: bash
-	
+
    $ cd  acumosk8s-public-cloud/azure
-				
 
 3. Edit acumos-kubectl.env file to make changes related to latest assembly , database connection , credentials ,etc.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ vi acumos-kubectl.env
 
 4. Use kubectl create command on kubernetes client machine to create a namespace.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ kubectl create namespace <namespace name>
    Example: kubectl create namespace acumos-ns01
 
 5. Change directory to  acumosk8s-public-cloud/azure/volumeclaim to create persistent volume claim (pvc).
 
-
-.. code-block:: bash	
+.. code-block:: bash
 
    $ cd  acumosk8s-public-cloud/azure/volumeclaim
 
 6. Edit acumos-volumeclaim.sh file and update variable ENV_FILE for absolute path of acumos-kubectl.env file.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ vi acumos-volumeclaim.sh
 
-7. Run all-start-stop.sh script under volumeclaim directory. This will create pvc for certs , nexus, output, acumos logs ,webonboarding and mariadb.
+7. Run all-start-stop.sh script under volumeclaim directory. This will create pvc for certs, nexus, output, acumos logs, webonboarding and mariadb.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ ./all-start-stop.sh create
 
 8. This step needs to be executed only if all the pvc created earlier needs to be deleted.This will delete all the pvc created under the given namespace.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ ./all-start-stop.sh delete
 
 9. If each volumeclaim need to be created individually then skip step 7 and use below command.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ ./acumos-volumeclaim.sh <name of volumeclaim .yaml file> create
    Example: ./acumos-volumeclaim.sh acumos-volumeclaim.yaml create
 
 10. Create a secret file for acumos that contains base64 encoding to pull docker image from nexus repo.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ log "Create k8s secret for docker image pulling from nexus repo"
      b64=$(cat ~/.docker/config.json | base64 -w 0)
@@ -338,73 +335,71 @@ Step-by-Step Guide
 
 11. Create configmap for ELK stack.
 
-.. code-block:: bash	
-   
+.. code-block:: bash
+
    $ cd  acumosk8s-public-cloud/azure/configmap
    $ ./acumos-configmap.sh <name of config.yaml file> create
    Example: ./acumos-configmap.sh es-config.yaml create
          ./acumos-configmap.sh logstash-config.yaml create
 
-
 12. Change directory to  acumosk8s-public-cloud/azure/deployments
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ cd  acumosk8s-public-cloud/azure/deployments
 
 13. Edit acumos-deployment.sh file and update variable ENV_FILE for absolute path of acumos-kubectl.env file.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ vi acumos-deployment.sh
 
 14. Run all-start-stop.sh script under deployments directory. This will create kubernetes deployment for mariadb ,kong, elk, acumos (containing all components), nexus, docker and proxy.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ ./all-start-stop.sh create
 
 15. This step needs to be executed only if all the deployment.yaml created earlier needs to be deleted.This will delete kubernetes deployment for mariadb ,kong, elk, acumos (containing all components), nexus, docker and proxy created under the given namespace.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ ./all-start-stop.sh delete
 
 16. If each deployment need to be created individually then skip step 14 and use below command.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ ./acumos-deployment.sh <name of deployment.yaml file> create
    Example: ./acumos-deployment.sh acumos-deployment.yaml create
 
 17. Change directory to  acumosk8s-public-cloud/azure/services
 
-
-.. code-block:: bash	
+.. code-block:: bash
 
    $ cd  acumosk8s-public-cloud/azure/services
 
 18. Edit acumos-service.sh file and update variable ENV_FILE for absolute path of acumos-kubectl.env file.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ vi acumos-service.sh
 
 19. Run all-start-stop.sh script under services directory. This will create kubernetes service for mariadb ,kong, elk, acumos (containing all components), nexus, docker ,federation and proxy. After services are up and running we need to map external endpoints generated for kibana-service , federation-service and acumos-nexus-service to FQDN in azure e.g. IP 40.117.115.236 generated for kibana is mapped to acumosk8s-log.eastus.cloudapp.azure.com
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ ./all-start-stop.sh create
 
 20. This step needs to be executed only if all the services.yaml created earlier needs to be deleted.This will delete kubernetes services for mariadb ,kong, elk, acumos (containing all components), nexus, docker , federation and proxy created under the given namespace.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ ./all-start-stop.sh delete
 
 21. If each service need to be created individually then skip step 19 and use below command.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ ./acumos-service.sh <name of service.yaml file> create
    Example: ./acumos-service.sh acumos-service.yaml create
@@ -413,13 +408,13 @@ Step-by-Step Guide
 
 23. Create certificate and run ./create-certs.sh , this shell file includes below line
 
-.. code-block:: bash	
+.. code-block:: bash
 
     openssl req -x509 -newkey rsa:4096 -keyout acumos-k8s.key -out acumos-k8s.cert -days 365
 
 24. Install certificates and run ./install-certificates.sh that includes below line. acumosk8s.eastus.cloudapp.azure.com is the FQDN  and 8001 is port no that is exposed.
 
-.. code-block:: bash	
+.. code-block:: bash
 
     curl -i -X POST http://acumosk8s.eastus.cloudapp.azure.com:8001/certificates \
     -F "cert=acumos-k8s.cert" \
@@ -428,7 +423,7 @@ Step-by-Step Guide
 
 25. Add to certificates run ./add-to-cacert.sh ,  this shell file includes below line.
 
-.. code-block:: bash	
+.. code-block:: bash
 
 /usr/lib/jvm/java-8-oracle/bin/keytool -import -noprompt -keystore acumosTrustStore.jks -storepass changeit -alias acumos-k8s -file acumos-k8s.pem
 
@@ -461,32 +456,21 @@ Step-by-Step Guide
 
 29. After copying .pkcs12 and .jks file restart the federation-gateway pod
 
-30. Run secure-acumos-api-internal.sh file on K8. You need to change few configuration listed below based on your environment in this file 
+30. Run secure-acumos-api-internal.sh file on K8. You need to change few configuration listed below based on your environment in this file
 
 .. code-block:: bash
 
   export ACUMOS_KONG_API_HOST_NAME=acumosk8s.eastus.cloudapp.azure.com
-
   export ACUMOS_KONG_API_HOST_SNIS=acumosk8s.eastus.cloudapp.azure.com
-
-  export ACUMOS_KONG_API_PORT=8001 
-
+  export ACUMOS_KONG_API_PORT=8001
   export ACUMOS_KONG_CERTIFICATE_PATH=/path-to-directory/acumos-k8s/certs
-
   export ACUMOS_CRT=acumos-k8s.cert
-
-  export ACUMOS_KEY=acumos-k8s.key 
-
+  export ACUMOS_KEY=acumos-k8s.key
   export ACUMOS_HOST_NAME=acumos.acumos-ns01
-
   export ACUMOS_NEXUS_HOST_NAME=acumos-nexus-service.acumos-ns01
-
   export ACUMOS_HOME_PAGE_PORT=8085
-
   export ACUMOS_ONBOARDING_PORT=8090
-
   export ACUMOS_CMS_PORT=9080
-
   export ACUMOS_NEXUS_PORT=8001
 
 31. Follow below steps to set up CMS.
@@ -573,12 +557,12 @@ Set up using Helm Charts
 2. Change directory to  acumosk8s-public-cloud/azure/HELM
 
 .. code-block:: bash
-	
+
    $ cd  acumosk8s-public-cloud/azure/HELM
 
 3. Create a secret file for acumos that contains base64 encoding to pull docker image from nexus repo.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ log "Create k8s secret for docker image pulling from nexus repo"
      b64=$(cat ~/.docker/config.json | base64 -w 0)
@@ -591,11 +575,11 @@ Set up using Helm Charts
      data:
        .dockerconfigjson: $b64
      type: kubernetes.io/dockerconfigjson
-     EOF				
+     EOF
 
 4. Use below helm install command on kubernetes client machine to install helm chart for non core components like nexus, mariadb ,etc and elk stack.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ helm install k8-noncore-chart
    $ helm install k8-elk-chart
@@ -630,20 +614,20 @@ Execute the DDL and DML scripts for any database version that needs to be config
 
 6. Edit values.yaml file inside k8-acumos-chart to make changes related to latest assembly , database connection , credentials ,onboarding-cli service,etc.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ cd k8-acumos-chart
    $ vi values.yaml
 
 7. Use below helm install command on kubernetes client machine to install helm chart for acumos core components like portal- fe , portal-be, onboarding,etc.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ helm install k8-acumos-chart
 
 8. To view and delete the helm charts installed.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ helm list
    $ helm delete <chart name>
@@ -661,11 +645,11 @@ Execute the DDL and DML scripts for any database version that needs to be config
 
 11. To redeploy core components based on weekly assembly use chart k8-acumos-redeploy-chart.
 
-.. code-block:: bash	
+.. code-block:: bash
 
    $ helm install k8-acumos-redeploy-chart
 
-12. Run secure-acumos-api-internal.sh file on K8. You need to change few configuration listed below based on your environment in this file 
+12. Run secure-acumos-api-internal.sh file on K8. You need to change few configuration listed below based on your environment in this file
 
 .. code-block:: bash
 
@@ -673,13 +657,13 @@ Execute the DDL and DML scripts for any database version that needs to be config
 
   export ACUMOS_KONG_API_HOST_SNIS=acumosk8s.FQDN
 
-  export ACUMOS_KONG_API_PORT=8001 
+  export ACUMOS_KONG_API_PORT=8001
 
   export ACUMOS_KONG_CERTIFICATE_PATH=/path-to-directory/certificates-is-stored
 
   export ACUMOS_CRT=acumos-k8s.cert
 
-  export ACUMOS_KEY=acumos-k8s.key 
+  export ACUMOS_KEY=acumos-k8s.key
 
   export ACUMOS_HOST_NAME=<acumos service name>.<namespace>
 
@@ -691,7 +675,7 @@ Execute the DDL and DML scripts for any database version that needs to be config
 
   export ACUMOS_NEXUS_PORT=8001
 
-  
+
 Monitoring resource utilization in kubernetes using Prometheus and Grafana
 --------------------------------------------------------------------------
 
@@ -722,7 +706,7 @@ Monitoring resource utilization in kubernetes using Prometheus and Grafana
 
     $ kubectl get pods -n prometheus
 
-5. Deploy Grafana into the pometheus namespace.
+5. Deploy Grafana into the prometheus namespace.
 
 .. code-block:: bash
 
@@ -739,12 +723,12 @@ Monitoring resource utilization in kubernetes using Prometheus and Grafana
 
 .. code-block:: bash
 
-    $ export POD_NAME=$(kubectl get pods --namespace prometheus -l "app=grafana,release=grafana" -o 
+    $ export POD_NAME=$(kubectl get pods --namespace prometheus -l "app=grafana,release=grafana" -o
       jsonpath="{.items[0].metadata.name}")
     $ kubectl --namespace prometheus port-forward $POD_NAME 3000
 
-8. Go to http://localhost:3000 in your browser. You should see the Grafana login screen.If step 7 gives 
-   connectivity issue then we can change type as LoadBalancer in grafana service file that will create an 
-   external endpoint and url will be accessible.
+8. Go to http://localhost:3000 in your browser. You should see the Grafana login screen.If step 7 gives
+   connectivity issue then we can change type as LoadBalancer in Grafana service file that will create an
+   external endpoint and URL will be accessible.
 
-9. Set the smtp settings in grafana config map to send email alerts notification.
+9. Set the SMTP settings in Grafana configmap to send email alerts notification.

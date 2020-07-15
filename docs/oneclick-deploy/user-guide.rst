@@ -259,7 +259,7 @@ folder, or in the system-integration clone under it.
 
 * providing a post_deploy.sh script
 
-  * aio_k8s_deploery.sh will execute a script named post_deploy.sh in the
+  * aio_k8s_deploy.sh will execute a script named post_deploy.sh in the
     deploy folder, if present. Such a script can be used for any arbitrary
     purpose, e.g. to create user accounts, onboard default models, further
     configure the platform though the available APIs, etc.
@@ -275,7 +275,7 @@ folder, or in the system-integration clone under it.
   * executes oneclick_deploy.sh, and saves a log
   * executes the post_deploy.sh script, if present
   * copies the updated files from the acumos-deployer container to the user's
-    workstation deploy subfolder, incuding the log files and all updated files
+    workstation deploy subfolder, including the log files and all updated files
     under the system-integration repo
 
 Deploying via the Prep-Deploy process
@@ -649,7 +649,7 @@ In AIO/mariadb:
 
 In AIO/mlwb:
 
-* scripts and templates to deploy the MWLB components of the Acumos platform
+* scripts and templates to deploy the MLWB components of the Acumos platform
 
 In AIO/nexus:
 
@@ -665,7 +665,7 @@ In charts:
   * ingress: Nginx-ingress controller
   * jenkins: the Jenkins service as used by the Deployment Client and SV Scanning
     Service
-  * jupyterhub: the JupterHub/JupyterLab services for notebook-based model
+  * jupyterhub: the JupyterHub/JupyterLab services for notebook-based model
     development
   * mariadb: MariaDB service
   * zeppelin: the Zeppelin service for notebook-based model development
@@ -689,7 +689,7 @@ In tests:
 * license_scan.sh: invokes a license scan for a solution, using the Security
   Verification Scanning Service.
 * onboard_model.sh: Model package onboarding via curl.
-* peer_test.sh: Peering and marketplace subsciptions setup for two AIO platforms.
+* peer_test.sh: Peering and marketplace subscriptions setup for two AIO platforms.
   Used to test federation use cases.
 
 In tools:
@@ -708,7 +708,7 @@ In tools:
   * setup_mariadb_client.sh: deploys the MariaDB client as used by other
     scripts to configure the Acumos database.
   * setup_openshift.sh: deploys an OpenShift Origin 3.11 kubernetes cluster, for
-    subsequent Acumos platform deploymet on Centos 7 servers.
+    subsequent Acumos platform deployment on Centos 7 servers.
   * setup_openshift_client.sh: deploys the OpenShift client (oc) tool
     used by other scripts and users to manage and interact with OpenShift based
     platform deployments.
@@ -773,16 +773,15 @@ Following are basic requirements for single-node/AIO machines:
 * minimum 1 network interface
 * network security rules in place to allow incoming traffic on the following ports:
 
-.. csv-table::
+.. csv-table:: TCP Ports
     :header: "Port(s)", "Purpose"
-    :widths: 20, 80
-    :align: left
+    :widths: 30, 100
 
     "22", "SSH into the VM"
     "80", "Ingress controller (Kong)"
     "443", "Ingress controller (http)"
     "443", "Ingress controller (https)"
-    "6443", "kubernetes API",
+    "6443", "kubernetes API"
     "30000-32767", "direct service access, e.g. k8s nodeports"
 ..
 
@@ -873,7 +872,7 @@ The Admin user will follow this process:
 
   * k8s: indicates deployment under k8s
   * user: non-sudo user account (use $USER if deploying for yourself)
-  * domain: domain name of Acumos platorm (resolves to this host)
+  * domain: domain name of Acumos platform (resolves to this host)
   * generic|openshift: use generic k8s or openshift
 
 When the process is complete, the updated system-integration clone and environment
@@ -1500,8 +1499,8 @@ associated with those components.
     ..
 
     * The example above accessing the logs from within the aio_k8s_deployer
-      container, but will also work in other envs, just use the correct path
-      for your acumos_env.sh script.
+      container, but will also work in other environments, just use the correct
+      path for your acumos_env.sh script.
     * In the example above you also see that not all of the log folders in the
       previous (AIO) example are shown; this is because in this case the
       SERVICE_LABEL values in acumos_env.sh have been configured to distribute
@@ -1553,7 +1552,7 @@ Notes on the table above:
   in charts/jupyterhub/setup_jupyterhub.sh.
 
 For other components, k8s nodeports are currently used for primary access or
-supplementatl access. Note that if possible, these services will be migrated to
+supplemental access. Note that if possible, these services will be migrated to
 access via the ingress controller, early in the next release. However, in many
 cases these services may be provided as shared application services, and
 deployed outside the Acumos platform. The AIO toolset supports that as an option,
@@ -1582,7 +1581,7 @@ Notes on the table above:
 * The Docker Proxy NodePort is currently required because an ingress rule for
   it has not been implemented/tested. An update will be published as soon as this
   has been done.
-* Configuraton of JupyterHub to avoid NodePort use is a WIP.
+* Configuration of JupyterHub to avoid NodePort use is a WIP.
 * Access to the Security Verification Scan API is provided so that Admins can
   invoke scans manually or through external systems, and also for the future
   support of external scan result notifications.
@@ -1693,12 +1692,12 @@ The AIO default PV size for the nexus-data PVC and the backing PV is 10Gi.
 This can be exhausted after a few images have been generated, and needs to be
 periodically cleaned. The effect is that artifacts or images can't be saved by
 the Nexus service. Onboarding service logs such as the below can indicate
-such issues are occuring:
+such issues are occurring:
 
 .. code-block:: bash
 
   2019-11-29T10:46:46.724Z	http-nio-8090-exec-2	ERROR	org.acumos.onboarding.services.impl.CommonOnboarding		Severity=DEBUG
-  Fail to upload artificat for OnboardingLog.txt - Failed to transfer file: http://nexus-service.acumos-prod.svc.cluster.local:8081
+  Fail to upload artifact for OnboardingLog.txt - Failed to transfer file: http://nexus-service.acumos-prod.svc.cluster.local:8081
   /repository/acumos_model_maven/org/acumos/64cd4781-d5b0-4ced-89e2-7fb3616d56ba/OnboardingLog/1.0.2/OnboardingLog-1.0.2.txt.
   Return code is: 500	org.apache.maven.wagon.TransferFailedException: Failed to transfer file: http://nexus-service.acumos-prod.svc.cluster.local:8081
   /repository/acumos_model_maven/org/acumos/64cd4781-d5b0-4ced-89e2-7fb3616d56ba/OnboardingLog/1.0.2/OnboardingLog-1.0.2.txt.

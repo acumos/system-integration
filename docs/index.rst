@@ -31,5 +31,6 @@ System Integration
        z2a/index
        z2a/configuration
        z2a/installation-guide
+       z2a/readme-proxy
 
 * :ref:`search`
