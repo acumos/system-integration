@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: portal-be-data-pvc
+  namespace: "{{ .Values.global.namespace }}"
+  labels:
+    app: acumos-portal-be
+spec:
+  accessModes:
+    - {{ .Values.storageAccessModes }}
+  {{- if .Values.storageClassName }}
+  storageClassName: "{{ .Values.storageClassName }}"
+  {{- end }}
+  resources:
+    requests:
+      storage: "{{ .Values.storageSize }}"
