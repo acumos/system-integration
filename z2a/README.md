@@ -88,6 +88,19 @@ In the directory `z2a/2-plugins` there is a single (1) script which performs:
 
 Currently, the only Acumos plugin supported is MLWB (Machine Learning WorkBench).
 
+## Flow-2
+
+Flow-2 consists of three (3) steps using the following scripts (and descriptions):
+
+```bash
+# Step 0
+z2a/0-kind/0a-env.sh                    # z2a environment creation
+# Step 1
+z2a/1-acumos/1-acumos.sh                # Acumos noncore and core component setup
+# Step 2 (optional)
+z2a/2-plugins/2-plugins.sh              # Acumos plugins setup (including dependencies)
+```
+
 ## Flow-2 Deployment
 
 Flow Two (Flow-2) performs a `z2a` Acumos installation including environment creation and deployment of Acumos noncore and core components. Flow-2 is based on the original `z2a` process flow, but is targeted at Acumos installations onto a Kubernetes cluster that is already built and ready for application installation.

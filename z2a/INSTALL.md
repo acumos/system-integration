@@ -8,7 +8,7 @@
 
 1) a vanilla VM (fresh install, no additional tools installed);
 2) need to build a k8s cluster; and,
-3) install Acumos (and optional plugins), then choose Flow-1.
+3) want to install Acumos (and optional plugins), then choose Flow-1.
 >
 >If you have:
 

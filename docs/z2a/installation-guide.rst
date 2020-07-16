@@ -21,9 +21,8 @@ Zero-to-Acumos (z2a) Installation Guide
 
 ..
 
-    Note:  Document development in progress.  Subject to change.
-
-..
+    | NOTE: Document is in the progress of development.
+    | NOTE: Subject to change while the document content stabilizes.
 
 This installation guide describes how to deploy Acumos using the
 `Zero-to-Acumos` (z2a) tool. `z2a` was designed for those who require a simple
@@ -85,13 +84,15 @@ Flow-1 consists of three (3) steps using the following scripts (and descriptions
 The process flow of `z2a` Flow-1 is depicted in the following diagram.
 
 .. image:: images/z2a-flow-1.jpg
-   :width: 100 %
 
-NOTE: `z2a` (Flow-1) should not be used as a production environment deployment
-tool at this time.  `z2a` (Flow-1) has been primarily designed for development
-and/or test environment installations.  Currently, a key component of `z2a`
-(Flow-1), `kind` -  Kubernetes in Docker - is not recommended for production
-installation or production workloads.
+..
+
+    NOTE: `z2a` (Flow-1) should not be used as a production environment deployment
+    tool at this time.  `z2a` (Flow-1) has been primarily designed for development
+    and/or test environment installations.  Currently, a key component of `z2a`
+    (Flow-1), `kind` -  Kubernetes in Docker - is not recommended for production
+    installation or production workloads.
+..
 
 What is `z2a` Flow-2?
 ---------------------
@@ -131,291 +132,213 @@ The process flow of `z2a` Flow-2 is depicted in the following diagram.
 Quickstart Guide to `z2a` Deployment (TL;DR)
 --------------------------------------------
 
-TL;DR - Choose a Flow
-+++++++++++++++++++++
+Choose a Flow
++++++++++++++
 
 If you have:
 
 1) a vanilla VM (fresh install, no additional tools installed);
 2) need to build a k8s cluster; and,
-3) install Acumos (and optional plugins), then choose Flow-1.
+3) want to install Acumos (and optional plugins), then choose Flow-1.
 
 If you have:
 
 1) a pre-built k8s cluster; and,
 2) want to install Acumos (and optional plugins), then choose Flow-2.
 
-TL;DR - README-PROXY
-++++++++++++++++++++
+README-PROXY
+^^^^^^^^^^^^
 
-If you are running `z2a` in an environment that requires a proxy, you may need to configure various items to use that proxy BEFORE you run `z2a`.
+If you are running `z2a` in an environment that requires a proxy, you may need
+to configure various items to use that proxy BEFORE you run `z2a`.
 
-  NOTE: You may also need to consult your systems/network administration team for the correct proxy values.
+  NOTE: You may also need to consult your systems/network administration team
+  for the correct proxy values.
 
-Please consult the README-PROXY document for details on the various items that will require configuration and links to resources that will assist in the configuration tasks.
+Please consult the README-PROXY document for details on the various items that
+will require configuration and links to resources that will assist in the
+configuration tasks.
 
-TL;DR (Flow-1)
-++++++++++++++
+Flow-1
+++++++
 
-1. Obtain a Virtual Machine (VM) with sudo access ; Login to VM
+Here are the steps to execute `z2a` Flow-1.
 
-  NOTE: /usr/local/bin is a required element in your $PATH
+  NOTE: ``/usr/local/bin`` is a required element in your $PATH
 
-2. Install 'git' distributed version-control tool
+1. Obtain a Virtual Machine (VM) with sudo access ; Login to the VM
+2. Install `git` distributed version-control tool
+3. For RPM-based distributions such as RHEL/CentOS, execute the `yum` command, shown below:
+4. For Debian-based distributions such as Ubuntu, execute the `apt-get` command, shown below:
+5. Make `src` directory ; change directory to that location
+6. Clone the Acumos 'system-integration' repo using `git`
+7. Set the ACUMOS_HOME environment variable
+8. Change directory to the `z2a` directory
 
-  For RPM-based distributions such as RHEL/CentOS, execute the following command:
+Here are the commands to execute:
 
-.. code-block::
+.. code-block:: bash
 
-    sudo yum install -y git
+    $ sudo yum install -y git
+    $ sudo apt-get install --no-install-recommends -y git
+    $ mkdir -p $HOME/src ; cd $HOME/src
+    $ git clone https://gerrit.acumos.org/r/system-integration
+    $ ACUMOS_HOME=$HOME/src/system-integration
+    $ cd $ACUMOS_HOME/z2a
 ..
 
-For Debian-based distributions such as Ubuntu, execute the following command:
+Next, we must choose one of the following methods to create a `global_value.yaml` file.
+
+Method 1 - example values
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+| # To use the example `global_value.yaml` file;
+| # copy the example values from z2a/dev1 to the helm-charts directory
 
 .. code-block::
 
-    sudo apt-get install --no-install-recommends -y git
-..
-
-Make src directory ; change directory to that location
-
-.. code-block::
-
-    mkdir -p $HOME/src ; cd $HOME/src
-..
-
-clone Acumos 'system-integration' repo
-
-.. code-block::
-
-    git clone https://gerrit.acumos.org/r/system-integration
-..
-
-set ACUMOS_HOME environment variable
-
-.. code-block::
-
-    ACUMOS_HOME=$HOME/src/system-integration
-..
-
-Change directory
-
-.. code-block::
-
-    cd $ACUMOS_HOME/z2a
-..
-
-Choose one of the following methods to create a `global_value.yaml` file
-
-# Method 1 - example values
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-To use the example global_value.yaml file; copy the example values from z2a/dev1 to the helm-charts directory
-
-.. code-block::
-
-    cp ./dev1/global_value.yaml.dev1 ../helm-charts/global_value.yaml
+    $ cp ./dev1/global_value.yaml.dev1 ../helm-charts/global_value.yaml
 ..
 
 Method 2 - customized values
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-# To use a customized global_value.yaml file;
-# edit $HOME/src/system-integration/helm-charts/global_value.yaml
-# using an editor and command similar to this:
-# vi $HOME/src/system-integration/helm-charts/global_value.yaml
+| # To use a customized global_value.yaml file;
+| # edit ``$HOME/src/system-integration/helm-charts/global_value.yaml``
+| # using an editor and command similar to this:
+| # vi $HOME/src/system-integration/helm-charts/global_value.yaml
 
-Once the global_value.yaml file has been copied or edited; you can proceed with the installation
+Once the `global_value.yaml` file has been copied or edited;
+you can proceed with the installation
 
-Execute 0-kind/0a-env.sh (setup user environment)
+| # Execute ``0-kind/0a-env.sh``(setup user environment)
+| # Execute ``0-kind/0b-depends.sh`` (install / configure dependencies)
+
+.. code-block:: bash
+
+    $ ./0-kind/0a-env.sh
+    $ ./0-kind/0b-depends.sh
+..
+
+| # LOG OUT OF SESSION ; LOG IN TO NEW SESSION (this step is required for Docker group inclusion)
+| # Reinitialize the user z2a environment by running ``0-kind/0a-env.sh``
+| # Execute ``0-kind/0c-cluster.sh`` (build and configure k8s cluster)
+
+.. code-block:: bash
+
+    $ ACUMOS_HOME=$HOME/src/system-integration
+    $ cd $ACUMOS_HOME/z2a
+    $ ./0-kind/0a-env.sh
+    $ ./0-kind/0c-cluster.sh
+..
+
+| # Ensure all k8s Pods created are in a 'Running' state.
+| # Execute ``1-acumos/1-acumos.sh`` (install / configure noncore & core Acumos components)
 
 .. code-block::
 
-    ./0-kind/0a-env.sh
+    $ kubectl get pods -A
+    $ ./1-acumos/1-acumos.sh
 ..
 
-# Execute 0-kind/0b-depends.sh (install / configure dependencies)
-
-.. code-block::
-
-    ./0-kind/0b-depends.sh
-..
-
-LOG OUT OF SESSION ; LOG IN TO NEW SESSION
-
-... this step is required for Docker group inclusion
-
-Reinitialize the user z2a environment
-
-Execute 0-kind/0c-cluster.sh (build and configure k8s cluster)
-
-.. code-block::
-
-    ACUMOS_HOME=$HOME/src/system-integration
-    cd $ACUMOS_HOME/z2a
-    ./0-kind/0a-env.sh
-    ./0-kind/0c-cluster.sh
-..
-
-# Ensure all k8s Pods created are in a 'Running' state.
-
-.. code-block::
-
-    kubectl get pods -A
-..
-
-Execute 1-acumos.sh (install / configure noncore & core Acumos components)
-
-.. code-block::
-
-    ./1-acumos/1-acumos.sh
-..
-
-If Acumos plugins are to be installed in a new session:
-
-Uncomment the ACUMOS_HOME line below and paste it into the command-line
+| # If Acumos plugins are to be installed in a new session:
+| # Uncomment the ACUMOS_HOME line below and paste it into the command-line
 
 # ACUMOS_HOME=$HOME/src/system-integration
 
-To install Acumos plugins ; proceed here
+| # To install Acumos plugins ;
+| # copy the example MLWB values file into ~/helm-charts
+| # Execute ``2-plugins/2-plugins.sh`` (install / configure Acumos plugins and dependencies)
 
-.. code-block::
+.. code-block:: bash
 
-    cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml.mlwb $ACUMOS_HOME/helm-charts/mlwb_value.yaml
-..
-
-# Execute 2-plugins.sh (install / configure Acumos plugins and dependencies)
-
-.. code-block::
-
-    ./2-plugins/2-plugins.sh
+    $ cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml.mlwb $ACUMOS_HOME/helm-charts/mlwb_value.yaml
+    $ ./2-plugins/2-plugins.sh
 ..
 
 TL;DR (Flow-2)
 ++++++++++++++
 
-To execute Flow-2, we will use a VM-based host for command & control
+To execute Flow-2, we will use a VM-based host for command & control.
+Here are the steps to execute `z2a` Flow-2.
 
-  Note: You MAY require sudo access on the command & control VM to allow you to install git
-  Note: /usr/local/bin is a required element in your $PATH
+  NOTE: You MAY require sudo access on the command & control VM to allow you to install git
+  NOTE: ``/usr/local/bin`` is a required element in your $PATH
 
-Login to the VM
+1. Login to the VM
+2. Install `git` distributed version-control tool
+3. For RPM-based distributions such as RHEL/CentOS, execute the `yum` command, shown below:
+4. For Debian-based distributions such as Ubuntu, execute the `apt-get` command, shown below:
+5. Make `src` directory ; change directory to that location
+6. Clone the Acumos 'system-integration' repo using `git`
+7. Set the ACUMOS_HOME environment variable
+8. Change directory to the `z2a` directory
 
-Install 'git' distributed version-control tool
+.. code-block:: bash
 
-For RPM-based distributions such as RHEL/CentOS, execute the following command:
-
-.. code-block::
-
-    sudo yum install -y git
+    $ sudo yum install -y git
+    $ sudo apt-get install --no-install-recommends -y git
+    $ mkdir -p $HOME/src ; cd $HOME/src
+    $ git clone https://gerrit.acumos.org/r/system-integration
+    $ ACUMOS_HOME=$HOME/src/system-integration
+    $ cd $ACUMOS_HOME/z2a
 ..
 
-For Debian-based distributions such as Ubuntu, execute the following command:
-
-.. code-block::
-
-    sudo apt-get install --no-install-recommends -y git
-..
-
-# Make src directory ; change directory to that location
-
-.. code-block::
-
-    mkdir -p $HOME/src ; cd $HOME/src
-..
-
-# clone Acumos 'system-integration' repo
-
-.. code-block::
-
-    git clone https://gerrit.acumos.org/r/system-integration
-..
-
-set ACUMOS_HOME environment variable
-
-.. code-block::
-
-    ACUMOS_HOME=$HOME/src/system-integration
-..
-
-Change directory
-
-.. code-block::
-
-    cd $ACUMOS_HOME/z2a
-..
-
-# Choose one of the following methods to create a global_value.yaml file
+| # Next, we must choose one of the following methods to create a global_value.yaml file.
 
 Method 1 - example values
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To use the example global_value.yaml file; copy the example values from z2a/dev1 to the helm-charts directory
+| # To use the example `global_value.yaml` file;
+| # copy the example values from z2a/dev1 to the helm-charts directory
 
 .. code-block::
 
-    cp ./dev1/global_value.yaml.dev1 ../helm-charts/global_value.yaml
+    $ cp ./dev1/global_value.yaml.dev1 ../helm-charts/global_value.yaml
 ..
 
 Method 2 - customized values
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To use a customized global_value.yaml file; edit $HOME/src/system-integration/helm-charts/global_value.yaml
+| # To use a customized `global_value.yaml` file;
+| # edit $HOME/src/system-integration/helm-charts/global_value.yaml
 
-Using an editor and command similar to this:
+| # Using an editor and command similar to this:
 
 .. code-block::
 
-    vi $HOME/src/system-integration/helm-charts/global_value.yaml
+    $ vi $HOME/src/system-integration/helm-charts/global_value.yaml
 ..
 
-Once the global_value.yaml file has been copied or edited; you can proceed with the installation
+| # Once the `global_value.yaml` file has been copied or edited;
+| # you can proceed with the installation.
 
-Execute 0-kind/0a-env.sh (setup user environment)
+| # Execute ``0-kind/0a-env.sh`` (setup user environment)
+| # Ensure all k8s Pods are in a 'Running' state.
+| # Execute ``1-acumos/1-acumos.sh`` (install / configure noncore & core Acumos components)
 
-.. code-block::
+.. code-block:: bash
 
-    ./0-kind/0a-env.sh
+    $ ./0-kind/0a-env.sh
+    $ kubectl get pods -A
+    $ ./1-acumos/1-acumos.sh
 ..
 
-Ensure all k8s Pods are in a 'Running' state.
+| # If Acumos plugins are to be installed in a new session:
+| # uncomment the ACUMOS_HOME line below and paste it into the command-line
+| # ACUMOS_HOME=$HOME/src/system-integration
 
-.. code-block::
+| # To install Acumos plugins ;
+| # copy the example MLWB values file into ~/helm-charts
+| # Execute ``2-plugins/2-plugins.sh`` (install / configure Acumos plugins and dependencies)
 
-    kubectl get pods -A
-..
+.. code-block:: bash
 
-Execute 1-acumos.sh (install / configure noncore & core Acumos components)
-
-.. code-block::
-
-    ./1-acumos/1-acumos.sh
-..
-
-If Acumos plugins are to be installed in a new session:
-
-Uncomment the ACUMOS_HOME line below and paste it into the command-line
-
-# ACUMOS_HOME=$HOME/src/system-integration
-
-To install Acumos plugins ; proceed here
-
-.. code-block::
-
-    cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml.mlwb $ACUMOS_HOME/helm-charts/mlwb_value.yaml
-..
-
-Execute 2-plugins.sh (install / configure Acumos plugins and dependencies)
-
-.. code-block::
-
-    ./2-plugins/2-plugins.sh
+    $ cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml.mlwb $ACUMOS_HOME/helm-charts/mlwb_value.yaml
+    $ ./2-plugins/2-plugins.sh
 ..
 
 <<<Last Edit - Continue Here>>>
 
-.. code-block::
-
-    // Created: 2020/07/13
-    // Last modified: 2020/07/14
-..
+:Created:           2020/07/13
+:Last Modified:     2020/07/15
