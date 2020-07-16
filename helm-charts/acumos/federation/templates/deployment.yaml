@@ -91,7 +91,7 @@ spec:
                "nexusproxy": "",
                "nexuspassword": "{{ .Values.global.acumosNexusUserPassword }}",
                "nexususername": "{{ .Values.global.acumosNexusUserName }}",
-               "nexusgroupid": "com.artifact"
+               "nexusggitroupid": "com.artifact"
              },
              "docker" : {
                 "host": "tcp://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosOnboardingAppPort }}",
