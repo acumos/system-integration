@@ -22,6 +22,30 @@
       "revId": "57527a71d4bcba25eaad7539c20368132c90e0bf",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "71bdace8_3b4ba455",
+        "filename": "helm-charts/acumos/portal-be/templates/deployment.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 24
+      },
+      "writtenOn": "2020-07-16T20:03:57Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "678575e9_d773ba00",
+      "range": {
+        "startLine": 139,
+        "startChar": 16,
+        "endLine": 141,
+        "endChar": 18
+      },
+      "revId": "57527a71d4bcba25eaad7539c20368132c90e0bf",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
