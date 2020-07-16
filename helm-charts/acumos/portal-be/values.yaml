@@ -36,3 +36,12 @@ emailService: ""
 casEnable: "false"
 verifyAccount: "false"
 tokenExpTime: 24
+
+#portal-ui
+dsMenu: "{\"workbenchActive\":true,\"acucomposeActive\":true,\"blocks\":[{\"active\":true,\"title\":\"AT&T Test 2\",\"description\":\"This another new test of the DS TILE THAT IS CONFIGURABLE VIA YML.\",\"url\":\"http://att.com\",\"imagePath\":\"/images/sidebar-icons/lfai-landscape-icon-color.png\"},{\"active\":true,\"title\":\"AT&T Test\",\"description\":\"This a new test of the DS TILE THAT IS CONFIGURABLE VIA YML.\",\"url\":\"http://att.com\",\"imagePath\":\"/images/sidebar-icons/AI_Ethics.png\"}]}"
+sideMenu: "[{\"name\" : \"ML Learning Path\", \"url\" : \"\", \"imagePath\" : \"/images/sidebar-icons/ML_learning_path_selected.png\" }]"
+
+#Storage
+storageAccessModes: ReadWriteMany
+storageClassName: 
+storageSize: "5Gi"
