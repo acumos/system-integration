@@ -87,11 +87,11 @@ spec:
                }
              },
              "nexus": {
-               "nexusendpointurl": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}/repository/{{ .Values.global.acumosNexusMavenRepo }}/",
-               "nexusproxy": "",
-               "nexuspassword": "{{ .Values.global.acumosNexusUserPassword }}",
-               "nexususername": "{{ .Values.global.acumosNexusUserName }}",
-               "nexusgroupid": "com.artifact"
+               "url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}/repository/{{ .Values.global.acumosNexusMavenRepo }}/",
+               "proxy": "",
+               "password": "{{ .Values.global.acumosNexusUserPassword }}",
+               "username": "{{ .Values.global.acumosNexusUserName }}",
+               "group-id": "com.artifact"
              },
              "docker" : {
                 "host": "tcp://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosOnboardingAppPort }}",
