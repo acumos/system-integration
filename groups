@@ -1,4 +1,5 @@
 # UUID                                                                               	Group Name
 #
 42f0c83244389e408b42fa668348002012ecba46                                             	GitHub Replication
+89f68cbd3dc82ac45387a08630f086aaad961209                                             	Administrators
 ldap:cn=acumos-gerrit-system-integration-committers,ou=Groups,dc=freestandards,dc=org	ldap/acumos-gerrit-system-integration-committers
