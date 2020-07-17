@@ -19,4 +19,5 @@
    :maxdepth: 2
    :numbered
 
+   start-here
    installation-guide

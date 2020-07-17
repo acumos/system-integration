@@ -19,6 +19,10 @@
 Zero-to-Acumos (z2a) Installation Guide
 =======================================
 
+.. toctree::
+   :maxdepth: 2
+   :numbered:
+
 ..
 
     | NOTE: Document is in the progress of development.
@@ -84,15 +88,15 @@ Flow-1 consists of three (3) steps using the following scripts (and descriptions
 The process flow of `z2a` Flow-1 is depicted in the following diagram.
 
 .. image:: images/z2a-flow-1.jpg
+   :width: 100 %
 
 ..
 
-    NOTE: `z2a` (Flow-1) should not be used as a production environment deployment
-    tool at this time.  `z2a` (Flow-1) has been primarily designed for development
-    and/or test environment installations.  Currently, a key component of `z2a`
-    (Flow-1), `kind` -  Kubernetes in Docker - is not recommended for production
-    installation or production workloads.
-..
+  NOTE: `z2a` (Flow-1) should not be used as a production environment deployment
+  tool at this time.  `z2a` (Flow-1) has been primarily designed for development
+  and/or test environment installations.  Currently, a key component of `z2a`
+  (Flow-1), `kind` -  Kubernetes in Docker - is not recommended for production
+  installation or production workloads.
 
 What is `z2a` Flow-2?
 ---------------------
@@ -159,8 +163,8 @@ Please consult the README-PROXY document for details on the various items that
 will require configuration and links to resources that will assist in the
 configuration tasks.
 
-Flow-1
-++++++
+TL;DR Flow-1
+++++++++++++
 
 Here are the steps to execute `z2a` Flow-1.
 
@@ -179,6 +183,7 @@ Here are the commands to execute:
 
 .. code-block:: bash
 
+    # Login to your VM
     $ sudo yum install -y git
     $ sudo apt-get install --no-install-recommends -y git
     $ mkdir -p $HOME/src ; cd $HOME/src
@@ -189,29 +194,32 @@ Here are the commands to execute:
 
 Next, we must choose one of the following methods to create a `global_value.yaml` file.
 
-Method 1 - example values
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Flow-1 - example values method
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-| # To use the example `global_value.yaml` file;
-| # copy the example values from z2a/dev1 to the helm-charts directory
+To use the example `global_value.yaml` file; copy the example values from ``~/z2a/dev1`` to the ``helm-charts``
+directory using the following command:
 
-.. code-block::
+.. code-block:: bash
 
     $ cp ./dev1/global_value.yaml.dev1 ../helm-charts/global_value.yaml
 ..
 
-Method 2 - customized values
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Flow-1 - customized values method
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-| # To use a customized global_value.yaml file;
-| # edit ``$HOME/src/system-integration/helm-charts/global_value.yaml``
-| # using an editor and command similar to this:
-| # vi $HOME/src/system-integration/helm-charts/global_value.yaml
+To use a customized global_value.yaml file; edit ``$HOME/src/system-integration/helm-charts/global_value.yaml``
+using an editor (``vi, nano, pico`` etc.) and command similar to this:
 
-Once the `global_value.yaml` file has been copied or edited;
-you can proceed with the installation
+.. code-block:: bash
 
-| # Execute ``0-kind/0a-env.sh``(setup user environment)
+    $ vi $HOME/src/system-integration/helm-charts/global_value.yaml
+..
+
+Once the `global_value.yaml` file has been copied or edited; you can proceed with
+the installation.
+
+| # Execute ``0-kind/0a-env.sh`` (setup user environment)
 | # Execute ``0-kind/0b-depends.sh`` (install / configure dependencies)
 
 .. code-block:: bash
@@ -226,6 +234,7 @@ you can proceed with the installation
 
 .. code-block:: bash
 
+    # Logout and Login to your VM
     $ ACUMOS_HOME=$HOME/src/system-integration
     $ cd $ACUMOS_HOME/z2a
     $ ./0-kind/0a-env.sh
@@ -235,14 +244,14 @@ you can proceed with the installation
 | # Ensure all k8s Pods created are in a 'Running' state.
 | # Execute ``1-acumos/1-acumos.sh`` (install / configure noncore & core Acumos components)
 
-.. code-block::
+.. code-block:: bash
 
     $ kubectl get pods -A
     $ ./1-acumos/1-acumos.sh
 ..
 
 | # If Acumos plugins are to be installed in a new session:
-| # Uncomment the ACUMOS_HOME line below and paste it into the command-line
+| # Uncomment the ACUMOS_HOME line below and paste it into the command-line.
 
 # ACUMOS_HOME=$HOME/src/system-integration
 
@@ -262,10 +271,10 @@ TL;DR (Flow-2)
 To execute Flow-2, we will use a VM-based host for command & control.
 Here are the steps to execute `z2a` Flow-2.
 
-  NOTE: You MAY require sudo access on the command & control VM to allow you to install git
+  NOTE: You MAY require sudo access on the command & control VM to allow you to install `git`
   NOTE: ``/usr/local/bin`` is a required element in your $PATH
 
-1. Login to the VM
+1. Login to the command and control VM
 2. Install `git` distributed version-control tool
 3. For RPM-based distributions such as RHEL/CentOS, execute the `yum` command, shown below:
 4. For Debian-based distributions such as Ubuntu, execute the `apt-get` command, shown below:
@@ -276,6 +285,7 @@ Here are the steps to execute `z2a` Flow-2.
 
 .. code-block:: bash
 
+    # Login to your command & control VM
     $ sudo yum install -y git
     $ sudo apt-get install --no-install-recommends -y git
     $ mkdir -p $HOME/src ; cd $HOME/src
@@ -284,38 +294,36 @@ Here are the steps to execute `z2a` Flow-2.
     $ cd $ACUMOS_HOME/z2a
 ..
 
-| # Next, we must choose one of the following methods to create a global_value.yaml file.
+Next, we must choose one of the following methods to create a `global_value.yaml` file.
 
-Method 1 - example values
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Flow-2 - example values method
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-| # To use the example `global_value.yaml` file;
-| # copy the example values from z2a/dev1 to the helm-charts directory
+To use the example `global_value.yaml` file;
+copy the example values from z2a/dev1 to the helm-charts directory
 
-.. code-block::
+.. code-block:: bash
 
     $ cp ./dev1/global_value.yaml.dev1 ../helm-charts/global_value.yaml
 ..
 
-Method 2 - customized values
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Flow-2 - customized values method
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-| # To use a customized `global_value.yaml` file;
-| # edit $HOME/src/system-integration/helm-charts/global_value.yaml
+To use a customized `global_value.yaml` file; edit ``$HOME/src/system-integration/helm-charts/global_value.yaml``
+using an editor (``vi, nano, pico,`` etc.) and command similar to this:
 
-| # Using an editor and command similar to this:
-
-.. code-block::
+.. code-block:: bash
 
     $ vi $HOME/src/system-integration/helm-charts/global_value.yaml
 ..
 
-| # Once the `global_value.yaml` file has been copied or edited;
-| # you can proceed with the installation.
+Once the `global_value.yaml` file has been copied or edited; you can proceed with the installation.
+Here are the next steps:
 
-| # Execute ``0-kind/0a-env.sh`` (setup user environment)
-| # Ensure all k8s Pods are in a 'Running' state.
-| # Execute ``1-acumos/1-acumos.sh`` (install / configure noncore & core Acumos components)
+1. Execute ``0-kind/0a-env.sh`` (setup user environment)
+2. Ensure all k8s Pods are in a 'Running' state.
+3. Execute ``1-acumos/1-acumos.sh`` (install / configure noncore & core Acumos components)
 
 .. code-block:: bash
 
@@ -324,13 +332,15 @@ Method 2 - customized values
     $ ./1-acumos/1-acumos.sh
 ..
 
-| # If Acumos plugins are to be installed in a new session:
-| # uncomment the ACUMOS_HOME line below and paste it into the command-line
+If Acumos plugins are to be installed in a new session:
+uncomment the ``ACUMOS_HOME`` line below and paste it into the command-line.
+
 | # ACUMOS_HOME=$HOME/src/system-integration
 
-| # To install Acumos plugins ;
-| # copy the example MLWB values file into ~/helm-charts
-| # Execute ``2-plugins/2-plugins.sh`` (install / configure Acumos plugins and dependencies)
+To install Acumos plugins;
+
+1. Copy the example MLWB values file into ``$HOME/src/system-integration/helm-charts/``
+2. Execute ``2-plugins/2-plugins.sh`` (install / configure Acumos plugins and dependencies)
 
 .. code-block:: bash
 
@@ -341,4 +351,4 @@ Method 2 - customized values
 <<<Last Edit - Continue Here>>>
 
 :Created:           2020/07/13
-:Last Modified:     2020/07/15
+:Last Modified:     2020/07/16

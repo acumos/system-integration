@@ -223,7 +223,7 @@ Pod security in OpenShift
 
 OpenShift is much more enterprise-focused k8s distribution, requiring explicit
 pod privilege management through Security Context Constraints (SCC). Managing
-SCCs is essential to a well-designed RBAC environment, that takes a
+SCC is essential to a well-designed RBAC environment, that takes a
 least-privilege approach to security at the pod and namespace levels. At this
 time, if used to setup cluster-level prerequisites, the OneClick toolset does
 not provide/support SCC management at a component level, rather at the namespace
@@ -289,7 +289,7 @@ do not work with OKD (the OpenShift version that has been explicitly tested and
 supported in Clio).
 
 What does work natively for OpenShift is the automatic creation of route objects
-that correspond to ingress objects. This works because OpenShift OKD's
+that correspond to ingress objects. This works because OpenShift OKD
 `route controller <https://docs.openshift.com/container-platform/3.11/architecture/networking/routes.html>`_
 watches for ingress objects that are associated with ready services/pods,
 and automatically manages routes related to those ingresses. However, the
@@ -367,7 +367,7 @@ Azure-AKS cluster, as long as they all need to reference a shared PVC, e.g. for
 logs, since in order to access the PVC, all components would need to be deployed
 as one pod.
 
-* this resulted in the intial approach of deploying all Acumos components
+* this resulted in the initial approach of deploying all Acumos components
   as a single pod, by the tools in system-integration/acumosk8s-public-cloud
 * however for node capacity / reliability reasons deploying all components
   in a single pod is not a recommended approach, thus for using the OneClick
@@ -458,7 +458,7 @@ the nginx-ingress controller. This is the design used in Clio, and is the same
 as for generic k8s except that:
 
 * the IP address associated with the platform domain name is provided in the
-  values input for the nging-ingress Helm chart, as
+  values input for the nginx-ingress Helm chart, as
   controller.service.loadBalancerIP.
 
 For deploying Acumos into Azure-AKS, an environment flag
@@ -494,7 +494,7 @@ and documented (as code) in a single place.
 However, additional work is recommended on this in future releases, in
 setup_prereqs.sh and the scripts it calls. See the related functions below in
 setup_prereqs.sh for examples of code that could/should be migrated to the
-specific setup scripts's 'prep' function, which may also require update to
+specific setup scripts' 'prep' function, which may also require update to
 add 'action' parameters:
 
 * setup_keystore vs AIO/setup_keystore.sh
@@ -578,7 +578,7 @@ upstream projects evolve:
 * the generally recommended goal of using the latest stable version of an
   actively developed/supported upstream component
 
-  * as projects evolve/fork, which upstream component versioh should be used
+  * as projects evolve/fork, which upstream component version should be used
   * which versions are compatible with the Acumos platform and OneClick toolset
   * how much effort, if any, is required to update the OneClick toolset for
     newer versions
@@ -636,11 +636,11 @@ the system-integration project:
 
       * deploys a prerequisite chart
       * updates dependent charts with values obtained from the deployed
-        components; examples include asigned ports and secrets
+        components; examples include assigned ports and secrets
       * proceeds with the next step of deployments per dependencies
 
   * Such a complex, ordered process for deploying a platform is analogous to
-    what application lifecycle manageing frameworks such as
+    what application lifecycle managing frameworks such as
     `JuJu <https://github.com/juju/juju>`_ or `Cloudify <https://cloudify.co/>`_
     support. In Cloudify's case, the Acumos platform could be represented as a
     TOSCA-based application, similar to how complex VNFs (virtual network functions)
@@ -656,7 +656,7 @@ In future releases, it's recommended that:
   which may also require Acumos/upstream chart updates, if Helm v3 is not
   backward-compatible with current charts
 * investigations consider how the Acumos platform can be deployed using a
-  hierachical Helm chart, or a set of them with a minimal values discovery
+  hierarchical Helm chart, or a set of them with a minimal values discovery
   capability, as needed to publish significant values to subsequent charts
 * investigations consider whether Acumos as a complex multi-component /
   multi-subsystem platform, might better benefit from management methods more
@@ -699,11 +699,11 @@ deploy (or redeploy) were added, e.g.:
 * Docker registries: Nexus or other docker registry compliant implementation
 * ELK stack services
 * docker engine (docker API service)
-* MWLB user-related services: NiFi, JupyterHub
+* MLWB user-related services: NiFi, JupyterHub
 * Jenkins
 
 Given the high number of permutations of the resulting choices, the approach to
-validating the OneClick toolset's continued reliability for successfully
+validating the OneClick toolset continued reliability for successfully
 deploying the platform under the wide range of options has also evolved. The
 current approach includes a program of continual (yet manually invoked)
 deployment and testing with each code commit, across these types of environments:
