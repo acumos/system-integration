@@ -2,22 +2,27 @@
 
 This directory contains various example values files.
 
-## Directories
+## Sub-directories
 
-* skel - this directory contains skeleton (incomplete) files for adding new noncore components and plugins
+* skel - this directory contains skeleton files for adding new noncore
+components and plugins
 
 ## Files
 
 >This directory contains the following files for `z2a`:
 
-```sh
+```bash
 README.md                   # this file
 global_value.yaml.dev1      # global_value file for namespace=acumos-dev1
 global_value.yaml.z2a-test  # global_value file for namespace=z2a-test
-mlwb_value.yaml.dev1        # mlwb value file for namespace=acumos-dev1
-mlwb_value.yaml.mlwb        # mlwb value file for namespace=mlwb
+mlwb_value.yam.mlwb         # mlwb value file for namespace=mlwb
 ```
 
-**Note:**  future versions of value files in this directory will have an explicit namespace per component as Acumos moves to a more 'cloud native' deployment strategy
+**Note:**  future versions of value files in this directory will have an
+explicit namespace per component as Acumos moves to a more 'cloud native'
+deployment strategy
 
-Last Edited: 2020-06-16
+```
+\\ Created: 2020-06-16
+\\ Last Edited: 2020-07-20
+```

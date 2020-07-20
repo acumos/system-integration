@@ -20,8 +20,8 @@
 # NOTE: The values in this file are for Acumos Z2A DEMONSTRATION PURPOSES ONLY.
 # NOTE: Do not use these values for any PRODUCTION or Internet-facing systems.
 #
-# TODO: xxxxxx is the placeholder for end-users to manually update
-# TODO: add different placeholder for automatic/dynamically generated values
+# NOTE: "xxxxxx" is the placeholder for end-users to manually update
+# NOTE: "******" is the placeholder for automatic/dynamically generated values
 
 global:
     appVersion: "1.0.0"
@@ -221,7 +221,7 @@ global:
 
     # Onboarding
     acumosOnboardingAppPort: "8090"
-    acumosOnboardingCli: "12.32.123.210"
+    acumosOnboardingCli: "10.2.123.210"
     acumosOnboardingBaseRImage: "acumos/onboarding-base-r:1.2.0"
     acumosOnboardingImage: "acumos/onboarding-app:4.6.3"
     onboarding:
