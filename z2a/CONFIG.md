@@ -28,7 +28,7 @@
 
 ## MLWB Plugin Configuration Tasks
 
->NOTE: Please refer to the `plugins-setup/README-plugins-setup.md documentation for additional tips/pointers.
+>NOTE: Please refer to the `plugins-setup/README-plugins-setup.md` documentation for additional tips/pointers.
 
 ### CouchDB
 

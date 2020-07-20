@@ -75,20 +75,22 @@ Where do I start with `z2a`?
 ----------------------------
 
 If you just want to start installing Acumos, refer to the TL;DR sections of
-the INSTALL.md document. The TL;DR sections provide abbreviated installation
-guides for Acumos and Acumos plugins.
+the installation-guide.rst document. The TL;DR sections provide abbreviated
+installation guides for Acumos and Acumos plugins.
 
 Please refer to the following documents for additional information:
 
-| configuration.rst   - Acumos configuration information document (in progress)
+| START-HERE - brief Acumos introduction document (this document - in progress)
 
-| installation-guide.rst  - Acumos installation document (in progress)
+| INSTALLATION-GUIDE  - Acumos installation document (in progress)
 
-| howto.rst    - Acumos task document (in progress)
+| README-PROXY - proxy configuration guidance (in progress)
+|   https://https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/readme-proxy.html
 
-| readme-proxy.rst - proxy configuration guidance (in progress)
+| HOWTO    - Acumos task document (in progress)
 
-| start-here.rst - brief Acumos introduction document (this document - in progress)
+| CONFIGURATION   - Acumos configuration information document (in progress)
+
 
 :Created:           2020/07/16
-:Last Modified:     2020/07/16
+:Last Modified:     2020/07/20

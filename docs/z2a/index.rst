@@ -17,7 +17,11 @@
 
 .. toctree::
    :maxdepth: 2
-   :numbered
 
    start-here
    installation-guide
+   readme-proxy
+   readme-plugins-setup
+   configuration
+
+* :ref:`search`

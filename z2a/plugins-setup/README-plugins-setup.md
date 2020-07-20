@@ -23,12 +23,6 @@ For the scripts in the `plugins-setup` directory to run stand-alone (i.e. outsid
 
 If you have downloaded the Acumos `system-integration` repository from `gerrit.acumos.org` then the following command would set the `ACUMOS_GLOBAL_VALUE` environment variable:
 
-> Assumption:
->
-> The Acumos `system-integration` repository has been cloned into: `$HOME/src`
-
-To setup the environment, execute the following commands:
-
 ```sh
 export ACUMOS_GLOBAL_VALUE=$HOME/src/system-integration/helm-charts/global_value.yaml
 ```
