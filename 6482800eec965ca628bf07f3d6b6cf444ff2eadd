@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3225bc59_f531f1b7",
+        "filename": "helm-charts/global_value.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 387
+      },
+      "writtenOn": "2020-07-21T17:02:48Z",
+      "side": 1,
+      "message": "Could you please make this change to the two (2) example values files used by z2a? \nThe example values files are here:\n\nz2a/dev1/global_value.yaml.dev1\nz2a/dev1/global_value.yaml.z2a-test\n\nWe are trying to ensure that these three (3) files have identical image values.\nThanks.",
+      "revId": "6482800eec965ca628bf07f3d6b6cf444ff2eadd",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
