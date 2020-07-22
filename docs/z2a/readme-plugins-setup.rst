@@ -2,7 +2,7 @@
 .. ===============LICENSE_START=======================================================
 .. Acumos CC-BY-4.0
 .. ===================================================================================
-.. Copyright (C) 2017-2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+.. Copyright (C) 2017-2020 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
 .. ===================================================================================
 .. This Acumos documentation file is distributed by AT&T and Tech Mahindra
 .. under the Creative Commons Attribution 4.0 International License (the "License");
@@ -26,14 +26,15 @@ Prerequisites
 
 Setting up the environment
 --------------------------
-^
-To run (execute) the `z2a plugins-setup` scripts in a standalone manner
-(i.e. from a Linux CLI session), you must execute the `0-kind/0a-env.sh` script
-before you run any of the `plugins-setup` scripts.
 
-| Assumption:
-|
-| The Acumos `system-integration` repository has been cloned into: `$HOME/src`
+To run (execute) the ``z2a/plugins-setup`` scripts in a standalone manner
+(i.e. from a Linux CLI session), you must execute the ``0-kind/0a-env.sh`` script
+before you run any of the ``z2a/plugins-setup`` scripts.
+
+  Assumption:
+
+  The Acumos ``system-integration`` repository has been cloned into:
+  ``$HOME/src`` or some other known location.
 
 To setup the environment, execute the following commands:
 
