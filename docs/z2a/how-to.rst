@@ -26,137 +26,25 @@ HOW TO
 This HOW TO document contains step-by-step procedures to perform common tasks
 using the `z2a` framework.
 
-How to install z2a from scratch on a VM with `kind` (default - Flow-1)
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+How to install Acumos from scratch on a VM with `kind` using z2a (default - Flow-1)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-.. code-block:: bash
+See the Flow-1 section in either of these documents:
 
-  # Obtain a Virtual Machine (VM) with sudo access ; Login to VM
-  # Note: ``/usr/local/bini`` is a required element in your $PATH
+  | TL;DR - to jump right into the installation
+  | https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/tl-dr.html
+  | Installation Guide - for a more detailed explanation
+  | https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/installation-guide.html
 
-  # Install 'git' distributed version-control tool
-  # For RPM-based distributions such as RHEL/CentOS, execute the following command:
-  $ sudo yum install -y git
-  # For Debian-based distributions such as Ubuntu, execute the following command:
-  $ sudo apt-get --no-install-recommends install -y git
-
-  # Make src directory ; change directory to that location
-  $ mkdir -p $HOME/src ; cd $HOME/src
-  # clone Acumos 'system-integration' repo
-  $ git clone https://gerrit.acumos.org/r/system-integration
-
-  # set ACUMOS_HOME environment variable
-  $ ACUMOS_HOME=$HOME/src/system-integration
-  # Change directory
-  $ cd $ACUMOS_HOME/z2a
-
-  # Choose one of the following methods to create a global_value.yaml file
-
-  # Method 1 - example values
-  #
-  # To use the example global_value.yaml file;
-  # copy the example values from z2a/dev1 to the helm-charts directory
-  $ cp ./dev1/global_value.yaml.dev1 ../helm-charts/global_value.yaml
-
-  # Method 2 - customized values
-  #
-  # To use a customized global_value.yaml file;
-  # edit $HOME/src/system-integration/helm-charts/global_value.yaml
-  # using an editor and command similar to this:
-  # vi $HOME/src/system-integration/helm-charts/global_value.yaml
-
-  # Once the global_value.yaml file has been copied and/or edited;
-  # you can proceed with the installation
-
-  # Execute 0-kind/0a-env.sh (setup user z2a environment)
-  $ ./0-kind/0a-env.sh
-  # Execute 0-kind/0b-depends.sh (install / configure dependencies)
-  $ ./0-kind/0b-depends.sh
-
-  # LOG OUT OF SESSION ; LOG IN TO NEW SESSION
-  # ... this step is required for Docker group inclusion)
-  # Reinitialize the user z2a environment
-  # Execute 0-kind/0c-cluster.sh (build and configure k8s cluster)
-  $ ACUMOS_HOME=$HOME/src/system-integration
-  $ cd $ACUMOS_HOME/z2a
-  $ ./0-kind/oa-env.sh
-  $ ./0-kind/0c-cluster.sh
-
-  # Ensure all k8s Pods created are in a 'Running' state.
-  $ kubectl get pods -A
-  # Execute 1-acumos.sh (install / configure noncore & core Acumos components)
-  $ ./1-acumos/1-acumos.sh
-
-  # If Acumos plugins are to be installed in a new session:
-  # Uncomment the ACUMOS_HOME line and paste into command-line
-  # ACUMOS_HOME=$HOME/src/system-integration
-
-  # To install Acumos plugins ; proceed here
-  $ cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml $ACUMOS_HOME/helm-charts/mlwb_value.yaml
-  # Execute 2-plugins.sh (install / configure Acumos plugins and dependencies)
-  $ ./2-plugins/2-plugins.sh
-
-How to use z2a to install Acumos onto an existing `k8s` cluster (Flow-2)
+How to install Acumos onto an existing `k8s` cluster using z2a (Flow-2)
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-.. code-block:: bash
+See the Flow-2 section in either of these documents:
 
-  # To execute Flow-2, we will use a VM-based host for command & control.
-  # Note: You MAY require sudo access on the command & control VM to allow you to install git
-  # Note: /usr/local/bin is a required element in your $PATH
-
-  # Login to the VM
-
-  # Install 'git' distributed version-control tool
-  # For RPM-based distributions such as RHEL/CentOS, execute the following command:
-  $ sudo yum install -y git
-  # For Debian-based distributions such as Ubuntu, execute the following command:
-  $ sudo apt-get install --no-install-recommends -y git
-
-  # Make src directory ; change directory to that location
-  $ mkdir -p $HOME/src ; cd $HOME/src
-  # clone Acumos 'system-integration' repo
-  $ git clone https://gerrit.acumos.org/r/system-integration
-
-  # set ACUMOS_HOME environment variable
-  $ ACUMOS_HOME=$HOME/src/system-integration
-  # Change directory
-  $ cd $ACUMOS_HOME/z2a
-
-  # Choose one of the following methods to create a global_value.yaml file
-
-  # Method 1 - example values
-  #
-  # To use the example global_value.yaml file;
-  # copy the example values from z2a/dev1 to the helm-charts directory
-  $ cp ./dev1/global_value.yaml.dev1 ../helm-charts/global_value.yaml
-
-  # Method 2 - customized values
-  #
-  # To use a customized global_value.yaml file;
-  # edit $HOME/src/system-integration/helm-charts/global_value.yaml
-  # using an editor and command similar to this:
-  # vi $HOME/src/system-integration/helm-charts/global_value.yaml
-
-  # Once the global_value.yaml file has been copied and/or edited;
-  # you can proceed with the installation
-
-  # Execute 0-kind/0a-env.sh (setup user environment)
-  $ ./0-kind/0a-env.sh
-
-  # Ensure all k8s Pods created are in a 'Running' state.
-  $ kubectl get pods -A
-  # Execute 1-acumos.sh (install / configure noncore & core Acumos components)
-  $ ./1-acumos/1-acumos.sh
-
-  # If Acumos plugins are to be installed in a new session:
-  # Uncomment the ACUMOS_HOME line and paste into command-line
-  # ACUMOS_HOME=$HOME/src/system-integration
-
-  # To install Acumos plugins ; proceed here
-  $ cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml.mlwb $ACUMOS_HOME/helm-charts/mlwb_value.yaml
-  # Execute 2-plugins.sh (install / configure Acumos plugins and dependencies)
-  $ ./2-plugins/2-plugins.sh
+  | TL;DR - to jump right into the installation
+  | https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/tl-dr.html
+  | Installation Guide - for a more detailed explanation
+  | https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/installation-guide.html
 
 How to pre-configure an existing `k8s` component
 ++++++++++++++++++++++++++++++++++++++++++++++++
@@ -278,4 +166,4 @@ Here is how to decode the above error:
   | ``./0-kind/0c-cluster.sh:62`` - the failure occurred at line 62 of the ``./0-kind/0c-cluster.sh`` script
 
 :Created:           2020/07/21
-:Last Modified:     2020/07/21
+:Last Modified:     2020/07/22

@@ -27,7 +27,25 @@ System Integration Release Notes
 Version 4.0.0, 10 Jun 2020
 --------------------------
 
-* Update information pending ....
+* Helm Chart refactor
+
+  * Separate Helm chart for each Acumos component
+
+    * separate charts for core and non-core components
+    * separate z2a structure for Acumos plugins (currently only MLWB is supported)
+
+  * Consolidate and sanitize key/values into ``global_value.yaml`` file
+  * Add secrets to Helm charts for secure communication between k8s cluster components
+
+* Zero-to-Acumos (z2a) Initial Release
+
+  * Acumos installation/configuration automation
+  * Flow (process) based model
+
+      - Flow-1 - build k8s cluster and install Acumos on a single VM
+      - Flow-2 - install Acumos on a pre-built k8s cluster
+
+  * z2a documentation
 
 --------------------------
 Version 3.0.3, 19 Dec 2019
@@ -79,7 +97,7 @@ Version 2.4.0, 15 Aug 2019
 
 This release adds final enhancements to the Boreas maintenance release.
 
-* `4851: Boreas maintenance release wrapup <https://gerrit.acumos.org/r/#/c/system-integration/+/4851/>`_
+* `4851: Boreas maintenance release wrap-up <https://gerrit.acumos.org/r/#/c/system-integration/+/4851/>`_
 
   * `ACUMOS-3212 Boreas maintenance release <https://jira.acumos.org/browse/ACUMOS-3212>`_
 
@@ -117,12 +135,10 @@ issues and work in progress have been completed.
 
 * `4374: Integrate MLWB components <https://gerrit.acumos.org/r/#/c/system-integration/+/4374/>`_
 
-  * Delivers Jira items
+  * Delivered JIRA items
 
     * `ACUMOS-2194: Integrate Jupyter notebook with Acumos Portal <https://jira.acumos.org/browse/ACUMOS-2194>`_
     * `ACUMOS-2491: Integrate Nifi with Acumos Portal <https://jira.acumos.org/browse/ACUMOS-2491>`_
-    * `ACUMOS-2714: Deploy security-verification component <https://jira.acumos.org/browse/ACUMOS-2714>`_
-    * `ACUMOS-2715: Support Helm use in Openshift deployments <https://jira.acumos.org/browse/ACUMOS-2715>`_
     * `ACUMOS-2714: Deploy security-verification component <https://jira.acumos.org/browse/ACUMOS-2714>`_
     * `ACUMOS-2715: Support Helm use in Openshift deployments <https://jira.acumos.org/browse/ACUMOS-2715>`_
     * `ACUMOS-2716: Add option for docker-on-host to address Azure-k8s issues <https://jira.acumos.org/browse/ACUMOS-2716>`_
@@ -166,7 +182,7 @@ address bugs, and any remaining items that can't be deferred.
 * `Release 2.2.0 <https://gerrit.acumos.org/r/#/c/4231/>`_
 * `Update to weekly assembly Acumos_1904021700 <https://gerrit.acumos.org/r/#/c/4089/>`_
 
-  * Delivers Jira items
+  * Deliver JIRA items
 
     * `ACUMOS-2714: Deploy security-verification component <https://jira.acumos.org/browse/ACUMOS-2714>`_
     * `ACUMOS-2715: Support Helm use in Openshift deployments <https://jira.acumos.org/browse/ACUMOS-2715>`_
@@ -194,7 +210,7 @@ for updated instructions.
 * `Fix release notes link <https://gerrit.acumos.org/r/#/c/4047/>`_
 * `AIO upgrade to CDS 2.0 <https://gerrit.acumos.org/r/#/c/3897/>`_
 
-  * Delivers Jira items
+  * Delivers JIRA items
 
     * `ACUMOS-2601: AIO upgrade to CDS 2.0 <https://jira.acumos.org/browse/ACUMOS-2601>`_
     * `ACUMOS-2587: Deploy MariaDB via Helm <https://jira.acumos.org/browse/ACUMOS-2587>`_
@@ -238,7 +254,7 @@ for updated instructions.
   * expand acumos-env.sh values set in oneclick_deploy.sh
   * use "source" vs "bash" internally to reuse env across scripts
   * avoid building docker images (tenants can't use non-secure registries)
-  * remove unneeded OUTPUT and WEBCONBOARDING PVs
+  * remove unneeded OUTPUT and WEBONBOARDING PVs
   * make clean.sh independent of acumos-env.sh, improve reliability
   * only create PVs if the user is an admin
   * use configmaps where possible to avoid need for PV-staged config data
@@ -428,7 +444,7 @@ Version 0.7, 24 August 2018
 
 * `Support for redeploy with existing DB <https://gerrit.acumos.org/r/#/c/2570/>`_
 
-  * `ACUOS-1598: AIO support for upgrading or redeploying with existing databases/config <https://jira.acumos.org/browse/ACUMOS-1598>`_
+  * `ACUMOS-1598: AIO support for upgrading or redeploying with existing databases/config <https://jira.acumos.org/browse/ACUMOS-1598>`_
 
 ---------------------------
 Version 0.6, 13 August 2018
@@ -576,7 +592,7 @@ Version 0.2, 13 March 2018
   * Various cleanups in docker-compose.yaml env variable use.
   * Remove extra daemon restart.
   * Fix insecure registries.
-  * Remove ports attibutes in docker-compose.yaml where possible.
+  * Remove ports attributes in docker-compose.yaml where possible.
   * clean.sh works without sudo.
   * Fix kong delay method
 

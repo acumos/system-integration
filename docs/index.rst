@@ -29,11 +29,5 @@ System Integration
        oneclick-deploy/configuration
        oneclick-deploy/developer-guide
        z2a/index
-       z2a/start-here
-       z2a/installation-guide
-       z2a/readme-proxy
-       z2a/readme-plugins-setup
-       z2a/configuration
-       z2a/how-to
 
 * :ref:`search`
