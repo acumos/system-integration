@@ -28,9 +28,9 @@ If you are here, you may know what Acumos is but you probably don't know:
 What is `z2a`?
 --------------
 
-`Zero-to-Acumos` (`z2a`) is a collection of Linux shell scripts that have been
-assembled to perform a simple set of tasks:  install and (where possible)
-configure Acumos on a Kubernetes (k8s) cluster.
+`Zero-to-Acumos` (`z2a`) is a modular collection of Linux shell scripts that
+have been assembled to perform a simple set of tasks:  install and (where
+possible) configure Acumos on a Kubernetes (k8s) cluster.
 
 `z2a` is composed of two (2) distinct process flows; Flow-1 and Flow-2. In
 each flow scenario, installation of additional Acumos plugins is optional
@@ -51,8 +51,6 @@ What is `z2a` Flow-1?
 environments where a Kubernetes cluster is built and Acumos is installed from
 scratch on a single VM.
 
-..
-
   NOTE: `z2a` (Flow-1) should not be used as a production environment deployment
   tool at this time.  `z2a` (Flow-1) has been primarily designed for development
   and/or test environment installations on pre-built VMs.
@@ -72,36 +70,38 @@ What is `z2a` Flow-2?
 `z2a` Flow-2 is a new `z2a` process flow targeting pre-built Kubernetes cluster
 environments. (i.e. BYOC - Bring Your Own Cluster)
 
-..
-
   NOTE: `z2a` (Flow-2) can be used as a production environment deployment tool when
   appropriate preparations are made.  `z2a` (Flow-2) has been primarily designed for
   installation on a pre-built k8s cluster.
 
+  NOTE:  Provisioning of a k8s cluster is beyond the scope of `z2a`.
+
 Where do I start with `z2a`?
 ----------------------------
 
-If you just want to start installing Acumos, refer to the TL;DR sections of
-the `installation-guide` document. The TL;DR sections provide abbreviated
-installation guides for Acumos and Acumos plugins.
-
+If you just want to start installing Acumos, refer to the `TL;DR` document
+which provides an abbreviated installation guide for Acumos and Acumos plugins.
 Please refer to the following documents for additional information:
 
-| START-HERE - brief Acumos introduction document (this document - in progress)
+  NOTE: Some of the documents listed below are currently being updated.
+
+| START-HERE - brief Acumos introduction document (this document)
 |   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/start-here.html
 |
-| INSTALLATION-GUIDE  - Acumos installation document (in progress)
+| TL;DR - abbreviated installation guide
+|   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/tl-dr.html
+|
+| INSTALLATION-GUIDE - Acumos installation document
 |   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/installation-guide.html
 |
-| README-PROXY - proxy configuration guidance (in progress)
+| README-PROXY - proxy configuration guidance
 |   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/readme-proxy.html
 |
-| HOWTO    - Acumos task document (in progress)
+| HOWTO - Acumos task document
 |   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/how-to.html
 |
-| CONFIGURATION   - Acumos configuration information document (in progress)
+| CONFIGURATION - Acumos configuration information document
 |   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/configuration.html
-|
 
 :Created:           2020/07/16
-:Last Modified:     2020/07/21
+:Last Modified:     2020/07/24

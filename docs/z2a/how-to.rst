@@ -32,7 +32,7 @@ How to install Acumos from scratch on a VM with `kind` using z2a (default - Flow
 See the Flow-1 section in either of these documents:
 
   | TL;DR - to jump right into the installation
-  | https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/tl-dr.html
+  | https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/tl-dr.html#flow-1
   | Installation Guide - for a more detailed explanation
   | https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/installation-guide.html
 
@@ -42,7 +42,7 @@ How to install Acumos onto an existing `k8s` cluster using z2a (Flow-2)
 See the Flow-2 section in either of these documents:
 
   | TL;DR - to jump right into the installation
-  | https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/tl-dr.html
+  | https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/tl-dr.html#flow-2
   | Installation Guide - for a more detailed explanation
   | https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/installation-guide.html
 
@@ -58,18 +58,22 @@ How to re-configure an existing `k8s` component
 
 .. code-block:: bash
 
-  TODO: Provide an example here .... steps to change existing configuration directives
+  TODO: Provide an example here .... steps to change existing configuration
+  directives
 
 How to add a new plugin to be installed (no pre/post configuration)
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-To add a new 'plugin' to the z2a installation framework, a series of steps need to be followed.  Here are the steps and an example to depict the process.
+To add a new 'plugin' to the `z2a` installation framework, a series of steps need
+to be followed.  Here are the steps and an example to depict the process.
 
-  1: Clone the `z2a/dev1/skel` directory into the `z2a/plugins-setup` directory.
+  1: Clone the ``z2a/dev1/skel`` directory into the ``z2a/plugins-setup`` directory.
 
-  2: The newly copied 'skel' directory should be renamed appropriately. `<name-of-new-plugin>`
+  2: The newly copied ``skel`` directory should be renamed appropriately to
+  ``<name-of-new-plugin>``
 
-  3: The `z2a/plugins/<name-of-new-plugin>/install-skel.sh` file should be renamed to `install-nameOfDirectory.sh`
+  3: The ``z2a/plugins/<name-of-new-plugin>/install-skel.sh`` file should be
+  renamed to ``install-nameOfDirectory.sh``
 
 .. code-block:: bash
 
@@ -118,7 +122,8 @@ Troubleshooting
 Does z2a create log files? Where can I find them?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Each `z2a` script creates a separate and distinct log file.  Below is a listing of these log files and their locations.
+Each `z2a` script creates a separate and distinct log file.  Below is a listing
+of these log files and their locations.
 
 +-------------------------------------------------------+--------------------------------------------------------+
 | Script Name & Location                                | Log File & Location                                    |
@@ -166,4 +171,4 @@ Here is how to decode the above error:
   | ``./0-kind/0c-cluster.sh:62`` - the failure occurred at line 62 of the ``./0-kind/0c-cluster.sh`` script
 
 :Created:           2020/07/21
-:Last Modified:     2020/07/22
+:Last Modified:     2020/07/24

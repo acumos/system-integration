@@ -42,81 +42,68 @@ To setup the environment, execute the following commands:
 
   cd $HOME/src/system-integration/z2a
   ./0-kind/0-env.sh
-..
 
 ACUMOS_GLOBAL_VALUE
 +++++++++++++++++++
 
-For the scripts in the `plugins-setup` directory to run stand-alone
-(i.e. outside the `z2a` Flow-1 or Flow-2 context), the `ACUMOS_GLOBAL_VALUE`
-environment variable MUST be set BEFORE executing `make` to install or
-configure any of the defined targets in the `noncore-config/Makefile`.
+For the scripts in the ``plugins-setup`` directory to run stand-alone
+(i.e. outside the `z2a` Flow-1 or Flow-2 context), the ``ACUMOS_GLOBAL_VALUE``
+environment variable MUST be set BEFORE executing ``make`` to install or
+configure any of the defined targets in the ``noncore-config/Makefile``.
 
-If you have cloned the Acumos `system-integration` repository from
+If you have cloned the Acumos ``system-integration`` repository from
 `gerrit.acumos.org` then the following command would set the
-`ACUMOS_GLOBAL_VALUE` environment variable:
+``ACUMOS_GLOBAL_VALUE`` environment variable:
 
 .. code-block:: bash
 
-  export ACUMOS_GLOBAL_VALUE=$HOME/src/system-integration/helm-charts/global_value.yaml
-..
+  $ export ACUMOS_GLOBAL_VALUE=$HOME/src/system-integration/helm-charts/global_value.yaml
 
 Installing and Configuring Plugins
 ----------------------------------
 
   NOTE:  At the time of this writing, only MLWB and it's dependencies
-  (CouchDB, JupyterHub and NiFi) are included in the `plugins-setup` directory.
+  (CouchDB, JupyterHub and NiFi) are included in the ``plugins-setup`` directory.
 
 Installing and Configuring - MLWB (ML WorkBench)
 ++++++++++++++++++++++++++++++++++++++++++++++++
 
-Execute `make mlwb` will install (and configure based on the target script) MLWB.
+Execute ``make mlwb`` will install (and configure based on the target script) MLWB.
 
 .. code-block:: bash
 
   $ cd $HOME/src/system-integration/z2a/plugins-setup
   $ make mlwb
-..
 
 Installing and Configuring - CouchDB (MLWB Dependency)
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Execute `make couchdb` will install (and configure based on the target script) CouchDB.
+Execute ``make couchdb`` will install (and configure based on the target script) CouchDB.
 
 .. code-block:: bash
 
   $ cd $HOME/src/system-integration/z2a/plugins-setup
   $ make couchdb
-..
 
 Installing and Configuring - JupyterHub (MLWB Dependency)
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Execute `make jupyterhub` will install (and configure based on the target script) JupyterHub.
+Execute ``make jupyterhub`` will install (and configure based on the target script) JupyterHub.
 
 .. code-block:: bash
 
   $ cd $HOME/src/system-integration/z2a/plugins-setup
   $ make jupyterhub
-..
 
 Installing and Configuring - NiFi (MLWB Dependency)
 +++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Execute `make nifi` will install (and configure based on the target script) NiFi.
+Execute ``make nifi`` will install (and configure based on the target script) NiFi.
 
 .. code-block:: bash
 
   $ cd $HOME/src/system-integration/z2a/plugins-setup
   $ make nifi
-..
-
------
-
-TODO LIST:
-  - Makefile `install` and `config` targets
-
------
 
 :Created:           2020/07/20
-:Last Modified:     2020/07/20
+:Last Modified:     2020/07/24

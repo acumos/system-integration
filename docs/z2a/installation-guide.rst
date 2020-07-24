@@ -20,8 +20,6 @@
 Zero-to-Acumos (z2a) Installation Guide
 =======================================
 
-..
-
     | NOTE: Document is in development.
     | NOTE: Subject to change.
 
@@ -62,32 +60,26 @@ Flow-1 consists of three (3) steps using the following scripts (and descriptions
 
 - Steps 0[a-c]
 
-  * ``z2a/0-kind/0a-env.sh                    # z2a environment creation``
-  * ``z2a/0-kind/0b-depends.sh                # dependency installation and setup``
-  * ``z2a/0-kind/0a-cluster.sh                # Kubernetes ('kind') cluster creation``
+  * ``z2a/0-kind/0a-env.sh          # z2a environment creation``
+  * ``z2a/0-kind/0b-depends.sh      # dependency installation and setup``
+  * ``z2a/0-kind/0a-cluster.sh      # Kubernetes ('kind') cluster creation``
 
 - Step 1
 
-  * ``z2a/1-acumos/1-acumos.sh                # Acumos noncore and core component installation & configuration``
+  * ``z2a/1-acumos/1-acumos.sh      # Acumos noncore and core component installation & configuration``
 
 - Step 2 (optional)
 
-  * ``z2a/2-plugins/2-plugins.sh              # Acumos plugins and dependencies installation & configuration``
-
-..
+  * ``z2a/2-plugins/2-plugins.sh    # Acumos plugins and dependencies installation & configuration``
 
   NOTE: In Flow-1, the `z2a` environment creation script
   ``z2a/0-kind/0a-env.sh``, will have to be executed during the initial setup
   and again after logging out and logging back into a new session.
 
-..
-
 The process flow of `z2a` Flow-1 is depicted in the following diagram.
 
 .. image:: images/z2a-flow-1.jpg
    :width: 100 %
-
-..
 
   NOTE: `z2a` (Flow-1) should not be used as a production environment deployment
   tool at this time.  `z2a` (Flow-1) has been primarily designed for development
@@ -114,15 +106,15 @@ Flow-2 consists of three (3) steps using the following scripts (and descriptions
 
 - Step 0
 
-  * ``z2a/0-kind/0a-env.sh                    # z2a environment creation``
+  * ``z2a/0-kind/0a-env.sh          # z2a environment creation``
 
 - Step 1
 
-  * ``z2a/1-acumos/1-acumos.sh                # Acumos noncore and core component installation & configuration``
+  * ``z2a/1-acumos/1-acumos.sh      # Acumos noncore and core component installation & configuration``
 
 - Step 2 (optional)
 
-  * ``z2a/2-plugins/2-plugins.sh              # Acumos plugins and dependencies installation & configuration``
+  * ``z2a/2-plugins/2-plugins.sh    # Acumos plugins and dependencies installation & configuration``
 
 The process flow of `z2a` Flow-2 is depicted in the following diagram.
 
@@ -157,7 +149,6 @@ Flow-2 Requirements
 +++++++++++++++++++
 
 * A Kubernetes (k8s) cluster
-
 * A command & control VM which will be used as the installation launch point
   for `z2a`
 
@@ -183,7 +174,8 @@ Proxy Requirements
 Misc. Requirements
 ++++++++++++++++++
 
-* z2a requires that the following tools be installed on the VM prior to execution of the `z2a` scripts:
+* z2a requires that the following tools be installed on the VM prior to
+execution of the `z2a` scripts:
 
   - git (the distributed source code management tool)
   - yq (the YAML file processing tool)
@@ -233,7 +225,6 @@ execute steps 2-6 above.
   $ cd $HOME/src
   $ git clone https://gerrit.acumos.org/r/system-integration
   $ cd $HOME/src/system-integration
-..
 
 Next, we will inspect the contents of the directory structure that was just
 created by the ``git clone`` command above.
@@ -253,19 +244,22 @@ created by the ``git clone`` command above.
   -rw-r--r--.  1 userID groupID 1281 Mar 19 13:30 INFO.yaml
   -rw-r--r--.  1 userID groupID  770 Mar 19 13:30 LICENSE.txt
   -rw-r--r--.  1 userID groupID 1388 Mar 19 13:30 README.md
-..
 
 In the directory listing shown above, two (2) directories are of special interest:
 
-  * ``helm_charts`` is the location of the Acumos core Helm charts used in this
-    installation process
-  * ``z2a`` is the location of the `z2a` scripts and supporting utilities.  We
-    will refer to that directory as the Z2A_BASE directory.  This directory
-    also contains some of the Acumos noncore dependency Helm charts.
+* ``helm_charts`` is the location of the Acumos core Helm charts used in this
+  installation process
+* ``z2a`` is the location of the `z2a` scripts and supporting utilities.  We
+  will refer to that directory as the Z2A_BASE directory.  This directory
+  also contains installation scripts for some of the Acumos noncore dependencies
+  and Acumos plugins.
 
-  NOTE: The `z2a` installation log files will be created in the Z2A_BASE directory.
+  NOTE: Please refer to the `Troubleshooting` section of the `HOW TO` document for
+  a complete listing of the log files created by `z2a` and their location.
 
-Using the Example `global_value.yaml` File
+  See: https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/how-to.html#troubleshooting
+
+Using the example `global_value.yaml` file
 ++++++++++++++++++++++++++++++++++++++++++
 
 z2a includes example ``global_value.yaml`` files for Acumos in the
@@ -282,14 +276,13 @@ The commands to use the Acumos example values are:
 
   $ ACUMOS_HOME=$HOME/src/system-integration
   $ cp $ACUMOS_HOME/z2a/dev1/global_value.yaml.dev1 $ACUMOS_HOME/z2a/helm-charts/global_value.yaml
-..
 
   NOTE: The Acumos example values can be used for a private development
   environment that is non-shared, non-production and not exposed to the
   Internet.  The values provided in the Acumos example file are for
   demonstration purposes only.
 
-Editing the `global_value.yaml` File
+Editing the `global_value.yaml` file
 ++++++++++++++++++++++++++++++++++++
 
 The ``global_value.yaml`` file is located in the ``ACUMOS_$HOME/helm_charts``
@@ -307,7 +300,6 @@ Here are the commands to execute to accomplish the next tasks.
 
   $ cd $ACUMOS_HOME/helm-charts
   $ cp global_value.yaml global_value.orig
-..
 
 The default ``global_value.yaml`` file requires the user to make edits to the
 masked values in the file.  Masked values are denoted by six (6) 'x' as shown:
@@ -330,7 +322,6 @@ for your environment):
     appVersion: "1.0.0"
     namespace: "xxxxxx"
     clusterName: "xxxxxx"
-..
 
 After edit: (Example 1)
 
@@ -340,7 +331,6 @@ After edit: (Example 1)
     appVersion: "1.0.0"
     namespace: "acumos-dev1"
     clusterName: "kind-acumos"
-..
 
 After edit: (Example 2)
 
@@ -350,7 +340,6 @@ After edit: (Example 2)
     appVersion: "1.0.0"
     namespace: "z2a-test"
     clusterName: "kind-acumos"
-..
 
 For entries in the ``global_value.conf`` file that have an existing entry, do
 not edit these values as they are essential for correct installation.
@@ -585,4 +574,4 @@ see the MLWB section of the CONFIGURATION document.
 TODO: Add section on accessing the Acumos Portal once installation is completed.
 
 :Created:           2020/07/13
-:Last Modified:     2020/07/22
+:Last Modified:     2020/07/24

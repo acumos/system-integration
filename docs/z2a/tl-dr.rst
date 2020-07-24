@@ -23,6 +23,38 @@ TL;DR
 
 Too Long ; Didn't Read ....
 
+..
+
+    | NOTE: Document is in development.
+    | NOTE: Subject to change.
+
+Choose a Flow
++++++++++++++
+
+If you have:
+
+1) a vanilla VM (fresh install, no additional tools installed);
+2) need to build a k8s cluster; and,
+3) want to install Acumos (and optional plugins), then choose Flow-1.
+
+If you have:
+
+1) a pre-built k8s cluster; and,
+2) want to install Acumos (and optional plugins), then choose Flow-2.
+
+README-PROXY
+++++++++++++
+
+If you are running `z2a` in an environment that requires a proxy, you may need
+to configure various items to use that proxy BEFORE you run `z2a`.
+
+  NOTE: You may also need to consult your systems/network administration team
+  for the correct proxy values.
+
+Please consult the README-PROXY document for details on the various items that
+will require configuration and links to resources that will assist in the
+configuration tasks.
+
 Flow-1
 ++++++
 
@@ -155,7 +187,6 @@ Flow-2
   $ cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml.mlwb $ACUMOS_HOME/helm-charts/mlwb_value.yaml
   # Execute 2-plugins.sh (install / configure Acumos plugins and dependencies)
   $ ./2-plugins/2-plugins.sh
-..
 
 :Created:           2020/07/22
-:Last Modified:     2020/07/22
+:Last Modified:     2020/07/24

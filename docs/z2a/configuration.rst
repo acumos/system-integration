@@ -30,37 +30,39 @@ Acumos Post-Install Configuration Steps
 Ingress - Native k8s service proxy and Ingress Controller (Nginx)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  NOTE: Basic configuration has been integrated into the
-  `z2a/1-acumos/1-acumos.sh` installation/configuration script.
+  NOTE: Basic Nginx configuration has been integrated into the
+  ``z2a/1-acumos/1-acumos.sh`` installation/configuration script.
 
 Kong - API Gateway for Acumos (deprecated)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  NOTE: Kong configuration has been integrated into the
-  `z2a/1-acumos/1-acumos.sh` installation/configuration script.
+  NOTE: Basic Kong configuration has been integrated into the
+  ``z2a/1-acumos/1-acumos.sh`` installation/configuration script.
 
 MariaDB - Common Data Services (CDS)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
   NOTE: CDS configuration has been integrated into the
-  `z2a/1-acumos/1-acumos.sh` installation/configuration script.
+  ``z2a/1-acumos/1-acumos.sh`` installation/configuration script.
 
 Sonatype Nexus - artifact management
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
   NOTE: Nexus configuration has been integrated into the
-  `z2a/1-acumos/1-acumos.sh` installation/configuration script.
+  ``z2a/1-acumos/1-acumos.sh`` installation/configuration script.
 
 Kubernetes (kind) Configuration Tasks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
   NOTE: Kubernetes (kind) configuration tasks that have been identified
-  are integrated into the ``z2a/0-kind/0c-cluster.sh`` installation/configuration script.
+  are integrated into the ``z2a/0-kind/0c-cluster.sh`` installation/configuration
+  script.
 
 MLWB Plugin Configuration Tasks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  NOTE: Please refer to the `z2a/plugins-setup/README-plugins-setup.md` markdown document or
+  NOTE: Please refer to the ``z2a/plugins-setup/README-plugins-setup.md``
+  markdown document or
   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/readme-plugins-setup.html
   for additional tips/pointers.
 
@@ -85,4 +87,4 @@ NiFi
 -----
 
 :Created:           2020/07/13
-:Last Modified:     2020/07/21
+:Last Modified:     2020/07/24

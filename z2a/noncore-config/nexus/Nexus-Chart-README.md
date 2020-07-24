@@ -1,7 +1,7 @@
 # Nexus-Chart-README
 
 For older Nexus Helm Chart where admin.password is stored on the POD ;
-you can execute the following code to retreive the password.
+you can execute the following code to retrieve the password.
 
 ```bash
 NAMESPACE="xxxxxx"
