@@ -1,0 +1,105 @@
+#============LICENSE_START=======================================================
+#
+#================================================================================
+# Copyright (C) 2020 AT&T Intellectual Property.  All rights reserved.
+#================================================================================
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============LICENSE_END=========================================================
+apiVersion: v1
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Values.global.acumosSoajsURACService }}"
+  namespace: "{{ .Values.global.namespace }}"
+  labels:
+    service.image.ts: "1587740894286"
+    soajs.catalog.id: 5df3ec10fa3912534948f008
+    soajs.catalog.v: "1"
+    soajs.content: "true"
+    soajs.env.code: dashboard
+    soajs.service.group: soajs-core-services
+    soajs.service.label: dashboard-urac-v3
+    soajs.service.mode: deployment
+    soajs.service.name: urac
+    soajs.service.replicas: "1"
+    soajs.service.subtype: soajs
+    soajs.service.type: service
+    soajs.service.version: "3"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: "{{ .Values.global.acumosSoajsURACService }}"
+
+  template:
+    metadata:
+      labels:
+        app: "{{ .Values.global.acumosSoajsURACService }}"
+    spec:
+      initContainers:
+        - name: acumos-soajs-urac-readiness
+          image: oomk8s/readiness-check:2.2.2
+          imagePullPolicy: IfNotPresent
+          command:
+            - /root/ready.py
+          args:
+            - --container-name
+            - acumos-soajs-nginx-container
+            - "-t"
+            - "15"
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+      containers:
+      - image: "{{ .Values.global.acumosSoajsURACImage }}"
+        imagePullPolicy: IfNotPresent
+        name: acumos-soajs-urac-container
+        workingDir: /opt/soajs/soajs.urac/
+        command:
+        - bash
+        args:
+        - -c
+        - "node ."
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        ports:
+        - containerPort: {{ .Values.global.acumosSoajsURACServicePort }}
+          name: service
+        - containerPort: {{ .Values.global.acumosSoajsURACMaintenancePort }}
+          name: maintenance
+        env:
+        - name: SOAJS_ENV
+          value: dashboard
+        - name: SOAJS_DEPLOY_HA
+          value: kubernetes
+        - name: SOAJS_MONGO_CON_KEEPALIVE
+          value: "true"
+        - name: SOAJS_BCRYPT
+          value: "true"
+        - name: SOAJS_REGISTRY_API
+          value: "{{ .Values.global.acumosSoajsControllerService }}:{{ .Values.global.acumosSoajsControllerMaintenancePort }}"
+        readinessProbe:
+          httpGet:
+            path: /heartbeat
+            port: maintenance
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 2
+          failureThreshold: 3
+

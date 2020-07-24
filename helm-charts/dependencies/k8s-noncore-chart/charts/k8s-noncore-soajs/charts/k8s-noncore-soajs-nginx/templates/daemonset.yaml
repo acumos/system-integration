@@ -1,0 +1,120 @@
+#============LICENSE_START=======================================================
+#
+#================================================================================
+# Copyright (C) 2020 AT&T Intellectual Property.  All rights reserved.
+#================================================================================
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============LICENSE_END=========================================================
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: "{{ .Values.global.acumosSoajsNginxService }}"
+  namespace: "{{ .Values.global.namespace }}"
+  labels:
+    {{- $ts := now | unixEpoch }}
+    service.image.ts: "{{ $ts }}"
+    soajs.catalog.id: 5df3ec10fa3912534948effe
+    soajs.catalog.v: "1"
+    soajs.content: "true"
+    soajs.env.code: dashboard
+    soajs.service.group: soajs-nginx
+    soajs.service.label: dashboard-nginx
+    soajs.service.mode: daemonset
+    soajs.service.name: nginx
+    soajs.service.subtype: nginx
+    soajs.service.type: server
+    soajs.service.version: "1"
+spec:
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: "{{ .Values.global.acumosSoajsNginxService }}"
+
+  template:
+    metadata:
+      labels:
+        app: "{{ .Values.global.acumosSoajsNginxService }}"
+        service.image.ts: "{{ $ts }}"
+        soajs.catalog.id: 5df3ec10fa3912534948effe
+        soajs.catalog.v: "1"
+        soajs.content: "true"
+        soajs.env.code: dashboard
+        soajs.service.group: soajs-nginx
+        soajs.service.label: dashboard-nginx
+        soajs.service.mode: daemonset
+        soajs.service.name: nginx
+        soajs.service.subtype: nginx
+        soajs.service.type: server
+        soajs.service.version: "1"
+    spec:
+      initContainers:
+        - name: acumos-soajs-nginx-readiness
+          image: oomk8s/readiness-check:2.2.2
+          imagePullPolicy: IfNotPresent
+          command:
+            - /root/ready.py
+          args:
+            - --container-name
+            - acumos-soajs-controller-container
+            - "-t"
+            - "15"
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+      containers:
+      - image: "{{ .Values.global.acumosSoajsNginxImage }}"
+        imagePullPolicy: IfNotPresent
+        name: acumos-soajs-nginx-container
+        workingDir: /opt/soajs/soajs.deployer/deployer/
+        command:
+        - bash
+        args:
+        - -c
+        - "node index.js -T nginx -S install && /opt/soajs/soajs.deployer/deployer/bin/nginx.sh"
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 443
+          name: https
+        env:
+        - name: SOAJS_ENV
+          value: dashboard
+        - name: SOAJS_EXTKEY
+          value: "{{ .Values.global.acumosSoajsConfig.tenantExternalKey }}"
+        - name: SOAJS_NX_DOMAIN
+          value: "{{ .Values.global.acumosSoajsConfig.domain }}"
+        - name: SOAJS_NX_API_DOMAIN
+          value: "{{ .Values.global.acumosSoajsConfig.apiPrefix }}.{{ .Values.global.acumosSoajsConfig.domain }}"
+        - name: SOAJS_NX_SITE_DOMAIN
+          value: "{{ .Values.global.acumosSoajsConfig.sitePrefix }}.{{ .Values.global.acumosSoajsConfig.domain }}"
+        - name: SOAJS_NX_CONTROLLER_NB
+          value: "1"
+        - name: SOAJS_NX_CONTROLLER_PORT
+          value: "4000"
+        - name: SOAJS_NX_CONTROLLER_IP_1
+          value: "{{ .Values.global.acumosSoajsControllerService }}"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 2
+          failureThreshold: 3
