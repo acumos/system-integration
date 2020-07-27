@@ -68,7 +68,7 @@ spec:
                       },
                       "workbench": {
                          "path": "/workbench/**",
-                         "url": "http://{{ .Values.mlwb.homeWebcomponent.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosHomeWebcomponentPort }}",
+                         "url": "http://{{ .Values.mlwb.homeWebcomponent.svcName }}.{{ .Values.mlwb.namespace }}:{{ .Values.mlwb.acumosHomeWebcomponentPort }}",
                          "sensitiveHeaders": ""
                       },
                       "azure": {

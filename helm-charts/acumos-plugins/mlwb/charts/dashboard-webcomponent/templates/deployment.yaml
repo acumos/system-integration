@@ -47,11 +47,11 @@ spec:
            - name: ENVIRONMENT
              value: "deploy"
            - name: projectmSURL
-             value: "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosProjectServicePort }}/mlWorkbench/v1/project"
+             value: "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.mlwb.namespace }}:{{ .Values.mlwb.acumosProjectServicePort }}/mlWorkbench/v1/project"
            - name: notebookmSURL
-             value: "http://{{ .Values.mlwb.notebookService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosNotebookServicePort }}/mlWorkbench/v1/notebook"
+             value: "http://{{ .Values.mlwb.notebookService.svcName }}.{{ .Values.mlwb.namespace }}:{{ .Values.mlwb.acumosNotebookServicePort }}/mlWorkbench/v1/notebook"
            - name: pipelinemSURL
-             value: "http://{{ .Values.mlwb.pipelineService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosPipelineServicePort }}/mlWorkbench/v1/pipeline"
+             value: "http://{{ .Values.mlwb.pipelineService.svcName }}.{{ .Values.mlwb.namespace }}:{{ .Values.mlwb.acumosPipelineServicePort }}/mlWorkbench/v1/pipeline"
            - name: portalFEURL
              value: "http://{{ .Values.global.portal.portalFe.svcName }}.{{ .Values.global.namespace }}"
            - name: portalBEURL
