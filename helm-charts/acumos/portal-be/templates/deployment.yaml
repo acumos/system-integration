@@ -68,7 +68,7 @@ spec:
                 },
                 "docker": {
                    "host": "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
-                   "port": "{{ .Values.global.acumosDockerPort }}"
+                   "port": "{{ .Values.global.acumosDockerPort }}",
                    "registry": {
                       "url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
                       "username": "{{ .Values.global.acumosNexusUserName }}",
