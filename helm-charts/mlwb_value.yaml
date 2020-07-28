@@ -24,6 +24,12 @@ mlwb:
     namespace: "xxxxxx"
     clusterName: "xxxxxx"
 
+    #ingress settings
+    ingress:
+        enabled: true
+        annotations: {}
+        tlsSecretName: "MLWB TLS cert SecretName"
+
     # Ports
     acumosDashboardWebcomponentPort: "9083"
     acumosHomeWebcomponentPort: "9082"
