@@ -355,6 +355,22 @@ After edit: (Example 2)
   entry, do not edit these values as they are essential for correct
   installation.
 
+Sonatype Nexus Configuration (Flow-2 Only)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+By default, the environment variable ``ADMIN_URL`` is configured for a Flow-1
+installation. The following code block of the
+``z2a/noncore-config/nexus/config-nexus.sh`` script will need to be edited
+for Flow-2 configuration to occur properly.
+
+.. code-block:: bash
+
+  # NOTE:  Uncomment ADMIN_URL as appropriate for the 'z2a' Flow used.
+  # Flow-1 (default)
+  ADMIN_URL="http://localhost:${NEXUS_API_PORT}/service/rest"
+  # Flow-2
+  # ADMIN_URL="http://$NEXUS_SVC.$NAMESPACE:${NEXUS_API_PORT}/service/rest"
+
 Flow-1 Installation Process
 +++++++++++++++++++++++++++
 
@@ -406,7 +422,7 @@ are running by executing this ``kubectl`` command.
 
     $ kubectl get pods -A
 
-7. When all Kubernetes pods are in a i``Running`` state, we can proceed and
+7. When all Kubernetes pods are in a ``Running`` state, we can proceed and
 execute the ``1-kind.sh`` script to install and configure Acumos.
 
 .. code-block:: bash

@@ -1,3 +1,23 @@
+<!---
+.. ===============LICENSE_START=======================================================
+.. Acumos CC-BY-4.0
+.. ===================================================================================
+.. Copyright (C) 2018 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+.. ===================================================================================
+.. This Acumos documentation file is distributed by AT&T and Tech Mahindra
+.. under the Creative Commons Attribution 4.0 International License (the "License");
+.. you may not use this file except in compliance with the License.
+.. You may obtain a copy of the License at
+..
+..      http://creativecommons.org/licenses/by/4.0
+..
+.. This file is distributed on an "AS IS" BASIS,
+.. WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+.. See the License for the specific language governing permissions and
+.. limitations under the License.
+.. ===============LICENSE_END=========================================================
+-->
+
 # README - Acumos noncore-config scripts
 
 ## Prerequisites
@@ -20,10 +40,10 @@ prerequisites. To install these prerequisites, execute the following commands:
 
 ```bash
 # For Redhat/CentOS
-sudo yum install -y --setopt=skip_missing_names_on_install=False git jq make socat yq
+  sudo yum install -y --setopt=skip_missing_names_on_install=False git jq make socat yq
 
 # Ubuntu Distribution misc. requirements
-sudo apt-get update -y && sudo apt-get install --no-install-recommends -y git jq make socat yq
+  sudo apt-get update -y && sudo apt-get install --no-install-recommends -y git jq make socat yq
 ```
 
 ## Setting up the environment
@@ -61,19 +81,21 @@ If you have downloaded the Acumos `system-integration` repository from
 To setup the environment, execute the following commands:
 
 ```bash
-export ACUMOS_GLOBAL_VALUE=$HOME/src/system-integration/helm-charts/global_value.yaml
+  export ACUMOS_GLOBAL_VALUE=$HOME/src/system-integration/helm-charts/global_value.yaml
 ```
 
 ## Installing the Configuration Helper - config-helper (OPTIONAL)
 
->NOTE: At this time, the config-helper is not required to be installed for
-subsequent scripts in this directory to execute properly.
+>NOTE: 'config-helper' is an optional component of 'z2a'.  'config-helper'
+>installs a 'helper' pod in the Kubernetes cluster that is configured with
+>a number of troubleshooting tools (`traceroute`, `ping`, `dig`, `nn`
+>... etc.).  'config-helper' is not required to be installed for
+>subsequent scripts in this directory to execute properly.
 
-To install the configuration helper pod used by subsequent scripts, execute
-the following command:
+To install the configuration helper pod, execute the following command:
 
 ```bash
-make config-helper
+  make config-helper
 ```
 
 ## Installing & Configuring - Ingress (work in progress)
@@ -81,60 +103,60 @@ make config-helper
 To configure Ingress (only), execute the following command:
 
 ```bash
-make config-ingress
+  make config-ingress
 ```
 
 To install Ingress (only), execute the following command:
 
 ```bash
-make install-ingress
+  make install-ingress
 ```
 
 To install and configure Ingress, execute the following command:
 
 ```bash
-make ingress
+  make ingress
 ```
 
 ## Installing & Configuring - Kong (deprecated)
 
 >NOTE: Kong has been deprecated as an Ingress controller.  Work is being done
-to adopt native k8s service proxying using the Nginx Ingress controller.
-This work is on-going until feature parity is obtained.
+>to adopt native k8s service proxying using the Nginx Ingress controller.
+>This work is on-going until feature parity is obtained.
 >
 >NOTE: X.509 certificate and key needs to be provided before running these
-scripts. The certificate and key MUST be installed in the
-`z2a/noncore-config/kong/certs` directory.
+>scripts. The certificate and key MUST be installed in the
+>`z2a/noncore-config/kong/certs` directory.
 >
 >NOTE:  Temporary Kong certificates can be generated using these commands:
 
 ```bash
-openssl req -newkey rsa:2048 -nodes -keyout key.pem -x509 -days 365 -out certificate.pem
-openssl x509 -text -noout -in certificate.pem
-openssl pkcs12 -inkey key.pem -in certificate.pem -export -out certificate.p12
-openssl pkcs12 -in certificate.p12 -noout -info
+  openssl req -newkey rsa:2048 -nodes -keyout key.pem -x509 -days 365 -out certificate.pem
+  openssl x509 -text -noout -in certificate.pem
+  openssl pkcs12 -inkey key.pem -in certificate.pem -export -out certificate.p12
+  openssl pkcs12 -in certificate.p12 -noout -info
 ```
 
 >NOTE: Temporary certificates have been provided in the
-`z2a/noncore-config/kong/certs` directory. These certificates should be replaced
-(using the commands shown above) and should NEVER be used in a production environment.
+>`z2a/noncore-config/kong/certs` directory. These certificates should be replaced
+>(using the commands shown above) and should NEVER be used in a production environment.
 
-To configure Kong (only), execute the following command:
+To configure Kong (only) (deprecated), execute the following command:
 
 ```bash
-make config-kong
+  make config-kong
 ```
 
-To install Kong (only), execute the following command:
+To install Kong (only) (deprecated), execute the following command:
 
 ```bash
-make install-kong
+  make install-kong
 ```
 
-To install and configure Kong, execute the following command:
+To install and configure Kong (deprecated), execute the following command:
 
 ```bash
-make kong
+  make kong
 ```
 
 ## Installing & Configuring - Mariadb-CDS (MariaDB for Common Data Services (CDS))
@@ -142,19 +164,19 @@ make kong
 To configure MariaDB-CDS (only), execute the following command:
 
 ```bash
-make config-mariadb-cds
+  make config-mariadb-cds
 ```
 
 To install MariaDB-CDS (only), execute the following command:
 
 ```bash
-make install-mariadb-cds
+  make install-mariadb-cds
 ```
 
 To install and configure MariaDB-CDS, execute the following command:
 
 ```bash
-make mariadb-cds
+  make mariadb-cds
 ```
 
 ## Installing & Configuring - Nexus
@@ -162,22 +184,22 @@ make mariadb-cds
 To configure Nexus (only), execute the following command:
 
 ```bash
-make config-config
+  make config-config
 ```
 
 To install Nexus (only), execute the following command:
 
 ```bash
-make install-nexus
+  make install-nexus
 ```
 
 To install and configure Nexus, execute the following command:
 
 ```bash
-make nexus
+  make nexus
 ```
 
 ```bash
 // Created: 2020/04/28
-// Last Edited: 2020/07/28
+// Last Edited: 2020/07/29
 ```
