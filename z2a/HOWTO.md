@@ -1,6 +1,6 @@
 # HOWTO
 
->NOTE: Under Construction (gaps exist in some methods of procedure) ....
+>NOTE: Under Construction ....
 
 ## How to install z2a from scratch on a VM with `kind` (default - Flow-1)
 
@@ -184,7 +184,44 @@ TODO: Provide an example here ....
 
 * where to start ; what to do
 
+## Troubleshooting
+
+Does z2a create log files? Where can I find them?
+
+Each `z2a` script creates a separate and distinct log file.  Below is a listing of these log files and their locations.
+
+| Script Name & Location | | Log File & Location |
+| :--------------------- | :-: | :-------------- |
+| z2a/0-kind/0a-env.sh       | | no log file created                 |
+| z2a/0-kind/0b-depends.sh   | | z2a/0-kind/0b-depends-install.log   |
+| z2a/0-kind/0c-cluster.sh   | | z2a/0-kind/0c-cluster-install.log   |
+| z2a/noncore-config/ingress/config-ingress.sh | | z2a/noncore-config/ingress/config-ingress.log |
+| z2a/noncore-config/mariadb-cds/config-mariadb-cds.sh | | z2a/noncore-config/mariadb-cds/config-mariadb-cds.log |
+| z2a/noncore-config/mariadb-cds/install-mariadb-cds.sh | | z2a/noncore-config/mariadb-cds/install-mariadb-cds.log |
+| z2a/noncore-config/nexus/config-nexus.sh | | z2a/noncore-config/nexus/config-nexus.log |
+| z2a/noncore-config/nexus/install-nexus.sh | | z2a/noncore-config/nexus/install-nexus.log |
+| z2a/plugins-setup/couchdb/install-couchdb.sh | | z2a/plugins-setup/couchdb/install-couchdb.log |
+| z2a/plugins-setup/jupyterhub/install-jupyterhub.sh | | z2a/plugins-setup/jupyterhub/install-jupyterhub.log |
+| z2a/plugins-setup/mlwb/install-mlwb.sh | | z2a/plugins-setup/mlwb/install-mlwb.log |
+| z2a/plugins-setup/nifi/install-nifi.sh | | z2a/plugins-setup/nifi/install-nifi.log |
+
+How do I decode an on-screen error?
+
+The `z2a` scripts use a shared function to display errors on-screen during execution.  You can decode the information to determine where to look to troubleshoot the problem.   Below is an example error:
+
+```sh
+“2020-05-20T15:28:19+00:00 z2a-utils.sh:42:(fail) unknown failure at ./0-kind/0c-cluster.sh:62”
+```
+
+Here is how to decode the above error:
+
+> `2020-05-20T15:28:19+00:00` - is the timestamp of the failure
+>
+> `z2a-utils.sh:42:(fail)` - is the 'fail' function (line 42) of the z2a-utils.sh script
+>
+> `./0-kind/0c-cluster.sh:62` - the failure occurred at line 62 of the ./0-kind/0c-cluster.sh script
+
 ```bash
 // Created: 2020/05/14
-// Last modified: 2020/07/09
+// Last modified: 2020/07/28
 ```

@@ -61,7 +61,7 @@ Flow-1
 .. code-block:: bash
 
   # Obtain a Virtual Machine (VM) with sudo access ; Login to VM
-  # Note: ``/usr/local/bin`` is a required element in your $PATH
+  # NOTE: /usr/local/bin is a required element in your $PATH
 
   # Install 'git' distributed version-control tool
   # For RPM-based distributions such as RHEL/CentOS, execute the following command:
@@ -131,9 +131,9 @@ Flow-2
 .. code-block:: bash
 
   # To execute Flow-2, we will use a VM-based host for command & control.
-  # Note: You MAY require sudo access on the command & control VM to allow you
+  # NOTE: You MAY require sudo access on the command & control VM to allow you
   # to install git
-  # Note: /usr/local/bin is a required element in your $PATH
+  # NOTE: /usr/local/bin is a required element in your $PATH
 
   # Login to the VM
 
@@ -189,4 +189,4 @@ Flow-2
   $ ./2-plugins/2-plugins.sh
 
 :Created:           2020/07/22
-:Last Modified:     2020/07/24
+:Last Modified:     2020/07/28

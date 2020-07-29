@@ -1,4 +1,3 @@
-..
 .. ===============LICENSE_START=======================================================
 .. Acumos CC-BY-4.0
 .. ===================================================================================
@@ -20,15 +19,15 @@
 Zero-to-Acumos (z2a) Installation Guide
 =======================================
 
-    | NOTE: Document is in development.
-    | NOTE: Subject to change.
-
-This installation guide describes how to deploy Acumos using the
-`Zero-to-Acumos` (z2a) tool. `z2a` was designed for those who require a simple
-and automated way to deploy an Acumos platform.
+  | NOTE: Document is in development.
+  | NOTE: Subject to change.
 
 What is `z2a`?
 --------------
+
+This installation guide describes how to deploy Acumos using `Zero-to-Acumos`
+(z2a). `z2a` was designed for those who require a simple and automated way to
+deploy Acumos.
 
 `Zero-to-Acumos` (`z2a`) is a collection of shell scripts that have been
 assembled to perform a simple set of tasks:  installation and (where possible)
@@ -60,17 +59,17 @@ Flow-1 consists of three (3) steps using the following scripts (and descriptions
 
 - Steps 0[a-c]
 
-  * ``z2a/0-kind/0a-env.sh          # z2a environment creation``
-  * ``z2a/0-kind/0b-depends.sh      # dependency installation and setup``
-  * ``z2a/0-kind/0a-cluster.sh      # Kubernetes ('kind') cluster creation``
+* ``z2a/0-kind/0a-env.sh          # z2a environment creation``
+* ``z2a/0-kind/0b-depends.sh      # dependency installation and setup``
+* ``z2a/0-kind/0a-cluster.sh      # Kubernetes ('kind') cluster creation``
 
 - Step 1
 
-  * ``z2a/1-acumos/1-acumos.sh      # Acumos noncore and core component installation & configuration``
+* ``z2a/1-acumos/1-acumos.sh      # Acumos noncore and core component installation & configuration``
 
 - Step 2 (optional)
 
-  * ``z2a/2-plugins/2-plugins.sh    # Acumos plugins and dependencies installation & configuration``
+* ``z2a/2-plugins/2-plugins.sh    # Acumos plugins and dependencies installation & configuration``
 
   NOTE: In Flow-1, the `z2a` environment creation script
   ``z2a/0-kind/0a-env.sh``, will have to be executed during the initial setup
@@ -78,14 +77,14 @@ Flow-1 consists of three (3) steps using the following scripts (and descriptions
 
 The process flow of `z2a` Flow-1 is depicted in the following diagram.
 
-.. image:: images/z2a-flow-1.jpg
-   :width: 100 %
-
   NOTE: `z2a` (Flow-1) should not be used as a production environment deployment
   tool at this time.  `z2a` (Flow-1) has been primarily designed for development
   and/or test environment installations.  Currently, a key component of `z2a`
   (Flow-1), `kind` -  Kubernetes in Docker - is not recommended for production
   installation or production workloads.
+
+.. image:: images/z2a-flow-1.jpg
+  :width: 100 %
 
 What is `z2a` Flow-2?
 +++++++++++++++++++++
@@ -97,7 +96,7 @@ What is `z2a` Flow-2?
 * deployment of Acumos noncore and core components on an existing Kubernetes cluster.
 
 The second process flow is a new `z2a` process flow targeting a pre-built Kubernetes
-cluster environments. (i.e. BYOC - Bring Your Own Cluster)
+cluster environments (i.e. BYOC - Bring Your Own Cluster).
 
 Flow-2 Components
 ^^^^^^^^^^^^^^^^^
@@ -106,20 +105,20 @@ Flow-2 consists of three (3) steps using the following scripts (and descriptions
 
 - Step 0
 
-  * ``z2a/0-kind/0a-env.sh          # z2a environment creation``
+* ``z2a/0-kind/0a-env.sh          # z2a environment creation``
 
 - Step 1
 
-  * ``z2a/1-acumos/1-acumos.sh      # Acumos noncore and core component installation & configuration``
+* ``z2a/1-acumos/1-acumos.sh      # Acumos noncore and core component installation & configuration``
 
 - Step 2 (optional)
 
-  * ``z2a/2-plugins/2-plugins.sh    # Acumos plugins and dependencies installation & configuration``
+* ``z2a/2-plugins/2-plugins.sh    # Acumos plugins and dependencies installation & configuration``
 
 The process flow of `z2a` Flow-2 is depicted in the following diagram.
 
 .. image:: images/z2a-flow-2.jpg
-   :width: 100 %
+  :width: 100 %
 
 Guide to `z2a` Deployment
 -------------------------
@@ -136,28 +135,29 @@ z2a Requirements
 Flow-1 Requirements
 +++++++++++++++++++
 
-* A Virtual Machine (VM)
+* A Virtual Machine (VM) which will be used as the host for the Kubernetes
+  cluster and the Acumos installation
 
   - The user **must** have sudo rights on the VM
     (i.e. must exist in the ``/etc/sudoers`` file).
   - The VM requires Internet access such that OS updates, OS supplemental
     packages and Helm chart installations can be performed. Either the VM has
     proxied access to the Internet or the user must be able to configure the
-    proxy setting for the VM.
+    proxy setting for the VM (if required).
 
 Flow-2 Requirements
 +++++++++++++++++++
 
-* A Kubernetes (k8s) cluster
-* A command & control VM which will be used as the installation launch point
-  for `z2a`
+* A Virtual Machine (VM) which will be used as the installation launch point
+  for `z2a` (command & control VM)
 
   - The user **must** have sudo rights on the VM
     (i.e. must exist in the ``/etc/sudoers`` file).
   - The VM requires Internet access such that OS updates, OS supplemental
     packages and Helm chart installations can be performed. Either the VM
     has proxied access to the Internet or the user must be able to configure
-    the proxy setting for the VM.
+    the proxy setting for the VM (if required).
+* A Kubernetes (k8s) cluster
 
 Proxy Requirements
 ++++++++++++++++++
@@ -167,18 +167,19 @@ Proxy Requirements
   NOTE: Internet proxy configurations are beyond the scope of the installation
   documentation.
 
-  Please consult the README-PROXY document for details on the various items
-  that will require configuration and links to resources that will assist in
-  the configuration tasks.
+Please consult the README-PROXY document for details on the various items
+that will require configuration and links to resources that will assist in
+the configuration tasks.
 
 Misc. Requirements
 ++++++++++++++++++
 
-* z2a requires that the following tools be installed on the VM prior to
-execution of the `z2a` scripts:
+* z2a requires that the following tools be installed on the VM noted above
+  for Flow-1 or Flow-2 prior to execution of the `z2a` scripts:
 
   - git (the distributed source code management tool)
-  - yq (the YAML file processing tool)
+  - jq (the JSON file processing tool)
+  - make (the software build automation tool)
 
 Assumptions
 +++++++++++
@@ -186,7 +187,7 @@ Assumptions
 It is assumed that the user who is performing this installation:
 
 * is familiar with Linux (i.e. directory creation, shell script execution,
-  editing files, reading log files etc.)
+  editing files using Linux editors, reading log files etc.)
 * has `sudo` access (elevated privileges) to the VM where the installation
   will occur (Flow-1)
 * has `sudo` access (elevated privileges) to the VM where the installation
@@ -205,7 +206,9 @@ Installation Location Creation (Flow-1 and Flow-2)
 In the following section, the user will perform the following actions:
 
 1. Login to the Linux VM where the install will occur
-2. Install the 'git' distributed version-control tool
+2. Install the 'git' distributed version-control tool,
+   the 'jq' JSON file processing tool and
+   the 'make' software build automation tool
 3. Create a new directory that will be used to perform this installation (i.e. `src`)
 4. Change directory into this new directory
 5. Clone the gerrit.acumos.org `system-integration` repository into the new directory
@@ -217,10 +220,12 @@ execute steps 2-6 above.
 .. code-block:: bash
 
   # Install 'git' distributed version-control tool
+  # Install 'jq' JSON file processing tool
+  # Install 'make' software build automation tool
   # For RPM-based distributions such as RHEL/CentOS, execute the following command:
-  $ sudo yum install -y git
+  $ sudo yum install -y git jq make
   # For Debian-based distributions such as Ubuntu, execute the following command:
-  $ sudo apt-get install --no-install-recommends -y git
+  $ sudo apt-get install --no-install-recommends -y git jq make
   $ mkdir -p $HOME/src
   $ cd $HOME/src
   $ git clone https://gerrit.acumos.org/r/system-integration
@@ -265,12 +270,17 @@ Using the example `global_value.yaml` file
 z2a includes example ``global_value.yaml`` files for Acumos in the
 ``$ACUMOS_HOME/z2a/dev1`` directory. These example Acumos values files are
 provided for both illustrative purposes and to assist in performing a quick
-installation (see: TL;DR section).
+installation (see: TL;DR document).
 
-The example Acumos values file can be used for a test installation and
+  NOTE: There are two (2) example files in the ``$ACUMOS_HOME/z2a/dev1`` directory.
+
+  ``$ACUMOS_HOME/z2a/dev1/global_value.yaml.dev1       # acumos-dev1 namespace``
+  ``$ACUMOS_HOME/z2a/dev1/global_value.yaml.z2a-test   # z2a-test namespace``
+
+The example Acumos values files can be used for a test installation and
 additional edits should not be required.
 
-The commands to use the Acumos example values are:
+The commands to use the Acumos ``global_value.yaml.dev1`` example value file are:
 
 .. code-block:: bash
 
@@ -341,8 +351,9 @@ After edit: (Example 2)
     namespace: "z2a-test"
     clusterName: "kind-acumos"
 
-For entries in the ``global_value.conf`` file that have an existing entry, do
-not edit these values as they are essential for correct installation.
+  NOTE: For entries in the ``global_value.conf`` file that have an existing
+  entry, do not edit these values as they are essential for correct
+  installation.
 
 Flow-1 Installation Process
 +++++++++++++++++++++++++++
@@ -350,25 +361,26 @@ Flow-1 Installation Process
 To perform an installation of Acumos, we will need to perform the following
 steps:
 
-1. Change directory into the `z2a/0-kind` directory.
+1. Change directory into the ``z2a/0-kind`` directory.
 
 .. code-block:: bash
 
     $ cd $ACUMOS_HOME/z2a/0-kind
 
-2. Execute the z2a `0a-env.sh` script.
+2. Execute the z2a ``0a-env.sh`` script.
 
 .. code-block:: bash
 
     $ ./0a-env.sh
 
-3. After successful execution of the `0a-env.sh` script, execute the z2a `0b-depends.sh` script.
+3. After successful execution of the ``0a-env.sh`` script, execute the `z2a`
+``0b-depends.sh`` script.
 
 .. code-block:: bash
 
     $ ./0b-depends.sh
 
-4. Once the z2a `0b-depends.sh` has completed, please log out of your session
+4. Once the z2a ``0b-depends.sh`` has completed, please log out of your session
 and log back in.  This step is required such that you (the installer) are
 added to the `docker` group, which is required in the next step.
 
@@ -376,8 +388,8 @@ added to the `docker` group, which is required in the next step.
 
     $ logout
 
-5. Once you are logged back into the VM, change directory into the `z2a/0-kind`
-directory and execute the z2a `0c-cluster.sh` script.
+5. Once you are logged back into the VM, change directory into the
+``z2a/0-kind`` directory and execute the z2a ``0c-cluster.sh`` script.
 
 .. code-block:: bash
 
@@ -388,14 +400,14 @@ directory and execute the z2a `0c-cluster.sh` script.
 6. After the z2a ``z2a/0-kind/0c-cluster.sh`` script has completed, we will
 need to check the status of the newly created Kubernetes pods before we proceed
 with the Acumos installation.  We can ensure that all necessary Kubernetes pods
-are running by executing this `kubectl` command.
+are running by executing this ``kubectl`` command.
 
 .. code-block:: bash
 
     $ kubectl get pods -A
 
-7. When all Kubernetes pods are in a `Running` state, we can proceed and
-execute the `1-kind.sh` script to install and configure Acumos.
+7. When all Kubernetes pods are in a i``Running`` state, we can proceed and
+execute the ``1-kind.sh`` script to install and configure Acumos.
 
 .. code-block:: bash
 
@@ -409,7 +421,7 @@ the Acumos installation process.
 
     $ kubectl get pods -A
 
-When all Kubernetes pods are in a `Running` state, the installation of the
+When all Kubernetes pods are in a ``Running`` state, the installation of the
 Acumos noncore  and core components has been completed.
 
 Flow-2 Installation Process
@@ -446,7 +458,7 @@ the Acumos installation process.
 
     $ kubectl get pods -A
 
-When all Kubernetes pods are in a `Running` state, the installation of the
+When all Kubernetes pods are in a ``Running`` state, the installation of the
 Acumos noncore and core components has been completed.
 
 Acumos Plugin Installation
@@ -550,7 +562,8 @@ MLWB Installation
 To perform an installation of MLWB, we will need to perform the following steps:
 
 1. Change directory into the ``z2a/2-plugins`` directory
-2. Execute the ``2-plugins.sh`` script which install the MLWB dependencies and the MLWB components
+2. Execute the ``2-plugins.sh`` script which install the MLWB dependencies and
+   the MLWB components
 
 .. code-block:: bash
 
@@ -571,7 +584,5 @@ Kind: https://kind.sigs.k8s.io/
 For post-installation Machine Learning WorkBench configuration steps, please
 see the MLWB section of the CONFIGURATION document.
 
-TODO: Add section on accessing the Acumos Portal once installation is completed.
-
 :Created:           2020/07/13
-:Last Modified:     2020/07/24
+:Last Modified:     2020/07/28

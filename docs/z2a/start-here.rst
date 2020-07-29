@@ -52,11 +52,10 @@ environments where a Kubernetes cluster is built and Acumos is installed from
 scratch on a single VM.
 
   NOTE: `z2a` (Flow-1) should not be used as a production environment deployment
-  tool at this time.  `z2a` (Flow-1) has been primarily designed for development
-  and/or test environment installations on pre-built VMs.
-
-  Currently, a key component of `z2a` (Flow-1), `kind` -  Kubernetes in Docker -
-  is not recommended for production installation or production workloads.
+  tool.  `z2a` (Flow-1) has been primarily designed for development and/or test
+  environment installations on pre-built VMs. A key component of `z2a` (Flow-1),
+  `kind` -  Kubernetes in Docker - is not recommended for production installs or
+  production workloads.
 
 What is `z2a` Flow-2?
 ---------------------
@@ -104,4 +103,4 @@ Please refer to the following documents for additional information:
 |   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/configuration.html
 
 :Created:           2020/07/16
-:Last Modified:     2020/07/24
+:Last Modified:     2020/07/28

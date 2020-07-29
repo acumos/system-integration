@@ -10,3 +10,8 @@ kubectl exec -it $POD --namespace=$NAMESPACE -- /bin/cat /nexus-data/admin.passw
 ```
 
 One you have the password - edit the `config-nexus.sh` script and replace the default password (admin123) with the retrieved password.
+
+```bash
+// Created: 2020/05/14
+// Last Edited: 2020/07/28
+```
