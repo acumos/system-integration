@@ -209,7 +209,7 @@ spec:
                    }
                  },
                  "gateway": {
-                    "url": "https://{{ .Values.global.acumosFederationName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosFederationLocalPort }}"
+                    "url": "https://{{ .Values.global.acumosFederationGatewayURL }}:{{ .Values.global.acumosFederationLocalPort }}"
                  },
                  "dcae": {
                     "model": {
