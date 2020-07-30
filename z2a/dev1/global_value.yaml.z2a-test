@@ -41,6 +41,14 @@ global:
     nexus3StagingRegistryLf: "nexus3.acumos.org:10004"
     nexus3RegistryName: "nexus3.acumos.org"
 
+    ingress:
+        enabled: true
+        annotations: {}
+            #kubernetes.io/ingress.class: nginx
+            #nginx.ingress.kubernetes.io/proxy-body-size: "0"
+            #nginx.ingress.kubernetes.io/proxy-max-temp-file-size: "0
+        tlsSecretName: "TLS cert SecretName"
+
     # Azure client
     acumosAzureClientImage: "acumos-azure-client:2.0.15"
     acumosAzureClientPort: "9081"

@@ -28,6 +28,16 @@ mlwb:
     namespace: "mlwb"
     clusterName: "kind-acumos"
 
+    #ingress settings
+    ingress:
+        enabled: true
+        annotations: {}
+            #kubernetes.io/ingress.class: nginx
+            #nginx.ingress.kubernetes.io/proxy-body-size: "0"
+            #nginx.ingress.kubernetes.io/proxy-max-temp-file-size: "0
+            #nginx.ingress.kubernetes.io/rewrite-target: /$2
+        tlsSecretName: "MLWB TLS cert SecretName"
+
     # Ports
     acumosDashboardWebcomponentPort: "9083"
     acumosHomeWebcomponentPort: "9082"
