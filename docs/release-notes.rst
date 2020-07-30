@@ -28,6 +28,7 @@ Version 4.0.0, 10 Jun 2020
 * Helm Chart refactor
 
   * Separate Helm chart for each Acumos component
+
     * separate charts for core and non-core components
     * separate z2a structure for Acumos plugins (currently only MLWB is supported)
   * Consolidate and sanitize key/values into ``global_value.yaml`` file
@@ -37,6 +38,7 @@ Version 4.0.0, 10 Jun 2020
 
   * Acumos installation/configuration automation
   * Flow (process) based model
+
     * Flow-1 - build k8s cluster and install Acumos on a single VM
     * Flow-2 - install Acumos on a pre-built k8s cluster
   * z2a documentation

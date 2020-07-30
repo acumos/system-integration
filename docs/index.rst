@@ -25,9 +25,9 @@ System Integration
        :maxdepth: 2
 
        release-notes
+       z2a/index
        oneclick-deploy/index
        oneclick-deploy/configuration
        oneclick-deploy/developer-guide
-       z2a/index
 
 * :ref:`search`

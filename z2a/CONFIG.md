@@ -36,35 +36,23 @@
 
 ### MariaDB - to support the Common Data Services (CDS)
 
->NOTE: CDS configuration has been integrated into the `1-acumos/1-acumos.sh` installation/configuration script.
+>NOTE: CDS configuration has been integrated into the `1-acumos/1-acumos.sh`
+installation/configuration script.
 
 ### Sonatype Nexus - to support artifact management
 
-Sonatype Nexus - artifact management
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-By default, the environment variable ``ADMIN_URL`` is configured for a Flow-1
-installation. The following code block of the
-``z2a/noncore-config/nexus/config-nexus.sh`` script will need to be edited
-for Flow-2 configuration to occur properly.
-
-```bash
-  # NOTE:  Uncomment ADMIN_URL as appropriate for the 'z2a' Flow used.
-  # Flow-1 (default)
-  ADMIN_URL="http://localhost:${NEXUS_API_PORT}/service/rest"
-  # Flow-2
-  # ADMIN_URL="http://$NEXUS_SVC.$NAMESPACE:${NEXUS_API_PORT}/service/rest"
-```
-
->NOTE: Nexus configuration has been integrated into the `1-acumos/1-acumos.sh` installation/configuration script.
+>NOTE: Nexus configuration has been integrated into the `1-acumos/1-acumos.sh`
+installation/configuration script.
 
 ## Kubernetes (kind) Configuration Tasks
 
->NOTE: Kubernetes (kind) configuration tasks that have been identified are folded into the `0-kind/0c-cluster.sh` installation/configuration script.
+>NOTE: Kubernetes (kind) configuration tasks that have been identified are folded
+into the `0-kind/0c-cluster.sh` installation/configuration script.
 
 ## MLWB Plugin Configuration Tasks
 
->NOTE: Please refer to the `plugins-setup/README-plugins-setup.md` documentation for additional tips/pointers.
+>NOTE: Please refer to the `plugins-setup/README-plugins-setup.md` documentation
+for additional tips/pointers.
 
 ### CouchDB
 
@@ -80,7 +68,7 @@ for Flow-2 configuration to occur properly.
 
 TODO: MLWB Post-Install Configuration steps in progress ...*
 
-```sh
+```bash
 // Created: 2020/06/10
-// Last modified: 2020/07/01
+// Last modified: 2020/07/30
 ```

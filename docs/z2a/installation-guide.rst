@@ -355,48 +355,29 @@ After edit: (Example 2)
   entry, do not edit these values as they are essential for correct
   installation.
 
-Sonatype Nexus Configuration (Flow-2 Only)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-By default, the environment variable ``ADMIN_URL`` is configured for a Flow-1
-installation. The following code block of the
-``z2a/noncore-config/nexus/config-nexus.sh`` script will need to be edited
-for Flow-2 configuration to occur properly.
-
-.. code-block:: bash
-
-  # NOTE:  Uncomment ADMIN_URL as appropriate for the 'z2a' Flow used.
-  # Flow-1 (default)
-  ADMIN_URL="http://localhost:${NEXUS_API_PORT}/service/rest"
-  # Flow-2
-  # ADMIN_URL="http://$NEXUS_SVC.$NAMESPACE:${NEXUS_API_PORT}/service/rest"
-
 Flow-1 Installation Process
 +++++++++++++++++++++++++++
 
 To perform an installation of Acumos, we will need to perform the following
 steps:
 
-1. Change directory into the ``z2a/0-kind`` directory.
+1. Change directory into the ``z2a/0-kind`` directory, and execute the
+``z2a/0-kind/0a-env.sh`` script.
 
 .. code-block:: bash
 
+    $ ACUMOS_HOME=$HOME/src/system-integration
     $ cd $ACUMOS_HOME/z2a/0-kind
-
-2. Execute the z2a ``0a-env.sh`` script.
-
-.. code-block:: bash
-
     $ ./0a-env.sh
 
-3. After successful execution of the ``0a-env.sh`` script, execute the `z2a`
+2. After successful execution of the ``0a-env.sh`` script, execute the `z2a`
 ``0b-depends.sh`` script.
 
 .. code-block:: bash
 
     $ ./0b-depends.sh
 
-4. Once the z2a ``0b-depends.sh`` has completed, please log out of your session
+3. Once the z2a ``0b-depends.sh`` has completed, please log out of your session
 and log back in.  This step is required such that you (the installer) are
 added to the `docker` group, which is required in the next step.
 
@@ -404,7 +385,7 @@ added to the `docker` group, which is required in the next step.
 
     $ logout
 
-5. Once you are logged back into the VM, change directory into the
+4. Once you are logged back into the VM, change directory into the
 ``z2a/0-kind`` directory and execute the z2a ``0c-cluster.sh`` script.
 
 .. code-block:: bash
@@ -413,7 +394,7 @@ added to the `docker` group, which is required in the next step.
     $ cd $ACUMOS_HOME/z2a/0-kind
     $ ./0c-cluster.sh
 
-6. After the z2a ``z2a/0-kind/0c-cluster.sh`` script has completed, we will
+5. After the z2a ``z2a/0-kind/0c-cluster.sh`` script has completed, we will
 need to check the status of the newly created Kubernetes pods before we proceed
 with the Acumos installation.  We can ensure that all necessary Kubernetes pods
 are running by executing this ``kubectl`` command.
@@ -422,7 +403,7 @@ are running by executing this ``kubectl`` command.
 
     $ kubectl get pods -A
 
-7. When all Kubernetes pods are in a ``Running`` state, we can proceed and
+6. When all Kubernetes pods are in a ``Running`` state, we can proceed and
 execute the ``1-kind.sh`` script to install and configure Acumos.
 
 .. code-block:: bash
@@ -430,7 +411,7 @@ execute the ``1-kind.sh`` script to install and configure Acumos.
     $ cd $ACUMOS_HOME/z2a/1-acumos
     $ ./1-acumos.sh
 
-8. The last step is to check the status of the Kubernetes pods create during
+7. The last step is to check the status of the Kubernetes pods create during
 the Acumos installation process.
 
 .. code-block:: bash
@@ -601,4 +582,4 @@ For post-installation Machine Learning WorkBench configuration steps, please
 see the MLWB section of the CONFIGURATION document.
 
 :Created:           2020/07/13
-:Last Modified:     2020/07/28
+:Last Modified:     2020/07/29

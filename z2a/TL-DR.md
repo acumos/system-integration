@@ -161,18 +161,6 @@ cp ./dev1/global_value.yaml.dev1 ../helm-charts/global_value.yaml
 # Once the global_value.yaml file has been copied or edited;
 # you can proceed with the installation
 
-# Edit the following block of the
-# $ACUMOS_HOME/z2a/noncore-config/nexus/config-nexus.sh script
-vi $ACUMOS_HOME/z2a/noncore-config/nexus/config-nexus.sh
-
---- edit here ---
-# NOTE:  Uncomment ADMIN_URL as appropriate for the 'z2a' Flow used.
-# Flow-1 (default)
-ADMIN_URL="http://localhost:${NEXUS_API_PORT}/service/rest"
-# Flow-2
-# ADMIN_URL="http://$NEXUS_SVC.$NAMESPACE:${NEXUS_API_PORT}/service/rest"
---- end edit ---
-
 # Execute 0-kind/0a-env.sh (setup user environment)
 ./0-kind/0a-env.sh
 
