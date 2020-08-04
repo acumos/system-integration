@@ -1,0 +1,22 @@
+{
+  "locked": true,
+  "username": "{{ .Values.global.acumosSoajsConfig.user.username }}",
+  "password": "{{ .Values.global.acumosSoajsConfig.user.hashedPassword }}",
+  "firstName": "owner",
+  "lastName": "owner",
+  "email": "{{ .Values.global.acumosSoajsConfig.user.email }}",
+  "ts": "{{ now | unixEpoch }}",
+  "status": "active",
+  "profile": {},
+  "groups": [
+    "owner"
+  ],
+  "config": {
+    "packages": {},
+    "keys": {}
+  },
+  "tenant": {
+    "id": "5c0e74ba9acc3c5a84a51259",
+    "code": "DBTN"
+  }
+}

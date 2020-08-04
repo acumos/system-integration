@@ -1,0 +1,50 @@
+#============LICENSE_START=======================================================
+#
+#================================================================================
+# Copyright (C) 2020 AT&T Intellectual Property.  All rights reserved.
+#================================================================================
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============LICENSE_END=========================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Values.global.acumosSoajsOAuthService }}"
+  namespace: "{{ .Values.global.namespace }}"
+  labels:
+    app: "{{ .Values.global.acumosSoajsOAuthService }}"
+    service.image.ts: "1587740864108"
+    soajs.catalog.id: 5df3ec10fa3912534948f006
+    soajs.catalog.v: "1"
+    soajs.content: "true"
+    soajs.env.code: dashboard
+    soajs.service.group: soajs-core-services
+    soajs.service.label: dashboard-oauth-v1
+    soajs.service.mode: deployment
+    soajs.service.name: oauth
+    soajs.service.replicas: "1"
+    soajs.service.subtype: soajs
+    soajs.service.type: service
+    soajs.service.version: "1"
+spec:
+  type: ClusterIP
+  ports:
+  - port: {{ .Values.global.acumosSoajsOAuthServicePort }}
+    targetPort: 4002
+    protocol: TCP
+    name: service-port
+  - port: {{ .Values.global.acumosSoajsOAuthMaintenancePort }}
+    targetPort: 5002
+    protocol: TCP
+    name: maintenance-port
+  selector:
+    app: "{{ .Values.global.acumosSoajsOAuthService }}"

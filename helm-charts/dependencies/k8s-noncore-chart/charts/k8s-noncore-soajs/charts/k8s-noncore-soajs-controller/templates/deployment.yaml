@@ -1,0 +1,112 @@
+#============LICENSE_START=======================================================
+#
+#================================================================================
+# Copyright (C) 2020 AT&T Intellectual Property.  All rights reserved.
+#================================================================================
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============LICENSE_END=========================================================
+apiVersion: v1
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Values.global.acumosSoajsControllerService }}"
+  namespace: "{{ .Values.global.namespace }}"
+  labels:
+    service.image.ts: "1587740803682"
+    soajs.catalog.id: 5df3ec10fa3912534948efff
+    soajs.catalog.v: "1"
+    soajs.content: "true"
+    soajs.env.code: dashboard
+    soajs.service.group: soajs-core-services
+    soajs.service.label: dashboard-controller-v1
+    soajs.service.mode: deployment
+    soajs.service.name: controller
+    soajs.service.replicas: "1"
+    soajs.service.subtype: soajs
+    soajs.service.type: service
+    soajs.service.version: "1"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: "{{ .Values.global.acumosSoajsControllerService }}"
+
+  template:
+    metadata:
+      labels:
+        app: "{{ .Values.global.acumosSoajsControllerService }}"
+    spec:
+      initContainers:
+        - name: acumos-soajs-controller-readiness
+          image: oomk8s/readiness-check:2.2.2
+          imagePullPolicy: IfNotPresent
+          command:
+            - /root/ready.py
+          args:
+            - --container-name
+            - acumos-soajsdata-container
+            - "-t"
+            - "15"
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+      containers:
+      - image: "{{ .Values.global.acumosSoajsControllerImage }}"
+        imagePullPolicy: IfNotPresent
+        name: acumos-soajs-controller-container
+        workingDir: //opt/soajs/soajs.controller/
+        command:
+        - bash
+        args:
+        - -c
+        - "node ."
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        ports:
+        - containerPort: {{ .Values.global.acumosSoajsControllerServicePort }}
+          name: service
+        - containerPort: {{ .Values.global.acumosSoajsControllerMaintenancePort }}
+          name: maintenance
+        env:
+        - name: SOAJS_ENV
+          value: dashboard
+        - name: SOAJS_PROFILE
+          value: /opt/soajs/profile/soajsprofile
+        - name: SOAJS_DEPLOY_HA
+          value: kubernetes
+        - name: SOAJS_MONGO_CON_KEEPALIVE
+          value: "true"
+        - name: SOAJS_BCRYPT
+          value: "true"
+        volumeMounts:
+        - mountPath: /opt/soajs/profile
+          name: soajsprofile
+        readinessProbe:
+          httpGet:
+            path: /heartbeat
+            port: maintenance
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 2
+          failureThreshold: 3
+      volumes:
+      - name: soajsprofile
+        secret:
+          defaultMode: 420
+          secretName: soajsprofile

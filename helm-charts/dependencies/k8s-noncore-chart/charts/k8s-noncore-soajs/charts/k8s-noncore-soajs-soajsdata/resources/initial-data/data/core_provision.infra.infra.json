@@ -1,0 +1,33 @@
+{
+  "api": {
+    "ipaddress": "{{ .Values.global.acumosSoajsConfig.kubernetes.ipAddr }}",
+    "token": "{{ .Values.global.acumosSoajsConfig.kubernetes.token }}",
+    "network": "soajs",
+    "port": "{{ .Values.global.acumosSoajsConfig.kubernetes.port }}",
+    "protocol": "https"
+  },
+  "name": "local",
+  "technologies": [
+    "kubernetes"
+  ],
+  "templates": null,
+  "drivers": [
+    "Native"
+  ],
+  "label": "Kubernetes Remote",
+  "deployments": [
+    {
+      "technology": "kubernetes",
+      "options": {
+        "zone": "local"
+      },
+      "environments": [
+        "DASHBOARD"
+      ],
+      "loadBalancers": {},
+      {{- $id := (randAlphaNum 13 | lower) }}
+      "name": "soajslocal{{ $id }}",
+      "id": "soajslocal{{ $id }}"
+    }
+  ]
+}
