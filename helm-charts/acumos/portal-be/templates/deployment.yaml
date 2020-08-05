@@ -97,7 +97,7 @@ spec:
                    "url" : ""
                 },
                 "lum" : {
-                   "url" : "https://{{ .Values.global.domainName }}/lum"
+                   "url" : "http://{{ .Values.global.lum.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.lum.port }}"
                 },
                 "image": {
                    "size": "800KB"

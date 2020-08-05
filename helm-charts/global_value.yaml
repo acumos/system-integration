@@ -279,3 +279,9 @@ global:
     acumosSecurityVerificationImage: "security-verification:0.0.24"
     acumosSecurityVerificationPort: "9099"
     acumosSVscan: "false"
+
+    #lum
+    # lum service is deployed by another helm chart, please make sure the service name and port is correct.
+    lum:
+        svcName:""
+        port:"8080"

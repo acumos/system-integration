@@ -101,7 +101,7 @@ spec:
                 "registryEmail": "{{ .Values.global.acumosNexusUserEmail }}"
              },
              "license-manager" : {
-                "url" : "https://{{ .Values.global.domainName }}/lum"
+                "url" : "http://{{ .Values.global.lum.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.lum.port }}"
              },
              "verification" : {
                  "url" : ""
