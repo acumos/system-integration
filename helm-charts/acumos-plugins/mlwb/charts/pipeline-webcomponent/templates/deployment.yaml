@@ -47,7 +47,7 @@ spec:
            - name: ENVIRONMENT
              value: "deploy"
            - name: pipelinemSURL
-             value: "http://{{ .Values.mlwb.pipelineService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosPipelineServicePort }}/mlWorkbench/v1/pipeline"
+             value: "http://{{ .Values.mlwb.pipelineService.svcName }}.{{ .Values.mlwb.namespace }}:{{ .Values.mlwb.acumosPipelineServicePort }}/mlWorkbench/v1/pipeline"
            - name: pipelineWikiURL
              value: "https://wiki.acumos.org/display/TRAIN"
            - name: useExternalPipeline
