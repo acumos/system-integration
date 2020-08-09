@@ -66,10 +66,10 @@ spec:
                     "port":"{{ .Values.mlwb.acumosCouchDB.port }}"
                 },
                 "projectservice": {
-                    "url": "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosProjectServicePort }}/mlWorkbench/v1/project"
+                    "url": "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.mlwb.namespace }}:{{ .Values.mlwb.acumosProjectServicePort }}/mlWorkbench/v1/project"
                 },
                 "modelservice": {
-                    "url": "http://{{ .Values.mlwb.modelService.svcName }}.{{ .Values.global.namespace }}:{{ .Values.mlwb.acumosModelServicePort }}/mlWorkbench/v1/modelservice"
+                    "url": "http://{{ .Values.mlwb.modelService.svcName }}.{{ .Values.mlwb.namespace }}:{{ .Values.mlwb.acumosModelServicePort }}/mlWorkbench/v1/modelservice"
                 },
                 "jwt" : {
                     "secretkey":"secret"
