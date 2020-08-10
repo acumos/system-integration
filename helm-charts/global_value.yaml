@@ -166,6 +166,12 @@ global:
     acumosKubernetesClientImage: "kubernetes-client:2.0.11"
     acumosKubernetesClientPort: "8082"
 
+    # License Usage Manager
+    # lum service is deployed by another helm chart, please make sure the service name and port is correct.
+    lum:
+        svcName: "xxxxxx"
+        port: "8080"
+
     # MailJet
     acumosMailJetApiKey: "xxxxxx"
     acumosMailJetId: "xxxxxx"
@@ -279,9 +285,3 @@ global:
     acumosSecurityVerificationImage: "security-verification:0.0.24"
     acumosSecurityVerificationPort: "9099"
     acumosSVscan: "false"
-
-    #lum
-    # lum service is deployed by another helm chart, please make sure the service name and port is correct.
-    lum:
-        svcName:""
-        port:"8080"
