@@ -56,7 +56,7 @@ log "Waiting .... (up to 15 minutes) for pod ready status ...."
 # Wait for the MariaDB-CDS pod to become ready
 wait_for_pod_ready 900 $RELEASE
 
-# Extract the DB root password from the K8s secrets ; insert the K/V into the global_values.yaml file
+# Wait for the k8s secret for the DB root password to be available
 log "\c"
 wait=180  # seconds
 for i in $(seq $((wait/5)) -1 1) ; do
@@ -67,9 +67,10 @@ for i in $(seq $((wait/5)) -1 1) ; do
 done
 logc ""
 
-# Extract the DB root password from the K8s secrets ; insert the K/V into the global_values.yaml file
+# Extract the DB root password from the K8s secret
 ROOT_PASSWORD=$(kubectl get secret --namespace $NAMESPACE $RELEASE -o jsonpath="{.data.mariadb-root-password}" | base64 --decode)
+# Back populate the global_values.yaml file with the value from the k8s secret
 yq w -i $ACUMOS_GLOBAL_VALUE global.acumosCdsDbRootPassword $ROOT_PASSWORD
 
-# write out logfile name
+# Write out logfile name
 success

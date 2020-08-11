@@ -35,12 +35,7 @@ Directory containing Kubernetes dashboard that is deployed into the `kind` (Kube
 
 Directory containing MetalLB load-balancer that is deployed into the `kind` (Kubernetes in Docker) cluster. (0c-cluster.sh script only)
 
-### k8s-svc-proxy (deprecated - to be removed)
-
-Directory containing Kubernetes service proxy that is deployed into the `kind` (Kubernetes in Docker) cluster. (replaced with Nginx native k8s service proxy)
-
-### z2a-svcs-proxy (deprecated - to be removed)
-
-Directory containing z2a service proxy that is deployed into the `kind` (Kubernetes in Docker) cluster. (replaced with Nginx k8s service proxy)
-
-Last Edited: 2020-06-16
+```bash
+// Created: 2020/03/20
+// Last modified: 2020/08/11
+```

@@ -1,4 +1,4 @@
-#
+#!/bin/bash
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -16,17 +16,35 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# ===============LICENSE_END========================================================
+# ===============LICENSE_END=========================================================
 #
-# Alpine linux would be great for this, but it's DNS does not use search paths.
-FROM ubuntu
+# Name: deploy.sh      - z2a noncore-config/deploy.sh deployment script
+#
+# Usage:
+#
 
-RUN apt-get update
-RUN apt-get -y --no-install-recommends install socat
+# error function
+function error {
+  echo "ERROR: $@" 1>&2
+  exit 1
+}
 
-RUN echo '#!/bin/bash' > /start.sh
-RUN echo 'exec socat ${5:+-T$5} ${1^^}-LISTEN:$2,reuseaddr,fork ${1^^}:$3:$4' >> /start.sh
-RUN chmod 755 /start.sh
+# deploy function
+function deploy {
+  set -e
+  cp utils.sh.tpl ${1}/utils.sh
+  cd ${1}/
+  if [ -x install-${1}.sh ] ; then ./install-${1}.sh ; else true ; fi
+  if [ -x config-${1}.sh ] ; then ./config-${1}.sh ; else true ; fi
+}
 
-# Usage: docker run -p <host-port>:<port> <this-container> <tcp|udp> <port> <service-name> <service-port> [timeout]
-ENTRYPOINT ["/start.sh"]
+# test for Acumos global values environment
+if [[ -z "$ACUMOS_GLOBAL_VALUE" ]] ; then
+  error  "ACUMOS_GLOBAL_VALUE is empty"
+fi
+
+# do the magic
+case ${1} in
+  ingress|mariadb-cds|nexus) deploy ${1} ;;
+  *) error "Unknown module [${1}]" ;;
+esac

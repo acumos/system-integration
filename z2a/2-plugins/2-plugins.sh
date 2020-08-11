@@ -71,17 +71,17 @@ echo "Starting 2-plugins dependency installation ...."
 
 echo "Starting MLWB dependency - CouchDB installation ...."
 # Installation - MLWB plugin dependencies
-(cd $Z2A_BASE/plugins-setup/ ; make couchdb)
+(cd $Z2A_BASE/plugins-setup/ ; ./deploy.sh couchdb)
 
 echo "Starting MLWB dependency - JupyterHub installation ...."
 # Installation - MLWB plugin dependencies
-(cd $Z2A_BASE/plugins-setup/ ; make jupyterhub)
+(cd $Z2A_BASE/plugins-setup/ ; ./deploy.sh jupyterhub)
 
 echo "Starting MLWB dependency - NiFi installation ...."
 # Installation - MLWB plugin dependencies
-(cd $Z2A_BASE/plugins-setup/ ; make nifi)
+(cd $Z2A_BASE/plugins-setup/ ; ./deploy.sh nifi)
 
 echo "Starting 2-plugins installation ...."
 # Installation - Machine Learning WorkBench (MLWB)
 echo "Installing MLWB Components ...."
-(cd $Z2A_BASE/plugins-setup/ ; make mlwb)
+(cd $Z2A_BASE/plugins-setup/ ; ./deploy.sh mlwb)

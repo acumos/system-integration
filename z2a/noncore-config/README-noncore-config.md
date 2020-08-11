@@ -118,47 +118,6 @@ To install and configure Ingress, execute the following command:
   make ingress
 ```
 
-## Installing & Configuring - Kong (deprecated)
-
->NOTE: Kong has been deprecated as an Ingress controller.  Work is being done
->to adopt native k8s service proxying using the Nginx Ingress controller.
->This work is on-going until feature parity is obtained.
->
->NOTE: X.509 certificate and key needs to be provided before running these
->scripts. The certificate and key MUST be installed in the
->`z2a/noncore-config/kong/certs` directory.
->
->NOTE:  Temporary Kong certificates can be generated using these commands:
-
-```bash
-  openssl req -newkey rsa:2048 -nodes -keyout key.pem -x509 -days 365 -out certificate.pem
-  openssl x509 -text -noout -in certificate.pem
-  openssl pkcs12 -inkey key.pem -in certificate.pem -export -out certificate.p12
-  openssl pkcs12 -in certificate.p12 -noout -info
-```
-
->NOTE: Temporary certificates have been provided in the
->`z2a/noncore-config/kong/certs` directory. These certificates should be replaced
->(using the commands shown above) and should NEVER be used in a production environment.
-
-To configure Kong (only) (deprecated), execute the following command:
-
-```bash
-  make config-kong
-```
-
-To install Kong (only) (deprecated), execute the following command:
-
-```bash
-  make install-kong
-```
-
-To install and configure Kong (deprecated), execute the following command:
-
-```bash
-  make kong
-```
-
 ## Installing & Configuring - Mariadb-CDS (MariaDB for Common Data Services (CDS))
 
 To configure MariaDB-CDS (only), execute the following command:
@@ -201,5 +160,5 @@ To install and configure Nexus, execute the following command:
 
 ```bash
 // Created: 2020/04/28
-// Last Edited: 2020/07/29
+// Last Edited: 2020/08/11
 ```

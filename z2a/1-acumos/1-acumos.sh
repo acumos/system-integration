@@ -67,22 +67,18 @@ echo "Starting 1-acumos (Acumos noncore dependencies) installation ...."
 # Install the Acumos noncore charts, one by one in this order (configuration is performed by default)
 
 echo "Install Acumos noncore dependency: Kubernetes ingress ...."
-(cd $Z2A_BASE/noncore-config/ ; make ingress)
+(cd $Z2A_BASE/noncore-config/ ; ./deploy.sh ingress)
 
 # echo "Install Acumos noncore dependency: Kubernetes config helper ...."
 # Default: config-helper is disabled by default ;
 # Uncomment the following line to enable for extended troubleshooting.
-# (cd $Z2A_BASE/noncore-config/ ; make config-helper)
+# (cd $Z2A_BASE/noncore-config/ ; ./deploy.sh config-helper)
 
 echo "Install Acumos noncore dependency: Sonatype Nexus (Oteemo Chart) ...."
-(cd $Z2A_BASE/noncore-config/ ; make nexus)
+(cd $Z2A_BASE/noncore-config/ ; ./deploy.sh nexus)
 
 echo "Install Acumos noncore dependency: MariaDB (Bitnami Chart) ...."
-(cd $Z2A_BASE/noncore-config/ ; make mariadb-cds)
-
-# Kong is currently disabled. To enable Kong, uncomment the following lines.
-# echo "Install Acumos noncore dependency: Kong & PostgreSQL (Bitnami Charts) ...."
-# (cd $Z2A_BASE/noncore-config/ ; make kong)
+(cd $Z2A_BASE/noncore-config/ ; ./deploy.sh mariadb-cds)
 
 # The following charts are installed  directly via a helm deployment command
 # NOTE: *this is a comment* helm install -name $CHARTNAME --namespace $NAMESPACE <PATH>$CHARTNAME -f <PATH>global_value.yaml

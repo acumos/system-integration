@@ -1,3 +1,4 @@
+#!/bin/bash
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -17,32 +18,33 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Makefile  - for Acumos plugins and dependencies (2-plugins)
+# Name: deploy.sh      - z2a plugins-setup/deploy.sh deployment script
 #
-#	target:
-#	couchdb 		- CouchDB instance for MLWB
-#	jupyterhub	- Jupyterhub Notebook facility for MLWB
-#	nifi				- NiFi data routing function
-#	mlwb				- MLWB installation (top-level)
+# Usage:
 #
 
-MODULES=couchdb jupyterhub nifi mlwb
-all :  check-env $(MODULES)
-.PHONY : check-env $(MODULES)
-SHELL = /bin/bash
-.ONESHELL :
+# error function
+function error {
+  echo "ERROR: $@" 1>&2
+  exit 1
+}
 
-check-env:
-ifndef ACUMOS_GLOBAL_VALUE
-	$(error ACUMOS_GLOBAL_VALUE is undefined)
-endif
+# deploy function
+function deploy {
+  set -e
+  cp utils.sh.tpl ${1}/utils.sh
+  cd ${1}/
+  if [ -x install-${1}.sh ] ; then ./install-${1}.sh ; else true ; fi
+  if [ -x config-${1}.sh ] ; then ./config-${1}.sh ; else true ; fi
+}
 
-$(MODULES) : check-env
-	@set -e
-	@cp utils.sh.tpl $@/utils.sh
-	@cd $@/
-	@if [ -x install-$@.sh ] ; then ./install-$@.sh ; fi
-	@if [ -x config-$@.sh ] ; then ./config-$@.sh ; fi
+# test for Acumos global values environment
+if [[ -z "$ACUMOS_GLOBAL_VALUE" ]] ; then
+  error  "ACUMOS_GLOBAL_VALUE is empty"
+fi
 
-clean :
-	rm  */utils.sh
+# do the magic
+case ${1} in
+  couchdb|jupyterhub|nifi|mlwb) deploy ${1} ;;
+  *) error "Unknown module [${1}]" ;;
+esac
