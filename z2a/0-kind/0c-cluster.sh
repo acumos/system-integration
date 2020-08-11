@@ -94,6 +94,8 @@ kubectl apply -f $HERE/z2a-k8s-dashboard/clusterrolebinding.yaml
 log "Installing Kubernetes native ingress controller (Nginx) ...."
 # Note: this k8s manifest is `kind` specific - do not install this as an ingress controller on a real k8s cluster
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
+# Label nginx-ingress jobs
+kubectl label pods -l app.kubernetes.io/component=admission-webhook -n ingress-nginx skip-wait=true
 
 log "Capturing Kubernetes Cluster Status ...."
 # Capture k8s cluster status
@@ -108,6 +110,6 @@ logc "\n$(echo "$TOKEN" | awk '/token:/ {print $2}')\n"
 
 log "Waiting for all cluster pods to attain 'Ready' status ...."
 # Query `kind` cluster for the condition of the deployed pods
-kubectl wait pods --for=condition=Ready --all -A --timeout=180s
+kubectl wait pods --for=condition=Ready -l skip-wait!=true -A --timeout=180s
 
 log "Completed Phase 0c-cluster creation (kind, metalLB, k8s dashboard, ingress) ...."
