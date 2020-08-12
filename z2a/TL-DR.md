@@ -53,11 +53,10 @@ configuration tasks.
 
 # Install 'git' distributed version-control tool
 # Install 'jq' JSON file processing tool
-# Install 'make' software build automation tool
 # For RPM-based distributions such as RHEL/CentOS, execute the following command:
-sudo yum install -y git jq make
+sudo yum install -y git jq
 # For Debian-based distributions such as Ubuntu, execute the following command:
-sudo apt-get install --no-install-recommends -y git jq make
+sudo apt-get install --no-install-recommends -y git jq
 
 # Make src directory ; change directory to that location
 mkdir -p $HOME/src ; cd $HOME/src
@@ -127,11 +126,10 @@ cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml.mlwb $ACUMOS_HOME/helm-charts/mlwb_valu
 
 # Install 'git' distributed version-control tool
 # Install 'jq' JSON file processing tool
-# Install 'make' software build automation tool
 # For RPM-based distributions such as RHEL/CentOS, execute the following command:
-sudo yum install -y git jq make
+sudo yum install -y git jq
 # For Debian-based distributions such as Ubuntu, execute the following command:
-sudo apt-get install --no-install-recommends -y git jq make
+sudo apt-get install --no-install-recommends -y git jq
 
 # Make src directory ; change directory to that location
 mkdir -p $HOME/src ; cd $HOME/src
@@ -177,4 +175,9 @@ kubectl get pods -A
 cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml.mlwb $ACUMOS_HOME/helm-charts/mlwb_value.yaml
 # Execute 2-plugins.sh (install / configure Acumos plugins and dependencies)
 ./2-plugins/2-plugins.sh
+```
+
+```bash
+// Created: 2020/07/28
+// Last modified: 2020/08/12
 ```

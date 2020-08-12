@@ -55,11 +55,12 @@
 
 >NOTE: `z2a` assumes that the VM has Internet access (with no proxies present).
 >
->NOTE: Internet proxy configurations are beyond the scope of the installation documentation.
+>NOTE: Internet proxy configurations are beyond the scope of the installation
+>documentation.
 >
 >Please consult the README-PROXY document for details on the various items that
-will require configuration and links to resources that will assist in the
-configuration tasks.
+>will require configuration and links to resources that will assist in the
+>configuration tasks.
 
 ### Misc. Requirements
 
@@ -67,7 +68,6 @@ configuration tasks.
 execution of the `z2a` scripts:
   * git (the distributed source code management tool)
   * jq (the JSON file processing tool)
-  * make (the software build automation tool)
 
 ## Assumptions
 
@@ -82,8 +82,9 @@ onto the k8s cluster will occur (Flow-2)
 
 ## Getting Started
 
-> NOTE: `z2a` depends on being able to reach a number of up-to-date software repositories.  All efforts have been made to not bypass distribution-specific
-package managers and software update facilities.
+>NOTE: `z2a` depends on being able to reach a number of up-to-date software
+>repositories.  All efforts have been made to not bypass distribution-specific
+>package managers and software update facilities.
 
 ### Installation Location Creation (Flow-1 and Flow-2)
 
@@ -103,11 +104,10 @@ After completing Step #1 above (log into the VM), here are the commands to execu
 ```bash
 # Install 'git' distributed version-control tool
 # Install 'jq' JSON file processing tool
-# Install 'make' software build automation tool
 # For RPM-based distributions such as RHEL/CentOS, execute the following command:
-sudo yum install -y git jq make
+sudo yum install -y git jq
 # For Debian-based distributions such as Ubuntu, execute the following command:
-sudo apt-get install --no-install-recommends -y git jq make
+sudo apt-get install --no-install-recommends -y git jq
 
 mkdir -p $HOME/src
 
@@ -137,21 +137,26 @@ drwxr-xr-x.  5 userID groupID  235 Mar 20 18:35 z2a
 -rw-r--r--.  1 userID groupID 1388 Mar 19 13:30 README.md
 ```
 
-In the directory listing shown above, two (2) directories are of special interest:
+In the directory listing shown above, two (2) directories are of special
+interest:
 
 * `helm_charts` is the location of the Acumos core Helm charts used in this
 installation process
-* `z2a` is the location of the `z2a` scripts and supporting utilities.  We will
-refer to that directory as the Z2A_BASE directory.  This directory also contains
-some of the Acumos noncore dependency Helm charts.
+* `z2a` is the location of the `z2a` scripts and supporting utilities.  We
+will refer to that directory as the Z2A_BASE directory.  This directory also
+contains some of the Acumos noncore dependency Helm charts.
 
-> NOTE: The `z2a` installation log files will be created in the Z2A_BASE directory.
+>NOTE: The `z2a` installation log files will be created in the Z2A_BASE
+>directory.
 
 ### Using the Example `global_value.yaml` File
 
-z2a includes an example `global_value.yaml` file for Acumos in the `$HOME/src/system-integration/z2a/z2a-config/dev1` directory.  This example Acumos values
-file is provided for both illustrative purposes and to assist in performing a quick installation (see: TL;DR section).  The example Acumos values file can be used
-for a test installation and additional edits should not be required.
+z2a includes an example `global_value.yaml` file for Acumos in the
+`$HOME/src/system-integration/z2a/z2a-config/dev1` directory.  This example
+Acumos values
+file is provided for both illustrative purposes and to assist in performing a
+quick installation (see: TL;DR section).  The example Acumos values file can
+be used for a test installation and additional edits should not be required.
 
 The commands to use the Acumos example values are:
 
@@ -243,7 +248,8 @@ steps:
     ./0a-env.sh
     ```
 
-3. After successful execution of the `0a-env.sh` script, execute the z2a `0b-depends.sh` script.
+3. After successful execution of the `0a-env.sh` script, execute the z2a
+`0b-depends.sh` script.
 
     ```bash
     ./0b-depends.sh
@@ -257,7 +263,8 @@ added to the `docker` group, which is required in the next step.
     logout
     ```
 
-5. Once you are logged back into the VM, change directory into the `z2a/0-kind` directory and execute the z2a `0c-cluster.sh` script.
+5. Once you are logged back into the VM, change directory into the `z2a/0-kind`
+directory and execute the z2a `0c-cluster.sh` script.
 
     ```bash
     cd $HOME/src/system-integration/z2a/0-kind
@@ -454,5 +461,5 @@ TODO: Add section on accessing the Acumos Portal once installation is completed.
 
 ```bash
 // Created: 2020/03/22
-// Last modified: 2020/07/29
+// Last modified: 2020/08/12
 ```

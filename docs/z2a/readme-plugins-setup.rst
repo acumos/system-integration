@@ -48,7 +48,7 @@ ACUMOS_GLOBAL_VALUE
 
 For the scripts in the ``plugins-setup`` directory to run stand-alone
 (i.e. outside the `z2a` Flow-1 or Flow-2 context), the ``ACUMOS_GLOBAL_VALUE``
-environment variable MUST be set BEFORE executing ``make`` to install or
+environment variable MUST be set BEFORE executing ``deploy.sh`` to install or
 configure any of the defined targets in the ``noncore-config/Makefile``.
 
 If you have cloned the Acumos ``system-integration`` repository from
@@ -68,42 +68,46 @@ Installing and Configuring Plugins
 Installing and Configuring - MLWB (ML WorkBench)
 ++++++++++++++++++++++++++++++++++++++++++++++++
 
-Execute ``make mlwb`` will install (and configure based on the target script) MLWB.
+Execute ``./deploy.sh mlwb`` will install (and configure based on the target
+script) MLWB.
 
 .. code-block:: bash
 
   $ cd $HOME/src/system-integration/z2a/plugins-setup
-  $ make mlwb
+  $ ./deploy.sh mlwb
 
 Installing and Configuring - CouchDB (MLWB Dependency)
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Execute ``make couchdb`` will install (and configure based on the target script) CouchDB.
+Execute ``./deploy.sh couchdb`` will install (and configure based on the target
+script) CouchDB.
 
 .. code-block:: bash
 
   $ cd $HOME/src/system-integration/z2a/plugins-setup
-  $ make couchdb
+  $ ./deploy.sh couchdb
 
 Installing and Configuring - JupyterHub (MLWB Dependency)
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Execute ``make jupyterhub`` will install (and configure based on the target script) JupyterHub.
+Execute ``./deploy.sh jupyterhub`` will install (and configure based on the target
+script) JupyterHub.
 
 .. code-block:: bash
 
   $ cd $HOME/src/system-integration/z2a/plugins-setup
-  $ make jupyterhub
+  $ ./deploy.sh jupyterhub
 
 Installing and Configuring - NiFi (MLWB Dependency)
 +++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Execute ``make nifi`` will install (and configure based on the target script) NiFi.
+Execute ``./deploy.sh nifi`` will install (and configure based on the target
+script) NiFi.
 
 .. code-block:: bash
 
   $ cd $HOME/src/system-integration/z2a/plugins-setup
-  $ make nifi
+  $ ./deploy.sh nifi
 
 :Created:           2020/07/20
-:Last Modified:     2020/07/24
+:Last Modified:     2020/08/12

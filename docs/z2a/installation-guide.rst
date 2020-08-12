@@ -179,7 +179,6 @@ Misc. Requirements
 
   - git (the distributed source code management tool)
   - jq (the JSON file processing tool)
-  - make (the software build automation tool)
 
 Assumptions
 +++++++++++
@@ -206,9 +205,8 @@ Installation Location Creation (Flow-1 and Flow-2)
 In the following section, the user will perform the following actions:
 
 1. Login to the Linux VM where the install will occur
-2. Install the 'git' distributed version-control tool,
-   the 'jq' JSON file processing tool and
-   the 'make' software build automation tool
+2. Install the 'git' distributed version-control tool, and
+   the 'jq' JSON file processing tool.
 3. Create a new directory that will be used to perform this installation (i.e. `src`)
 4. Change directory into this new directory
 5. Clone the gerrit.acumos.org `system-integration` repository into the new directory
@@ -221,11 +219,10 @@ execute steps 2-6 above.
 
   # Install 'git' distributed version-control tool
   # Install 'jq' JSON file processing tool
-  # Install 'make' software build automation tool
   # For RPM-based distributions such as RHEL/CentOS, execute the following command:
-  $ sudo yum install -y git jq make
+  $ sudo yum install -y git jq
   # For Debian-based distributions such as Ubuntu, execute the following command:
-  $ sudo apt-get install --no-install-recommends -y git jq make
+  $ sudo apt-get install --no-install-recommends -y git jq
   $ mkdir -p $HOME/src
   $ cd $HOME/src
   $ git clone https://gerrit.acumos.org/r/system-integration
@@ -582,4 +579,4 @@ For post-installation Machine Learning WorkBench configuration steps, please
 see the MLWB section of the CONFIGURATION document.
 
 :Created:           2020/07/13
-:Last Modified:     2020/07/29
+:Last Modified:     2020/08/12
