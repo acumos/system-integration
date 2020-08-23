@@ -60,10 +60,14 @@ spec:
              value: "https://{{ .Values.global.domainName }}/{{ .Values.mlwb.pipelineWebcomponent.svcName }}"
            - name: pipelineCatalogComponent
              value: "https://{{ .Values.global.domainName }}/{{ .Values.mlwb.pipelineCatalogWebcomponent.svcName }}"
+           - name: datasourceComponent
+             value: "https://{{ .Values.global.domainName }}/{{ .Values.mlwb.datasourceWebcomponent.svcName }}"
+           - name: datasourceCatalogComponent
+             value: "https://{{ .Values.global.domainName }}/{{ .Values.mlwb.datasourceCatalogWebcomponent.svcName }}"
            - name: portalFEURL
              value: "https://{{ .Values.global.domainName }}"
            - name: menuItems
-             value: '[{"title": "Dashboard", "icon": "fa fa-tachometer-alt", "link": "/pages/dashboard", "home": true}, {"title": "Projects", "icon": "fa fa-project-diagram", "link": "/pages/projects/catalog"}, {"title": "Notebooks", "icon": "fas fa-book-open", "link": "/pages/notebook/catalog"}, {"title": "Data Pipelines", "icon": "fa fa-code-branch", "link": "/pages/pipeline/catalog"}, {"title": "AcuCompose", "icon": "fas fa-crop-alt", "link": "/pages/acuCompose"}]'
+             value: '[{"title": "Dashboard", "icon": "fa fa-tachometer-alt", "link": "/pages/dashboard", "home": true}, {"title": "Projects", "icon": "fa fa-project-diagram", "link": "/pages/projects/catalog"}, {"title": "Notebooks", "icon": "fas fa-book-open", "link": "/pages/notebook/catalog"}, {"title": "Data Pipelines", "icon": "fa fa-code-branch", "link": "/pages/pipeline/catalog"}, {"title": "Datasources", "icon": "fa fa-database", "link": "/pages/datasource/catalog"}, {"title": "AcuCompose", "icon": "fas fa-crop-alt", "link": "/pages/acuCompose"}]'
          volumeMounts:
            - mountPath: /maven/logs
              name: home-webcomponent-logs

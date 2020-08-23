@@ -55,7 +55,7 @@ spec:
                     "pwd":"{{ .Values.global.acumosCdsPassword }}"
                 },
                 "projectservice": {
-                    "url" : "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.mlwb.namespace }}:{{ .Values.acumosProjectServicePort }}/mlWorkbench/v1/project"
+                    "url" : "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.mlwb.namespace }}:{{ .Values.mlwb.acumosProjectServicePort }}/mlWorkbench/v1/project"
                 },
                 "couchdb":{
                     "user":"{{ .Values.mlwb.acumosCouchDB.user }}",

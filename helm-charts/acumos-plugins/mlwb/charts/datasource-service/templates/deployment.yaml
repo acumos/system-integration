@@ -21,62 +21,63 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{ .Values.mlwb.notebookService.podName | quote }}
+ name: {{ .Values.mlwb.datasourceService.podName | quote }}
  namespace: "{{ .Values.mlwb.namespace }}"
  labels:
-   app: {{ .Values.mlwb.notebookService.name | quote }}
+   app: {{ .Values.mlwb.datasourceService.name | quote }}
 spec:
  selector:
    matchLabels:
-     app: {{ .Values.mlwb.notebookService.name | quote }}
+     app: {{ .Values.mlwb.datasourceService.name | quote }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{ .Values.mlwb.notebookService.name | quote }}
+       app: {{ .Values.mlwb.datasourceService.name | quote }}
    spec:
      containers:
-       - name: notebook-service
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.mlwb.acumosNotebookServiceImage }}
+       - name: datasource-service
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.mlwb.acumosDatasourceServiceImage }}
          ports:
-           - containerPort: {{ .Values.mlwb.acumosNotebookServicePort }}
+           - containerPort: {{ .Values.mlwb.acumosDatasourceServicePort }}
          env:
            - name: SPRING_APPLICATION_JSON
              value: '{
                 "server":{
-                    "port":"{{ .Values.mlwb.acumosNotebookServicePort }}"
+                    "port":"{{ .Values.mlwb.acumosDatasourceServicePort }}"
                 },
-                "dateformat": "yyyy-MM-dd-HH-mm-ss-SSS",
-                "resultsetSize" : "2000",
-                "outputFolder": "/tmp",
-                "cmndatasvc": {
-                    "endpointurl": "http://{{ .Values.global.cds.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
-                    "user": "{{ .Values.global.acumosCdsUser }}",
-                    "pwd": "{{ .Values.global.acumosCdsPassword }}"
+                "resultsetSize":"2000",
+                "cmndatasvc" : {
+                    "url":"http://{{ .Values.global.cds.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosCommonDataSvcPort }}/ccds",
+                    "user":"{{ .Values.global.acumosCdsUser }}",
+                    "pwd":"{{ .Values.global.acumosCdsPassword }}"
+                },
+                "couchdb":{
+                    "user":"{{ .Values.mlwb.acumosCouchDB.user }}",
+                    "pwd":"{{ .Values.mlwb.acumosCouchDB.pwd }}",
+                    "name":"{{ .Values.mlwb.acumosCouchDB.dbname }}",
+                    "createdb":{
+                        "if-not-exist":"{{ .Values.mlwb.acumosCouchDB.createdb }}"
+                    },
+                    "protocol":"{{ .Values.mlwb.acumosCouchDB.protocol }}",
+                    "host":"{{ .Values.mlwb.acumosCouchDB.host }}",
+                    "port":"{{ .Values.mlwb.acumosCouchDB.port }}"
                 },
                 "projectservice": {
                     "url" : "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.mlwb.namespace }}:{{ .Values.mlwb.acumosProjectServicePort }}/mlWorkbench/v1/project"
                 },
-                "jupyterhub": {
-                    "url" : "{{ .Values.mlwb.acumosJupyterHub.url }}",
-                    "token" : "{{ .Values.mlwb.acumosJupyterHub.url }}",
-                    "storepass": "{{ .Values.mlwb.acumosJupyterHub.storepass }}",
-                    "installcert": "{{ .Values.mlwb.acumosJupyterHub.installcert }}"
-                },
-                "jupyternotebook":{
-                    "url": "{{ .Values.mlwb.acumosJupyterNotebook.url }}"
-                },
-                "jwt": {
+                "sqldrivername": "com.mysql.jdbc.Driver",
+                "componentpropertyvalue": "50",
+                "jwt" : {
                     "secretkey":"secret"
-                },
-                "useexternalnotebook": "{{ .Values.mlwb.useexternalnotebook }}"
+                }
                 }'
          volumeMounts:
            - mountPath: /maven/logs
-             name: notebook-service-logs
+             name: datasource-service-logs
      volumes:
-       - name: notebook-service-logs
+       - name: datasource-service-logs
          emptyDir: {}
      imagePullSecrets:
        - name: acumossecret
