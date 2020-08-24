@@ -45,7 +45,7 @@ committers:
       id: 'cl778h'
       timezone: 'America/New_York'
 tsc:
-    approval: ''
+    approval: 'link'
     changes:
         - type: ''
           name: ''
