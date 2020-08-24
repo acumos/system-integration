@@ -23,17 +23,9 @@ dependencies:
     repository: 'file://charts/k8s-noncore-docker'
     alias: k8s-noncore-docker
     version: ~3.x-0
-  - name: k8s-noncore-mariadb
-    repository: 'file://charts/k8s-noncore-mariadb'
-    alias: k8s-noncore-mariadb
-    version: ~3.x-0
-  - name: k8s-noncore-nexus
-    repository: 'file://charts/k8s-noncore-nexus'
-    alias: k8s-noncore-nexus
-    version: ~3.x-0
   - name: acumos-proxy
     repository: 'file://charts/k8s-noncore-proxy'
-    alias: k8s-noncore--proxy
+    alias: k8s-noncore-proxy
     version: ~3.x-0
   - name: k8s-noncore-kong
     repository: 'file://charts/k8s-noncore-kong'
