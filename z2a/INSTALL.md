@@ -20,7 +20,10 @@
 
 # Installation
 
-> Note: Work in progress.  Subject to change.
+>NOTE: Work in progress.  Subject to change.
+>
+>NOTE: The Acumos installation Wiki document can be found here:
+<https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/installation-guide.html>
 
 ## Requirements
 
@@ -162,7 +165,7 @@ The commands to use the Acumos example values are:
 
 ```bash
 ACUMOS_HOME=$HOME/src/system-integration
-cp $ACUMOS_HOME/z2a/dev1/global_value.yaml.dev1 $ACUMOS_HOME/z2a/helm-charts/global_value.yaml
+cp $ACUMOS_HOME/z2a/dev1/global_value.yaml.dev1 $ACUMOS_HOME/helm-charts/global_value.yaml
 ```
 
 >NOTE: The Acumos example values can be used for a private development
@@ -236,26 +239,23 @@ not edit these values as they are essential for correct installation.
 To perform an installation of Acumos, we will need to perform the following
 steps:
 
-1. Change directory into the `z2a/0-kind` directory.
+1. Set the ACUMOS_HOME environment variable, change directory into the ``z2a/0-kind``
+directory, and execute the ``z2a/0-kind/0a-env.sh`` script.
 
     ```bash
+    ACUMOS_HOME=$HOME/src/system-integration
     cd $HOME/src/system-integration/z2a/0-kind
-    ```
-
-2. Execute the z2a `0a-env.sh` script.
-
-    ```bash
     ./0a-env.sh
     ```
 
-3. After successful execution of the `0a-env.sh` script, execute the z2a
+2. After successful execution of the `0a-env.sh` script, execute the z2a
 `0b-depends.sh` script.
 
     ```bash
     ./0b-depends.sh
     ```
 
-4. Once the z2a `0b-depends.sh` has completed, please log out of your session
+3. Once the z2a `0b-depends.sh` has completed, please log out of your session
 and log back in.  This step is required such that you (the installer) are
 added to the `docker` group, which is required in the next step.
 
@@ -263,15 +263,16 @@ added to the `docker` group, which is required in the next step.
     logout
     ```
 
-5. Once you are logged back into the VM, change directory into the `z2a/0-kind`
-directory and execute the z2a `0c-cluster.sh` script.
+4. Once you are logged back into the VM, set the ACUMOS_HOME environment variable, change directory into the `z2a/0-kind` directory and execute the z2a `0a-env.sh` script and then the `0a-cluster.sh` script.
 
     ```bash
+    ACUMOS_HOME=$HOME/src/system-integration
     cd $HOME/src/system-integration/z2a/0-kind
+    ./0a-env.sh
     ./0c-cluster.sh
     ```
 
-6. After the z2a `0c-cluster.sh` script has completed, we will need to check
+5. After the z2a `0c-cluster.sh` script has completed, we will need to check
 the status of the newly created Kubernetes pods before we proceed with the
 Acumos installation.  We can ensure that all necessary Kubernetes pods are
 running by executing this `kubectl` command.
@@ -280,7 +281,7 @@ running by executing this `kubectl` command.
     kubectl get pods -A
     ```
 
-7. When all Kubernetes pods are in a `Running` state, we can proceed and
+6. When all Kubernetes pods are in a `Running` state, we can proceed and
 execute the `1-kind.sh` script to install and configure Acumos.
 
     ```bash
@@ -288,7 +289,7 @@ execute the `1-kind.sh` script to install and configure Acumos.
     ./1-acumos.sh
     ```
 
-8. The last step is to check the status of the Kubernetes pods create during
+7. The last step is to check the status of the Kubernetes pods create during
 the Acumos installation process.
 
     ```bash
@@ -307,19 +308,16 @@ NOTE:  The `global_value.yaml` file must be edited to provide the correct
 `clusterName` and `namespace`.  Please refer to the previous section on
 performing the edits to the `global_value.yaml` file.
 
-1. Change directory into the `z2a/0-kind` directory.
+1. Set the ACUMOS_HOME environment variable, change directory into the ``z2a/0-kind``
+directory, and execute the ``z2a/0-kind/0a-env.sh`` script.
 
     ```bash
+    ACUMOS_HOME=$HOME/src/system-integration
     cd $HOME/src/system-integration/z2a/0-kind
-    ```
-
-2. Execute the z2a `0a-env.sh` script.
-
-    ```bash
     ./0a-env.sh
     ```
 
-3. After successful execution of the `0a-env.sh` script, execute the `1-kind.sh`
+2. After successful execution of the `0a-env.sh` script, execute the `1-kind.sh`
 script to install and configure Acumos.
 
     ```bash
@@ -327,7 +325,7 @@ script to install and configure Acumos.
     ./1-acumos.sh
     ```
 
-4. The last step is to check the status of the Kubernetes pods create during the
+3. The last step is to check the status of the Kubernetes pods create during the
 Acumos installation process.
 
     ```bash
@@ -356,7 +354,7 @@ directory could be used here and these edits are not required.
 >
 ```bash
 ACUMOS_HOME=$HOME/src/system-integration
-cp ${ACUMOS_HOME}/z2a/dev1/mlwb_value.yaml.mlwb ${ACUMOS_HOME}/z2a/helm-charts/mlwb_value.yaml
+cp ${ACUMOS_HOME}/z2a/dev1/mlwb_value.yaml.mlwb ${ACUMOS_HOME}/helm-charts/mlwb_value.yaml
 ```
 >
 >The MLWB example values can be used for a private development environment that
@@ -433,11 +431,13 @@ acumosNifi:
 
 To perform an installation of MLWB, we will need to perform the following steps:
 
-1. change directory into the `z2a/2-plugins` directory
-2. execute the `2-plugins.sh` script which install the MLWB dependencies and
+1. set the ACUMOS_HOME environment variable
+2. change directory into the `z2a/2-plugins` directory
+3. execute the `2-plugins.sh` script which install the MLWB dependencies and
    the MLWB components
 
 ```bash
+ACUMOS_HOME=$HOME/src/system-integration
 cd $HOME/src/system-integration/z2a/2-plugins
 ./2-plugins.sh
 ```
@@ -457,9 +457,7 @@ Kind: <https://kind.sigs.k8s.io/>
 For post-installation Machine Learning WorkBench configuration steps, please
 see the MLWB section of the CONFIG.md document.
 
-TODO: Add section on accessing the Acumos Portal once installation is completed.
-
 ```bash
 // Created: 2020/03/22
-// Last modified: 2020/08/12
+// Last modified: 2020/08/25
 ```
