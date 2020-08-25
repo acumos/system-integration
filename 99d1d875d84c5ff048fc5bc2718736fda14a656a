@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cfcbf6b1_d40f3ebb",
+        "filename": "helm-charts/mlwb_value.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 387
+      },
+      "writtenOn": "2020-08-25T16:34:44Z",
+      "side": 1,
+      "message": "Can we get these added to the example \u0027mlwb_value.yaml.mlwb\u0027 file in the z2a/dev1 directory?",
+      "revId": "99d1d875d84c5ff048fc5bc2718736fda14a656a",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cfcaa77f_9a0bd0bf",
+        "filename": "helm-charts/mlwb_value.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 387
+      },
+      "writtenOn": "2020-08-25T16:34:44Z",
+      "side": 1,
+      "message": "Can we get these added to the example \u0027mlwb_value.yaml.mlwb\u0027 file in the z2a/dev1 directory?",
+      "revId": "99d1d875d84c5ff048fc5bc2718736fda14a656a",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "57f2335e_a19484db",
+        "filename": "helm-charts/mlwb_value.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 387
+      },
+      "writtenOn": "2020-08-25T16:34:44Z",
+      "side": 1,
+      "message": "Can we get these added to the example \u0027mlwb_value.yaml.mlwb\u0027 file in the z2a/dev1 directory?",
+      "revId": "99d1d875d84c5ff048fc5bc2718736fda14a656a",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
