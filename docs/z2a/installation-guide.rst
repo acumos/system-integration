@@ -22,8 +22,8 @@ Zero-to-Acumos (z2a) Installation Guide
   | NOTE: Document is in development.
   | NOTE: Subject to change.
 
-What is `z2a`?
---------------
+Overview
+--------
 
 This installation guide describes how to deploy Acumos using `Zero-to-Acumos`
 (z2a). `z2a` was designed for those who require a simple and automated way to
@@ -358,8 +358,8 @@ Flow-1 Installation Process
 To perform an installation of Acumos, we will need to perform the following
 steps:
 
-1. Change directory into the ``z2a/0-kind`` directory, and execute the
-``z2a/0-kind/0a-env.sh`` script.
+1. Set the ACUMOS_HOME environment variable, change directory into the ``z2a/0-kind``
+directory, and execute the ``z2a/0-kind/0a-env.sh`` script.
 
 .. code-block:: bash
 
@@ -382,13 +382,15 @@ added to the `docker` group, which is required in the next step.
 
     $ logout
 
-4. Once you are logged back into the VM, change directory into the
-``z2a/0-kind`` directory and execute the z2a ``0c-cluster.sh`` script.
+4. Once you are logged back into the VM, set the ACUMOS_HOME environment
+variable, change directory into the `z2a/0-kind` directory and execute the
+z2a `0a-env.sh` script and then the `0a-cluster.sh` script.
 
 .. code-block:: bash
 
     $ ACUMOS_HOME=$HOME/src/system-integration
     $ cd $ACUMOS_HOME/z2a/0-kind
+    $ ./0a-env.sh
     $ ./0c-cluster.sh
 
 5. After the z2a ``z2a/0-kind/0c-cluster.sh`` script has completed, we will
@@ -428,8 +430,8 @@ to perform the following steps:
   *clusterName* and *namespace*.  Please refer to the previous section on
   performing the edits to the ``global_value.yaml`` file.
 
-1. Change directory into the ``z2a/0-kind`` directory, and execute the
-``z2a/0-kind/0a-env.sh`` script.
+1. Set the ACUMOS_HOME environment variable, change directory into the ``z2a/0-kind``
+directory, and execute the ``z2a/0-kind/0a-env.sh`` script.
 
 .. code-block:: bash
 
@@ -479,7 +481,7 @@ The commands to use the MLWB example values are:
 .. code-block:: bash
 
   $ ACUMOS_HOME=$HOME/src/system-integration
-  $ cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml.mlwb $ACUMOS_HOME/z2a/helm-charts/mlwb_value.yaml
+  $ cp $ACUMOS_HOME/z2a/dev1/mlwb_value.yaml.mlwb $ACUMOS_HOME/helm-charts/mlwb_value.yaml
 
 The MLWB example values can be used for a private development environment that
 is non-shared, non-production and not exposed to the Internet.  The values in
@@ -555,8 +557,9 @@ MLWB Installation
 
 To perform an installation of MLWB, we will need to perform the following steps:
 
-1. Change directory into the ``z2a/2-plugins`` directory
-2. Execute the ``2-plugins.sh`` script which install the MLWB dependencies and
+1. set the ACUMOS_HOME environment variable
+2. Change directory into the ``z2a/2-plugins`` directory
+3. Execute the ``2-plugins.sh`` script which install the MLWB dependencies and
    the MLWB components
 
 .. code-block:: bash
@@ -579,4 +582,4 @@ For post-installation Machine Learning WorkBench configuration steps, please
 see the MLWB section of the CONFIGURATION document.
 
 :Created:           2020/07/13
-:Last Modified:     2020/08/12
+:Last Modified:     2020/08/26
