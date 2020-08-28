@@ -66,14 +66,14 @@ spec:
                             "host": "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
                             "port": "{{ .Values.global.acumosDockerPort }}",
                             "config": "/docker_host/.docker",
-                            "registry": {"url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
+                            "registry": {"url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusDockerPort }}/",
                             "username": "{{ .Values.global.acumosNexusUserName }}",
                             "password": "{{ .Values.global.acumosNexusUserPassword }}",
                             "email": "{{ .Values.global.acumosDockerRegistryEmail }}"},
                             "tls": { "verify": "false" },
                             "api": { "version": "1.23" },
                             "imagetag": {
-                                "prefix": "{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}",
+                                "prefix": "{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusDockerPort }}",
                                 "proxyPrefix": "{{ .Values.global.acumosProxy }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosProxyPort }}"
                                     },
                             "max_total_connections":  "1", "max_per_route_connections": "1"

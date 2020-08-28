@@ -219,11 +219,10 @@ global:
     acumosNexusAdminPassword: "xxxxxx"
     acumosNexusBlobStore: "acumos-blob-store"
     acumosNexusDataPath: "nexus-data"
-    acumosNexusDockerPort: "10002"
     acumosNexusDockerRepo: "acumos-docker-repo"
     acumosNexusEndpointPort: "8081"
     acumosNexusMavenRepo: "acumos-maven-repo"
-    acumosNexusPort: "8001"
+    acumosNexusDockerPort: "8001"
     acumosNexusRelease: "acumos-nexus"
     acumosNexusService: "acumos-nexus-service"
 

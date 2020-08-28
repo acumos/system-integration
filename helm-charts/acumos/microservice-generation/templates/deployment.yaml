@@ -68,7 +68,7 @@ spec:
                      "port": "{{ .Values.global.acumosDockerPort }}",
                      "config": "/docker_host/.docker",
                      "registry": {
-                        "url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
+                        "url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusDockerPort }}/",
                         "username": "{{ .Values.global.acumosNexusUserName }}",
                         "password": "{{ .Values.global.acumosNexusUserPassword }}",
                         "email": "{{ .Values.global.acumosDockerRegistryEmail }}"
@@ -80,7 +80,7 @@ spec:
                        "version": "1.23"
                      },
                      "imagetag": {
-                       "prefix": "{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}"
+                       "prefix": "{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusDockerPort }}"
                      },
                      "max_total_connections": "1",
                      "max_per_route_connections": "1"

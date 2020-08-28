@@ -70,13 +70,13 @@ spec:
                    "host": "{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}",
                    "port": "{{ .Values.global.acumosDockerPort }}",
                    "registry": {
-                      "url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}/",
+                      "url": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusDockerPort }}/",
                       "username": "{{ .Values.global.acumosNexusUserName }}",
                       "password": "{{ .Values.global.acumosNexusUserPassword }}",
                       "email": "admin@acumos.com"
                    },
                    "imagetag": {
-                       "prefix": "{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusPort }}"
+                       "prefix": "{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusDockerPort }}"
                    }
                 },
                 "qanda": {
