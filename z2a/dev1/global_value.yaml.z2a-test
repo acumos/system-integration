@@ -27,7 +27,7 @@ global:
     appVersion: "1.0.0"
     namespace: "z2a-test"
     clusterName: "kind-acumos"
-    domainName: "ingress.controller.domain.name"
+    domainName: "******"
 
     image:
         repository: "nexus3.acumos.org:10002"

@@ -26,15 +26,12 @@
         {{- toYaml .Values.global.ingress.annotations | nindent 12 }}
     spec:
         rules:
-        - host: {{ .Values.global.domainName }}
-          http:
+        - http:
             paths:
             - path: /
               backend:
                 serviceName: {{ .Values.global.portal.portalFe.svcName | quote }}
                 servicePort: {{ .Values.global.acumosPortalFePort }}
         tls:
-        - hosts:
-          - {{ .Values.global.domainName }}
-          secretName: {{ .Values.global.ingress.tlsSecretName }}
+        - secretName: {{ .Values.global.ingress.tlsSecretName }}
 {{ end }}

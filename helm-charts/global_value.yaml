@@ -18,6 +18,7 @@
 # ===============LICENSE_END=========================================================
 #
 # Notes:
+#   - "xxxxxx" is the placeholder for end-users to manually update
 #   - all sections alphabetically sorted
 #   - see Misc. blocks for miscellaneous values
 #   - see TODO notes for proposed improvements
@@ -26,7 +27,8 @@ global:
     appVersion: "1.0.0"
     namespace: "xxxxxx"
     clusterName: "xxxxxx"
-    domainName: "ingress.controller.domain.name"
+    # change domainName to FQDN of ingress
+    domainName: "xxxxxx"
 
     image:
         repository: "nexus3.acumos.org:10002"
