@@ -1,6 +1,6 @@
 #
 #============LICENSE_START=======================================================
-# Acumos Apache-2.0
+# Acumos Apache-2.0datasource
 #================================================================================
 # Copyright (C) 2020 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
 #================================================================================
@@ -21,50 +21,40 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: {{ .Values.mlwb.dashboardWebcomponent.podName | quote }}
+ name: {{ .Values.mlwb.datasourceWebcomponent.podName | quote }}
  namespace: "{{ .Values.mlwb.namespace }}"
  labels:
-   app: {{ .Values.mlwb.dashboardWebcomponent.name | quote }}
+   app: {{ .Values.mlwb.datasourceWebcomponent.name | quote }}
 spec:
  selector:
    matchLabels:
-     app: {{ .Values.mlwb.dashboardWebcomponent.name | quote }}
+     app: {{ .Values.mlwb.datasourceWebcomponent.name | quote }}
  replicas: 1
  revisionHistoryLimit: 10
  template:
    metadata:
      labels:
-       app: {{ .Values.mlwb.dashboardWebcomponent.name | quote }}
+       app: {{ .Values.mlwb.datasourceWebcomponent.name | quote }}
    spec:
      containers:
-       - name: dashboard-webcomponent
-         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/acumos/{{ .Values.mlwb.acumosDashboardWebcomponentImage }}
+       - name: datasource-webcomponent
+         image: {{ .Values.global.nexus3ReleaseRegistryLf }}/{{ .Values.mlwb.acumosDatasourceWebcomponentImage }}
          ports:
-           - containerPort: {{ .Values.mlwb.acumosDashboardWebcomponentPort }}
+           - containerPort: {{ .Values.mlwb.acumosDatasourceWebcomponentPort }}
          env:
            - name: ES_JAVA_OPTS
              value: "-Xmx256m -Xms256m"
            - name: ENVIRONMENT
              value: "deploy"
-           - name: projectmSURL
-             value: "http://{{ .Values.mlwb.projectService.svcName }}.{{ .Values.mlwb.namespace }}:{{ .Values.mlwb.acumosProjectServicePort }}/mlWorkbench/v1/project"
-           - name: notebookmSURL
-             value: "http://{{ .Values.mlwb.notebookService.svcName }}.{{ .Values.mlwb.namespace }}:{{ .Values.mlwb.acumosNotebookServicePort }}/mlWorkbench/v1/notebook"
-           - name: pipelinemSURL
-             value: "http://{{ .Values.mlwb.pipelineService.svcName }}.{{ .Values.mlwb.namespace }}:{{ .Values.mlwb.acumosPipelineServicePort }}/mlWorkbench/v1/pipeline"
-           - name: portalFEURL
-             value: "http://{{ .Values.global.portal.portalFe.svcName }}.{{ .Values.global.namespace }}"
-           - name: portalBEURL
-             value: "http://{{ .Values.global.portal.portalBe.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalBePort }}"
-           - name: pipelineFlag
-             value: "true"
            - name: datasourcemSURL
              value: "http://{{ .Values.mlwb.datasourceService.svcName }}.{{ .Values.mlwb.namespace }}:{{ .Values.mlwb.acumosDatasourceServicePort }}/mlWorkbench/v1/datasource"
+           - name: datasourceWikiURL
+             value: "https://docs.acumos.org/en/latest/submodules/workbench/docs/mlwb-user-guide/datasource-component/index.html"
          volumeMounts:
            - mountPath: /maven/logs
-             name: dashboard-webcomponent-logs
+             name: datasource-webcomponent-logs
      volumes:
-       - name: dashboard-webcomponent-logs
+       - name: datasource-webcomponent-logs
          emptyDir: {}
      imagePullSecrets:
        - name: acumossecret

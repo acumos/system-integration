@@ -48,6 +48,9 @@ mlwb:
     acumosProjectCatalogWebcomponentPort: "9085"
     acumosProjectServicePort: "9088"
     acumosProjectWebcomponentPort: "9084"
+    acumosDatasourceCatalogWebcomponentPort: "9092"
+    acumosDatasourceServicePort: "9077"
+    acumosDatasourceWebcomponentPort: "9091"
     acumosValidationPort: "9603"
 
     # Images
@@ -64,6 +67,9 @@ mlwb:
     acumosProjectCatalogWebcomponentImage: "project-catalog-webcomponent:2.0.9"
     acumosProjectServiceImage: "project-service:2.0.4"
     acumosProjectWebcomponentImage: "project-webcomponent:2.0.9"
+    acumosDatasourceCatalogWebcomponentImage: "acumos/datasource-catalog-webcomponent:3.0.0"
+    acumosDatasourceServiceImage: "acumos/datasource-service:1.0.0"
+    acumosDatasourceWebcomponentImage: "acumos/datasource-webcomponent:3.0.0"
 
     useexternalpipeline: "true"
     useexternalnotebook: "true"
@@ -119,6 +125,18 @@ mlwb:
         name: "acumos-mlwb-project-webcomponent"
         podName: "acumos-k8s-mlwb-project-webcomponent"
         svcName: "mlwb-project-webcomponent"
+    datasourceCatalogWebcomponent:
+        name: "acumos-mlwb-datasource-catalog-webcomponent"
+        podName: "acumos-k8s-mlwb-datasource-catalog-webcomponent"
+        svcName: "mlwb-datasource-catalog-webcomponent"
+    datasourceService:
+        name: "acumos-mlwb-datasource-service"
+        podName: "acumos-k8s-mlwb-datasource-service"
+        svcName: "mlwb-datasource-service"
+    datasourceWebcomponent:
+        name: "acumos-mlwb-datasource-webcomponent"
+        podName: "acumos-k8s-mlwb-datasource-webcomponent"
+        svcName: "mlwb-datasource-webcomponent"
 
     #CouchDB
     acumosCouchDB:
