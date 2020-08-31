@@ -66,8 +66,8 @@ echo "Starting 1-acumos (Acumos noncore dependencies) installation ...."
 # Installation - Acumos noncore dependencies
 # Install the Acumos noncore charts, one by one in this order (configuration is performed by default)
 
-echo "Install Acumos noncore dependency: Kubernetes ingress ...."
-(cd $Z2A_BASE/noncore-config/ ; ./deploy.sh ingress)
+# echo "Install Acumos noncore dependency: Kubernetes ingress ...."
+# (cd $Z2A_BASE/noncore-config/ ; ./deploy.sh ingress)
 
 # echo "Install Acumos noncore dependency: Kubernetes config helper ...."
 # Default: config-helper is disabled by default ;

@@ -18,6 +18,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============LICENSE_END=========================================================
+#
+# NOTE: "xxxxxx" is the placeholder for end-users to manually update
 
 mlwb:
     # MLWB-specific values
@@ -36,6 +38,9 @@ mlwb:
 
     # Ports
     acumosDashboardWebcomponentPort: "9083"
+    acumosDatasourceCatalogWebcomponentPort: "9092"
+    acumosDatasourceServicePort: "9077"
+    acumosDatasourceWebcomponentPort: "9091"
     acumosHomeWebcomponentPort: "9082"
     acumosModelServicePort: "9091"
     acumosNotebookCatalogWebcomponentPort: "9087"
@@ -48,14 +53,14 @@ mlwb:
     acumosProjectCatalogWebcomponentPort: "9085"
     acumosProjectServicePort: "9088"
     acumosProjectWebcomponentPort: "9084"
-    acumosDatasourceCatalogWebcomponentPort: "9092"
-    acumosDatasourceServicePort: "9077"
-    acumosDatasourceWebcomponentPort: "9091"
     acumosValidationPort: "9603"
 
     # Images
-    acumosDashboardWebcomponentImage: "dashboard-webcomponent:2.0.9"
-    acumosHomeWebcomponentImage: "home-webcomponent:2.0.9"
+    acumosDashboardWebcomponentImage: "dashboard-webcomponent:2.0.8"
+    acumosDatasourceCatalogWebcomponentImage: "acumos/datasource-catalog-webcomponent:3.0.0"
+    acumosDatasourceServiceImage: "acumos/datasource-service:1.0.0"
+    acumosDatasourceWebcomponentImage: "acumos/datasource-webcomponent:3.0.0"
+    acumosHomeWebcomponentImage: "home-webcomponent:2.0.8"
     acumosModelServiceImage: "model-service:2.0.3"
     acumosNotebookCatalogWebcomponentImage: "notebook-catalog-webcomponent:2.0.9"
     acumosNotebookServiceImage: "notebook-service:2.0.3"
@@ -66,10 +71,7 @@ mlwb:
     acumosPredictorServiceImage: "predictor-service:1.0.3"
     acumosProjectCatalogWebcomponentImage: "project-catalog-webcomponent:2.0.9"
     acumosProjectServiceImage: "project-service:2.0.4"
-    acumosProjectWebcomponentImage: "project-webcomponent:2.0.9"
-    acumosDatasourceCatalogWebcomponentImage: "acumos/datasource-catalog-webcomponent:3.0.0"
-    acumosDatasourceServiceImage: "acumos/datasource-service:1.0.0"
-    acumosDatasourceWebcomponentImage: "acumos/datasource-webcomponent:3.0.0"
+    acumosProjectWebcomponentImage: "project-webcomponent:2.0.8"
 
     useexternalpipeline: "true"
     useexternalnotebook: "true"
@@ -77,6 +79,18 @@ mlwb:
         name: "acumos-mlwb-dashboard-webcomponent"
         podName: "acumos-k8s-mlwb-dashboard-webcomponent"
         svcName: "mlwb-dashboard-webcomponent"
+    datasourceCatalogWebcomponent:
+        name: "acumos-mlwb-datasource-catalog-webcomponent"
+        podName: "acumos-k8s-mlwb-datasource-catalog-webcomponent"
+        svcName: "mlwb-datasource-catalog-webcomponent"
+    datasourceService:
+        name: "acumos-mlwb-datasource-service"
+        podName: "acumos-k8s-mlwb-datasource-service"
+        svcName: "mlwb-datasource-service"
+    datasourceWebcomponent:
+        name: "acumos-mlwb-datasource-webcomponent"
+        podName: "acumos-k8s-mlwb-datasource-webcomponent"
+        svcName: "mlwb-datasource-webcomponent"
     homeWebcomponent:
         name: "acumos-mlwb-home-webcomponent"
         podName: "acumos-k8s-mlwb-home-webcomponent"
@@ -125,18 +139,6 @@ mlwb:
         name: "acumos-mlwb-project-webcomponent"
         podName: "acumos-k8s-mlwb-project-webcomponent"
         svcName: "mlwb-project-webcomponent"
-    datasourceCatalogWebcomponent:
-        name: "acumos-mlwb-datasource-catalog-webcomponent"
-        podName: "acumos-k8s-mlwb-datasource-catalog-webcomponent"
-        svcName: "mlwb-datasource-catalog-webcomponent"
-    datasourceService:
-        name: "acumos-mlwb-datasource-service"
-        podName: "acumos-k8s-mlwb-datasource-service"
-        svcName: "mlwb-datasource-service"
-    datasourceWebcomponent:
-        name: "acumos-mlwb-datasource-webcomponent"
-        podName: "acumos-k8s-mlwb-datasource-webcomponent"
-        svcName: "mlwb-datasource-webcomponent"
 
     #CouchDB
     acumosCouchDB:

@@ -26,15 +26,12 @@
         {{- toYaml .Values.global.ingress.annotations | nindent 12 }}
     spec:
         rules:
-        - host: {{ .Values.global.domainName }}
-          http:
+        - http:
             paths:
             - path: /onboarding-app/
               backend:
                 serviceName: {{ .Values.global.onboarding.svcName | quote }}
                 servicePort: {{ .Values.global.acumosOnboardingAppPort }}
         tls:
-        - hosts:
-          - {{ .Values.global.domainName }}
-          secretName: {{ .Values.global.ingress.tlsSecretName }}
+        - secretName: {{ .Values.global.ingress.tlsSecretName }}
 {{ end }}

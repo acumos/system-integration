@@ -26,15 +26,12 @@
         {{- toYaml .Values.mlwb.ingress.annotations | nindent 12 }}
     spec:
         rules:
-        - host: {{ .Values.global.domainName }}
-          http:
+        - http:
             paths:
             - path: /{{.Values.mlwb.pipelineWebcomponent.svcName}}(/|$)(.*)
               backend:
                 serviceName: {{ .Values.mlwb.pipelineWebcomponent.svcName | quote }}
                 servicePort: {{ .Values.mlwb.acumosPipelineWebcomponentPort }}
         tls:
-        - hosts:
-          - {{ .Values.global.domainName }}
-          secretName: {{ .Values.mlwb.ingress.tlsSecretName }}
+        - secretName: {{ .Values.mlwb.ingress.tlsSecretName }}
 {{ end }}

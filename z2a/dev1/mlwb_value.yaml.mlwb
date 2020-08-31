@@ -22,6 +22,8 @@
 # NOTE: The values in this file are for Acumos Z2A DEMONSTRATION PURPOSES ONLY.
 # NOTE: Do not use these values for any PRODUCTION or Internet-facing systems.
 #
+# NOTE: "xxxxxx" is the placeholder for end-users to manually update
+# NOTE: "******" is the placeholder for automatic/dynamically generated values
 
 mlwb:
     # MLWB-specific values
@@ -40,6 +42,9 @@ mlwb:
 
     # Ports
     acumosDashboardWebcomponentPort: "9083"
+    acumosDatasourceCatalogWebcomponentPort: "9092"
+    acumosDatasourceServicePort: "9077"
+    acumosDatasourceWebcomponentPort: "9091"
     acumosHomeWebcomponentPort: "9082"
     acumosModelServicePort: "9091"
     acumosNotebookCatalogWebcomponentPort: "9087"
@@ -56,16 +61,19 @@ mlwb:
 
     # Images
     acumosDashboardWebcomponentImage: "dashboard-webcomponent:2.0.8"
+    acumosDatasourceCatalogWebcomponentImage: "acumos/datasource-catalog-webcomponent:3.0.0"
+    acumosDatasourceServiceImage: "acumos/datasource-service:1.0.0"
+    acumosDatasourceWebcomponentImage: "acumos/datasource-webcomponent:3.0.0"
     acumosHomeWebcomponentImage: "home-webcomponent:2.0.8"
     acumosModelServiceImage: "model-service:2.0.3"
-    acumosNotebookCatalogWebcomponentImage: "notebook-catalog-webcomponent:2.0.8"
+    acumosNotebookCatalogWebcomponentImage: "notebook-catalog-webcomponent:2.0.9"
     acumosNotebookServiceImage: "notebook-service:2.0.3"
-    acumosNotebookWebcomponentImage: "notebook-webcomponent:2.0.8"
-    acumosPipelineCatalogWebcomponentImage: "pipeline-catalog-webcomponent:2.0.8"
+    acumosNotebookWebcomponentImage: "notebook-webcomponent:2.0.9"
+    acumosPipelineCatalogWebcomponentImage: "pipeline-catalog-webcomponent:2.0.9"
     acumosPipelineServiceImage: "pipeline-service:2.0.4"
-    acumosPipelineWebcomponentImage: "pipeline-webcomponent:2.0.8"
+    acumosPipelineWebcomponentImage: "pipeline-webcomponent:2.0.9"
     acumosPredictorServiceImage: "predictor-service:1.0.3"
-    acumosProjectCatalogWebcomponentImage: "project-catalog-webcomponent:2.0.8"
+    acumosProjectCatalogWebcomponentImage: "project-catalog-webcomponent:2.0.9"
     acumosProjectServiceImage: "project-service:2.0.4"
     acumosProjectWebcomponentImage: "project-webcomponent:2.0.8"
 
@@ -75,6 +83,18 @@ mlwb:
         name: "acumos-mlwb-dashboard-webcomponent"
         podName: "acumos-k8s-mlwb-dashboard-webcomponent"
         svcName: "mlwb-dashboard-webcomponent"
+    datasourceCatalogWebcomponent:
+        name: "acumos-mlwb-datasource-catalog-webcomponent"
+        podName: "acumos-k8s-mlwb-datasource-catalog-webcomponent"
+        svcName: "mlwb-datasource-catalog-webcomponent"
+    datasourceService:
+        name: "acumos-mlwb-datasource-service"
+        podName: "acumos-k8s-mlwb-datasource-service"
+        svcName: "mlwb-datasource-service"
+    datasourceWebcomponent:
+        name: "acumos-mlwb-datasource-webcomponent"
+        podName: "acumos-k8s-mlwb-datasource-webcomponent"
+        svcName: "mlwb-datasource-webcomponent"
     homeWebcomponent:
         name: "acumos-mlwb-home-webcomponent"
         podName: "acumos-k8s-mlwb-home-webcomponent"
@@ -139,9 +159,9 @@ mlwb:
         installcert: "false"
         storepass: "true"
         token: "nil"
-        url: "http://jupyterhub.acumos-dev1"
+        url: "http://jupyterhub.mlwb"
     acumosJupyterNotebook:
-        url: "http://jupyter-notebook.acumos-dev1"
+        url: "http://jupyter-notebook.mlwb"
 
     #NIFI
     acumosNifi:
@@ -149,5 +169,5 @@ mlwb:
         createpod: "false"
         namespace: "default"
         registryname: "nexus-name"
-        registryurl: "http://some-registryurl.acumos-dev1"
-        serviceurl: "http://some-serviceurl.acumos-dev1"
+        registryurl: "http://acumos-nifi-registryurl.mlwb"
+        serviceurl: "http://acumos-nifi-serviceurl.mlwb"
