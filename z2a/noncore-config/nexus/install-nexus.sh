@@ -46,7 +46,10 @@ service:
   enabled: true
   name: $RELEASE
   ports:
-  - name: nexus-service
+  - name: docker-repo-service
+    targetPort: 8001
+    port: 8001
+  - name: nexus-console-service
     targetPort: 8081
     port: 8081
 EOF
