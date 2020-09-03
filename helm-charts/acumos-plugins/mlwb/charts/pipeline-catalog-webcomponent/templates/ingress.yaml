@@ -20,7 +20,7 @@
     apiVersion: extensions/v1beta1
     kind: Ingress
     metadata:
-      name: {{.Values.mlwb.pipelineCatalogWebcomponent.svcName}}-ingress
+      name: {{ .Values.mlwb.pipelineCatalogWebcomponent.svcName }}-ingress
       namespace: "{{ .Values.mlwb.namespace }}"
       annotations:
         {{- toYaml .Values.mlwb.ingress.annotations | nindent 12 }}
@@ -28,7 +28,7 @@
         rules:
         - http:
             paths:
-            - path: /{{.Values.mlwb.pipelineCatalogWebcomponent.svcName}}(/|$)(.*)
+            - path: /{{ .Values.mlwb.pipelineCatalogWebcomponent.svcName }}(/|$)(.*)
               backend:
                 serviceName: {{ .Values.mlwb.pipelineCatalogWebcomponent.svcName | quote }}
                 servicePort: {{ .Values.mlwb.acumosPipelineCatalogWebcomponentPort }}

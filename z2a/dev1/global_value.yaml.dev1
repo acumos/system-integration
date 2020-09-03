@@ -263,6 +263,7 @@ global:
     acumosPortalFePort: "8085"
     portal:
         portalFe:
+            externalUrl: ""
             name: "acumos-portal-front-end"
             podName: "acumos-k8s-portal-fe"
             svcName: "acumos-portal-fe"

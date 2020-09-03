@@ -18,25 +18,13 @@
 .. ===============LICENSE_END=========================================================
 -->
 
-# 2-plugins - README
+# mlwb-k8s-native - README
 
-This is the README for the `2-plugins` stage of `z2a`.
+> This is the directory for mlwn-k8s-native plugin recipe.
+> NOTE: experimental
 
-## Shell Scripts
 
->This directory contains the following scripts for `z2a`:
-
-```sh
-# Script name and purpose
-2-plugins.sh             # Acumos plugin dependency and plugin installation
 ```
-
-## Files
-
->This directory contains the following files for `z2a`:
-
-```sh
-README.md                # this markdown document
+\\ Created: 2020-09-09
+\\ Last Edited: 2020-09-09
 ```
-
-Last Edited: 2020-05-19

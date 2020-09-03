@@ -170,6 +170,7 @@ global:
 
     # License Usage Manager
     # lum service is deployed by another helm chart, please make sure the service name and port is correct.
+    # TODO: port should be svcPort
     lum:
         svcName: "xxxxxx"
         port: "8080"
@@ -259,18 +260,21 @@ global:
 
     # Portal FE/BE
     acumosPortalBeImage: "acumos/acumos-portal-be:4.0.12"
+    # TODO: portal.portalBe.svcPort
     acumosPortalBePort: "8083"
     acumosPortalFeImage: "acumos/acumos-portal-fe:4.0.12"
+    # TODO: portal.portalFe.svcPort
     acumosPortalFePort: "8085"
     portal:
-        portalFe:
-            name: "acumos-portal-front-end"
-            podName: "acumos-k8s-portal-fe"
-            svcName: "acumos-portal-fe"
         portalBe:
             name: "acumos-portal-back-end"
             podName: "acumos-k8s-portal-be"
             svcName: "acumos-portal-be"
+        portalFe:
+            externalUrl: ""
+            name: "acumos-portal-front-end"
+            podName: "acumos-k8s-portal-fe"
+            svcName: "acumos-portal-fe"
 
     # Proxy
     acumosProxy: "acumos-proxy"

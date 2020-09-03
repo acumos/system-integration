@@ -79,70 +79,87 @@ mlwb:
 
     useexternalpipeline: "true"
     useexternalnotebook: "true"
+
     dashboardWebcomponent:
         name: "acumos-mlwb-dashboard-webcomponent"
         podName: "acumos-k8s-mlwb-dashboard-webcomponent"
         svcName: "mlwb-dashboard-webcomponent"
+        svcPort: "9083"
     datasourceCatalogWebcomponent:
         name: "acumos-mlwb-datasource-catalog-webcomponent"
         podName: "acumos-k8s-mlwb-datasource-catalog-webcomponent"
         svcName: "mlwb-datasource-catalog-webcomponent"
+        svcPort: "9092"
     datasourceService:
         name: "acumos-mlwb-datasource-service"
         podName: "acumos-k8s-mlwb-datasource-service"
         svcName: "mlwb-datasource-service"
+        svcPort: "9077"
     datasourceWebcomponent:
         name: "acumos-mlwb-datasource-webcomponent"
         podName: "acumos-k8s-mlwb-datasource-webcomponent"
         svcName: "mlwb-datasource-webcomponent"
+        svcPort: "9091"
     homeWebcomponent:
         name: "acumos-mlwb-home-webcomponent"
         podName: "acumos-k8s-mlwb-home-webcomponent"
         svcName: "mlwb-home-webcomponent"
+        svcPort: "9082"
     modelService:
         name: "acumos-mlwb-model-service"
         podName: "acumos-k8s-mlwb-model-service"
         svcName: "mlwb-model-service"
+        svcPort: "9091"
     notebookService:
         name: "acumos-mlwb-notebook-service"
         podName: "acumos-k8s-mlwb-notebook-service"
         svcName: "mlwb-notebook-service"
+        svcPort: "9089"
     notebookCatalogWebcomponent:
         name: "acumos-mlwb-notebook-catalog-webcomponent"
         podName: "acumos-k8s-mlwb-notebook-catalog-webcomponent"
         svcName: "mlwb-notebook-catalog-webcomponent"
+        svcPort: "9087"
     notebookWebcomponent:
         name: "acumos-mlwb-notebook-webcomponent"
         podName: "acumos-k8s-mlwb-notebook-webcomponent"
         svcName: "mlwb-notebook-webcomponent"
+        svcPort: "9086"
     pipelineCatalogWebcomponent:
         name: "acumos-mlwb-pipeline-catalog-webcomponent"
         podName: "acumos-k8s-mlwb-pipeline-catalog-webcomponent"
         svcName: "mlwb-pipeline-catalog-webcomponent"
+        svcPort: "9092"
     pipelineService:
         name: "acumos-mlwb-pipeline-service"
         podName: "acumos-k8s-mlwb-pipeline-service"
         svcName: "mlwb-pipeline-service"
+        svcPort: "9090"
     pipelineWebcomponent:
         name: "acumos-mlwb-pipeline-webcomponent"
         podName: "acumos-k8s-mlwb-pipeline-webcomponent"
         svcName: "mlwb-pipeline-webcomponent"
+        svcPort: "9091"
     predictorService:
         name: "acumos-mlwb-predictor-service"
         podName: "acumos-k8s-mlwb-predictor-service"
         svcName: "mlwb-predictor-service"
+        svcPort: "9094"
     projectCatalogWebcomponent:
         name: "acumos-mlwb-project-catalog-webcomponent"
         podName: "acumos-k8s-mlwb-project-catalog-webcomponent"
         svcName: "mlwb-project-catalog-webcomponent"
+        svcPort: "9085"
     projectService:
         name: "acumos-mlwb-project-service"
         podName: "acumos-k8s-mlwb-project-service"
         svcName: "mlwb-project-service"
+        svcPort: "9088"
     projectWebcomponent:
         name: "acumos-mlwb-project-webcomponent"
         podName: "acumos-k8s-mlwb-project-webcomponent"
         svcName: "mlwb-project-webcomponent"
+        svcPort: "9084"
 
     #CouchDB
     acumosCouchDB:

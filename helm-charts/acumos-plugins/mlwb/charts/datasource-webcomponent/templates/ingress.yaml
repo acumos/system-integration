@@ -20,7 +20,7 @@
     apiVersion: extensions/v1beta1
     kind: Ingress
     metadata:
-      name: {{.Values.mlwb.datasourceWebcomponent.svcName}}-ingress
+      name: {{ .Values.mlwb.datasourceWebcomponent.svcName }}-ingress
       namespace: "{{ .Values.mlwb.namespace }}"
       annotations:
         {{- toYaml .Values.mlwb.ingress.annotations | nindent 12 }}
@@ -28,7 +28,7 @@
         rules:
         - http:
             paths:
-            - path: /{{.Values.mlwb.datasourceWebcomponent.svcName}}(/|$)(.*)
+            - path: /{{ .Values.mlwb.datasourceWebcomponent.svcName }}(/|$)(.*)
               backend:
                 serviceName: {{ .Values.mlwb.datasourceWebcomponent.svcName | quote }}
                 servicePort: {{ .Values.mlwb.acumosDatasourceWebcomponentPort }}

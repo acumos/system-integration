@@ -19,26 +19,26 @@
 # ============LICENSE_END=========================================================
 dependencies:
   - name: couchdb
-  version: 3.2.0
-  repository: https://github.com/apache/couchdb-helm/tree/master/couchdb
-  condition: globals.couchdb.enabled
-  tags:
-    - database
-    - couchdb-chart
-- name: jupyterhub
-  version: 0.8.2
-  repository: https://jupyterhub.github.io/helm-chart/
-  condition: globals.jupyterhub.enabled
-  tags:
-    - notebook
-    - jupyterhub-chart
-- name: nifi
-  version: 0.3.3
-  repository: https://cetic.github.io/helm-charts
-  condition: globals.nifi.enabled
-  tags:
-    - datarouter
-    - nifi-chart
+    version: 3.2.0
+    repository: https://github.com/apache/couchdb-helm/tree/master/couchdb
+    condition: globals.couchdb.enabled
+    tags:
+      - database
+      - couchdb-chart
+  - name: jupyterhub
+    version: 0.8.2
+    repository: https://jupyterhub.github.io/helm-chart/
+    condition: globals.jupyterhub.enabled
+    tags:
+      - notebook
+      - jupyterhub-chart
+  - name: nifi
+    version: 0.3.3
+    repository: https://cetic.github.io/helm-charts
+    condition: globals.nifi.enabled
+    tags:
+      - datarouter
+      - nifi-chart
   - name: project-service
     repository: 'file://charts/project-service'
     version: ~2.x-0
