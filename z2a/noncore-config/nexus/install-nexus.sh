@@ -39,7 +39,10 @@ helm repo update
 
 #TODO: See https://github.com/Oteemo/charts/tree/master/charts/sonatype-nexus for recommended values
 # Local override values for 3rd party Nexus chart goes here
+# Default value for storageSize: 8Gi (8GB)
 cat <<EOF | tee $HERE/nexus_value.yaml
+persistence:
+  storageSize: 8Gi
 nexusProxy:
   enabled: false
 service:
