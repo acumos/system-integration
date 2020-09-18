@@ -18,18 +18,20 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: config-ingress.sh    - helper script to configure ingress for Acumos core
-#
+# Name: config-license-manager.sh
+#  - helper script to configure License Usage Manager
+
 # Anchor the base directory for the util.sh helper
 HERE=$(dirname $(readlink -f $0))
 source $HERE/utils.sh
 setup_logging
 
-# Acumos Specific Values
+# Default values for License Usage Manager (LUM)
+# Edit these values for custom values
 NAMESPACE=$(gv_read global.namespace)
+# RELEASE=$(gv_read global.acumosCdsDbService)
 
-log "Configure Acumos noncore dependency: Ingress ...."
-helm install -name acumos-ingress --namespace $NAMESPACE $HERE/ingress
+log "Configuring License Usage Manager (LUM) ...."
 
 # write out logfile name
 success

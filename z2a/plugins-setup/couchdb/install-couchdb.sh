@@ -63,7 +63,7 @@ log "Waiting for CouchDB instance to become ready ...."
 for i in $(seq 1 20) ; do
   sleep 10
   kubectl exec --namespace $MLWB_NAMESPACE $RELEASE-couchdb-0 -c couchdb -- curl -s http://127.0.0.1:5984/ && break
-  if [ $i -eq 20 ] ; then log "\nTimeout waiting for CouchDB to become available ...." ; exit ; fi
+  if [ $i -eq 20 ] ; then log "\nTimeout waiting for CouchDB to become available ...." ; exit 1 ; fi
 done
 log "\n"
 

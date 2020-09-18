@@ -66,9 +66,6 @@ echo "Starting 1-acumos (Acumos noncore dependencies) installation ...."
 # Installation - Acumos noncore dependencies
 # Install the Acumos noncore charts, one by one in this order (configuration is performed by default)
 
-# echo "Install Acumos noncore dependency: Kubernetes ingress ...."
-# (cd $Z2A_BASE/noncore-config/ ; ./deploy.sh ingress)
-
 # echo "Install Acumos noncore dependency: Kubernetes config helper ...."
 # Default: config-helper is disabled by default ;
 # Uncomment the following line to enable for extended troubleshooting.
@@ -79,6 +76,12 @@ echo "Install Acumos noncore dependency: Sonatype Nexus (Oteemo Chart) ...."
 
 echo "Install Acumos noncore dependency: MariaDB (Bitnami Chart) ...."
 (cd $Z2A_BASE/noncore-config/ ; ./deploy.sh mariadb-cds)
+
+echo "Install Acumos noncore dependency: License Usage Manager (LUM) ...."
+(cd $Z2A_BASE/noncore-config/ ; ./deploy.sh license-usage-manager)
+
+echo "Install Acumos noncore dependency: License Manager (LM) ...."
+(cd $Z2A_BASE/noncore-config/ ; ./deploy.sh license-manager)
 
 # The following charts are installed  directly via a helm deployment command
 # NOTE: *this is a comment* helm install -name $CHARTNAME --namespace $NAMESPACE <PATH>$CHARTNAME -f <PATH>global_value.yaml

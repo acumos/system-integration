@@ -1,3 +1,4 @@
+#!/bin/bash
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -16,11 +17,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ===============LICENSE_END=========================================================
+#
+# Name: config-license-manager.sh  - helper script to configure (CDS)
 
-resources:
-  requests:
-    cpu: 100m
-    memory: 512Mi
-  limits:
-    cpu: 1000m
-    memory: 2048Mi
+# Anchor the base directory for the util.sh helper
+HERE=$(dirname $(readlink -f $0))
+source $HERE/utils.sh
+setup_logging
+
+# Default values for Common Data Services (CDS)
+# Edit these values for custom values
+NAMESPACE=$(gv_read global.namespace)
+RELEASE=$(gv_read global.acumosCdsDbService)
+
+log "Preparing Database Files ...."
+
+
+# write out logfile name
+success

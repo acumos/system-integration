@@ -45,6 +45,6 @@ fi
 
 # do the magic
 case ${1} in
-  ingress|mariadb-cds|nexus) deploy ${1} ;;
+  ingress|mariadb-cds|nexus|license-usage-manager|license-manager) deploy ${1} ;;
   *) error "Unknown module [${1}]" ;;
 esac

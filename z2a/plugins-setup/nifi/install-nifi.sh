@@ -54,7 +54,7 @@ for i in $(seq 1 20) ; do
   # TODO: craft a query to determine the status of NiFi
   # kubectl exec --namespace $NAMESPACE $RELEASE
   break
-  if [ $i -eq 20 ] ; then log "\nTimeout waiting for Nifi to become available ...." ; exit ; fi
+  if [ $i -eq 20 ] ; then log "\nTimeout waiting for Nifi to become available ...." ; exit 1; fi
 done
 log "\n"
 
