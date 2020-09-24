@@ -2,4 +2,3 @@
 #
 42f0c83244389e408b42fa668348002012ecba46                                             	GitHub Replication
 526c2b88cd90b19336952111609f7ba82e7bf559                                             	saml/acumos-gerrit-system-integration-committers
-ldap:cn=acumos-gerrit-system-integration-committers,ou=Groups,dc=freestandards,dc=org	ldap/acumos-gerrit-system-integration-committers
