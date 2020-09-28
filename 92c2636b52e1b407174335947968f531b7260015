@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b769931f_78784a3a",
+        "filename": "z2a/1-acumos/1-acumos.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 24
+      },
+      "writtenOn": "2020-09-28T13:13:56Z",
+      "side": 0,
+      "message": "Are we removing K8S ingress?",
+      "range": {
+        "startLine": 69,
+        "startChar": 22,
+        "endLine": 70,
+        "endChar": 46
+      },
+      "revId": "92c2636b52e1b407174335947968f531b7260015",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
