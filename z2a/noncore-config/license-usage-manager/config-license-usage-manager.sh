@@ -29,7 +29,6 @@ setup_logging
 # Default values for License Usage Manager (LUM)
 # Edit these values for custom values
 NAMESPACE=$(gv_read global.namespace)
-# RELEASE=$(gv_read global.acumosCdsDbService)
 
 log "Configuring License Usage Manager (LUM) ...."
 

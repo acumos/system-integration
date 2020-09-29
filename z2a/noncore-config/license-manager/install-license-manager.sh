@@ -25,7 +25,7 @@ HERE=$(dirname $(readlink -f $0))
 source $HERE/utils.sh
 setup_logging
 
-# Default values for Common Data Services (CDS)
+# Default values for License Manager
 # Edit these values for custom values
 NAMESPACE=$(gv_read global.namespace)
 
@@ -43,13 +43,6 @@ log "Downloading LM (License Manager) Chart ...."
 mkdir -p license-manager
 curl -L "https://gerrit.acumos.org/r/gitweb?p=license-manager.git;a=snapshot;h=HEAD;sf=tgz" \
   | tar xz -C license-manager --strip-components=1 --wildcards license-manager-*/
-
-# yq commands to update PostgreSQL
-# yq w -i license-manager/lum-helm/requirements.yaml dependencies[0].version 9.4.1
-# yq w -i license-manager/lum-helm/requirements.yaml dependencies[0].repository https://charts.bitnami.com/bitnami
-
-# Remove stale requirements.lock file
-# rm -f $HERE/license-manager/lum-helm/requirements.lock
 
 # Use helm to deploy license-profile-editor helm chart
 RELEASE=license-profile-editor

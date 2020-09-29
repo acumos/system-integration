@@ -18,20 +18,19 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: config-license-manager.sh  - helper script to configure (CDS)
+# Name: config-license-manager.sh  - helper script to configure
+# License Manager.
 
 # Anchor the base directory for the util.sh helper
 HERE=$(dirname $(readlink -f $0))
 source $HERE/utils.sh
 setup_logging
 
-# Default values for Common Data Services (CDS)
+# Default values for License Manager
 # Edit these values for custom values
 NAMESPACE=$(gv_read global.namespace)
-RELEASE=$(gv_read global.acumosCdsDbService)
 
-log "Preparing Database Files ...."
-
+log "Configuring License Manager (LUM) ...."
 
 # write out logfile name
 success
