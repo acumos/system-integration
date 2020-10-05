@@ -62,17 +62,25 @@ If you just want to start installing Acumos, refer to the TL;DR sections of the 
 
 Please refer to the following documents for additional information:
 
-> CONFIG.md   - Acumos configuration information document (in progress)
+>CONFIG.md       - Acumos configuration information document (in progress)
 >
-> INSTALL.md  - Acumos installation document (in progress)
+>DIR-Listing.md  - Directory Listing document
 >
-> HOWTO.md    - Acumos task document (in progress)
+>FAQ.md          - Frequently Asked Questions document
 >
-> README-proxy.md - proxy configuration guidance (in progress)
+>HOWTO.md        - Acumos task document (in progress)
 >
-> START-HERE.md - brief Acumos introduction document (this document - in progress)
+>INSTALL.md      - Acumos installation document (in progress)
+>
+>README-PROXY.md - proxy configuration guidance (in progress)
+>
+>README-VALUES.md - changing values for various subsystems (in progress)
+>
+>START-HERE.md   - brief Acumos introduction document (this document - in progress)
+>
+>TL-DR.md        - Too Long; Didn't Read (extracted from INSTALL.md)
 
 ```sh
 // Created: 2020/06/23
-// Last modified: 2020/07/13
+// Last modified: 2020/10/05
 ```

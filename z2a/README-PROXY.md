@@ -20,7 +20,8 @@
 
 # README-PROXY
 
-If you are using `z2a` behind a proxy; here is the list of items that need to be configured before you execute the `z2a` framework:
+If you are using `z2a` behind a proxy; here is the list of items that need to
+be configured before you execute the `z2a` framework:
 
 * user environment (.profile, .bashrc, .kshrc etc.)
 * package manager application (apt for Ubuntu, yum/dnf for Redhat/CentOS)
@@ -30,11 +31,16 @@ If you are using `z2a` behind a proxy; here is the list of items that need to be
 
 ## User Environment
 
-Configuration of end-user environments is beyond the scope of this document.  Numerous on-line resources exist which provide step-by-step details on how to configure user environments to use proxy servers.  Below  is an example on-line resource found with a simple Google search.
+Configuration of end-user environments is beyond the scope of this document.
+Numerous on-line resources exist which provide step-by-step details on how to
+configure user environments to use proxy servers.  Below is an example
+one-line resource found with a simple Google search.
 
-Shellhacks: <https://www.shellhacks.com/linux-proxy-server-settings-set-proxy-command-line/>
+Shellhacks:
+<https://www.shellhacks.com/linux-proxy-server-settings-set-proxy-command-line/>
 
->NOTE: Check with your network administrator for the correct value/values for your environment.
+>NOTE: Check with your network administrator for the correct value/values for
+>your environment.
 
 ## Package Manager Configuration
 
@@ -68,8 +74,8 @@ For RHEL users, you’ll also need to set the proxy for accessing RHSM content:
   proxy_port = 8080
 ```
 
-  NOTE: If your proxy server requires authentication, also set these values in the
-  files noted above:
+  NOTE: If your proxy server requires authentication, also set these values in
+  the files noted above:
 
 ```bash
   # user name for authenticating to an HTTP proxy, if needed
@@ -110,13 +116,15 @@ Internet on Ubuntu Linux machines.
 
 ## Docker Client
 
-To configure the Docker client, please consult the Docker documentation at the link provided below.
+To configure the Docker client, please consult the Docker documentation at the
+link provided below.
 
 Docker Client: <https://docs.docker.com/network/proxy/>
 
 ## Docker Service
 
-To configure the Docker service, please consult the **HTTP/HTTPS proxy** section of the Docker documentation at the link provided below.
+To configure the Docker service, please consult the **HTTP/HTTPS proxy**
+section of the Docker documentation at the link provided below.
 
 Docker Service: <https://docs.docker.com/config/daemon/systemd/>
 
@@ -124,5 +132,5 @@ Docker Service: <https://docs.docker.com/config/daemon/systemd/>
 
 ```bash
 // Created: 2020/06/16
-// Last modified: 2020/07/28
+// Last modified: 2020/10/05
 ```

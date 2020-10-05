@@ -93,8 +93,14 @@ Please refer to the following documents for additional information:
 | INSTALLATION-GUIDE - Acumos installation document
 |   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/installation-guide.html
 |
+| README-PLUGINS-SETUP - Acumos Plugin Setup guidance
+|   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/readme-proxy.html
+|
 | README-PROXY - proxy configuration guidance
 |   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/readme-proxy.html
+|
+| README-VALUES - additional values configuration guidance
+|   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/readme-values.html
 |
 | HOWTO - Acumos task document
 |   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/how-to.html
@@ -103,4 +109,4 @@ Please refer to the following documents for additional information:
 |   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/configuration.html
 
 :Created:           2020/07/16
-:Last Modified:     2020/07/28
+:Last Modified:     2020/10/05
