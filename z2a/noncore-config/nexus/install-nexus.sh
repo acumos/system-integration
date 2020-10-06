@@ -39,10 +39,11 @@ helm repo update
 
 #TODO: See https://github.com/Oteemo/charts/tree/master/charts/sonatype-nexus for recommended values
 # Local override values for 3rd party Nexus chart goes here
-# Default value for storageSize: 8Gi (8GB)
+# Default value for storageSize: 100Gi (100GB from global_value.yaml)
+NEXUS_PVC_SIZE=$(gv_read global.acumosNexusPVCStorage)
 cat <<EOF | tee $HERE/nexus_value.yaml
 persistence:
-  storageSize: 8Gi
+  storageSize: "$NEXUS_PVC_SIZE"
 nexusProxy:
   enabled: false
 service:

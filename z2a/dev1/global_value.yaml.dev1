@@ -278,8 +278,8 @@ global:
 
     # PVC
     acumosCdsDbPvcStorage: "1Gi"
-    acumosDockerPVCStorage: "100Gi"
-    acumosNexusPVCStorage: "100Gi"
+    acumosDockerPVCStorage: "10Gi"
+    acumosNexusPVCStorage: "8Gi"
     acumosPVCStorage: "2Gi"
 
     # Security Verification (sv)

@@ -21,27 +21,26 @@
 # README-VALUES
 
 The standard method of setting values for Acumos using the `z2a` installation
-method is to edit the `global_value` file.  It should be noted, that there are
-some values that will need to set by editing other files.  Below are examples:
+method is to edit the `global_value.yaml` file.  It should be noted, that there
+are local override values that will need to set by editing other files.
+
+Below are some examples of common value changes:
 
 ## Nexus
 
-To configure the size of the persistence storage (PVC) for Nexus, edit the
-following file:
+For `z2a` using Flow-1 with an example values file, the default value for
+Nexus persistent volume storage size is 8GB (8Gi). This value is large enough
+to test with and not overly large for the recommended VM sizing.
 
-`~/z2a/noncore-config/nexus/install-nexus.sh`
-
-Edit this section of the file to set the value of `storageSize` to the value
-of the persistent storage required.
+To adjust the size of the Nexus persistent storage size, edit the following
+value in the `global_value.yaml` file:
 
 ```bash
-# Default value for storageSize: 8Gi (8GB)
-cat <<EOF | tee $HERE/nexus_value.yaml
-persistence:
-  storageSize: 8Gi
+# PVC
+    acumosNexusPVCStorage: "8Gi"
 ```
 
 ```bash
 // Created: 2020/10/05
-// Last modified: 2020/10/05
+// Last modified: 2020/10/06
 ```
