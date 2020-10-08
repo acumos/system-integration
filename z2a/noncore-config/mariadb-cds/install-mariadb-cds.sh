@@ -48,9 +48,11 @@ slave:
     size: "$CDS_PVC_SIZE"
 EOF
 
+# Set the MariaDB Helm Chart version
+MARIADB_CHART_VERSION=7.10.4
 log "Installing Bitnami MariaDB Helm Chart ...."
 # Helm Chart Installation incantation
-helm install $RELEASE --namespace $NAMESPACE -f $ACUMOS_GLOBAL_VALUE -f $HERE/cds_mariadb_value.yaml bitnami/mariadb
+helm install $RELEASE --namespace $NAMESPACE -f $ACUMOS_GLOBAL_VALUE -f $HERE/cds_mariadb_value.yaml bitnami/mariadb --version=$MARIADB_CHART_VERSION
 
 log "Waiting .... (up to 15 minutes) for pod ready status ...."
 # Wait for the MariaDB-CDS pod to become ready

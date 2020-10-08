@@ -20,17 +20,15 @@
 #
 # Name: kind-config.tpl - kind cluster configuration template
 #
-# Four node kind cluster config - one control-plane, three workers
-# One control plane node and three "workers".
+# Four (4) node kind cluster config
+# - one (1) control-plane, three (3) worker nodes
 #
 # This kind configuration WILL NOT ADD MORE REAL COMPUTE CAPACITY and
-# have limited isolation, this can be useful for testing rolling updates
-# etc.
+# has limited isolation. This configuration can be useful for testing
+# rolling updates and other features.
 #
 # The API-server and other control plane components will be
-# on the control-plane node. Default values are shown.
-#
-# Network subnet values are default.
+# on the control-plane node. Network subnet values are default.
 #
 
 kind: Cluster
