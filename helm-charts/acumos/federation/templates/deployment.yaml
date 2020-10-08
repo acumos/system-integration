@@ -94,8 +94,8 @@ spec:
                "group-id": "com.artifact"
              },
              "docker" : {
-                "host": "tcp://{{ .Values.global.onboarding.svcName }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosOnboardingAppPort }}",
-                "registryUrl": "http://{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusEndpointPort }}",
+                "host": "tcp://{{ .Values.global.acumosDockerHost }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosDockerPort }}",
+                "registryUrl": "{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusDockerPort }}",
                 "registryUsername" : "{{ .Values.global.acumosNexusUserName }}",
                 "registryPassword" : "{{ .Values.global.acumosNexusUserPassword }}",
                 "registryEmail": "{{ .Values.global.acumosNexusUserEmail }}"
