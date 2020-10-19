@@ -163,13 +163,15 @@ mlwb:
 
     #CouchDB
     acumosCouchDB:
+        adminUsername: "admin"
+        adminPassword: "changeMeAlsoPlease"
         createdb: "true"
         dbname: "acumos-couchdb"
         host: "localhost"
         port: "5984"
         protocol: "http"
         pwd: "changeMePlease"
-        user: "couch-admin"
+        user: "couch-user"
 
     # Jupyter
     acumosJupyterHub:

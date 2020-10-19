@@ -158,6 +158,8 @@ mlwb:
 
     #CouchDB
     acumosCouchDB:
+        adminUsername: "xxxxxx"
+        adminPassword: "xxxxxx"
         createdb: "true"
         dbname: "xxxxxx"
         host: "xxxxxx"
