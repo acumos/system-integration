@@ -103,8 +103,8 @@ sudo chown root:root /tmp/helm
 sudo chmod 755 /tmp/helm
 sudo mv /tmp/helm /usr/local/bin/helm
 
-KIND_RELEASE=v0.8.1 			# (current version)
-# KIND_RELEASE=v0.9.0 		# (testing version)
+# KIND_RELEASE=v0.8.1 			# (current version)
+KIND_RELEASE=v0.9.0 		# (testing version)
 log "Installing kind $KIND_RELEASE  (Kubernetes in Docker) ...."
 # Download and install kind (kubernetes in docker)
 # NOTE: kind is NOT DESIGNED FOR PRODUCTION ENVIRONMENTS

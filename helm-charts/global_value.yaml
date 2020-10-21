@@ -94,7 +94,8 @@ global:
     acumosDockerHost: "acumos-docker-service"
     acumosDockerPassword: "docker"
     acumosDockerPlatformPort: "8002"
-    acumosDockerPort: "2375"
+    acumosDockerPort: "2375"  # non-SSL
+    # acumosDockerPort: "2376"    # SSL/TLS
     acumosDockerProxyHost: "acumos-docker-proxy-service"
     acumosDockerProxyPort: "8883"
     acumosDockerRegistryEmail: "xxxxxx"
@@ -102,7 +103,9 @@ global:
     docker:
         image:
             repository: "docker"
-            tag: "17.06.0-dind"
+            # tag: "17.06.0-dind"
+            tag: "18.09.9-dind"
+            # tag: "19.03.13-dind"
 
     # DesignStudio Composition
     acumosDesignStudioImage: "acumos/ds-compositionengine:3.0.6"

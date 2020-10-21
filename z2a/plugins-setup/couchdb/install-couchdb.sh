@@ -40,7 +40,11 @@ helm repo add couchdb https://apache.github.io/couchdb-helm
 helm repo update
 
 # k/v map to set CouchDB local configuration values
+ADMIN_PASSWD=$(yq r $MLWB_GLOBAL_VALUE acumosCouchDB.adminUsername)
+ADMIN_USER=$(yq r $MLWB_GLOBAL_VALUE acumosCouchDB.adminPassword)
 cat <<EOF | tee $HERE/couchdb_value.yaml
+adminPassword: $ADMIN_PASSWD
+adminUsername: $ADMIN_USER
 service:
   type: NodePort
 couchdbConfig:
@@ -50,7 +54,8 @@ couchdbConfig:
 EOF
 
 log "Installing CouchDB Helm Chart ...."
-helm install $RELEASE --namespace $MLWB_NAMESPACE -f $ACUMOS_GLOBAL_VALUE -f $ACUMOS_BASE/mlwb_value.yaml -f $HERE/couchdb_value.yaml --set allowAdminParty=true couchdb/couchdb
+# helm install $RELEASE --namespace $MLWB_NAMESPACE -f $ACUMOS_GLOBAL_VALUE -f $ACUMOS_BASE/mlwb_value.yaml -f $HERE/couchdb_value.yaml --set allowAdminParty=true couchdb/couchdb
+helm install $RELEASE --namespace $MLWB_NAMESPACE -f $ACUMOS_GLOBAL_VALUE -f $ACUMOS_BASE/mlwb_value.yaml -f $HERE/couchdb_value.yaml couchdb/couchdb
 SVC=$(svc_lookup $RELEASE $MLWB_NAMESPACE)
 yq w -i $ACUMOS_BASE/mlwb_value.yaml mlwb.couchdbSvcName $SVC
 
