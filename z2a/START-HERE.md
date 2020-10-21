@@ -72,9 +72,13 @@ Please refer to the following documents for additional information:
 >
 >INSTALL.md      - Acumos installation document (in progress)
 >
+>README-PLUGINS-SETUP.md - Acumos Plugin setup guidance document (in progress)
+>
 >README-PROXY.md - proxy configuration guidance (in progress)
 >
 >README-VALUES.md - changing values for various subsystems (in progress)
+>
+>README.md        - project README file (in progress)
 >
 >START-HERE.md   - brief Acumos introduction document (this document - in progress)
 >
@@ -82,5 +86,5 @@ Please refer to the following documents for additional information:
 
 ```sh
 // Created: 2020/06/23
-// Last modified: 2020/10/05
+// Last modified: 2020/10/21
 ```

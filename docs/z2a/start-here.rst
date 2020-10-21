@@ -84,11 +84,11 @@ Please refer to the following documents for additional information:
 
   NOTE: Some of the documents listed below are currently being updated.
 
-| START-HERE - brief Acumos introduction document (this document)
-|   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/start-here.html
+| CONFIGURATION - Acumos configuration information document
+|   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/configuration.html
 |
-| TL;DR - abbreviated installation guide
-|   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/tl-dr.html
+| HOWTO - Acumos task document
+|   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/how-to.html
 |
 | INSTALLATION-GUIDE - Acumos installation document
 |   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/installation-guide.html
@@ -102,11 +102,11 @@ Please refer to the following documents for additional information:
 | README-VALUES - additional values configuration guidance
 |   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/readme-values.html
 |
-| HOWTO - Acumos task document
-|   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/how-to.html
+| START-HERE - brief Acumos introduction document (this document)
+|   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/start-here.html
 |
-| CONFIGURATION - Acumos configuration information document
-|   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/configuration.html
+| TL;DR - abbreviated installation guide
+|   https://docs.acumos.org/en/latest/submodules/system-integration/docs/z2a/tl-dr.html
 
 :Created:           2020/07/16
-:Last Modified:     2020/10/05
+:Last Modified:     2020/10/21
