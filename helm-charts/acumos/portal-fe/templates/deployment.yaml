@@ -61,7 +61,7 @@ spec:
                         "url": "http://{{ .Values.global.portal.portalBe.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalBePort }}"
                       },
                       "dsce": {
-                        "url": "http://{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalDsCompositionPort }}"
+                        "url": "http://{{ .Values.global.dsComposition.svcName}}.{{ .Values.global.namespace }}:{{ .Values.global.acumosPortalDsCompositionPort }}"
                       },
                       "cmnt": {
                          "url": "http://acumos.{{ .Values.global.namespace }}:{{ .Values.global.acumosPlatOnPort }}"
