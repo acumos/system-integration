@@ -81,6 +81,7 @@ spec:
                      },
                      "imagetag": {
                        "prefix": "{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusDockerPort }}"
+                       "proxyPrefix" : "{{ .Values.global.acumos-proxy }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosProxyPort }}"
                      },
                      "max_total_connections": "1",
                      "max_per_route_connections": "1"
