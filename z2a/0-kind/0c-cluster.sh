@@ -54,7 +54,7 @@ log "Starting Phase 0c-cluster creation (kind, metalLB, k8s dashboard, ingress) 
 
 log "Initializing official Helm stable chart repo ...."
 # Initialize the official helm stable chart repo ; perform update
-helm repo add stable --force-update https://kubernetes-charts.storage.googleapis.com/
+helm repo add stable --force-update https://charts.helm.sh/stable
 helm repo update
 
 log "Creating kind cluster : name = $Z2A_K8S_CLUSTERNAME (this may take a few minutes .... relax!!!!)"

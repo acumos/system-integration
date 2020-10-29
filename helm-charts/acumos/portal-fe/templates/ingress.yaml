@@ -17,7 +17,7 @@
 # ===============LICENSE_END=========================================================
 
 {{ if .Values.global.ingress.enabled }}
-    apiVersion: extensions/v1beta1
+    apiVersion: networking.k8s.io/v1
     kind: Ingress
     metadata:
       name: portal-fe-ingress
@@ -29,9 +29,12 @@
         - http:
             paths:
             - path: /
+              pathType: Prefix
               backend:
-                serviceName: {{ .Values.global.portal.portalFe.svcName | quote }}
-                servicePort: {{ .Values.global.acumosPortalFePort }}
+                service:
+                  name: {{ .Values.global.portal.portalFe.svcName | quote }}
+                  port:
+                    number: {{ .Values.global.acumosPortalFePort }}
         tls:
         - secretName: {{ .Values.global.ingress.tlsSecretName }}
 {{ end }}
