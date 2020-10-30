@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "148d18f8_b69d592f",
+        "filename": "helm-charts/acumos/microservice-generation/templates/deployment.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 24
+      },
+      "writtenOn": "2020-10-30T18:39:56Z",
+      "side": 1,
+      "message": "check this variable in global values files.",
+      "range": {
+        "startLine": 84,
+        "startChar": 43,
+        "endLine": 84,
+        "endChar": 70
+      },
+      "revId": "2d4b63589b0a059361ea86d99c139331d5745d9f",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
