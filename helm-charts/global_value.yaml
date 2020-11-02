@@ -168,7 +168,7 @@ global:
     acumosKongSslPort: "8443"
 
     # Kubernetes Client
-    acumosKubernetesClientImage: "kubernetes-client:2.0.11"
+    acumosKubernetesClientImage: "acumos/kubernetes-client:3.0.4"
     acumosKubernetesClientPort: "8082"
 
     # License Usage Manager
