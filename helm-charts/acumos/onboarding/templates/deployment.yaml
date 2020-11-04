@@ -87,7 +87,7 @@ spec:
                             "nexusGroupId": "com.artifact"
                            },
                  "tosca": {
-                            "OutputFolder": "/temp/",
+                            "OutputFolder": "/tmp/",
                             "GeneratorEndPointURL": "http://acumos.acumos-ns01:8080/model_create"
                           },
                  "mktPlace": {
