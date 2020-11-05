@@ -80,7 +80,7 @@ spec:
                        "version": "1.23"
                      },
                      "imagetag": {
-                       "prefix": "{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusDockerPort }}"
+                       "prefix": "{{ .Values.global.acumosNexusService }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosNexusDockerPort }}",
                        "proxyPrefix" : "{{ .Values.global.acumosProxy }}.{{ .Values.global.namespace }}:{{ .Values.global.acumosProxyPort }}"
                      },
                      "max_total_connections": "1",
