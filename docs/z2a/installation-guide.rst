@@ -300,8 +300,8 @@ installation (see: TL;DR document).
 
   NOTE: There are two (2) example files in the ``$ACUMOS_HOME/z2a/dev1`` directory.
 
-  ``$ACUMOS_HOME/z2a/dev1/global_value.yaml.dev1       # acumos-dev1 namespace``
-  ``$ACUMOS_HOME/z2a/dev1/global_value.yaml.z2a-test   # z2a-test namespace``
+  ``$ACUMOS_HOME/z2a/dev1/global_value.yaml.dev1     # acumos-dev1 namespace
+  $ACUMOS_HOME/z2a/dev1/global_value.yaml.z2a-test   # z2a-test namespace``
 
 The example Acumos values files can be used for a test installation and
 additional edits should not be required.

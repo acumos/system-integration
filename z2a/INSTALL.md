@@ -149,19 +149,25 @@ installation process
 will refer to that directory as the Z2A_BASE directory.  This directory also
 contains some of the Acumos noncore dependency Helm charts.
 
->NOTE: The `z2a` installation log files will be created in the Z2A_BASE
->directory.
+>NOTE: Please refer to the `Troubleshooting` section of the `HOWTO.md` document
+>for a complete listing of the log files created by `z2a` and their location.
 
 ### Using the Example `global_value.yaml` File
 
-z2a includes an example `global_value.yaml` file for Acumos in the
-`$HOME/src/system-integration/z2a/z2a-config/dev1` directory.  This example
-Acumos values
-file is provided for both illustrative purposes and to assist in performing a
-quick installation (see: TL;DR section).  The example Acumos values file can
-be used for a test installation and additional edits should not be required.
+z2a includes example `global_value.yaml` files for Acumos in the
+`$HOME/src/system-integration/z2a/z2a-config/dev1` directory.  These example
+Acumos values files are provided for both illustrative purposes and to assist
+in performing a quick installation (see: TL;DR section).
 
-The commands to use the Acumos example values are:
+>NOTE: There are two (2) example files in the ``$ACUMOS_HOME/z2a/dev1`` directory.
+>
+>`$ACUMOS_HOME/z2a/dev1/global_value.yaml.dev1       # acumos-dev1 namespace`
+>`$ACUMOS_HOME/z2a/dev1/global_value.yaml.z2a-test   # z2a-test namespace`
+
+The example Acumos values file can be used for a test installation and
+additional edits should not be required.
+
+The commands to use the Acumos `global_value.yaml.dev1` example value file are:
 
 ```bash
 ACUMOS_HOME=$HOME/src/system-integration
