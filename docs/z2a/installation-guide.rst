@@ -62,14 +62,10 @@ greater, 20.04 recommended).
   NOTE: earlier versions of RedHat/CentOS (v6) or Ubuntu (16.04) may be
   sufficient to run the z2a installation, but they have not been tested.
 
-  NOTE: Version 0.8.1 of ``kind`` provides new cluster recovery
-  capabilities. ``kind`` v0.8.1 requires that the VM used be Ubuntu
-  20.04 or Centos 8 to operate properly.
-
 Flow-1 VM Resource Sizing Recommendations
   -  four (4) vCPU (minimum)
   -  32GB of memory (minimum)
-  -  60GB disk space (minimum) (~100GB+ for MLWB and other plugins)
+  -  80GB disk space (minimum) (~100GB+ for MLWB and other plugins)
   -  additional disk space for models (based on developer requirements)
 
 VM Distribution Recommendations

@@ -1,4 +1,4 @@
-#!/bin/bash
+#
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -18,34 +18,33 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: deploy.sh      - z2a noncore-config/deploy.sh deployment script
-#
-# Usage:
-#
-
-# error function
-function error {
-  echo "ERROR: $@" 1>&2
-  exit 1
-}
-
-# deploy function
-function deploy {
-  set -e
-  cp utils.sh.tpl ${1}/utils.sh
-  cd ${1}/
-  if [ -x install-${1}.sh ] ; then ./install-${1}.sh ; else true ; fi
-  if [ -x config-${1}.sh ] ; then ./config-${1}.sh ; else true ; fi
-}
-
-# test for Acumos global values environment
-if [[ -z "$ACUMOS_GLOBAL_VALUE" ]] ; then
-  error  "ACUMOS_GLOBAL_VALUE is empty"
-fi
-
-# do the magic
-if [[ -d ${1} ]] ; then
-  deploy ${1}
-else
-  error "Unknown module [${1}]"
-fi
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pyauth
+  labels:
+    app: pyauth
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pyauth
+  template:
+    metadata:
+      labels:
+        app: pyauth
+    spec:
+      containers:
+      - name: pyauth
+        image: nexus-proxy-pyauth:v1.0
+        env:
+        - name: ACUMOS_DOCKER_PROXY_AUTH_API_PORT
+          value: "8080"
+        - name: ACUMOS_DOCKER_PROXY_AUTH_API_PATH
+          value: "/auth"
+        - name: ACUMOS_DOCKER_PROXY_LOG_FILE
+          value: "/docker-proxy.log"
+        - name: ACUMOS_DOCKER_PROXY_LOG_LEVEL
+          value: "1"
+        ports:
+        - containerPort: 8080

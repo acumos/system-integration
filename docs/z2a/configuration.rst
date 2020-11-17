@@ -36,7 +36,7 @@ Ingress - Native k8s service proxy and Ingress Controller (Nginx)
 Kong - API Gateway for Acumos (deprecated)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  NOTE: Basic Kong configuration has been integrated into the
+  NOTE: Kong configuration has been removed from the
   ``z2a/1-acumos/1-acumos.sh`` installation/configuration script.
 
 MariaDB - Common Data Services (CDS)
@@ -81,4 +81,4 @@ NiFi
 -----
 
 :Created:           2020/07/13
-:Last Modified:     2020/07/29
+:Last Modified:     2020/12/18

@@ -74,6 +74,9 @@ echo "Starting 1-acumos (Acumos noncore dependencies) installation ...."
 echo "Install Acumos noncore dependency: Sonatype Nexus (Oteemo Chart) ...."
 (cd $Z2A_BASE/noncore-config/ ; ./deploy.sh nexus)
 
+echo "Install Acumos noncore dependency: Sonatype Nexus Proxy ...."
+(cd $Z2A_BASE/noncore-config/ ; ./deploy.sh nexus-proxy)
+
 echo "Install Acumos noncore dependency: MariaDB (Bitnami Chart) ...."
 (cd $Z2A_BASE/noncore-config/ ; ./deploy.sh mariadb-cds)
 

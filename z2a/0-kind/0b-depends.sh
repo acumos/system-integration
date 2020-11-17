@@ -103,14 +103,14 @@ sudo chown root:root /tmp/helm
 sudo chmod 755 /tmp/helm
 sudo mv /tmp/helm /usr/local/bin/helm
 
-# KIND_RELEASE=v0.8.1 			# (current version)
-KIND_RELEASE=v0.9.0 		# (testing version)
+# KIND_RELEASE=v0.8.1 			# (previous version)
+KIND_RELEASE=v0.9.0 		# (current version)
 log "Installing kind $KIND_RELEASE  (Kubernetes in Docker) ...."
 # Download and install kind (kubernetes in docker)
 # NOTE: kind is NOT DESIGNED FOR PRODUCTION ENVIRONMENTS
 # NOTE: kind v0.7.0 does not provide any form of cluster recovery or persistence (deprecated)
-# NOTE: kind v0.8.1 provides preliminary cluster recovery and persistence (requires Ubuntu 20.04) (current)
-# NOTE: kind v0.9.0 NFS support, improved 'no_proxy' detection, improved CNI (requires Ubuntu 20.04) (testing)
+# NOTE: kind v0.8.1 provides preliminary cluster recovery and persistence (requires Ubuntu 20.04) (previous)
+# NOTE: kind v0.9.0 NFS support, improved 'no_proxy' detection, improved CNI (requires Ubuntu 20.04) (current)
 #
 curl -L -o /tmp/kind "https://github.com/kubernetes-sigs/kind/releases/download/$KIND_RELEASE/kind-$(uname)-amd64"
 sudo chown root:root /tmp/kind

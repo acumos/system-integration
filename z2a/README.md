@@ -60,7 +60,7 @@ greater, 20.04 recommended).
 * Flow-1 VM Resource Sizing Recommendations
   * four (4) vCPU (minimum)
   * 32GB of memory (minimum)
-  * 60GB disk space (minimum) (~100GB+ for MLWB and other plugins)
+  * 80GB disk space (minimum) (~100GB+ for MLWB and other plugins)
   * additional disk space for models (based on developer requirements)
 
 * VM Distribution Recommendations
@@ -220,5 +220,5 @@ being performed:
 
 ```bash
 // Created: 2020/03/20
-// Last modified: 2020/08/12
+// Last modified: 2020/12/18
 ```

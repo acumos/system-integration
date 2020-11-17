@@ -1,4 +1,3 @@
-#!/bin/bash
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
@@ -18,34 +17,11 @@
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# Name: deploy.sh      - z2a noncore-config/deploy.sh deployment script
-#
-# Usage:
-#
+# Dockerfile - Dockerfile for nginx
 
-# error function
-function error {
-  echo "ERROR: $@" 1>&2
-  exit 1
-}
+FROM nginx:latest
 
-# deploy function
-function deploy {
-  set -e
-  cp utils.sh.tpl ${1}/utils.sh
-  cd ${1}/
-  if [ -x install-${1}.sh ] ; then ./install-${1}.sh ; else true ; fi
-  if [ -x config-${1}.sh ] ; then ./config-${1}.sh ; else true ; fi
-}
+COPY acumos_auth.py /acumos_auth.py
+RUN apt-get update && apt-get install -y python3 python3-pip && pip3 install requests
 
-# test for Acumos global values environment
-if [[ -z "$ACUMOS_GLOBAL_VALUE" ]] ; then
-  error  "ACUMOS_GLOBAL_VALUE is empty"
-fi
-
-# do the magic
-if [[ -d ${1} ]] ; then
-  deploy ${1}
-else
-  error "Unknown module [${1}]"
-fi
+ENTRYPOINT python /acumos_auth.py
