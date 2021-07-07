@@ -188,7 +188,7 @@ global:
     acumosMetricBeatPort: "8098"
 
     # Microservice Generation
-    acumosMicroServiceGenerationImage: "acumos/microservice-generation:4.7.0"
+    acumosMicroServiceGenerationImage: "acumos/microservice-generation:5.1.1"
     acumosMicroServiceGenerationPort: "8333"
     microserviceGeneration:
         name: "acumos-microservice-generation"
@@ -241,8 +241,8 @@ global:
     # Onboarding
     acumosOnboardingAppPort: "8090"
     acumosOnboardingCli: "xxxxxx"
-    acumosOnboardingBaseRImage: "acumos/onboarding-base-r:1.2.3"
-    acumosOnboardingImage: "acumos/onboarding-app:4.6.3"
+    acumosOnboardingBaseRImage: "acumos/onboarding-base-r:1.2.4"
+    acumosOnboardingImage: "acumos/onboarding-app:5.0.2"
     onboarding:
         name: "acumos-onboarding"
         podName: "acumos-k8s-onboarding"
@@ -262,10 +262,10 @@ global:
     acumosSecurityGroupName: "xxxxxx"
 
     # Portal FE/BE
-    acumosPortalBeImage: "acumos/acumos-portal-be:4.0.12"
+    acumosPortalBeImage: "acumos/acumos-portal-be:5.0.2"
     # TODO: portal.portalBe.svcPort
     acumosPortalBePort: "8083"
-    acumosPortalFeImage: "acumos/acumos-portal-fe:4.0.12"
+    acumosPortalFeImage: "acumos/acumos-portal-fe:5.0.2"
     # TODO: portal.portalFe.svcPort
     acumosPortalFePort: "8085"
     portal:
