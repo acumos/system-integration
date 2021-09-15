@@ -70,6 +70,7 @@ rhel && {
   cat <<EOF | sudo tee -a /etc/sysctl.d/98-inotify.conf
 fs.inotify.max_user_watches = 524288
 fs.inotify.max_user_instances = 512
+net.netfilter.nf_conntrack_max = 131072
 EOF
 	sudo systemctl --system
 }
@@ -79,6 +80,7 @@ ubuntu && {
 # Local Modifications
 fs.inotify.max_user_watches = 524288
 fs.inotify.max_user_instances = 512
+net.netfilter.nf_conntrack_max = 131072
 EOF
 	sudo systemctl -p /etc/sysctl.conf
 }
@@ -103,8 +105,8 @@ sudo chown root:root /tmp/helm
 sudo chmod 755 /tmp/helm
 sudo mv /tmp/helm /usr/local/bin/helm
 
-# KIND_RELEASE=v0.9.0 			# (previous version)
-KIND_RELEASE=v0.10.0 		# (current version)
+# KIND_RELEASE=v0.10.0 			# (previous version)
+KIND_RELEASE=v0.11.1 		# (current version)
 log "Installing kind ${KIND_RELEASE}  (Kubernetes in Docker) ...."
 # Download and install kind (kubernetes in docker)
 # NOTE: kind is NOT DESIGNED FOR PRODUCTION ENVIRONMENTS
@@ -112,6 +114,7 @@ log "Installing kind ${KIND_RELEASE}  (Kubernetes in Docker) ...."
 # NOTE: kind v0.8.1  - provides preliminary cluster recovery and persistence (requires Ubuntu 20.04) (1st version)
 # NOTE: kind v0.9.0  - NFS support, improved 'no_proxy' detection, improved CNI (requires Ubuntu 20.04) (previous)
 # NOTE: kind v0.10.0 - Smaller footprint, updated log generation, udev disabled, IPv6 /56, K8s v1.20.2
+# NOTE: kind v0.11.1 - Internal kubeconfig exposed to control plane, multiple fixes, K8s v1.21.1
 #
 curl -L -o /tmp/kind "https://github.com/kubernetes-sigs/kind/releases/download/$KIND_RELEASE/kind-$(uname)-amd64"
 sudo chown root:root /tmp/kind

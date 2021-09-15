@@ -41,9 +41,10 @@ if [[ ! -d /usr/local/bin ]] ; then
 fi
 
 # Test for presence of 'yq' and install if necessary
+# NOTE:  yq v3.4.1 is the last of yq v3
 if ! yq --version ; then
   echo "Installing yq (YAML processor) to /usr/local/bin ...."
-  wget -O /tmp/yq https://github.com/mikefarah/yq/releases/download/3.2.1/yq_linux_amd64
+  wget -O /tmp/yq https://github.com/mikefarah/yq/releases/download/3.4.1/yq_linux_amd64
   sudo chown root:root /tmp/yq
   sudo chmod 755 /tmp/yq
   sudo mv /tmp/yq /usr/local/bin/
