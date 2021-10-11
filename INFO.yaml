@@ -44,6 +44,16 @@ committers:
       company: 'ATT'
       id: 'cl778h'
       timezone: 'America/New_York'
+    - name: 'Prasanna Kulkarni'
+      email: 'pk00745450@techmahindra.com'
+      company: 'Tech Mahindra Limited'
+      id: 'prasannatechm'
+      timezone: 'Asia/Kolkata'
+    - name: 'Ramanaiah Pirla'
+      email: 'RP00490596@TechMahindra.com'
+      company: 'Tech Mahindra Limited'
+      id: 'RP00490596'
+      timezone: 'Asia/Kolkata'
 tsc:
     approval: ''
     changes:
