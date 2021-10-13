@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fac56b23_3c857ec6",
+        "filename": "INFO.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 223
+      },
+      "writtenOn": "2021-10-13T17:45:28Z",
+      "side": 1,
+      "message": "This should not be in quotes.",
+      "range": {
+        "startLine": 12,
+        "startChar": 17,
+        "endLine": 12,
+        "endChar": 49
+      },
+      "revId": "fd93bc514e61dc5d217757f636aea86376cfc33f",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f1b4c8f6_55c52852",
+        "filename": "INFO.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 223
+      },
+      "writtenOn": "2021-10-13T17:45:28Z",
+      "side": 1,
+      "message": "I don\u0027t believe either of these people are still with the project. They should probably be removed.",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 34
+      },
+      "revId": "fd93bc514e61dc5d217757f636aea86376cfc33f",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
