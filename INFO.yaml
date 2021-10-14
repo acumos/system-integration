@@ -9,7 +9,7 @@ project_lead: &acumos_system-integration_ptl
     id: 'blsaws'
     company: 'ATT'
     timezone: 'America/Los_Angeles'
-primary_contact: '*acumos_system-integration_ptl'
+primary_contact: *acumos_system-integration_ptl
 issue_tracking:
     type: 'jira'
     url: 'https://jira.acumos.org/projects/ACUMOS'
@@ -34,16 +34,6 @@ repositories:
     - 'system-integration'
 committers:
     - <<: *acumos_system-integration_ptl
-    - name: 'Aimee Ukasick'
-      email: 'aimeeu@research.att.com'
-      company: 'ATT'
-      id: 'aimeeu'
-      timezone: 'America/Chicago'
-    - name: 'Chris Lott'
-      email: 'cl778h@att.com'
-      company: 'ATT'
-      id: 'cl778h'
-      timezone: 'America/New_York'
     - name: 'Prasanna Kulkarni'
       email: 'pk00745450@techmahindra.com'
       company: 'Tech Mahindra Limited'
