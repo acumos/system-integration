@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c6c4505f_9f620f53",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 223
+      },
+      "writtenOn": "2021-10-15T22:15:28Z",
+      "side": 1,
+      "message": "One thing, since this hasn\u0027t been merged yet: the commit subject should be in the imperative mood, i.e. \"Address review comments from the LF team\"",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 38
+      },
+      "revId": "140ae3660c6119725d32a4cc251b360270acfc12",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
