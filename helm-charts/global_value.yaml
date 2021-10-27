@@ -262,10 +262,10 @@ global:
     acumosSecurityGroupName: "xxxxxx"
 
     # Portal FE/BE
-    acumosPortalBeImage: "acumos/acumos-portal-be:5.0.2"
+    acumosPortalBeImage: "acumos/acumos-portal-be:5.0.4"
     # TODO: portal.portalBe.svcPort
     acumosPortalBePort: "8083"
-    acumosPortalFeImage: "acumos/acumos-portal-fe:5.0.2"
+    acumosPortalFeImage: "acumos/acumos-portal-fe:5.0.4"
     # TODO: portal.portalFe.svcPort
     acumosPortalFePort: "8085"
     portal:
